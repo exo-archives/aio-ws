@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://exoplatform.org/soap/xfire" xmlns:tns="http://exoplatform.org/soap/xfire" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soapenc11="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenc12="http://www.w3.org/2003/05/soap-encoding" xmlns:soap11="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://exoplatform.org/soap/xfire">
+<xsd:element name="calculate">
+<xsd:complexType/>
+</xsd:element>
+<xsd:element name="calculateResponse">
+<xsd:complexType>
+<xsd:sequence>
+<xsd:element maxOccurs="1" minOccurs="1" name="calculateResult" type="xsd:float"/>
+</xsd:sequence>
+</xsd:complexType>
+</xsd:element>
+<xsd:element name="item1" type="xsd:float"/>
+<xsd:element name="item2" type="xsd:float"/>
+<xsd:element name="operation" type="xsd:string"/>
+</xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="calculateRequest">
+    <wsdl:part name="parameters" element="tns:calculate">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="calculateResponse">
+    <wsdl:part name="parameters" element="tns:calculateResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="calculateRequestHeaders">
+    <wsdl:part name="item1" element="tns:item1">
+    </wsdl:part>
+    <wsdl:part name="item2" element="tns:item2">
+    </wsdl:part>
+    <wsdl:part name="operation" element="tns:operation">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="CalculatorService">
+    <wsdl:operation name="calculate">
+      <wsdl:input name="calculateRequest" message="tns:calculateRequest">
+    </wsdl:input>
+      <wsdl:output name="calculateResponse" message="tns:calculateResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="CalculatorServiceHttpBinding" type="tns:CalculatorService">
+    <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="calculate">
+      <wsdlsoap:operation soapAction="urn:Calculate"/>
+      <wsdl:input name="calculateRequest">
+        <wsdlsoap:body use="literal"/>
+        <wsdlsoap:header message="tns:calculateRequestHeaders" part="item1" use="literal">
+        </wsdlsoap:header>
+        <wsdlsoap:header message="tns:calculateRequestHeaders" part="item2" use="literal">
+        </wsdlsoap:header>
+        <wsdlsoap:header message="tns:calculateRequestHeaders" part="operation" use="literal">
+        </wsdlsoap:header>
+      </wsdl:input>
+      <wsdl:output name="calculateResponse">
+        <wsdlsoap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="CalculatorService">
+    <wsdl:port name="CalculatorServiceHttpPort" binding="tns:CalculatorServiceHttpBinding">
+      <wsdlsoap:address location="http://localhost/services/CalculatorService"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
