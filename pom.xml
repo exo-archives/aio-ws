@@ -1,0 +1,136 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.exoplatform.ws</groupId>
+  <artifactId>config</artifactId>
+  <name>eXo WebServices Config</name>
+  <version>0.1</version>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>commons</module>
+    <module>soap/jsr181</module>
+    <module>rest</module>
+  </modules>
+
+  <build>
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <outputDirectory>target/classes</outputDirectory>
+    <testSourceDirectory>src/test/java</testSourceDirectory>
+    <testOutputDirectory>target/test-classes</testOutputDirectory>
+  
+    <resources>
+        <resource>
+            <directory>src/main/java</directory>
+            <includes>
+                <include>**/*.xml</include>
+                <include>**/*.xsl</include>
+                <include>**/*.properties</include>
+                <include>**/*.ion</include>
+            </includes>
+        </resource>
+        <resource>
+            <directory>src/main/resources</directory>
+            <includes>
+                <include>**/*.xml</include>
+                <include>**/*.xsl</include>
+                <include>**/*.properties</include>
+                <include>**/login.conf</include>
+                <include>**/*.ion</include>
+            </includes>
+        </resource>
+    </resources>
+    <testResources>
+        <testResource>
+            <directory>src/test/java</directory>
+            <includes>
+                <include>**/*.properties</include>
+                <include>**/*.xml</include>
+                <include>**/*.txt</include>
+            </includes>
+        </testResource>
+        <testResource>
+            <directory>src/test/resources</directory>
+            <includes>
+                <include>**/*.properties</include>
+                <include>**/*.xml</include>
+                <include>**/*.txt</include>
+            </includes>
+        </testResource>
+    </testResources>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+            <source>1.5</source>
+            <target>1.5</target>
+            <optimize>${exo.compile.optimize}</optimize>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skip>${exo.test.skip}</skip>
+          <useFile>${exo.test.use.file}</useFile>
+          <forkMode>once</forkMode><!--once , pertest -->
+          <testFailureIgnore>${exo.test.failure.ignore}</testFailureIgnore>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+	<reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <configLocation>src/test/resources/exo-checkstyle-checker.xml</configLocation>
+        </configuration>
+      </plugin>
+    </plugins>
+	</reporting>
+
+  <!--repositories>
+    <repository>
+      <id>codehaus</id>
+      <name>Codehaus maven repository</name>
+      <url>http://dist.codehaus.org/</url>
+      <layout>legacy</layout>
+    </repository>
+    <repository>
+      <id>apache-snapshots</id>
+      <name>Snapshot repository</name>
+      <url>http://people.apache.org/maven-snapshot-repository/</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>snapshot</id>
+      <name>Snapshot repository</name>
+      <url>http://snapshots.maven.codehaus.org/maven2/</url>
+    </pluginRepository>
+  </pluginRepositories-->
+
+  <profiles>
+    <profile>
+      <id>default</id>
+      <activation>
+        <property><name>default</name></property>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <org.exoplatform.tool.version>2.0.3</org.exoplatform.tool.version>
+        <org.exoplatform.kernel.version>2.0.3</org.exoplatform.kernel.version>
+        <org.exoplatform.core.version>2.0.3</org.exoplatform.core.version>
+        <org.exoplatform.jcr.version>1.6</org.exoplatform.jcr.version>
+      </properties>
+    </profile>
+  </profiles>
+</project>
