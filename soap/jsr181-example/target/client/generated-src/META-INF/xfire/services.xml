@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://xfire.codehaus.org/config/1.0">
-  <service>
-    <serviceClass>org.exoplatform.services.ws.examples.jsr181.client.hello.SayHelloServiceImpl</serviceClass>
-    <wsdlURL>file:/home/andrew/exo-java/projects/projects/ws/trunk/soap/jsr181-example/target/SayHelloService.wsdl</wsdlURL>
-    <serviceFactory>org.codehaus.xfire.jaxb2.JaxbServiceFactory</serviceFactory>
-  </service>
-</beans>
-
