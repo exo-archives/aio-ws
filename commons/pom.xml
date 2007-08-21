@@ -1,0 +1,7 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.exoplatform.ws.commons</groupId>
+  <artifactId>exo_ws_commons</artifactId>
+  <version>0.1</version>
+  <description></description>
+</project>
