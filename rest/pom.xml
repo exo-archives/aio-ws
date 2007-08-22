@@ -7,7 +7,7 @@
   
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.exoplatform.ws.rest</groupId>
-  <artifactId>exo_rest_core</artifactId>
+  <artifactId>exo.restcore</artifactId>
   <packaging>jar</packaging>
   <!--version>${org.exoplatform.jcr.version}</version-->
   <version>0.1</version>
@@ -34,7 +34,7 @@
     </dependency>
     <dependency>
       <groupId>org.exoplatform.ws.commons</groupId>
-      <artifactId>exo_ws_commons</artifactId>
+      <artifactId>exo.ws.commons</artifactId>
       <version>0.1</version>
       <scope>compile</scope>
     </dependency>

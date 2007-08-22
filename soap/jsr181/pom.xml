@@ -7,7 +7,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.exoplatform.ws.soap</groupId>
-  <artifactId>exo_soap_xfire_jsr181</artifactId>
+  <artifactId>exo.soap.xfire.jsr181</artifactId>
   <version>0.1</version>
   <description></description>
   <dependencies>
