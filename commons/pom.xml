@@ -3,5 +3,6 @@
   <groupId>org.exoplatform.ws.commons</groupId>
   <artifactId>exo.ws.commons</artifactId>
   <version>0.1</version>
+  <name>HTTP commons utils</name>
   <description></description>
 </project>

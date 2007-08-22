@@ -9,6 +9,7 @@
   <groupId>org.exoplatform.ws.soap</groupId>
   <artifactId>exo.soap.xfire.jsr181</artifactId>
   <version>0.1</version>
+  <name>SOAP XFire JSR181 impl</name>
   <description></description>
   <dependencies>
     <dependency>
