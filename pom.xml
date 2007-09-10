@@ -9,7 +9,7 @@
   <modules>
     <module>commons</module>
     <module>soap/jsr181</module>
-    <module>rest</module>
+    <module>rest/core</module>
   </modules>
 
   <build>
