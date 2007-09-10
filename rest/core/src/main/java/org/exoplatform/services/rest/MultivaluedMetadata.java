@@ -19,8 +19,16 @@ import java.util.List;
  */
 public class MultivaluedMetadata {
 
-  private HashMap < String, List < String > > data = new HashMap < String, List < String > >();
+  private HashMap < String, List < String > > data;
 
+  public MultivaluedMetadata() {
+    data = new HashMap < String, List < String > >();
+  }
+  
+  public MultivaluedMetadata(HashMap < String, List < String >> data) {
+    this.data = data; 
+  }
+  
   /**
    * Set key's value to one item list of values.
    * @param key the key
