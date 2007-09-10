@@ -7,6 +7,7 @@ package org.exoplatform.services.rest.ejb3.client;
 import static java.lang.System.out;
 
 
+import javax.ejb.EJBAccessException;
 import javax.naming.InitialContext;
 
 import org.exoplatform.services.rest.ejb3.SimpleRestEJBConnector;
@@ -76,7 +77,7 @@ public class Main {
           + SimpleRestEJBConnectorRemote.class.getName() + BEAN_REMOTE_SUFFIX);
       return bean;
     } catch (Exception e) {
-      return null;
+      throw new EJBAccessException("Bean SimpleRestEJBConnectorBean not found through JNDI!");
     }
   }
   

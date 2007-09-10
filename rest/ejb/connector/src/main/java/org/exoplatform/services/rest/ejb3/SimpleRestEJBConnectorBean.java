@@ -8,6 +8,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.ejb.EJBException;
 import javax.ejb.Stateless;
 
 import org.apache.commons.logging.Log;
@@ -50,18 +52,20 @@ public class SimpleRestEJBConnectorBean implements SimpleRestEJBConnectorRemote,
     try {
       container = ExoContainerContext.getCurrentContainer();
     } catch (Exception e) {
-      LOGGER.error("Cann't get current container");
-      e.printStackTrace();
+      LOGGER.error("Can't get current container!");
+      throw new EJBException("Can't get current container!", e);
     }
     resBinder = (ResourceBinder) container.getComponentInstanceOfType(ResourceBinder.class);
     resDispatcher = (ResourceDispatcher) container
         .getComponentInstanceOfType(ResourceDispatcher.class);
 
     if (resBinder == null) {
-      LOGGER.error("RESOURCE_BINDER is null");
+      LOGGER.error("ResourceBinder not found in container!");
+      throw new EJBException("ResourceBinder not found in container!");
     }
     if (resDispatcher == null) {
-      LOGGER.error("RESOURCE_DISPATCHER is null");
+      LOGGER.error("ResourceDispatcher not found in container!");
+      throw new EJBException("ResourceDispatcher not found in container!");
     }
     try {
       // This is simple example. Work only with string.
@@ -72,17 +76,17 @@ public class SimpleRestEJBConnectorBean implements SimpleRestEJBConnectorRemote,
       Request req = new Request(dataStream, new ResourceIdentifier(url), method,
           new MultivaluedMetadata(headers), new MultivaluedMetadata(queries));
 
+      String respString = null;
       Response resp = resDispatcher.dispatch(req);
       if (resp.getEntity() != null) {
-        return (String) resp.getEntity();
+        respString = (String) resp.getEntity();
       }
-      return null;
+      return respString;
 
     } catch (Exception e) {
       LOGGER.error("This request cann't be serve by service.\n"
           + "Check request parameters and try again.");
-      e.printStackTrace();
-      return null;
+      throw new EJBException("ResourceDispatcher not found in container!", e);
     }
   }
 
