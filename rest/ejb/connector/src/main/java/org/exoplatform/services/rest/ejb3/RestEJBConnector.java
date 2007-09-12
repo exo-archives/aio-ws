@@ -12,7 +12,7 @@ import java.util.List;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public interface SimpleRestEJBConnector {
+public interface RestEJBConnector {
 
   /**
    * @param str - data String.

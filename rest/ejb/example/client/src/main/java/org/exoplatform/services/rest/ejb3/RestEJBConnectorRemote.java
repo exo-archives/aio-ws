@@ -11,5 +11,5 @@ import javax.ejb.Remote;
  * @version $Id: $
  */
 @Remote
-public interface SimpleRestEJBConnectorRemote extends SimpleRestEJBConnector {
+public interface RestEJBConnectorRemote extends RestEJBConnector {
 }

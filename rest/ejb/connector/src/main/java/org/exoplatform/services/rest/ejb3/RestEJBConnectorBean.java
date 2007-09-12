@@ -28,8 +28,8 @@ import org.exoplatform.services.rest.Response;
  * @version $Id: $
  */
 @Stateless
-public class SimpleRestEJBConnectorBean implements SimpleRestEJBConnectorRemote,
-    SimpleRestEJBConnectorLocal {
+public class RestEJBConnectorBean implements RestEJBConnectorRemote,
+    RestEJBConnectorLocal {
 
   private ExoContainer container;
 
@@ -37,7 +37,7 @@ public class SimpleRestEJBConnectorBean implements SimpleRestEJBConnectorRemote,
 
   private ResourceBinder resBinder;
 
-  private static final Log LOGGER = ExoLogger.getLogger(SimpleRestEJBConnectorBean.class);
+  private static final Log LOGGER = ExoLogger.getLogger(RestEJBConnectorBean.class);
 
   /*
    * (non-Javadoc)

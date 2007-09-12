@@ -10,8 +10,8 @@ import static java.lang.System.out;
 import javax.ejb.EJBAccessException;
 import javax.naming.InitialContext;
 
-import org.exoplatform.services.rest.ejb3.SimpleRestEJBConnector;
-import org.exoplatform.services.rest.ejb3.SimpleRestEJBConnectorRemote;
+import org.exoplatform.services.rest.ejb3.RestEJBConnector;
+import org.exoplatform.services.rest.ejb3.RestEJBConnectorRemote;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -22,46 +22,13 @@ public class Main {
   private static final String URL = "/ejb/simple-service/";
   // only for easybeans container on Jonas
   private static final String BEAN_NAME =
-    "org.exoplatform.services.rest.ejb3.SimpleRestEJBConnectorBean";
+    "org.exoplatform.services.rest.ejb3.RestEJBConnectorBean";
   // for JBoss
-//  private static final String BEAN_NAME = "SimpleRestEJBConnectorBean/remote";
+//  private static final String BEAN_NAME = "RestEJBConnectorBean/remote";
   private static final String BEAN_REMOTE_SUFFIX = "@Remote";
 
-  
-  public void doGet(int id) {
-    SimpleRestEJBConnector bean = getBean();
-    if (bean != null) {
-      out.println("Response: "
-          + bean.service("GET", URL + id + "/"));
-    }
-  }
-  
-  public void doPost(String data, int id) {
-    SimpleRestEJBConnector bean = getBean();
-    if (bean != null) {
-      out.println("Response: "
-          + bean.service(data, "POST", URL + id + "/"));
-    }
-  }
-
-  public void doDelete(int id) {
-    SimpleRestEJBConnector bean = getBean();
-    if (bean != null) {
-      out.println("Response: "
-          + bean.service("DELETE", URL + id + "/"));
-    }
-  }
-
-  public void doPut(String data) {
-    SimpleRestEJBConnector bean = getBean();
-    if (bean != null) {
-      out.println("Response: "
-          + bean.service(data, "PUT", URL));
-    }
-  }
-
   public void init() {
-    SimpleRestEJBConnector bean = getBean();
+    RestEJBConnector bean = getBean();
     if (bean != null) {
       out.println("Response: "
           + bean.service("DELETE", URL));
@@ -69,43 +36,47 @@ public class Main {
   }
   
   
-  private SimpleRestEJBConnector getBean() {
+  private RestEJBConnector getBean() {
     try {
       InitialContext ctx = new InitialContext();
       out.println("Serching RestEJBServiceBean...");
-      SimpleRestEJBConnector bean = (SimpleRestEJBConnector) ctx.lookup(BEAN_NAME + "_"
-          + SimpleRestEJBConnectorRemote.class.getName() + BEAN_REMOTE_SUFFIX);
+      RestEJBConnector bean = (RestEJBConnector) ctx.lookup(BEAN_NAME + "_"
+          + RestEJBConnectorRemote.class.getName() + BEAN_REMOTE_SUFFIX);
       return bean;
     } catch (Exception e) {
       throw new EJBAccessException("Bean SimpleRestEJBConnectorBean not found through JNDI!");
     }
   }
   
-  /**
-   * @param args
-   */
   public static void main(String[] args) {
     Main m = new Main();
+    
+    RestEJBConnector bean = m.getBean();
+
     m.init();
+
+    String data = "test_string_";
+    
     out.println("\tPut method (send new data)...");
     for (int i = 0; i < 5; i++) {
-      m.doPut("test_string_" + i);
+      out.println("Response: " + bean.service(data + i, "PUT", URL));
     }
     out.println("\tGet method (get data)...");
     for (int i = 0; i < 5; i++) {
-      m.doGet(i);
+      out.println("Response: " + bean.service("GET", URL + i + "/"));
     }
     out.println("\tPost method (change data)...");
     for (int i = 0; i < 5; i++) {
-      m.doPost(("test_string_" + i).toUpperCase(), i);
+      out.println("Response: "
+          + bean.service(new StringBuffer(data + i).reverse().toString(), "POST", URL + i + "/"));
     }
     out.println("\tGet method (get data)...");
     for (int i = 0; i < 5; i++) {
-      m.doGet(i);
+      out.println("Response: " + bean.service("GET", URL + i + "/"));
     }
     out.println("\tDelete method (remove data)...");
     for (int i = 4; i >= 0; i--) {
-      m.doDelete(i);
+      out.println("Response: " + bean.service("DELETE", URL + i));
     }
   }
 

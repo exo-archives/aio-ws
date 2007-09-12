@@ -11,5 +11,5 @@ import javax.ejb.Local;
  * @version $Id: $
  */
 @Local
-public interface SimpleRestEJBConnectorLocal extends SimpleRestEJBConnector {
+public interface RestEJBConnectorLocal extends RestEJBConnector {
 }
