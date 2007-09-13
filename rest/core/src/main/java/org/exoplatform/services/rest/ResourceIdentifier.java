@@ -15,18 +15,22 @@ public class ResourceIdentifier {
 
   private Map < String, String > parameters = null;
   
-  private String host;
+  private String host = "localhost";
   
   private String uri;
   
   private String baseURI;
 
+  public ResourceIdentifier(String host, String baseURI, String relURI) {
+    this(baseURI, relURI);
+    this.host = host;
+  }  
+  
   /**
    * @param baseURI the base URI
    * @param relURI the relative URI
    */
-  public ResourceIdentifier(String host, String baseURI, String relURI) {
-    this.host = host;
+  public ResourceIdentifier(String baseURI, String relURI) {
     this.uri = (relURI.endsWith("/")) ? relURI : (relURI + "/");
     this.baseURI = baseURI;
   }
@@ -36,7 +40,7 @@ public class ResourceIdentifier {
    *          ResourceContainer with can serv the request
    */
   public ResourceIdentifier(String relURI) {
-    this("", "", relURI);
+    this("", relURI);
   }
 
   /**
