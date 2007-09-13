@@ -189,8 +189,12 @@ public class ResourceDispatcher implements Connector {
       queryParams = new MultivaluedMetadata();
     }
 
+    public String getServerName() {
+      return identifier.getHost();
+    }
+    
     public String getContextHref() {
-      return identifier.getBaseURI();
+      return identifier.getBaseURI();      
     }
     
     /**

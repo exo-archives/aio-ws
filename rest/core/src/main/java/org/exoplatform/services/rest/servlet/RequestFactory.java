@@ -51,7 +51,7 @@ public class RequestFactory {
         + port
         + httpRequest.getContextPath();
 
-    ResourceIdentifier identifier = new ResourceIdentifier(baseURI, pathInfo);
+    ResourceIdentifier identifier = new ResourceIdentifier(httpRequest.getServerName(), baseURI, pathInfo);
     return new Request(in, identifier, method, headerParams, queryParams);
   }
 

@@ -14,14 +14,19 @@ import java.util.Map;
 public class ResourceIdentifier {
 
   private Map < String, String > parameters = null;
+  
+  private String host;
+  
   private String uri;
+  
   private String baseURI;
 
   /**
    * @param baseURI the base URI
    * @param relURI the relative URI
    */
-  public ResourceIdentifier(String baseURI, String relURI) {
+  public ResourceIdentifier(String host, String baseURI, String relURI) {
+    this.host = host;
     this.uri = (relURI.endsWith("/")) ? relURI : (relURI + "/");
     this.baseURI = baseURI;
   }
@@ -31,9 +36,16 @@ public class ResourceIdentifier {
    *          ResourceContainer with can serv the request
    */
   public ResourceIdentifier(String relURI) {
-    this("", relURI);
+    this("", "", relURI);
   }
 
+  /**
+   * @return the host
+   */
+  public String getHost() {
+    return host;
+  }  
+  
   /**
    * @return the relative URI
    */
