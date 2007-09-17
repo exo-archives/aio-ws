@@ -6,8 +6,6 @@ package org.exoplatform.services.rest.ejb3.client;
 
 import static java.lang.System.out;
 
-
-import javax.ejb.EJBAccessException;
 import javax.ejb.EJBException;
 import javax.naming.InitialContext;
 
