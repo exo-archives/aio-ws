@@ -6,7 +6,7 @@
 	</parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.exoplatform.ws.rest</groupId>
-  <artifactId>exo.simple.rest.ejbconnector</artifactId>
+  <artifactId>exo.simple.rest.ejbconnector30</artifactId>
   <version>0.1</version>
   <description></description>
   
