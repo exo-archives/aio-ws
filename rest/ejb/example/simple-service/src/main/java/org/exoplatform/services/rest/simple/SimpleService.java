@@ -3,6 +3,7 @@ package org.exoplatform.services.rest.simple;
 import org.apache.commons.logging.Log;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
+//import org.exoplatform.container.RootContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.rest.HTTPMethod;
 import org.exoplatform.services.rest.InputTransformer;
@@ -24,6 +25,9 @@ public class SimpleService implements ResourceContainer {
 
   private SimpleStorage getStorage() throws Exception {
     ExoContainer container = ExoContainerContext.getCurrentContainer();
+//    if (container instanceof RootContainer) {
+//      container = ExoContainerContext.getContainerByName("portal");
+//    }
     return (SimpleStorage) container.getComponentInstanceOfType(SimpleStorage.class);
   }
 
@@ -41,6 +45,7 @@ public class SimpleService implements ResourceContainer {
       return Response.Builder.notFound().build();
     } catch (Exception e) {
       LOGGER.error("Can't get object, object id " + id);
+      e.printStackTrace();
       return Response.Builder.serverError().build();
     }
   }
@@ -56,6 +61,7 @@ public class SimpleService implements ResourceContainer {
       return Response.Builder.noContent().build();
     } catch (Exception e) {
       LOGGER.error("Can't change object, object id " + id);
+      e.printStackTrace();
       return Response.Builder.serverError().build();
     }
   }
@@ -71,6 +77,7 @@ public class SimpleService implements ResourceContainer {
       return Response.Builder.ok("Add new object with id " + (ms.size() - 1)).build();
     } catch (Exception e) {
       LOGGER.error("Can't add new object.");
+      e.printStackTrace();
       return Response.Builder.serverError().build();
     }
   }
@@ -86,8 +93,8 @@ public class SimpleService implements ResourceContainer {
       return Response.Builder.ok(
           "Remove object: " + getStorage().remove(index)).build();
     } catch (Exception e) {
-      e.printStackTrace();
       LOGGER.error("Can't remove object, object id " + id);
+      e.printStackTrace();
       return Response.Builder.serverError().build();
     }
   }
@@ -101,6 +108,7 @@ public class SimpleService implements ResourceContainer {
       return Response.Builder.ok("Clean storage.").build();
     } catch (Exception e) {
       LOGGER.error("Can't clean storage!");
+      e.printStackTrace();
       return Response.Builder.serverError().build();
     }
   }
