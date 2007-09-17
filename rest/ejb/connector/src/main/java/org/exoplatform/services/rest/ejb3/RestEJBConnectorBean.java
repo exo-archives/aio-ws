@@ -86,7 +86,7 @@ public class RestEJBConnectorBean implements RestEJBConnectorRemote,
     } catch (Exception e) {
       LOGGER.error("This request cann't be serve by service.\n"
           + "Check request parameters and try again.");
-      throw new EJBException("ResourceDispatcher not found in container!", e);
+      throw new EJBException("This request can't be serve!", e);
     }
   }
 
