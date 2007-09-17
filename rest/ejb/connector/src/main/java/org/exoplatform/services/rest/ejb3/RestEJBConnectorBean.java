@@ -42,7 +42,7 @@ public class RestEJBConnectorBean implements RestEJBConnectorRemote,
   /*
    * (non-Javadoc)
    * 
-   * @see org.exoplatform.services.rest.ejb3.SimpleRestEJBConnector#service(java.lang.String,
+   * @see org.exoplatform.services.rest.ejb3.RestEJBConnector#service(java.lang.String,
    *      java.lang.String, java.lang.String, java.util.HashMap,
    *      java.util.HashMap)
    */
@@ -93,7 +93,7 @@ public class RestEJBConnectorBean implements RestEJBConnectorRemote,
   /*
    * (non-Javadoc)
    * 
-   * @see org.exoplatform.services.rest.ejb3.SimpleRestEJBConnector#service(java.lang.String,
+   * @see org.exoplatform.services.rest.ejb3.RestEJBConnector#service(java.lang.String,
    *      java.lang.String, java.lang.String)
    */
   public String service(String str, String method, String url) {
@@ -104,7 +104,7 @@ public class RestEJBConnectorBean implements RestEJBConnectorRemote,
   /*
    * (non-Javadoc)
    * 
-   * @see org.exoplatform.services.rest.ejb3.SimpleRestEJBConnector#service(java.lang.String,
+   * @see org.exoplatform.services.rest.ejb3.RestEJBConnector#service(java.lang.String,
    *      java.lang.String)
    */
   public String service(String method, String url) {
