@@ -8,6 +8,7 @@ import static java.lang.System.out;
 
 
 import javax.ejb.EJBAccessException;
+import javax.ejb.EJBException;
 import javax.naming.InitialContext;
 
 import org.exoplatform.services.rest.ejb3.RestEJBConnector;
@@ -44,7 +45,7 @@ public class Main {
           + RestEJBConnectorRemote.class.getName() + BEAN_REMOTE_SUFFIX);
       return bean;
     } catch (Exception e) {
-      throw new EJBAccessException("Bean SimpleRestEJBConnectorBean not found through JNDI!");
+      throw new EJBException("Can't get bean RestEJBConnectorBean unreachable!");
     }
   }
   
