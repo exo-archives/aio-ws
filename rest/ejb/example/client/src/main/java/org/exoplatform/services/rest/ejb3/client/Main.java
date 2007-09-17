@@ -43,7 +43,7 @@ public class Main {
           + RestEJBConnectorRemote.class.getName() + BEAN_REMOTE_SUFFIX);
       return bean;
     } catch (Exception e) {
-      throw new EJBException("Can't get bean RestEJBConnectorBean unreachable!");
+      throw new EJBException("Can't get bean RestEJBConnectorBean!");
     }
   }
   
