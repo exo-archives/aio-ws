@@ -35,7 +35,7 @@ public class ResourceBinder implements Startable {
   private List < ResourceContainerResolvingStrategy > bindStrategies;
   private ExoContainerContext containerContext;
   private ExoContainer container;
-  private static Log logger = ExoLogger.getLogger("ResourceBinder");
+  private static final Log LOGGER = ExoLogger.getLogger("ResourceBinder");
 
   /**
    * Constructor sets the resolving strategy.
@@ -72,7 +72,7 @@ public class ResourceBinder implements Startable {
       List < ResourceDescriptor > resList = strategy.resolve(resourceCont);
       validate(resList);
       resourceDescriptors.addAll(resList);
-      logger.info("Bind new ResourceContainer: " + resourceCont);
+      LOGGER.info("Bind new ResourceContainer: " + resourceCont);
       // After binding new component(s) to the ResourceDescriptor list
       // it must be sorted by number of parameter in URITemplate.
       // The resources which have more parameters must be at the
@@ -240,7 +240,7 @@ public class ResourceBinder implements Startable {
       try {
         bind(c);
       } catch (InvalidResourceDescriptorException irde) {
-        logger.error("Can't add ResourceContainer Component: " + c.getClass().getName());
+        LOGGER.error("Can't add ResourceContainer Component: " + c.getClass().getName());
       }
     }
   }

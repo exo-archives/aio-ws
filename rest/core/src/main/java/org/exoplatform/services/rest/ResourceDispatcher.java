@@ -29,7 +29,7 @@ public class ResourceDispatcher implements Connector {
 
   private List < ResourceDescriptor > resourceDescriptors;
   private ThreadLocal < Context > contextHolder = new ThreadLocal < Context >();
-//  private static Log logger = ExoLogger.getLogger("ResourceDispatcher");
+//  private static final Log LOGGER = ExoLogger.getLogger("ResourceDispatcher");
 
   /**
    * Constructor gets all binded ResourceContainers from ResourceBinder.
