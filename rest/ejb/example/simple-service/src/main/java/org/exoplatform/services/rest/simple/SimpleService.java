@@ -25,9 +25,6 @@ public class SimpleService implements ResourceContainer {
 
   private SimpleStorage getStorage() throws Exception {
     ExoContainer container = ExoContainerContext.getCurrentContainer();
-//    if (container instanceof RootContainer) {
-//      container = ExoContainerContext.getContainerByName("portal");
-//    }
     return (SimpleStorage) container.getComponentInstanceOfType(SimpleStorage.class);
   }
 
@@ -55,7 +52,7 @@ public class SimpleService implements ResourceContainer {
   @InputTransformer(StringInputTransformer.class)
   public Response post(String data, @URIParam("id")
   String id) throws Exception {
-    LOGGER.debug(">>> [POST]");
+    LOGGER.debug(">>> [POST], data: " + data);
     try {
       getStorage().set(Integer.valueOf(id).intValue(), data);
       return Response.Builder.noContent().build();
@@ -70,7 +67,7 @@ public class SimpleService implements ResourceContainer {
   @InputTransformer(StringInputTransformer.class)
   @OutputTransformer(StringOutputTransformer.class)
   public Response put(String data) throws Exception {
-    LOGGER.debug(">>> [PUT]");
+    LOGGER.debug(">>> [PUT], data: " + data);
     try {
       SimpleStorage ms = getStorage();
       ms.add(data);
