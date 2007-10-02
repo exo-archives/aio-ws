@@ -9,9 +9,15 @@ import static java.lang.System.out;
 import javax.ejb.EJBException;
 import javax.naming.InitialContext;
 import javax.rmi.PortableRemoteObject;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
 
 import org.exoplatform.services.rest.ejb21.RestEJBConnector;
 import org.exoplatform.services.rest.ejb21.RestEJBConnectorHome;
+
+import org.objectweb.jonas.security.auth.callback.LoginCallbackHandler;
+
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -38,6 +44,17 @@ public class Main {
   
   public static void main(String[] args) throws Exception {
     Main m = new Main();
+    
+//    CallbackHandler handler = new LoginCallbackHandler();
+//    
+//    LoginContext login = new LoginContext("ask_remote", handler);
+//    
+//    try {
+//      login.login();
+//      System.out.println("Loggin ok");
+//    } catch(LoginException le) {
+//      le.printStackTrace();
+//    }
     
     RestEJBConnector bean = m.getBean();
 

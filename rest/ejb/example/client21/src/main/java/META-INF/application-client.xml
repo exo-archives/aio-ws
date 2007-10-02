@@ -12,4 +12,5 @@
     <home>org.exoplatform.services.rest.ejb3.RestEJBConnectorHome</home>
     <remote>org.exoplatform.services.rest.ejb3.RestEJBConnector</remote>
   </ejb-ref>
+  <callback-handler>org.objectweb.jonas.security.auth.callback.LoginCallbackHandler</callback-handler>
 </application-client>
