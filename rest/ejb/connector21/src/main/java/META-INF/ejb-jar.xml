@@ -9,14 +9,30 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j
       <ejb-name>RestEJBConnector</ejb-name>
       <home>org.exoplatform.services.rest.ejb21.RestEJBConnectorHome</home>
       <remote>org.exoplatform.services.rest.ejb21.RestEJBConnector</remote>
-      <local-home>org.exoplatform.services.rest.ejb21.RestEJBConnectorLocalHome</local-home>
-      <local>org.exoplatform.services.rest.ejb21.RestEJBConnectorLocal</local>
+      <!-- local-home>org.exoplatform.services.rest.ejb21.RestEJBConnectorLocalHome</local-home>
+      <local>org.exoplatform.services.rest.ejb21.RestEJBConnectorLocal</local-->
       <ejb-class>org.exoplatform.services.rest.ejb21.RestEJBConnectorBean</ejb-class>
       <session-type>Stateless</session-type>
       <transaction-type>Bean</transaction-type>
+      <!-- security-role-ref>
+      	<role-name>admin</role-name>
+      	<role-link>admin</role-link>
+      </security-role-ref-->
       <security-identity>
         <use-caller-identity/>              
       </security-identity>
     </session>
   </enterprise-beans>
+  <assembly-descriptor>
+  	<security-role>
+  		<role-name>user</role-name>
+  	</security-role>
+  	<method-permission>
+  		<role-name>user</role-name>
+  		<method>
+  			<ejb-name>RestEJBConnector</ejb-name>
+  			<method-name>*</method-name>
+  		</method>
+  	</method-permission>
+  </assembly-descriptor>
 </ejb-jar>

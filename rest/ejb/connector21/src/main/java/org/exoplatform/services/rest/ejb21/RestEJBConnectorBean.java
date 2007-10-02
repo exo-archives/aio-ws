@@ -5,6 +5,7 @@
 package org.exoplatform.services.rest.ejb21;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
@@ -31,15 +32,17 @@ import org.exoplatform.services.rest.Response;
 public class RestEJBConnectorBean implements SessionBean {
 
   static final long serialVersionUID = 234765347623L;
-  
-	private ExoContainer container;
 
-	private ResourceDispatcher resDispatcher;
+  private ExoContainer container;
 
-	private ResourceBinder resBinder;
+  private ResourceDispatcher resDispatcher;
 
-	private static final Log LOGGER = ExoLogger
-			.getLogger(RestEJBConnectorBean.class);
+  private ResourceBinder resBinder;
+
+  private static final Log LOGGER = ExoLogger
+      .getLogger(RestEJBConnectorBean.class);
+
+  SessionContext context;
 
   /**
    * @param str - data String.
@@ -49,86 +52,93 @@ public class RestEJBConnectorBean implements SessionBean {
    * @param queries - Map of query parameters.
    * @return - result String from REST service.
    */
-	public String service(String str, String method, String url,
-			HashMap<String, List<String>> headers,
-			HashMap<String, List<String>> queries) {
+  public String service(String str, String method, String url,
+      HashMap<String, List<String>> headers,
+      HashMap<String, List<String>> queries) {
 
-		try {
-			container = ExoContainerContext.getCurrentContainer();
-		} catch (Exception e) {
-			LOGGER.error("Can't get current container!");
-			throw new EJBException("Can't get current container!", e);
-		}
-		resBinder = (ResourceBinder) container
-				.getComponentInstanceOfType(ResourceBinder.class);
-		resDispatcher = (ResourceDispatcher) container
-				.getComponentInstanceOfType(ResourceDispatcher.class);
+    try {
+//      container = ExoContainerContext.getCurrentContainer();
+      container = ExoContainerContext.getContainerByName("portal");
+    } catch (Exception e) {
+      LOGGER.error("Can't get current container!");
+      throw new EJBException("Can't get current container!", e);
+    }
+    resBinder = (ResourceBinder) container
+        .getComponentInstanceOfType(ResourceBinder.class);
+    resDispatcher = (ResourceDispatcher) container
+        .getComponentInstanceOfType(ResourceDispatcher.class);
 
-		if (resBinder == null) {
-			LOGGER.error("ResourceBinder not found in container!");
-			throw new EJBException("ResourceBinder not found in container!");
-		}
-		if (resDispatcher == null) {
-			LOGGER.error("ResourceDispatcher not found in container!");
-			throw new EJBException("ResourceDispatcher not found in container!");
-		}
-		try {
-			// This is simple example. Work only with string.
-			InputStream dataStream = null;
-			if (str != null) {
-				dataStream = new ByteArrayInputStream(str.getBytes());
-			}
-			Request req = new Request(dataStream, new ResourceIdentifier(url),
-					method, new MultivaluedMetadata(headers),
-					new MultivaluedMetadata(queries));
+    if (resBinder == null) {
+      LOGGER.error("ResourceBinder not found in container!");
+      throw new EJBException("ResourceBinder not found in container!");
+    }
+    if (resDispatcher == null) {
+      LOGGER.error("ResourceDispatcher not found in container!");
+      throw new EJBException("ResourceDispatcher not found in container!");
+    }
+    try {
+      // This is simple example. Work only with string.
+      InputStream dataStream = null;
+      if (str != null) {
+        dataStream = new ByteArrayInputStream(str.getBytes());
+      }
+      Request req = new Request(dataStream, new ResourceIdentifier(url),
+          method, new MultivaluedMetadata(headers), new MultivaluedMetadata(
+              queries));
 
-			String respString = null;
-			Response resp = resDispatcher.dispatch(req);
-			if (resp.getEntity() != null) {
-				respString = (String) resp.getEntity();
-			}
-			return respString;
+      String respString = null;
+      Response resp = resDispatcher.dispatch(req);
+      if (resp.getEntity() != null) {
+        respString = (String) resp.getEntity();
+      }
+      return respString;
 
-		} catch (Exception e) {
-			LOGGER.error("This request cann't be serve by service.\n"
-					+ "Check request parameters and try again.");
-			throw new EJBException("This request can't be serve!", e);
-		}
-	}
-
-  /**
-   * @param str - data string.
-   * @param method - HTTP method.
-   * @param url - URL
-   * @return - result String from REST service.
-   */
-	public String service(String str, String method, String url) {
-		return service(str, method, url, new HashMap<String, List<String>>(),
-				new HashMap<String, List<String>>());
-	}
+    } catch (Exception e) {
+      LOGGER.error("This request cann't be serve by service.\n"
+          + "Check request parameters and try again.");
+      throw new EJBException("This request can't be serve!", e);
+    }
+  }
 
   /**
-   * @param method - HTTP method.
-   * @param url - URL
+   * @param str -
+   *            data string.
+   * @param method -
+   *            HTTP method.
+   * @param url -
+   *            URL
    * @return - result String from REST service.
    */
-	public String service(String method, String url) {
-		return service(null, method, url, new HashMap<String, List<String>>(),
-				new HashMap<String, List<String>>());
-	}
+  public String service(String str, String method, String url) {
+    return service(str, method, url, new HashMap<String, List<String>>(),
+        new HashMap<String, List<String>>());
+  }
 
-	public void ejbPassivate() {
-	}
+  /**
+   * @param method -
+   *            HTTP method.
+   * @param url -
+   *            URL
+   * @return - result String from REST service.
+   */
+  public String service(String method, String url) {
+    return service(null, method, url, new HashMap<String, List<String>>(),
+        new HashMap<String, List<String>>());
+  }
 
-	public void ejbActivate() {
-	}
+  public void ejbPassivate() {
+  }
 
-	public void ejbRemove() {
-	}
+  public void ejbActivate() {
+  }
 
-	public void setSessionContext(SessionContext contx) {
-	}
-	
-	public void ejbCreate() {
-	}
+  public void ejbRemove() {
+  }
+
+  public void setSessionContext(SessionContext contx) {
+    context = contx;
+  }
+
+  public void ejbCreate() {
+  }
 }
