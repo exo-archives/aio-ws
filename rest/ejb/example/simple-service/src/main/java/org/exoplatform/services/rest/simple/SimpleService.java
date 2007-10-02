@@ -24,7 +24,8 @@ public class SimpleService implements ResourceContainer {
   }
 
   private SimpleStorage getStorage() throws Exception {
-    ExoContainer container = ExoContainerContext.getCurrentContainer();
+//    ExoContainer container = ExoContainerContext.getCurrentContainer();
+    ExoContainer container = ExoContainerContext.getContainerByName("portal");
     return (SimpleStorage) container.getComponentInstanceOfType(SimpleStorage.class);
   }
 
