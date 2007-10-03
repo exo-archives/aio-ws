@@ -12,9 +12,9 @@
     <module>soap/jsr181</module>
     <module>rest/ejb/connector21</module>
     <module>rest/ejb/connector30</module>
-    <!--module>rest/ejb/example/client21</module-->
-    <!--module>rest/ejb/example/client30</module-->
-    <!--module>rest/ejb/example/simple-service</module-->
+    <module>rest/ejb/example/client21</module>
+    <module>rest/ejb/example/client30</module>
+    <module>rest/ejb/example/simple-service</module>
   </modules>
 
   <build>

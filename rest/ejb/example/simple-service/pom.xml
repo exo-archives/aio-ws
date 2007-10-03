@@ -8,6 +8,7 @@
   <groupId>org.exoplatform.ws.rest</groupId>
   <artifactId>exo.simple.rest.service</artifactId>
   <version>0.1</version>
+  <name>simple service</name>
   <description></description>
   <dependencies>
     <dependency>
