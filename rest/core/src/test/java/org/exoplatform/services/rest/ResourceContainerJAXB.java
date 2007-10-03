@@ -23,6 +23,7 @@ public class ResourceContainerJAXB implements ResourceContainer{
   @InputTransformer(JAXBInputTransformer.class)
   @OutputTransformer(JAXBOutputTransformer.class)
   public Response method1(Book book) throws Exception {
+
     System.out.println(">>> JAXBTransformation");
     System.out.println("==Book Card==");
     System.out.println("===> tittle: " + book.getTitle());
@@ -36,6 +37,7 @@ public class ResourceContainerJAXB implements ResourceContainer{
     book.setSendByPost(false);
     book.setPrice(createPrice("EUR", 21.75f));
     book.setMemberPrice(createMemberPrice("EUR", 17.25f));
+    
     return Response.Builder.ok(book, "text/xml").build();
   }
 

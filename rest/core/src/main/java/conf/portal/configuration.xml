@@ -15,12 +15,15 @@
     </init-params>
  	</component>
   <!--component>
-    <type>org.exoplatform.services.rest.data.XMLValidator</type>
+    <type>org.exoplatform.services.rest.server.StandaloneRestServer</type>
+
     <init-params>
-    	<value-param>
-    		<name>schema1</name>
-    		<value>src/test/java/conf/standalone/test.xsd</value>
-    	</value-param>
+		<properties-param>
+			<name>standalone-rest-server.properties</name>
+			<property name="context-path" value="/rest"/>
+			<property name="filter-class1" value="org.exoplatform.frameworks.jcr.web.ThreadLocalSessionProviderInitializedFilter"/>
+			<property name="filter-mapping1" value="/*"/>
+		</properties-param>
     </init-params>
   </component-->
 </configuration>

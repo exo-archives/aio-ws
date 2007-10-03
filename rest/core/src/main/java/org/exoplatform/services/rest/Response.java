@@ -72,51 +72,53 @@ public class Response {
    * Content-Length header.
    * @return content length in bytes
    */
-  private long length = 0;
-  public long countContentLength() {
-    // check is transformer available and is not
-    // entity represented by InputStream. Can't read
-    // from Stream!!! (after reading Stream is empty)
-    if (transformer != null && !InputStream.class.isInstance(entity)) {
-      final PipedOutputStream pou = new PipedOutputStream();
-      final PipedInputStream pin = new PipedInputStream();
-
-      try {
-        pin.connect(pou);
-        new Thread() {
-          public void run() {
-            try {
-              transformer.writeTo(entity, pou);
-            } catch (IOException e) {
-              length = 0;
-            } finally {
-              try {
-                pou.flush();
-                pou.close();
-              } catch (IOException ioe) {
-                ;
-              }
-            }
-          }
-        }.start();
-
-        int rd = -1;
-        byte[] buff = new byte[1024];
-        while ((rd = pin.read(buff)) != -1) {
-          length += rd;
-        }
-      } catch (IOException ioe) {
-        length = 0;
-      } finally {
-        try {
-          pin.close();
-        } catch (IOException ioe) {
-          length = 0;
-        }
-      }
-    }
-    return length;
-  }
+// see ResourceDispather for explanation about counting Content-Length
+  
+//  private long length = 0;
+//  public long countContentLength() {
+//    // check is transformer available and is not
+//    // entity represented by InputStream. Can't read
+//    // from Stream!!! (after reading Stream is empty)
+//    if (transformer != null && !InputStream.class.isInstance(entity)) {
+//      final PipedOutputStream pou = new PipedOutputStream();
+//      final PipedInputStream pin = new PipedInputStream();
+//
+//      try {
+//        pin.connect(pou);
+//        new Thread() {
+//          public void run() {
+//            try {
+//              transformer.writeTo(entity, pou);
+//            } catch (IOException e) {
+//              length = 0;
+//            } finally {
+//              try {
+//                pou.flush();
+//                pou.close();
+//              } catch (IOException ioe) {
+//                ;
+//              }
+//            }
+//          }
+//        }.start();
+//
+//        int rd = -1;
+//        byte[] buff = new byte[1024];
+//        while ((rd = pin.read(buff)) != -1) {
+//          length += rd;
+//        }
+//      } catch (IOException ioe) {
+//        length = 0;
+//      } finally {
+//        try {
+//          pin.close();
+//        } catch (IOException ioe) {
+//          length = 0;
+//        }
+//      }
+//    }
+//    return length;
+//  }
 
   /**
    * EntityMetadata gives possibility to view some response headers by use method get.<br/>

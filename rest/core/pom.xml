@@ -75,6 +75,26 @@
       <artifactId>maven-jaxb2-plugin</artifactId>
       <version>0.1</version>
     </dependency>
+ 		<dependency>
+ 			<groupId>jetty</groupId>
+ 			<artifactId>jetty</artifactId>
+ 			<version>6.1.5</version>
+ 			</dependency>   
+ 		<dependency>
+	 	<groupId>jetty</groupId>
+ 			<artifactId>jetty-util</artifactId>
+ 			<version>6.1.5</version>
+ 		</dependency>   
+ 		<dependency>
+ 			<groupId>jetty</groupId>
+ 			<artifactId>jetty-plus</artifactId>
+ 			<version>6.1.5</version>
+ 		</dependency>   
+ 		<dependency>   
+  		<groupId>org.exoplatform.ws.rest</groupId>
+  		<artifactId>exo.simple.rest.service</artifactId>
+  		<version>0.1</version>
+ 		</dependency>    
   </dependencies>  
 
   <build>

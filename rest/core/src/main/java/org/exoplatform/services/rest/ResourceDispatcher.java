@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 
 //import org.apache.commons.logging.Log;
-import org.exoplatform.container.ExoContainer;
-import org.exoplatform.container.ExoContainerContext;
 //import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.rest.container.InvalidResourceDescriptorException;
 import org.exoplatform.services.rest.container.ResourceDescriptor;
@@ -36,10 +34,7 @@ public class ResourceDispatcher implements Connector {
    * @param containerContext ExoContainerContext
    * @throws Exception any Exception
    */
-  public ResourceDispatcher(ExoContainerContext containerContext) throws Exception {
-    ExoContainer container = containerContext.getContainer();
-    ResourceBinder binder =
-      (ResourceBinder) container.getComponentInstanceOfType(ResourceBinder.class);
+  public ResourceDispatcher(ResourceBinder binder) throws Exception {
     this.resourceDescriptors = binder.getAllDescriptors();
   }
 
@@ -104,14 +99,16 @@ public class ResourceDispatcher implements Connector {
         if (!resp.isTransformerInitialized() && resp.isEntityInitialized()) {
           resp.setTransformer(getTransformer(resource));
         }
-        if (resp.getEntityMetadata().getLength() == 0) {
-          long contentLength = resp.countContentLength();
-//          if (contentLength == 0) {
-//            logger.warn("Length of content can't be counted."
-//                + " May be data represented by InputStream. Content-Length header: 0");
-//          }
-          resp.getResponseHeaders().putSingle("Content-Length", contentLength + "");
-        }
+//  Disable count content lenght.
+//  If Content-Lenght was not set by ResourceContainer HTTPResponse must be chunked (HTTP 1.1 client only) 
+//        if (resp.getEntityMetadata().getLength() == 0) {
+//          long contentLength = resp.countContentLength();
+////          if (contentLength == 0) {
+////            logger.warn("Length of content can't be counted."
+////                + " May be data represented by InputStream. Content-Length header: 0");
+////          }
+//          resp.getResponseHeaders().putSingle("Content-Length", contentLength + "");
+//        }
 //TODO solution about default Cache-Control        
 //        if (resp.getEntityMetadata().getCacheControl() == null) {
 //          resp.getResponseHeaders().putSingle("Cache-Control", new CacheControl().getAsString());

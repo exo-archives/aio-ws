@@ -13,5 +13,4 @@ package org.exoplatform.services.rest.transformer;
  * @version $Id: $
  */
 public interface GenericInputEntityTransformer extends GenericEntityTransformer {
-  
 }
