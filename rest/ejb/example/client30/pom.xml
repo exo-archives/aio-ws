@@ -8,6 +8,7 @@
   <groupId>org.exoplatform.ws.rest</groupId>
   <artifactId>exo.simple.rest.service.client30-jonas</artifactId>
   <version>0.1</version>
+  <name>REST-EJB simple client (ejb3.0)</name>
   <description></description>
   
   <dependencies>

@@ -9,7 +9,12 @@
   <modules>
     <module>commons</module>
     <module>soap/jsr181</module>
-    <module>rest/core</module>
+    <module>rest/ejb/connector21</module>
+    <module>rest/ejb/connector30</module>
+    <!--module>rest/ejb/example/client21</module-->
+    <!--module>rest/ejb/example/client30</module-->
+    <!--module>rest/core</module-->
+    <!--module>rest/ejb/example/simple-service</module-->
   </modules>
 
   <build>
@@ -46,6 +51,8 @@
                 <include>**/*.properties</include>
                 <include>**/*.xml</include>
                 <include>**/*.txt</include>
+		<include>**/*.conf</include>
+		<include>**/*.config</include>
             </includes>
         </testResource>
         <testResource>
@@ -54,6 +61,8 @@
                 <include>**/*.properties</include>
                 <include>**/*.xml</include>
                 <include>**/*.txt</include>
+		<include>**/*.conf</include>
+		<include>**/*.config</include>
             </includes>
         </testResource>
     </testResources>
