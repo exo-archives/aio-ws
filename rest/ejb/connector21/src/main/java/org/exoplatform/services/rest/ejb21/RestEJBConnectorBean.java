@@ -5,7 +5,6 @@
 package org.exoplatform.services.rest.ejb21;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +57,7 @@ public class RestEJBConnectorBean implements SessionBean {
 
     try {
 //      container = ExoContainerContext.getCurrentContainer();
+      // >>> temporary
       container = ExoContainerContext.getContainerByName("portal");
     } catch (Exception e) {
       LOGGER.error("Can't get current container!");
