@@ -200,17 +200,6 @@ public class Response {
       return new Response(status, responseHeaders, entity, transformer);
     }
     
-    /**
-     * Prepared error response and set transformer. 
-     * @param message - error message
-     * @return the new instance of Builder with entity represented by String and
-     *         StringOutputTransformer. 
-     */
-    public static Builder errorMessage(String message) {
-      Builder b = representation(message);
-      b.transformer(new StringOutputTransformer());
-      return b;
-    }
 
     /**
      * create Builder with selected status.
@@ -541,6 +530,19 @@ public class Response {
       this.responseHeaders.putSingle("Cache-Control", c.getAsString());
       return this;
     }
+    
+    /**
+     * Prepared error response and set transformer. 
+     * @param message - error message
+     * @return the new instance of Builder with entity represented by String and
+     *         StringOutputTransformer. 
+     */
+    public Builder errorMessage(String message) {
+      this.entity = message;
+      this.transformer = new StringOutputTransformer();
+      return this;
+    }
+    
   }
 
 }
