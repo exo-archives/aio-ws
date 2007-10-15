@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.exoplatform.common.http.HTTPStatus;
 import org.exoplatform.services.rest.transformer.OutputEntityTransformer;
+import org.exoplatform.services.rest.transformer.StringOutputTransformer;
 
 /**
  * REST Response.
@@ -198,11 +199,23 @@ public class Response {
     public Response build() {
       return new Response(status, responseHeaders, entity, transformer);
     }
+    
+    /**
+     * Prepared error response and set transformer. 
+     * @param message - error message
+     * @return the new instance of Builder with entity represented by String and
+     *         StringOutputTransformer. 
+     */
+    public static Builder errorMessage(String message) {
+      Builder b = representation(message);
+      b.transformer(new StringOutputTransformer());
+      return b;
+    }
 
     /**
      * create Builder with selected status.
      * @param st the HTTP status
-     * @return the new instance of Builder whith status: st
+     * @return the new instance of Builder with status: st
      */
     public static Builder withStatus(int st) {
       Builder b = newInstance();
