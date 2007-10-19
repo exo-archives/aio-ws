@@ -68,11 +68,11 @@ public class StandaloneRestServer implements Startable {
       String pname = f.getName();
       if (pname.startsWith(CONFIG_FILTER_NAME_PREFIX)) {
         filters.add(f.getValue());
-        LOGGER.debug("Filter: " + f.getValue());
+        LOGGER.info("Filter: " + f.getValue());
         String fmap = params.getProperty(CONFIG_FILTER_MAPPING_PREFIX
         		+ pname.substring(CONFIG_FILTER_NAME_PREFIX.length()));
         filterURIPatterns.add((fmap != null) ? fmap : "/*");
-        LOGGER.debug("Filter mapping: " + fmap);
+        LOGGER.info("Filter mapping: " + fmap);
       }
     }
     
