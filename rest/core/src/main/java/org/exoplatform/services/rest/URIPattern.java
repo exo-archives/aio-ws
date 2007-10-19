@@ -146,8 +146,4 @@ public class URIPattern {
     return pattern;
   }
 
-//  private String[] getTokens() {
-//    return tokens;
-//  }
-
 }
