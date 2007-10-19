@@ -169,6 +169,12 @@ public class ResourceContainerTest extends TestCase {
 
     ResourceContainerGET resourceContainerGET1 = new ResourceContainerGET();
     ResourceContainerPOST resourceContainerPOST1 = new ResourceContainerPOST();
+    ResourceContainerConflict2 resourceContainerConflict2 = new ResourceContainerConflict2();
+    try {
+      binder.bind(resourceContainerConflict2);
+      fail("Bind for this component shuold be failed!");
+    } catch(Exception e) {}
+    assertEquals(2, list.size());
     try {
       binder.bind(resourceContainerGET1);
       fail("Bind for this component shuold be failed!");
@@ -350,6 +356,31 @@ public class ResourceContainerTest extends TestCase {
     Response resp = dispatcher.dispatch(request);
     System.out.println(">>> Content-Length: " + resp.getEntityMetadata().getLength());
     resp.writeEntity(System.out);
+    binder.unbind(resourceContainer);
+    assertEquals(0, list.size());
   }
 
+  public void testConflict() throws Exception {
+    assertNotNull(dispatcher);
+    assertNotNull(binder);
+    
+    List <ResourceDescriptor> list = binder.getAllDescriptors();
+    ResourceContainerConflict resourceContainer = new ResourceContainerConflict();
+    binder.bind(resourceContainer);
+    assertEquals(2, list.size());
+    
+    MultivaluedMetadata mm = new MultivaluedMetadata();
+    Request request =
+        new Request(null, new ResourceIdentifier("/test1/id1/id2/test2/"), "GET", mm, null);
+    Response resp = dispatcher.dispatch(request);
+    assertEquals("id1", resp.getEntity());
+//    resp.writeEntity(System.out);
+    request =
+      new Request(null, new ResourceIdentifier("/test/test1/id2/id1/test/test2/"), "GET", mm, null);
+    resp = dispatcher.dispatch(request);
+    assertEquals("id2", resp.getEntity());
+//    resp.writeEntity(System.out);
+    binder.unbind(resourceContainer);
+    assertEquals(0, list.size());
+  }
 }
