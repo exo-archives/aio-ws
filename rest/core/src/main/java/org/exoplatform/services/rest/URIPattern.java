@@ -45,7 +45,7 @@ public class URIPattern {
       assert paramNames[numParams - 1] != null;
     }
     this.pattern = patternString;
-    params = Collections.unmodifiableSet(new HashSet(Arrays.asList(paramNames)));
+    params = Collections.unmodifiableSet(new HashSet < String >(Arrays.asList(paramNames)));
   }
 
   /**
@@ -73,16 +73,16 @@ public class URIPattern {
       if (string.equals(pattern)) {
         return ret;
       }
-      throw new IllegalArgumentException("Pattern not matched: " + pattern + "," + string);
+      throw new IllegalArgumentException("Pattern not matched: " + pattern + ", " + string);
     }
     if (!matches(string)) {
-      throw new IllegalArgumentException("Pattern not matched: " + pattern + "," + string);
+      throw new IllegalArgumentException("Pattern not matched: " + pattern + ", " + string);
     }
     int pos = tokens[0].length();
     for (int i = 0; i < paramNames.length; i++) {
       int nextPos = tokens[i + 1].length() > 0 ? string.indexOf(tokens[i + 1], pos) : string.length();
       if (nextPos < 0) {
-        throw new IllegalArgumentException("Pattern not matched: " + pattern + "," + string);
+        throw new IllegalArgumentException("Pattern not matched: " + pattern + ", " + string);
       }
       if (i == paramNames.length - 1
           && tokens[i + 1].equals("/")) {
@@ -95,35 +95,19 @@ public class URIPattern {
     return ret;
   }
 
-  // /**
-  // * Returns the result of substituting the placeholders in the
-  // * pattern with given parameter values.
-  // * @param paramValues map of parameter names to values
-  // * @return substituted string
-  // */
-  // public String substitute(Map<String, String> paramValues) {
-  // StringBuffer sb = new StringBuffer();
-  // for (int i = 0; i < tokens.length; i++) {
-  // sb.append(tokens[i]);
-  // if (i < tokens.length - 1) {
-  // sb.append(paramValues.get(paramNames[i]));
-  // }
-  // }
-  // return sb.toString();
-  // }
-
   /**
-   * Checks wheter the given string matches the underlying pattern.
+   * Checks if the given string matches the underlying pattern.
    * @param string string to test
    * @return true if the string matches the pattern false otherwise
    */
   public boolean matches(String string) {
-    if (string.indexOf(tokens[0], 0) < 0) {
+    if (string.indexOf(tokens[0], 0) != 0) {
       return false;
     }
     int pos = tokens[0].length();
     for (int i = 0; i < paramNames.length; i++) {
-      int nextPos = (tokens[i + 1].length() > 0) ? string.indexOf(tokens[i + 1], pos) : string.length();
+      int nextPos = (tokens[i + 1].length() > 0) ? string.indexOf(tokens[i + 1], pos)
+          : string.length();
       if (nextPos < 0) {
         return false;
       }
@@ -141,14 +125,17 @@ public class URIPattern {
    * @return the result of comparison
    */
   public boolean matches(URIPattern another) {
-    int minSize = (tokens.length <= another.getTokens().length) ? tokens.length : another
-        .getTokens().length;
-    for (int i = 0; i < minSize; i++) {
-      if (!tokens[i].equals(another.getTokens()[i])) {
-        return false;
-      }
-    }
-    return true;
+    Pattern p = Pattern.compile("\\{.*\\}");
+    return matches(p.matcher(another.getString()).replaceAll("x"));
+
+//    int minSize = (tokens.length <= another.getTokens().length) ? tokens.length : another
+//        .getTokens().length;
+//    for (int i = 0; i < minSize; i++) {
+//      if (!tokens[i].equals(another.getTokens()[i])) {
+//        return false;
+//      }
+//    }
+//    return true;
   }
 
   /**
@@ -159,7 +146,8 @@ public class URIPattern {
     return pattern;
   }
 
-  private String[] getTokens() {
-    return tokens;
-  }
+//  private String[] getTokens() {
+//    return tokens;
+//  }
+
 }
