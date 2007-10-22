@@ -37,7 +37,7 @@ public class ResourceIdentifier {
 
   /**
    * @param relURI the relative URI Relative URI used for identification
-   *          ResourceContainer with can serv the request
+   *          ResourceContainer with can serve the request
    */
   public ResourceIdentifier(String relURI) {
     this("", relURI);
@@ -74,8 +74,8 @@ public class ResourceIdentifier {
   }
 
   /**
-   * @return the key-value pairs of URi parameters
-   * @throws IllegalStateException URI parameters not initializaed yet
+   * @return the key-value pairs of URi parameters.
+   * @throws IllegalStateException URI parameters not initialized yet.
    */
   public Map < String, String > getParameters() throws IllegalStateException {
     if (parameters == null) {
