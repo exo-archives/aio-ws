@@ -49,6 +49,7 @@ public class RequestFactory {
     String baseURI = httpRequest.getScheme()
         + "://" + httpRequest.getServerName()
         + port
+        + httpRequest.getServletPath()
         + httpRequest.getContextPath();
 
     ResourceIdentifier identifier = new ResourceIdentifier(httpRequest.getServerName(), baseURI, pathInfo);
