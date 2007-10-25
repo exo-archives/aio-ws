@@ -18,7 +18,7 @@ import org.exoplatform.services.rest.transformer.OutputEntityTransformer;
 import org.exoplatform.services.rest.transformer.EntityTransformerFactory;
 
 /**
- * Created by The eXo Platform SARL.<br/>
+ * Created by The eXo Platform SAS.<br/>
  * ResourceDispatcher finds ResourceContainer with can serve the Request and calls method it.
  * @author Gennady Azarenkov
  * @version $Id: $

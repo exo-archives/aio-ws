@@ -22,7 +22,7 @@ import org.exoplatform.services.rest.transformer.InputEntityTransformer;
 import org.exoplatform.services.rest.transformer.OutputEntityTransformer;
 
 /**
- * Created by The eXo Platform SARL .
+ * Created by The eXo Platform SAS .
  * @author Gennady Azarenkov
  * @version $Id: $
  */

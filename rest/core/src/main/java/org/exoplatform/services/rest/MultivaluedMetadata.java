@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.List;
 
 /**
- * Created by The eXo Platform SARL .<br/> A map of key-value pair.
+ * Created by The eXo Platform SAS .<br/> A map of key-value pair.
  * Each key can have few value.<br/>
  * @author Gennady Azarenkov
  * @version $Id: $

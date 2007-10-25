@@ -12,7 +12,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Created by The eXo Platform SARL.<br/> HTTPMethod defines HTTP method for
+ * Created by The eXo Platform SAS.<br/> HTTPMethod defines HTTP method for
  * ResourceContainer
  * @author Gennady Azarenkov
  * @version $Id: $

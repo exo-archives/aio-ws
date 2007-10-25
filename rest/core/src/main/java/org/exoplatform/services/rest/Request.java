@@ -8,7 +8,7 @@ package org.exoplatform.services.rest;
 import java.io.InputStream;
 
 /**
- * Created by The eXo Platform SARL.<br/>
+ * Created by The eXo Platform SAS.<br/>
  * Request represents REST request (not HTTP request).<br/>
  * @author Gennady Azarenkov
  * @version $Id: $

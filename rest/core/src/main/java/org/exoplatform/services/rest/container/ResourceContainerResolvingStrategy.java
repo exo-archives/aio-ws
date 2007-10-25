@@ -8,7 +8,7 @@ package org.exoplatform.services.rest.container;
 import java.util.List;
 
 /**
- * Created by The eXo Platform SARL. <br/>
+ * Created by The eXo Platform SAS. <br/>
  * Abstraction of administration strategy for ResourceContainer
  * @author Gennady Azarenkov
  * @version $Id: $

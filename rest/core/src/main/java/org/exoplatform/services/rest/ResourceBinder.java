@@ -24,7 +24,7 @@ import org.exoplatform.services.rest.container.ResourceContainer;
 import org.exoplatform.services.rest.container.ResourceContainerResolvingStrategy;
 
 /**
- * Created by The eXo Platform SARL.<br/>
+ * Created by The eXo Platform SAS.<br/>
  * For binding and unbinding ResourceContainers.<br/>
  * @author Gennady Azarenkov
  * @version $Id: $

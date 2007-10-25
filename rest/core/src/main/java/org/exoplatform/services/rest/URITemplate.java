@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 
 /**
  * URITemplate defines URI pattern for ResourceContainer.
- * Created by The eXo Platform SARL.
+ * Created by The eXo Platform SAS.
  * @author Gennady Azarenkov
  * @version $Id: $
  */

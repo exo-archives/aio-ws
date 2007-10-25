@@ -5,7 +5,7 @@
 
 package org.exoplatform.services.rest.container;
 /**
- * Created by The eXo Platform SARL        .
+ * Created by The eXo Platform SAS        .
  * @author Gennady Azarenkov
  * @version $Id: $
  */

@@ -7,7 +7,7 @@ package org.exoplatform.services.rest;
 import java.util.Map;
 
 /**
- * Created by The eXo Platform SARL .<br/>
+ * Created by The eXo Platform SAS .<br/>
  * @author Gennady Azarenkov
  * @version $Id: $
  */
