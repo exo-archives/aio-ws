@@ -4,7 +4,7 @@
     <artifactId>config</artifactId>
     <version>0.1</version>
   </parent>
-  
+
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.exoplatform.ws.rest</groupId>
   <artifactId>exo.rest.core</artifactId>
@@ -74,23 +74,24 @@
       <groupId>org.jvnet.jaxb2.maven2</groupId>
       <artifactId>maven-jaxb2-plugin</artifactId>
       <version>0.1</version>
+      <scope>test</scope>
     </dependency>
  		<dependency>
  			<groupId>jetty</groupId>
  			<artifactId>jetty</artifactId>
  			<version>6.1.5</version>
- 		</dependency>   
+ 		</dependency>
  		<dependency>
 	 	<groupId>jetty</groupId>
  			<artifactId>jetty-util</artifactId>
  			<version>6.1.5</version>
- 		</dependency>   
+ 		</dependency>
  		<dependency>
  			<groupId>jetty</groupId>
  			<artifactId>jetty-plus</artifactId>
  			<version>6.1.5</version>
- 		</dependency>   
-  </dependencies>  
+ 		</dependency>
+  </dependencies>
 
   <build>
     <plugins>
