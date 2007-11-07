@@ -5,10 +5,11 @@
 package org.exoplatform.services.rest.transformer;
 
 /**
- * Implementations of GenericOutputEntityTransformer can write
- * given object to OutputStream.<br/>
+ * Implementations of GenericOutputEntityTransformer can write given object to
+ * OutputStream.<br/>
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public interface GenericOutputEntityTransformer extends GenericEntityTransformer {
+public interface GenericOutputEntityTransformer extends
+    GenericEntityTransformer {
 }

@@ -2,9 +2,13 @@
  * Copyright 2001-2007 The eXo Platform SAS         All rights reserved.  *
  * Please look at license.txt in info directory for more license detail.   *
  **************************************************************************/
-package org.exoplatform.services.rest;
+package org.exoplatform.services.rest.container;
 
+import org.exoplatform.services.rest.HTTPMethod;
+import org.exoplatform.services.rest.URITemplate;
+import org.exoplatform.services.rest.URIParam;
 import org.exoplatform.services.rest.container.ResourceContainer;
+import org.exoplatform.services.rest.Response;
 import org.exoplatform.services.rest.transformer.StringOutputTransformer;
 
 /**
@@ -13,16 +17,18 @@ import org.exoplatform.services.rest.transformer.StringOutputTransformer;
  */
 @URITemplate("/level1/level2/")
 public class ResourceContainerAnnot implements ResourceContainer {
-  
+
   @HTTPMethod("GET")
   @URITemplate("/level3/{id1}/{id2}/")
-  public Response method1(@URIParam("id1") String param) {
+  public Response method1(@URIParam("id1")
+  String param) {
     System.out.println(">>> (annot. class) method1 called");
     System.out.println(">>> (annot. class) param = " + param);
     String entity = ">>> annotated container response!!!\n";
     StringOutputTransformer transformer = new StringOutputTransformer();
-    Response resp = Response.Builder.ok(entity, "text/plain").transformer(transformer).build();
+    Response resp = Response.Builder.ok(entity, "text/plain").transformer(
+        transformer).build();
     return resp;
   }
- 
-} 
+
+}

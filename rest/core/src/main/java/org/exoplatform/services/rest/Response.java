@@ -5,10 +5,7 @@
 package org.exoplatform.services.rest;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
@@ -23,11 +20,11 @@ import org.exoplatform.services.rest.transformer.StringOutputTransformer;
  * @version $Id: $
  */
 public class Response {
-  private int status;
-  private EntityMetadata metadata;
-  private Object entity;
-  private OutputEntityTransformer transformer;
-  private MultivaluedMetadata responseHeaders;
+  private int status_;
+  private EntityMetadata metadata_;
+  private Object entity_;
+  private OutputEntityTransformer transformer_;
+  private MultivaluedMetadata responseHeaders_;
 
   /**
    * @param status the HTTP status
@@ -35,13 +32,13 @@ public class Response {
    * @param entity the representation requested object
    * @param transformer the entity serializator
    */
-  protected Response(int status, MultivaluedMetadata responseHeaders, Object entity,
-      OutputEntityTransformer transformer) {
-    this.status = status;
-    this.entity = entity;
-    this.transformer = transformer;
-    this.responseHeaders = responseHeaders;
-    this.metadata = new EntityMetadata(responseHeaders);
+  protected Response(int status, MultivaluedMetadata responseHeaders,
+      Object entity, OutputEntityTransformer transformer) {
+    status_ = status;
+    entity_ = entity;
+    transformer_ = transformer;
+    responseHeaders_ = responseHeaders;
+    metadata_ = new EntityMetadata(responseHeaders);
 
   }
 
@@ -50,7 +47,7 @@ public class Response {
    * @return the HTTP status
    */
   public int getStatus() {
-    return status;
+    return status_;
   }
 
   /**
@@ -58,7 +55,7 @@ public class Response {
    * @return the HTTP headers for response
    */
   public MultivaluedMetadata getResponseHeaders() {
-    return responseHeaders;
+    return responseHeaders_;
   }
 
   /**
@@ -66,68 +63,21 @@ public class Response {
    * @return the entity
    */
   public Object getEntity() {
-    return entity;
+    return entity_;
   }
 
   /**
-   * Content-Length header.
-   * @return content length in bytes
-   */
-// see ResourceDispather for explanation about counting Content-Length
-  
-//  private long length = 0;
-//  public long countContentLength() {
-//    // check is transformer available and is not
-//    // entity represented by InputStream. Can't read
-//    // from Stream!!! (after reading Stream is empty)
-//    if (transformer != null && !InputStream.class.isInstance(entity)) {
-//      final PipedOutputStream pou = new PipedOutputStream();
-//      final PipedInputStream pin = new PipedInputStream();
-//
-//      try {
-//        pin.connect(pou);
-//        new Thread() {
-//          public void run() {
-//            try {
-//              transformer.writeTo(entity, pou);
-//            } catch (IOException e) {
-//              length = 0;
-//            } finally {
-//              try {
-//                pou.flush();
-//                pou.close();
-//              } catch (IOException ioe) {
-//                ;
-//              }
-//            }
-//          }
-//        }.start();
-//
-//        int rd = -1;
-//        byte[] buff = new byte[1024];
-//        while ((rd = pin.read(buff)) != -1) {
-//          length += rd;
-//        }
-//      } catch (IOException ioe) {
-//        length = 0;
-//      } finally {
-//        try {
-//          pin.close();
-//        } catch (IOException ioe) {
-//          length = 0;
-//        }
-//      }
-//    }
-//    return length;
-//  }
-
-  /**
-   * EntityMetadata gives possibility to view some response headers by use method get.<br/>
-   * For example:<br/><pre>metadata.getMediaType()</pre> - Content-Type header.
-   * @return @see org.exoplatform.services.rest.EntityMetadata
+   * EntityMetadata gives possibility to view some response headers by use
+   * method get.<br/> For example:<br/>
+   * 
+   * <pre>
+   * metadata.getMediaType()
+   * </pre> - Content-Type header.
+   * @return
+   * @see org.exoplatform.services.rest.EntityMetadata
    */
   public EntityMetadata getEntityMetadata() {
-    return metadata;
+    return metadata_;
   }
 
   /**
@@ -135,7 +85,7 @@ public class Response {
    * @return the state of OutputEntityTransformer
    */
   public boolean isTransformerInitialized() {
-    if (transformer != null) {
+    if (transformer_ != null) {
       return true;
     }
     return false;
@@ -146,7 +96,7 @@ public class Response {
    * @return the entity state
    */
   public boolean isEntityInitialized() {
-    if (entity != null) {
+    if (entity_ != null) {
       return true;
     }
     return false;
@@ -157,7 +107,7 @@ public class Response {
    * @param transformer the transformer which can serialize entity.
    */
   public void setTransformer(OutputEntityTransformer transformer) {
-    this.transformer = transformer;
+    this.transformer_ = transformer;
   }
 
   /**
@@ -166,8 +116,8 @@ public class Response {
    * @throws IOException Input/Output Exception
    */
   public void writeEntity(OutputStream outputEntityStream) throws IOException {
-    if (transformer != null) {
-      transformer.writeTo(entity, outputEntityStream);
+    if (transformer_ != null) {
+      transformer_.writeTo(entity_, outputEntityStream);
     }
   }
 
@@ -199,7 +149,6 @@ public class Response {
     public Response build() {
       return new Response(status, responseHeaders, entity, transformer);
     }
-    
 
     /**
      * create Builder with selected status.
@@ -262,7 +211,8 @@ public class Response {
      * create Builder with HTTP status 200 (OK),entity and set entity type.
      * @param e the entity
      * @param mediaType the entity type
-     * @return the new instance of Builder with status 200 (OK), entity and media type
+     * @return the new instance of Builder with status 200 (OK), entity and
+     *         media type
      */
     public static Builder ok(Object e, String mediaType) {
       Builder b = ok(e).mediaType(mediaType);
@@ -272,7 +222,8 @@ public class Response {
     /**
      * create Builder with status 201 (CREATED).
      * @param location the location created resources
-     * @return the new instance of Builder with status 201 (CREATED) and header Location
+     * @return the new instance of Builder with status 201 (CREATED) and header
+     *         Location
      */
     public static Builder created(String location) {
       Builder b = newInstance();
@@ -285,8 +236,8 @@ public class Response {
      * create Builder with status 201 (CREATED) and entity.
      * @param e the entity
      * @param location the location created resources
-     * @return the new instance of Builder with status 201 (CREATED),
-     * header Location and Location in entity body
+     * @return the new instance of Builder with status 201 (CREATED), header
+     *         Location and Location in entity body
      */
     public static Builder created(Object e, String location) {
       Builder b = created(location);
@@ -339,7 +290,8 @@ public class Response {
     /**
      * create Builder with HTTP status 304 (NOT MODIFIED) and HTTP EntityTag.
      * @param tag the HTTP EntityTag
-     * @return the new instance of Builder with status 304 (NOT MODIFIED) and HTTP EntityTag
+     * @return the new instance of Builder with status 304 (NOT MODIFIED) and
+     *         HTTP EntityTag
      */
     public static Builder notModified(String tag) {
       Builder b = notModified();
@@ -379,7 +331,8 @@ public class Response {
 
     /**
      * create Builder with HTTP status 500 (INTERNAL SERVER ERROR).
-     * @return the new instance of Builder with status 500 (INTERNAL SERVER ERROR)
+     * @return the new instance of Builder with status 500 (INTERNAL SERVER
+     *         ERROR)
      */
     public static Builder serverError() {
       Builder b = newInstance();
@@ -434,7 +387,7 @@ public class Response {
      * @param languages the List &lt; String &gt; of language
      * @return the Builder with added header "Content-Language"
      */
-    public Builder languages(List < String > languages) {
+    public Builder languages(List<String> languages) {
       this.responseHeaders.put("Content-Language", languages);
       return this;
     }
@@ -444,7 +397,7 @@ public class Response {
      * @param encodings the List &lt; String &gt; of content encoding
      * @return the Builder with added header "Content-Encoding"
      */
-    public Builder encodings(List < String > encodings) {
+    public Builder encodings(List<String> encodings) {
       this.responseHeaders.put("Content-Encoding", encodings);
       return this;
     }
@@ -465,8 +418,8 @@ public class Response {
      * @return the Builder with added "Last-Modified" header
      */
     public Builder lastModified(Date lastModified) {
-      this.responseHeaders
-          .putSingle("Last-Modified", DateFormat.getInstance().format(lastModified));
+      this.responseHeaders.putSingle("Last-Modified", DateFormat.getInstance()
+          .format(lastModified));
       return this;
     }
 
@@ -521,28 +474,29 @@ public class Response {
       this.responseHeaders = headers;
       return this;
     }
-    
+
     /**
-     * @param c @see org.exoplatform.services.rest.CacheControl
+     * @param c
+     * @see org.exoplatform.services.rest.CacheControl
      * @return the Builder with added Cache-Control header
      */
     public Builder cacheControl(CacheControl c) {
       this.responseHeaders.putSingle("Cache-Control", c.getAsString());
       return this;
     }
-    
+
     /**
-     * Prepared error response and set transformer. 
+     * Prepared error response and set transformer.
      * @param message - error message
      * @return the new instance of Builder with entity represented by String and
-     *         StringOutputTransformer. 
+     *         StringOutputTransformer.
      */
     public Builder errorMessage(String message) {
       this.entity = message;
       this.transformer = new StringOutputTransformer();
       return this;
     }
-    
+
   }
 
 }

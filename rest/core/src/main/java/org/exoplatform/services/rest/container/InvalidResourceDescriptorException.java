@@ -4,8 +4,9 @@
  */
 
 package org.exoplatform.services.rest.container;
+
 /**
- * Created by The eXo Platform SAS        .
+ * Created by The eXo Platform SAS .
  * @author Gennady Azarenkov
  * @version $Id: $
  */
@@ -16,15 +17,16 @@ public class InvalidResourceDescriptorException extends Exception {
     super();
   }
 
-  public InvalidResourceDescriptorException(String message, Throwable cause) {
+  public InvalidResourceDescriptorException(final String message,
+      final Throwable cause) {
     super(message, cause);
   }
 
-  public InvalidResourceDescriptorException(String message) {
+  public InvalidResourceDescriptorException(final String message) {
     super(message);
   }
 
-  public InvalidResourceDescriptorException(Throwable cause) {
+  public InvalidResourceDescriptorException(final Throwable cause) {
     super(cause);
   }
 

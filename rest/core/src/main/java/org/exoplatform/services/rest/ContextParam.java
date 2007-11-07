@@ -4,24 +4,18 @@
  **************************************************************************/
 package org.exoplatform.services.rest;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import org.exoplatform.services.rest.transformer.SerializableEntity;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class SimpleSerializableEntity implements SerializableEntity {
-
-	String data;
-
-	public SimpleSerializableEntity() {
-	}
-
-	public void writeObject(OutputStream out) throws IOException {
-		out.write(data.getBytes());
-	}
-
+@Target(value = { PARAMETER })
+@Retention(RUNTIME)
+public @interface ContextParam {
+  String value();
 }

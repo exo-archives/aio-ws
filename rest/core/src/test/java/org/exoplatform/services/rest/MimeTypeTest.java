@@ -12,20 +12,21 @@ import org.exoplatform.services.rest.data.MimeTypes;
  * @version $Id: $
  */
 public class MimeTypeTest extends TestCase {
-	
-	MimeTypes mt;
-	public void setUp() {
-		mt = new MimeTypes("image/jpeg;q=0.8,image/gif;q=0.7,image/png;q=0.9");
-	}
-	
-	public void testMimeTypes() {
-		assertTrue(mt.hasMimeType("image/jpeg"));
-		assertTrue(mt.hasMimeType("image/gif"));
-		assertTrue(mt.hasMimeType("image/png"));
-		assertFalse(mt.hasMimeType("image/jpg"));
-		assertEquals("image/png", mt.getMimeType(0));
-		for(String t : mt.getMimeTypes())
-			System.out.print(t + ",");
-	}
+
+  MimeTypes mt;
+
+  public void setUp() {
+    mt = new MimeTypes("image/jpeg;q=0.8,image/gif;q=0.7,image/png;q=0.9");
+  }
+
+  public void testMimeTypes() {
+    assertTrue(mt.hasMimeType("image/jpeg"));
+    assertTrue(mt.hasMimeType("image/gif"));
+    assertTrue(mt.hasMimeType("image/png"));
+    assertFalse(mt.hasMimeType("image/jpg"));
+    assertEquals("image/png", mt.getMimeType(0));
+    for (String t : mt.getMimeTypes())
+      System.out.print(t + ",");
+  }
 
 }

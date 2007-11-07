@@ -9,29 +9,30 @@ import java.util.regex.Matcher;
 
 /**
  * An abstraction for the value of a HTTP Cache-Control response header.
- * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9">
+ * @see <a
+ *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9">
  *      HTTP/1.1 section 14.9</a>
  */
 public class CacheControl {
 
-  private boolean publicCacheable;
-  private boolean privateCacheable;
-  private boolean noCache;
-  private boolean noStore;
-  private boolean noTransform;
-  private boolean mustRevalidate;
-  private boolean proxyRevalidate;
-  private int maxAge  = -1;
-  private int smaxAge = -1;
-  private List < String > privateFields;
-  private List < String > noCacheFields;
-  private Map < String, String > cacheExtension;
-  
+  private boolean publicCacheable_;
+  private boolean privateCacheable_;
+  private boolean noCache_;
+  private boolean noStore_;
+  private boolean noTransform_;
+  private boolean mustRevalidate_;
+  private boolean proxyRevalidate_;
+  private int maxAge_ = -1;
+  private int smaxAge_ = -1;
+  private List<String> privateFields_;
+  private List<String> noCacheFields_;
+  private Map<String, String> cacheExtension_;
+
   private static final Pattern SPACES_PATTERN = Pattern.compile("\\s");
 
   /**
-   * Create a new instance of CacheControl.<br/>
-   * The new instance will have the following default settings:
+   * Create a new instance of CacheControl.<br/> The new instance will have the
+   * following default settings:
    * <ul>
    * <li>public = true</li>
    * <li>private = false</li>
@@ -46,15 +47,15 @@ public class CacheControl {
    * </ul>
    */
   public CacheControl() {
-    publicCacheable = true;
-    privateCacheable = false;
-    noCache = false;
-    noStore = false;
-    noTransform = true;
-    mustRevalidate = false;
-    proxyRevalidate = false;
+    publicCacheable_ = true;
+    privateCacheable_ = false;
+    noCache_ = false;
+    noStore_ = false;
+    noTransform_ = true;
+    mustRevalidate_ = false;
+    proxyRevalidate_ = false;
   }
-  
+
   /**
    * String representation of CacheControl. This string should be included in
    * response as header.
@@ -81,7 +82,7 @@ public class CacheControl {
       appendString(buff, "must-revalidate");
     }
     if (isProxyRevalidate()) {
-      appendString(buff, "proxy-revalidate"); 
+      appendString(buff, "proxy-revalidate");
     }
     if (getMaxAge() >= 0) {
       appendString(buff, getMaxAge() + "");
@@ -89,7 +90,7 @@ public class CacheControl {
     if (getSMaxAge() >= 0) {
       appendString(buff, getSMaxAge() + "");
     }
-    for (Map.Entry < String, String > entry : getCacheExtension().entrySet()) {
+    for (Map.Entry<String, String> entry : getCacheExtension().entrySet()) {
       appendWithSingleParameter(buff, entry.getKey(), entry.getValue());
     }
     return buff.toString();
@@ -97,294 +98,323 @@ public class CacheControl {
 
   /**
    * Corresponds to the must-revalidate cache control directive.
-   * @return true if the must-revalidate cache control directive will be included in the
-   *         response, false otherwise.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.4">
+   * @return true if the must-revalidate cache control directive will be
+   *         included in the response, false otherwise.
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.4">
    *      HTTP/1.1 section 14.9.4</a>
    */
   public boolean isMustRevalidate() {
-    return mustRevalidate;
+    return mustRevalidate_;
   }
 
   /**
    * Corresponds to the must-revalidate cache control directive.
-   * @param status true if the must-revalidate cache control directive
-   *        should be included in the response, false otherwise.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.4">
+   * @param status true if the must-revalidate cache control directive should be
+   *            included in the response, false otherwise.
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.4">
    *      HTTP/1.1 section 14.9.4</a>
    */
   public void setMustRevalidate(boolean status) {
-    mustRevalidate = status;
+    mustRevalidate_ = status;
   }
 
   /**
    * Corresponds to the proxy-revalidate cache control directive.
-   * @return true if the proxy-revalidate cache control directive will be included in the
-   *         response, false otherwise.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.4">
+   * @return true if the proxy-revalidate cache control directive will be
+   *         included in the response, false otherwise.
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.4">
    *      HTTP/1.1 section 14.9.4</a>
    */
   public boolean isProxyRevalidate() {
-    return proxyRevalidate;
+    return proxyRevalidate_;
   }
 
   /**
    * Corresponds to the must-revalidate cache control directive.
-   * @param status true if the proxy-revalidate cache control directive
-   *        should be included in the response, false otherwise.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.4">HTTP/1.1
+   * @param status true if the proxy-revalidate cache control directive should
+   *            be included in the response, false otherwise.
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.4">HTTP/1.1
    *      section 14.9.4</a>
    */
   public void setProxyRevalidate(boolean status) {
-    proxyRevalidate = status;
+    proxyRevalidate_ = status;
   }
 
   /**
    * Corresponds to the max-age cache control directive.
-   * @return the value of the max-age cache control directive, -1 if the directive is disabled.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.3">
+   * @return the value of the max-age cache control directive, -1 if the
+   *         directive is disabled.
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.3">
    *      HTTP/1.1 section 14.9.3</a>
    */
   public int getMaxAge() {
-    return maxAge;
+    return maxAge_;
   }
 
   /**
    * Corresponds to the max-age cache control directive.
-   * @param age the value of the max-age cache control directive, a value of -1 will disable
-   *        the directive.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.3">HTTP/1.1
+   * @param age the value of the max-age cache control directive, a value of -1
+   *            will disable the directive.
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.3">HTTP/1.1
    *      section 14.9.3</a>
    */
   public void setMaxAge(int age) {
-    maxAge = age;
+    maxAge_ = age;
   }
 
   /**
    * Corresponds to the s-maxage cache control directive.
-   * @return the value of the s-maxage cache control directive, -1 if the directive is disabled.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.3">
+   * @return the value of the s-maxage cache control directive, -1 if the
+   *         directive is disabled.
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.3">
    *      HTTP/1.1 section 14.9.3</a>
    */
   public int getSMaxAge() {
-    return smaxAge;
+    return smaxAge_;
   }
 
   /**
    * Corresponds to the s-maxage cache control directive.
-   * @param age the value of the s-maxage cache control directive, a value
-   *        of -1 will disable the directive.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.3">HTTP/1.1
+   * @param age the value of the s-maxage cache control directive, a value of -1
+   *            will disable the directive.
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.3">HTTP/1.1
    *      section 14.9.3</a>
    */
   public void setSMaxAge(int age) {
-    smaxAge = age;
+    smaxAge_ = age;
   }
 
   /**
    * Corresponds to the no-cache cache control directive.
-   * @return true if the no-cache cache control directive will be included in the
-   *         response, false otherwise.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.1">
+   * @return true if the no-cache cache control directive will be included in
+   *         the response, false otherwise.
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.1">
    *      HTTP/1.1 section 14.9.1</a>
    */
   public boolean isNoCache() {
-    return noCache;
+    return noCache_;
   }
 
   /**
    * Corresponds to the no-cache cache control directive.
    * @param state true if the no-cache cache control directive should be
-   *        included in the response, false otherwise.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.1">HTTP/1.1
+   *            included in the response, false otherwise.
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.1">HTTP/1.1
    *      section 14.9.1</a>
    */
   public void setNoCache(boolean state) {
-    noCache = state;
+    noCache_ = state;
   }
 
   /**
    * Corresponds to the no-cache cache control directive.
    * @param state true if the no-cache cache control directive should be
-   *        included in the response, false otherwise.
+   *            included in the response, false otherwise.
    * @param fields array of fields.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.1">HTTP/1.1
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.1">HTTP/1.1
    *      section 14.9.1</a>
    */
-  public void setNoCache(boolean state, List < String > fields) {
-    noCache = state;
-    noCacheFields = fields;
+  public void setNoCache(boolean state, List<String> fields) {
+    noCache_ = state;
+    noCacheFields_ = fields;
   }
 
   /**
    * Corresponds to the value of the no-cache cache control directive.
-   * @return a mutable list of field-names that will form the value of the no-cache
-   *         cache control directive. An empty list results in a bare no-cache directive.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.1">
+   * @return a mutable list of field-names that will form the value of the
+   *         no-cache cache control directive. An empty list results in a bare
+   *         no-cache directive.
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.1">
    *      HTTP/1.1 section 14.9.1</a>
    */
-  public List < String > getNoCacheFields() {
-    if (noCacheFields == null) {
-      noCacheFields = new ArrayList < String >();
+  public List<String> getNoCacheFields() {
+    if (noCacheFields_ == null) {
+      noCacheFields_ = new ArrayList<String>();
     }
-    return noCacheFields;
+    return noCacheFields_;
   }
 
   /**
    * Corresponds to the public cache control directive.
    * @return true if the public cache control directive will be included in the
    *         response, false otherwise.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.1">
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.1">
    *      HTTP/1.1 section 14.9.1</a>
    */
   public boolean isPublicCacheable() {
-    return publicCacheable;
+    return publicCacheable_;
   }
 
   /**
    * Corresponds to the public cache control directive.
-   * @param status true if the public cache control directive should be
-   *        included in the response, false otherwise.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.1">HTTP/1.1
+   * @param status true if the public cache control directive should be included
+   *            in the response, false otherwise.
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.1">HTTP/1.1
    *      section 14.9.1</a>
    */
   public void setPublicCacheable(boolean status) {
-    publicCacheable = status;
+    publicCacheable_ = status;
   }
 
   /**
    * Corresponds to the private cache control directive.
    * @return true if the private cache control directive will be included in the
    *         response, false otherwise.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.1">
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.1">
    *      HTTP/1.1 section 14.9.1</a>
    */
   public boolean isPrivateCacheable() {
-    return privateCacheable;
+    return privateCacheable_;
   }
 
   /**
    * Corresponds to the private cache control directive.
    * @param status true if the private cache control directive should be
-   *        included in the response, false otherwise.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.1">HTTP/1.1
+   *            included in the response, false otherwise.
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.1">HTTP/1.1
    *      section 14.9.1</a>
    */
   public void setPrivateCacheable(boolean status) {
-    privateCacheable = status;
+    privateCacheable_ = status;
   }
 
   /**
    * Corresponds to the private cache control directive.
    * @param status true if the private cache control directive should be
-   *        included in the response, false otherwise.
+   *            included in the response, false otherwise.
    * @param fields array of fields.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.1">HTTP/1.1
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.1">HTTP/1.1
    *      section 14.9.1</a>
    */
-  public void setPrivateCacheable(boolean status, List < String > fields) {
-    privateCacheable = status;
-    privateFields = fields;
+  public void setPrivateCacheable(boolean status, List<String> fields) {
+    privateCacheable_ = status;
+    privateFields_ = fields;
   }
 
   /**
    * Corresponds to the value of the private cache control directive.
-   * @return a mutable list of field-names that will form the value of the private cache control directive.
-   *         An empty list results in a bare no-cache directive.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.1">HTTP/1.1 section 14.9.1</a>
+   * @return a mutable list of field-names that will form the value of the
+   *         private cache control directive. An empty list results in a bare
+   *         no-cache directive.
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.1">HTTP/1.1
+   *      section 14.9.1</a>
    */
   public List<String> getPrivateFields() {
-    if (privateFields == null) {
-      privateFields = new ArrayList < String >();
+    if (privateFields_ == null) {
+      privateFields_ = new ArrayList<String>();
     }
-    return privateFields;
+    return privateFields_;
   }
 
   /**
    * Corresponds to the no-transform cache control directive.
-   * @return true if the no-transform cache control directive will be included in the
-   *         response, false otherwise.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.5">
+   * @return true if the no-transform cache control directive will be included
+   *         in the response, false otherwise.
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.5">
    *      HTTP/1.1 section 14.9.5</a>
    */
   public boolean isNoTransform() {
-    return noTransform;
+    return noTransform_;
   }
 
   /**
    * Corresponds to the no-transform cache control directive.
-   * @param status true if the no-transform cache control directive should
-   *        be included in the response, false otherwise.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.5">HTTP/1.1
+   * @param status true if the no-transform cache control directive should be
+   *            included in the response, false otherwise.
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.5">HTTP/1.1
    *      section 14.9.5</a>
    */
   public void setNoTransform(boolean status) {
-    noTransform = status;
+    noTransform_ = status;
   }
 
   /**
    * Corresponds to the no-store cache control directive.
-   * @return true if the no-store cache control directive will be included in the
-   *         response, false otherwise.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.2">
+   * @return true if the no-store cache control directive will be included in
+   *         the response, false otherwise.
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.2">
    *      HTTP/1.1 section 14.9.2</a>
    */
   public boolean isNoStore() {
-    return noStore;
+    return noStore_;
   }
 
   /**
    * Corresponds to the no-store cache control directive.
    * @param status true if the no-store cache control directive should be
-   *        included in the response, false otherwise.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.2">HTTP/1.1
+   *            included in the response, false otherwise.
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.2">HTTP/1.1
    *      section 14.9.2</a>
    */
   public void setNoStore(boolean status) {
-    noStore = status;
+    noStore_ = status;
+  }
+
+  /**
+   * Corresponds to a set of extension cache control directives. A mutable map
+   * of cache control extension names and their values. If a key has a null
+   * value, it will appear as a bare directive. If a key has a value that
+   * contains no whitespace then the directive will appear as a simple
+   * name=value pair. If a key has a value that contains whitespace then the
+   * directive will appear as a quoted name="value" pair.
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.6">HTTP/1.1
+   *      section 14.9.6</a>
+   */
+  public void setCacheExtension(Map<String, String> extensions) {
+    cacheExtension_ = extensions;
   }
 
   /**
    * Corresponds to a set of extension cache control directives.
-   * A mutable map of cache control extension names and their values. If
-   * a key has a null value, it will appear as a bare directive. If a
-   * key has a value that contains no whitespace then the directive will
-   * appear as a simple name=value pair. If a key has a value that
-   * contains whitespace then the directive will appear as a quoted
-   * name="value" pair.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.6">HTTP/1.1
-   *      section 14.9.6</a>
-   */
-  public void setCacheExtension(Map < String, String > extensions) {
-    cacheExtension = extensions;
-  }
-  
-  /**
-   * Corresponds to a set of extension cache control directives.
-   * @return a mutable map of cache control extension names and their values.
-   *         If a key has a null value, it will appear as a bare directive. If a key has
-   *         a value that contains no whitespace then the directive will appear as
-   *         a simple name=value pair. If a key has a value that contains whitespace 
-   *         then the directive will appear as a quoted name="value" pair.
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.6">
+   * @return a mutable map of cache control extension names and their values. If
+   *         a key has a null value, it will appear as a bare directive. If a
+   *         key has a value that contains no whitespace then the directive will
+   *         appear as a simple name=value pair. If a key has a value that
+   *         contains whitespace then the directive will appear as a quoted
+   *         name="value" pair.
+   * @see <a
+   *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.6">
    *      HTTP/1.1 section 14.9.6</a>
    */
   public Map<String, String> getCacheExtension() {
-    if (cacheExtension == null) {
-      cacheExtension = new HashMap < String, String >();
+    if (cacheExtension_ == null) {
+      cacheExtension_ = new HashMap<String, String>();
     }
-    return cacheExtension;
+    return cacheExtension_;
   }
 
-//////////////////////////////////////////////////////
   private void appendString(StringBuffer buff, String s) {
-    if(buff.length() > 0) {
+    if (buff.length() > 0) {
       buff.append(", ");
     }
     buff.append(s);
   }
-  
-  private void appendWithSingleParameter(StringBuffer buff, String s, String param) {
+
+  private void appendWithSingleParameter(StringBuffer buff, String s,
+      String param) {
     StringBuffer localBuff = new StringBuffer();
     localBuff.append(s);
     if (param != null && param.length() > 0) {
@@ -394,7 +424,8 @@ public class CacheControl {
     appendString(buff, localBuff.toString());
   }
 
-  private void appendWithParameters (StringBuffer buff, String s, List < String > params) {
+  private void appendWithParameters(StringBuffer buff, String s,
+      List<String> params) {
     appendString(buff, s);
     if (params.size() > 0) {
       StringBuffer localBuff = new StringBuffer();
@@ -406,7 +437,7 @@ public class CacheControl {
       buff.append("\"");
     }
   }
-  
+
   private String addQuotes(String s) {
     Matcher macther = SPACES_PATTERN.matcher(s);
     if (macther.find()) {
@@ -414,5 +445,5 @@ public class CacheControl {
     }
     return s;
   }
-  
+
 }

@@ -3,6 +3,12 @@
 
   <component>
     <type>org.exoplatform.services.rest.ResourceDispatcher</type>
+    <init-params>
+		<properties-param>
+			<name>contex-params</name>
+			<property name="test" value="test11"/>
+		</properties-param>
+    </init-params>
   </component>
   <component>
   	<type>org.exoplatform.services.rest.ResourceBinder</type>

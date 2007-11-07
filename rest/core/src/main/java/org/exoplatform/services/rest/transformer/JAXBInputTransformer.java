@@ -25,9 +25,9 @@ public class JAXBInputTransformer extends InputEntityTransformer {
    * @see org.exoplatform.services.rest.transformer.InputEntityTransformer#readFrom(java.io.InputStream)
    */
   @Override
-  public final Object readFrom(InputStream entityDataStream) throws IOException {
+  public final Object readFrom(final InputStream entityDataStream) throws IOException {
     try {
-      JAXBContext jaxbContext = JAXBContext.newInstance(entityType);
+      JAXBContext jaxbContext = JAXBContext.newInstance(entityType_);
       return jaxbContext.createUnmarshaller().unmarshal(entityDataStream);
     } catch (JAXBException jaxbe) {
       throw new IOException("Can't transform InputStream to Object: " + jaxbe);

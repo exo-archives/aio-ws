@@ -19,7 +19,8 @@ import org.xml.sax.SAXException;
 public class XMLInputTransformer extends InputEntityTransformer {
 
   @Override
-  public final Document readFrom(InputStream entityDataStream) throws IOException {
+  public final Document readFrom(final InputStream entityDataStream)
+      throws IOException {
     try {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setNamespaceAware(true);

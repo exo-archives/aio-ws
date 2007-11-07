@@ -19,33 +19,36 @@ import java.util.regex.Pattern;
 
 public class URIPattern {
 
-  private static Pattern paramPattern = Pattern.compile("\\{[^\\}^\\{]*\\}");
-  private String[]       tokens;
-  private String[]       paramNames;
-  private String         pattern;
-  private Set < String > params;
+  private static Pattern paramPattern_ = Pattern.compile("\\{[^\\}^\\{]*\\}");
+  private String[] tokens_;
+  private String[] paramNames_;
+  private String pattern_;
+  private Set<String> params_;
 
   /**
    * Creates a new instance of ParametrizedStringParser.
+   * @param patternString pattern.
    */
   public URIPattern(String patternString) {
-    tokens = paramPattern.split(patternString, -1);
-    for (int i = 0; i < tokens.length; i++) {
-      if (tokens[i].length() == 0) {
+    tokens_ = paramPattern_.split(patternString, -1);
+    for (int i = 0; i < tokens_.length; i++) {
+      if (tokens_[i].length() == 0) {
         throw new IllegalArgumentException("Invalid pattern:" + patternString);
       }
     }
-    int numParams = tokens.length - 1;
-    paramNames = new String[numParams];
-    Matcher matcher = paramPattern.matcher(patternString);
+    int numParams = tokens_.length - 1;
+    paramNames_ = new String[numParams];
+    Matcher matcher = paramPattern_.matcher(patternString);
     for (int i = 0; matcher.find(); i++) {
-      paramNames[i] = patternString.substring(matcher.start() + 1, matcher.end() - 1);
+      paramNames_[i] = patternString.substring(matcher.start() + 1, matcher
+          .end() - 1);
     }
     if (numParams > 0) {
-      assert paramNames[numParams - 1] != null;
+      assert paramNames_[numParams - 1] != null;
     }
-    this.pattern = patternString;
-    params = Collections.unmodifiableSet(new HashSet < String >(Arrays.asList(paramNames)));
+    this.pattern_ = patternString;
+    params_ = Collections.unmodifiableSet(new HashSet<String>(Arrays
+        .asList(paramNames_)));
   }
 
   /**
@@ -53,8 +56,8 @@ public class URIPattern {
    * participating in the underlying pattern string.
    * @return <code>Set</code> of string parameters
    */
-  public Set < String > getParamNames() {
-    return params;
+  public Set<String> getParamNames() {
+    return params_;
   }
 
   /**
@@ -64,33 +67,36 @@ public class URIPattern {
    * @return <code>Map</code> of parameter names to values
    * @throws IllegalArgumentException if the string doesn't match the pattern
    */
-  public Map < String, String > parse(String string) {
+  public Map<String, String> parse(String string) {
     if (string == null) {
       throw new NullPointerException();
     }
-    Map < String, String > ret = new HashMap < String, String >();
-    if (paramNames.length == 0) {
-      if (string.equals(pattern)) {
+    Map<String, String> ret = new HashMap<String, String>();
+    if (paramNames_.length == 0) {
+      if (string.equals(pattern_)) {
         return ret;
       }
-      throw new IllegalArgumentException("Pattern not matched: " + pattern + ", " + string);
+      throw new IllegalArgumentException("Pattern not matched: " + pattern_ +
+          ", " + string);
     }
     if (!matches(string)) {
-      throw new IllegalArgumentException("Pattern not matched: " + pattern + ", " + string);
+      throw new IllegalArgumentException("Pattern not matched: " + pattern_ +
+          ", " + string);
     }
-    int pos = tokens[0].length();
-    for (int i = 0; i < paramNames.length; i++) {
-      int nextPos = tokens[i + 1].length() > 0 ? string.indexOf(tokens[i + 1], pos) : string.length();
+    int pos = tokens_[0].length();
+    for (int i = 0; i < paramNames_.length; i++) {
+      int nextPos = tokens_[i + 1].length() > 0 ? string.indexOf(tokens_[i + 1],
+          pos) : string.length();
       if (nextPos < 0) {
-        throw new IllegalArgumentException("Pattern not matched: " + pattern + ", " + string);
+        throw new IllegalArgumentException("Pattern not matched: " + pattern_ +
+            ", " + string);
       }
-      if (i == paramNames.length - 1
-          && tokens[i + 1].equals("/")) {
-        ret.put(paramNames[i], string.substring(pos, string.length() - 1));
+      if (i == paramNames_.length - 1 && tokens_[i + 1].equals("/")) {
+        ret.put(paramNames_[i], string.substring(pos, string.length() - 1));
       } else {
-        ret.put(paramNames[i], string.substring(pos, nextPos));
+        ret.put(paramNames_[i], string.substring(pos, nextPos));
       }
-      pos = nextPos + tokens[i + 1].length();
+      pos = nextPos + tokens_[i + 1].length();
     }
     return ret;
   }
@@ -101,19 +107,19 @@ public class URIPattern {
    * @return true if the string matches the pattern false otherwise
    */
   public boolean matches(String string) {
-    if (string.indexOf(tokens[0], 0) != 0) {
+    if (string.indexOf(tokens_[0], 0) != 0) {
       return false;
     }
-    int pos = tokens[0].length();
-    for (int i = 0; i < paramNames.length; i++) {
-      int nextPos = (tokens[i + 1].length() > 0) ? string.indexOf(tokens[i + 1], pos)
-          : string.length();
+    int pos = tokens_[0].length();
+    for (int i = 0; i < paramNames_.length; i++) {
+      int nextPos = (tokens_[i + 1].length() > 0) ? string.indexOf(
+          tokens_[i + 1], pos) : string.length();
       if (nextPos < 0) {
         return false;
       }
-      pos = nextPos + tokens[i + 1].length();
+      pos = nextPos + tokens_[i + 1].length();
     }
-    if (string.lastIndexOf(tokens[tokens.length - 1], string.length()) < 0) {
+    if (string.lastIndexOf(tokens_[tokens_.length - 1], string.length()) < 0) {
       return false;
     }
     return true;
@@ -128,22 +134,23 @@ public class URIPattern {
     Pattern p = Pattern.compile("\\{.*\\}");
     return matches(p.matcher(another.getString()).replaceAll("x"));
 
-//    int minSize = (tokens.length <= another.getTokens().length) ? tokens.length : another
-//        .getTokens().length;
-//    for (int i = 0; i < minSize; i++) {
-//      if (!tokens[i].equals(another.getTokens()[i])) {
-//        return false;
-//      }
-//    }
-//    return true;
+// int minSize = (tokens.length <= another.getTokens().length) ? tokens.length :
+// another
+// .getTokens().length;
+// for (int i = 0; i < minSize; i++) {
+// if (!tokens[i].equals(another.getTokens()[i])) {
+// return false;
+// }
+// }
+// return true;
   }
 
   /**
    * Returns the underlying pattern string.
-   * @return the underlying pattern string
+   * @return the underlying pattern string.
    */
   public String getString() {
-    return pattern;
+    return pattern_;
   }
 
 }

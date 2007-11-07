@@ -7,7 +7,6 @@ package org.exoplatform.services.rest.transformer;
 import java.io.OutputStream;
 import java.io.IOException;
 
-
 /**
  * This type of transformers can work with objects which implement interface
  * SerializableEntity. Transformer use own method of Object for writing object
@@ -22,7 +21,8 @@ public class SerializableTransformer extends OutputEntityTransformer {
    * @see org.exoplatform.services.rest.transformer.OutputEntityTransformer#writeTo(java.lang.Object,
    *      java.io.OutputStream)
    */
-  public final void writeTo(Object entity, OutputStream entityDataStream) throws IOException {
+  public final void writeTo(final Object entity,
+      final OutputStream entityDataStream) throws IOException {
     SerializableEntity e = (SerializableEntity) entity;
     e.writeObject(entityDataStream);
   }

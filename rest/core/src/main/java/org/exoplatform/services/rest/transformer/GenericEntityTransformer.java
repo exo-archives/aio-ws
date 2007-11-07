@@ -5,9 +5,8 @@
 package org.exoplatform.services.rest.transformer;
 
 /**
- * Abstraction of transformer.
- * Transformer is a Java Object which can write given object to
- * OutputStream and build some object from InputStream.<br/>
+ * Abstraction of transformer. Transformer is a Java Object which can write
+ * given object to OutputStream and build some object from InputStream.<br/>
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */

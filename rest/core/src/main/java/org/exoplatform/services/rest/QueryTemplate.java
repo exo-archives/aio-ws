@@ -4,19 +4,18 @@
  **************************************************************************/
 package org.exoplatform.services.rest;
 
-import org.exoplatform.services.rest.container.ResourceContainer;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static java.lang.annotation.ElementType.METHOD;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-@URITemplate("/level1/{method}/")
-public class ResourceContainerPOST implements ResourceContainer {
-
-  @HTTPMethod("POST")
-  public Response method1(@URIParam("method") String methodName) throws Exception {
-    System.out.println(">>>ResourceContainerPOST - method: " + methodName);
-    return Response.Builder.ok().build();
-  }
-
+@Target(value = { METHOD })
+@Retention(RUNTIME)
+public @interface QueryTemplate {
+  String value();
 }

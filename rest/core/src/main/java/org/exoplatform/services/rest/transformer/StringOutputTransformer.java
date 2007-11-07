@@ -20,7 +20,8 @@ public class StringOutputTransformer extends OutputEntityTransformer {
    *      java.lang.Object, java.io.OutputStream)
    */
   @Override
-  public final void writeTo(Object entity, OutputStream entityDataStream) throws IOException {
+  public final void writeTo(final Object entity, final OutputStream entityDataStream)
+      throws IOException {
     String e = (String) entity;
     entityDataStream.write(e.getBytes());
   }

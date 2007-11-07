@@ -13,6 +13,7 @@ import java.lang.annotation.Target;
 /**
  * UriParam define the names of URI. In this way ResourceContainer gets only URI
  * parameters wich it needs. For example:<br/>
+ * 
  * <pre>
  * URI pattern: /level1/{id1}/level2/{id2}/level3
  * and URI:     /level1/myID1/level2/myID2/level3
@@ -21,12 +22,13 @@ import java.lang.annotation.Target;
  * ...
  * }
  * </pre>
- * <br/>
- * Method getMethod gets URI parameter "id2" (in this example myID2) as String id.<br/>
+ * 
+ * <br/> Method getMethod gets URI parameter "id2" (in this example myID2) as
+ * String id.<br/>
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-@Target(value = {PARAMETER})
+@Target(value = { PARAMETER })
 @Retention(RUNTIME)
 public @interface URIParam {
   String value();

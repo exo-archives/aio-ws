@@ -13,19 +13,19 @@ import java.util.Map;
  */
 public class ResourceIdentifier {
 
-  private Map < String, String > parameters = null;
-  
+  private Map<String, String> parameters = null;
+
   private String host = "localhost";
-  
+
   private String uri;
-  
+
   private String baseURI;
 
   public ResourceIdentifier(String host, String baseURI, String relURI) {
     this(baseURI, relURI);
     this.host = host;
-  }  
-  
+  }
+
   /**
    * @param baseURI the base URI
    * @param relURI the relative URI
@@ -37,7 +37,7 @@ public class ResourceIdentifier {
 
   /**
    * @param relURI the relative URI Relative URI used for identification
-   *          ResourceContainer with can serve the request
+   *            ResourceContainer with can serve the request
    */
   public ResourceIdentifier(String relURI) {
     this("", relURI);
@@ -48,8 +48,8 @@ public class ResourceIdentifier {
    */
   public String getHost() {
     return host;
-  }  
-  
+  }
+
   /**
    * @return the relative URI
    */
@@ -77,7 +77,7 @@ public class ResourceIdentifier {
    * @return the key-value pairs of URi parameters.
    * @throws IllegalStateException URI parameters not initialized yet.
    */
-  public Map < String, String > getParameters() throws IllegalStateException {
+  public Map<String, String> getParameters() throws IllegalStateException {
     if (parameters == null) {
       throw new IllegalStateException(
           "Prarameters are not initialized. Call initParameters(pattern) first");

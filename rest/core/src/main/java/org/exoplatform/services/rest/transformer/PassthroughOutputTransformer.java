@@ -17,15 +17,18 @@ import java.io.OutputStream;
  */
 public class PassthroughOutputTransformer extends OutputEntityTransformer {
 
+  private static final int BUFF_SIZE = 4096;
+  
   /*
    * (non-Javadoc)
    * @see org.exoplatform.services.rest.transformer.OutputEntityTransformer#writeTo(java.lang.Object,
    *      java.io.OutputStream)
    */
   @Override
-  public final void writeTo(Object entity, OutputStream entityDataStream) throws IOException {
+  public final void writeTo(final Object entity, final OutputStream entityDataStream)
+      throws IOException {
     InputStream e = (InputStream) entity;
-    byte[] buf = new byte[4096];
+    byte[] buf = new byte[BUFF_SIZE];
     int rd = -1;
     while ((rd = e.read(buf)) != -1) {
       entityDataStream.write(buf, 0, rd);

@@ -11,14 +11,15 @@ package org.exoplatform.services.rest.transformer;
  */
 public class EntityTransformerFactory {
 
-  private final Class < ? extends GenericEntityTransformer > transformerType;
+  private final Class<? extends GenericEntityTransformer> transformerType_;
 
   /**
    * Create a new instance of GenericEntityTransformer.<br/>
    * @param transformerType the type of transformer with should be creted.
    */
-  public EntityTransformerFactory(Class < ? extends GenericEntityTransformer > transformerType) {
-    this.transformerType = transformerType;
+  public EntityTransformerFactory(
+      Class<? extends GenericEntityTransformer> transformerType) {
+    this.transformerType_ = transformerType;
   }
 
   /**
@@ -28,7 +29,7 @@ public class EntityTransformerFactory {
    * @throws Exception create transformer instance exception
    */
   public final GenericEntityTransformer newTransformer() throws Exception {
-    return transformerType.newInstance();
+    return transformerType_.newInstance();
   }
 
 }

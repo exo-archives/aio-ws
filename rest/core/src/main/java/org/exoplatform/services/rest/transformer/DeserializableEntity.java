@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Object implement this interface should be able to read
- * entity data by own methods.<br/>
+ * Object implement this interface should be able to read entity data by own
+ * methods.<br/>
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */

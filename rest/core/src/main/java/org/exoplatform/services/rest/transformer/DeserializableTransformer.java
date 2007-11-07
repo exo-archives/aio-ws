@@ -7,7 +7,6 @@ package org.exoplatform.services.rest.transformer;
 import java.io.InputStream;
 import java.io.IOException;
 
-
 /**
  * This type of transformers can work whith objects which implement interface
  * DeserializableEntity. Transformer use own method of Object for reading object
@@ -21,9 +20,10 @@ public class DeserializableTransformer extends InputEntityTransformer {
    * (non-Javadoc)
    * @see org.exoplatform.services.rest.transformer.InputEntityTransformer#readFrom(java.io.InputStream)
    */
-  public final DeserializableEntity readFrom(InputStream entityDataStream) throws IOException {
+  public final DeserializableEntity readFrom(final InputStream entityDataStream)
+      throws IOException {
     try {
-      DeserializableEntity e = (DeserializableEntity) entityType.newInstance();
+      DeserializableEntity e = (DeserializableEntity) entityType_.newInstance();
       e.readObject(entityDataStream);
       return e;
     } catch (IllegalAccessException iae) {

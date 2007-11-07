@@ -2,7 +2,7 @@
  * Copyright 2001-2007 The eXo Platform SAS         All rights reserved.  *
  * Please look at license.txt in info directory for more license detail.   *
  **************************************************************************/
-package org.exoplatform.services.rest;
+package org.exoplatform.services.rest.container;
 
 import java.math.BigDecimal;
 
@@ -11,13 +11,18 @@ import org.exoplatform.services.rest.transformer.JAXBOutputTransformer;
 import org.exoplatform.services.rest.container.ResourceContainer;
 import org.exoplatform.services.rest.generated.*;
 
+import org.exoplatform.services.rest.OutputTransformer;
+import org.exoplatform.services.rest.InputTransformer;
+import org.exoplatform.services.rest.HTTPMethod;
+import org.exoplatform.services.rest.URITemplate;
+import org.exoplatform.services.rest.Response;
+
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 @URITemplate("/test/jaxb/")
-public class ResourceContainerJAXB implements ResourceContainer{
-
+public class ResourceContainerJAXB implements ResourceContainer {
 
   @HTTPMethod("GET")
   @InputTransformer(JAXBInputTransformer.class)
@@ -27,17 +32,19 @@ public class ResourceContainerJAXB implements ResourceContainer{
     System.out.println(">>> JAXBTransformation");
     System.out.println("==Book Card==");
     System.out.println("===> tittle: " + book.getTitle());
-		System.out.println("===> author: " + book.getAuthor());
-		System.out.println("===> currency price: " + book.getPrice().getCurrency());
-		System.out.println("===> currency member price: " + book.getMemberPrice().getCurrency());
-		System.out.println("===> price: " + book.getPrice().getValue());
-		System.out.println("===> member price: " + book.getMemberPrice().getValue());
+    System.out.println("===> author: " + book.getAuthor());
+    System.out.println("===> currency price: " + book.getPrice().getCurrency());
+    System.out.println("===> currency member price: " +
+        book.getMemberPrice().getCurrency());
+    System.out.println("===> price: " + book.getPrice().getValue());
+    System.out
+        .println("===> member price: " + book.getMemberPrice().getValue());
     book.setTitle("Red Hat Enterprise Linux 5 Administration Unleashed");
     book.setAuthor("Tammy Fox");
     book.setSendByPost(false);
     book.setPrice(createPrice("EUR", 21.75f));
     book.setMemberPrice(createMemberPrice("EUR", 17.25f));
-    
+
     return Response.Builder.ok(book, "text/xml").build();
   }
 
@@ -54,5 +61,5 @@ public class ResourceContainerJAXB implements ResourceContainer{
     mprice.setValue(new BigDecimal(value));
     return mprice;
   }
-  
+
 }

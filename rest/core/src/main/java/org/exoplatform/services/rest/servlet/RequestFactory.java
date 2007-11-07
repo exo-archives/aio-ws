@@ -20,11 +20,12 @@ import org.exoplatform.services.rest.ResourceIdentifier;
  * @version $Id: $
  */
 public class RequestFactory {
-  
-  /* 
+
+  /*
    * Class has only static methods.
    */
-  private RequestFactory() {}
+  private RequestFactory() {
+  }
 
   /**
    * Create REST request.
@@ -32,7 +33,8 @@ public class RequestFactory {
    * @return REST request REST request
    * @throws IOException Input/Output Exception
    */
-  public static Request createRequest(HttpServletRequest httpRequest) throws IOException {
+  public static Request createRequest(HttpServletRequest httpRequest)
+      throws IOException {
     String pathInfo = httpRequest.getPathInfo();
     String method = httpRequest.getMethod();
     MultivaluedMetadata headerParams = parseHttpHeaders(httpRequest);
@@ -44,25 +46,26 @@ public class RequestFactory {
     // if(contentType == null)
     // contentType = "application/octet-stream";
     // //
-    String port = (httpRequest.getServerPort() == 80) ? "" : ":" + httpRequest.getServerPort();
+    String port = (httpRequest.getServerPort() == 80) ? "" : ":" +
+        httpRequest.getServerPort();
 
-    String baseURI = httpRequest.getScheme()
-        + "://" + httpRequest.getServerName()
-        + port
-        + httpRequest.getContextPath()
-    	+ httpRequest.getServletPath();
+    String baseURI = httpRequest.getScheme() + "://" +
+        httpRequest.getServerName() + port + httpRequest.getContextPath() +
+        httpRequest.getServletPath();
 
-    ResourceIdentifier identifier = new ResourceIdentifier(httpRequest.getServerName(), baseURI, pathInfo);
+    ResourceIdentifier identifier = new ResourceIdentifier(httpRequest
+        .getServerName(), baseURI, pathInfo);
     return new Request(in, identifier, method, headerParams, queryParams);
   }
 
   /**
    * Parse headers from http request.
-   * @param httpRequest HttpServletRequest 
-   * @return Map provide http header in structure Map &lt; String,
-   * Enumeration &lt; String &gt; &gt;
+   * @param httpRequest HttpServletRequest
+   * @return Map provide http header in structure Map &lt; String, Enumeration
+   *         &lt; String &gt; &gt;
    */
-  private static MultivaluedMetadata parseHttpHeaders(HttpServletRequest httpRequest) {
+  private static MultivaluedMetadata parseHttpHeaders(
+      HttpServletRequest httpRequest) {
     MultivaluedMetadata headerParams = new MultivaluedMetadata();
     Enumeration temp = httpRequest.getHeaderNames();
     while (temp.hasMoreElements()) {
@@ -78,9 +81,11 @@ public class RequestFactory {
   /**
    * Parse query parameters from http request
    * @param httpRequest HttpServletRequest
-   * @return Map provide http query params in structure Map &gt; String, String[] &gt;
+   * @return Map provide http query params in structure Map &gt; String,
+   *         String[] &gt;
    */
-  private static MultivaluedMetadata parseQueryParams(HttpServletRequest httpRequest) {
+  private static MultivaluedMetadata parseQueryParams(
+      HttpServletRequest httpRequest) {
     MultivaluedMetadata queryParams = new MultivaluedMetadata();
     Enumeration temp = httpRequest.getParameterNames();
     while (temp.hasMoreElements()) {

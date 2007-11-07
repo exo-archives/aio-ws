@@ -6,10 +6,16 @@ package org.exoplatform.services.rest;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-//import org.apache.commons.logging.Log;
-//import org.exoplatform.services.log.ExoLogger;
+// import org.apache.commons.logging.Log;
+// import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.PropertiesParam;
+import org.exoplatform.container.xml.Property;
 import org.exoplatform.services.rest.container.InvalidResourceDescriptorException;
 import org.exoplatform.services.rest.container.ResourceDescriptor;
 import org.exoplatform.services.rest.data.MimeTypes;
@@ -18,134 +24,175 @@ import org.exoplatform.services.rest.transformer.OutputEntityTransformer;
 import org.exoplatform.services.rest.transformer.EntityTransformerFactory;
 
 /**
- * Created by The eXo Platform SAS.<br/>
- * ResourceDispatcher finds ResourceContainer with can serve the Request and calls method it.
+ * Created by The eXo Platform SARL.<br/> ResourceDispatcher finds
+ * ResourceContainer with can serve the Request and calls method it.
  * @author Gennady Azarenkov
  * @version $Id: $
  */
 public class ResourceDispatcher implements Connector {
 
-  private List < ResourceDescriptor > resourceDescriptors;
-  private ThreadLocal < Context > contextHolder = new ThreadLocal < Context >();
-//  private static final Log LOGGER = ExoLogger.getLogger("ResourceDispatcher");
+  public static final String CONTEXT_PARAM_HOST = "host";
+  public static final String CONTEXT_PARAM_BASE_URI = "baseURI";
+  public static final String CONTEXT_PARAM_REL_URI = "relURI";
+
+  private List<ResourceDescriptor> resourceDescriptors_;
+  private ThreadLocal<Context> contextHolder_ = new ThreadLocal<Context>();
+  private final Map<String, String> contextParams_ = new HashMap<String, String>();
+
+// private static final Log LOGGER = ExoLogger.getLogger("ResourceDispatcher");
 
   /**
    * Constructor gets all binded ResourceContainers from ResourceBinder.
    * @param containerContext ExoContainerContext
    * @throws Exception any Exception
    */
-  public ResourceDispatcher(ResourceBinder binder) throws Exception {
-    this.resourceDescriptors = binder.getAllDescriptors();
+  public ResourceDispatcher(InitParams params, ResourceBinder binder)
+      throws Exception {
+    PropertiesParam contextParam = params.getPropertiesParam("contex-params");
+    if (contextParam != null) {
+      Iterator<Property> iterator = contextParam.getPropertyIterator();
+      while (iterator.hasNext()) {
+        Property property = iterator.next();
+        contextParams_.put(property.getName(), property.getValue());
+      }
+    }
+    this.resourceDescriptors_ = binder.getAllDescriptors();
   }
 
   /**
-   * Dispatchs Request to method of ResourceContainer.
-   * @param request REST request
-   * @return REST response from ResourceContainer
-   * @throws Exception any Exception
+   * Dispatches Request to method of ResourceContainer.
+   * @param request REST request.
+   * @return REST response from ResourceContainer.
+   * @throws Exception any Exception.
    */
   public Response dispatch(Request request) throws Exception {
     String requestedURI = request.getResourceIdentifier().getURI();
     String methodName = request.getMethodName();
     String acceptedMimeTypes = (request.getHeaderParams().get("accept") != null) ? request
-        .getHeaderParams().get("accept") : MimeTypes.ALL;
+        .getHeaderParams().get("accept")
+        : MimeTypes.ALL;
     MimeTypes requestedMimeTypes = new MimeTypes(acceptedMimeTypes);
+    for (ResourceDescriptor resource : resourceDescriptors_) {
 
-    for (ResourceDescriptor resource : resourceDescriptors) {
-      MimeTypes producedMimeTypes = new MimeTypes(resource.getProducedMimeTypes());
+      MimeTypes producedMimeTypes = new MimeTypes(resource
+          .getProducedMimeTypes());
+      MultivaluedMetadata annotatedQueryParams = resource.getQueryPattern();
+
       // Check is this ResourceContainer have appropriated parameters,
-      // such URIPattern, HTTP method and mimetype
-      
-      if (resource.getAcceptableMethod().equalsIgnoreCase(methodName)
-          && resource.getURIPattern().matches(requestedURI)
-          && (compareMimeTypes(requestedMimeTypes.getMimeTypes(), producedMimeTypes.getMimeTypes()))) {
+      // such URIPattern, HTTP method, QueryParamFilter and mimetype.
+      if (resource.getAcceptableMethod().equalsIgnoreCase(methodName) &&
+          resource.getURIPattern().matches(requestedURI) &&
+          (compareMimeTypes(requestedMimeTypes.getMimeTypes(),
+              producedMimeTypes.getMimeTypes())) &&
+          (isQueryParamsMatches(request.getQueryParams(), annotatedQueryParams))) {
         ResourceIdentifier identifier = request.getResourceIdentifier();
         identifier.initParameters(resource.getURIPattern());
 
         // set initialized context to thread local
-        contextHolder.set(new Context(identifier));
+        contextHolder_.set(new Context(contextParams_, identifier));
 
-        Annotation[] methodParametersAnnotations = resource.getMethodParameterAnnotations();
-        Class < ? >[] methodParameters = resource.getMethodParameters();
+        Annotation[] methodParametersAnnotations = resource
+            .getMethodParameterAnnotations();
+        Class<?>[] methodParameters = resource.getMethodParameters();
         Object[] params = new Object[methodParameters.length];
         // building array of parameters
         for (int i = 0; i < methodParametersAnnotations.length; i++) {
           if (methodParametersAnnotations[i] == null) {
-            EntityTransformerFactory factory = new EntityTransformerFactory(resource
-                .getInputTransformerType());
-            InputEntityTransformer transformer = (InputEntityTransformer) factory.newTransformer();
+            EntityTransformerFactory factory = new EntityTransformerFactory(
+                resource.getInputTransformerType());
+            InputEntityTransformer transformer = (InputEntityTransformer) factory
+                .newTransformer();
             transformer.setType(methodParameters[i]);
             params[i] = transformer.readFrom(request.getEntityStream());
           } else {
             Annotation a = methodParametersAnnotations[i];
             if (a.annotationType().isAssignableFrom(URIParam.class)) {
               URIParam u = (URIParam) a;
-              params[i] = request.getResourceIdentifier().getParameters().get(u.value());
-              contextHolder.get().setURIParam(u.value(), (String) params[i]);
+              params[i] = request.getResourceIdentifier().getParameters().get(
+                  u.value());
             } else if (a.annotationType().isAssignableFrom(HeaderParam.class)) {
               HeaderParam h = (HeaderParam) a;
               params[i] = request.getHeaderParams().get(h.value());
-              contextHolder.get().setHeaderParam(h.value(), (String) params[i]);
             } else if (a.annotationType().isAssignableFrom(QueryParam.class)) {
               QueryParam q = (QueryParam) a;
               params[i] = request.getQueryParams().get(q.value());
-              contextHolder.get().setQueryParam(q.value(), (String) params[i]);
+            } else if (a.annotationType().isAssignableFrom(ContextParam.class)) {
+              ContextParam c = (ContextParam) a;
+              params[i] = contextHolder_.get().get(c.value());
             }
           }
         }
-        Response resp =
-          (Response) resource.getServer().invoke(resource.getResourceContainer(), params);
-        
+        Response resp = (Response) resource.getServer().invoke(
+            resource.getResourceContainer(), params);
+
         if (!resp.isTransformerInitialized() && resp.isEntityInitialized()) {
           resp.setTransformer(getTransformer(resource));
         }
-//  Disable count content lenght.
-//  If Content-Lenght was not set by ResourceContainer HTTPResponse must be chunked (HTTP 1.1 client only) 
-//        if (resp.getEntityMetadata().getLength() == 0) {
-//          long contentLength = resp.countContentLength();
-////          if (contentLength == 0) {
-////            logger.warn("Length of content can't be counted."
-////                + " May be data represented by InputStream. Content-Length header: 0");
-////          }
-//          resp.getResponseHeaders().putSingle("Content-Length", contentLength + "");
-//        }
-//TODO solution about default Cache-Control        
-//        if (resp.getEntityMetadata().getCacheControl() == null) {
-//          resp.getResponseHeaders().putSingle("Cache-Control", new CacheControl().getAsString());
-//        }
         return resp;
       }
     }
     // if no one ResourceContainer found
-    throw new NoSuchMethodException("No method found for " + methodName + " " + requestedURI + " "
-        + acceptedMimeTypes);
+    throw new NoSuchMethodException("No method found for " + methodName + " " +
+        requestedURI + " " + acceptedMimeTypes);
   }
-  
+
   /**
    * Get runtime context.
-   * @return the runtimeContext
+   * @return the runtimeContext.
+   * @deprecated Instead of directly use <code>Context</code> should be user
+   *             <code>@ContextParam</code>.
    */
+  @Deprecated
   public Context getRuntimeContext() {
-    return contextHolder.get();
+    return contextHolder_.get();
   }
 
   private OutputEntityTransformer getTransformer(ResourceDescriptor resource)
       throws InvalidResourceDescriptorException {
     try {
-      EntityTransformerFactory factory =
-        new EntityTransformerFactory(resource.getOutputTransformerType());
+      EntityTransformerFactory factory = new EntityTransformerFactory(resource
+          .getOutputTransformerType());
       return (OutputEntityTransformer) factory.newTransformer();
     } catch (Exception e) {
-      throw new InvalidResourceDescriptorException("Could not get EntityTransformer from Response"
-          + " or annotation to ResourceDescriptor. Exception: " + e);
+      throw new InvalidResourceDescriptorException(
+          "Could not get EntityTransformer from Response" +
+              " or annotation to ResourceDescriptor. Exception: " + e);
     }
   }
 
   /**
+   * Compared query parameters.
+   * @param fromRequest - query from request.
+   * @param queryPattern - annotated query string.
+   * @return true if query parameters matches to pattern false otherwise.
+   */
+  private boolean isQueryParamsMatches(MultivaluedMetadata fromRequest,
+      MultivaluedMetadata queryPattern) {
+    // if resource has not any QueryPattern it accept all request
+    if (queryPattern.keys().size() == 0) {
+      return true;
+    }
+    if (!fromRequest.keys().containsAll(queryPattern.keys())) {
+      return false;
+    }
+    Set<String> keys = queryPattern.keys();
+    Iterator<String> iterator = keys.iterator();
+    while (iterator.hasNext()) {
+      String key = iterator.next();
+      List<String> r = fromRequest.getList(key);
+      List<String> p = queryPattern.getList(key);
+      if (!r.containsAll(p)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * Compared requested and produced mimetypes.
-   * @param requested mimetypes from request
-   * @param produced mimetypes wich ResourceContainer can produce
-   * @return comparetion result
+   * @param requested mimetypes from request.
+   * @param produced mimetypes which ResourceContainer can produce.
+   * @return true if mimetypes compatible false otherwise.
    */
   private boolean compareMimeTypes(String[] requested, String[] produced) {
     for (String r : requested) {
@@ -172,54 +219,57 @@ public class ResourceDispatcher implements Connector {
    * resource.
    */
   public class Context {
-    
-    private HashMap < String, String > uriParams;
-    private MultivaluedMetadata headerParams;
-    private MultivaluedMetadata queryParams;
-    private ResourceIdentifier identifier;
 
-    public Context(ResourceIdentifier identifier) {
-      this.identifier = identifier;
-      uriParams = new HashMap < String, String >();
-      headerParams = new MultivaluedMetadata();
-      queryParams = new MultivaluedMetadata();
+    private final Map<String, String> params_;
+
+    private Context(Map<String, String> params, ResourceIdentifier identifier) {
+      params_ = params;
+      params_.put(CONTEXT_PARAM_HOST, identifier.getHost());
+      params_.put(CONTEXT_PARAM_BASE_URI, identifier.getBaseURI());
+      params_.put(CONTEXT_PARAM_REL_URI, identifier.getURI());
     }
 
+    /**
+     * @return the host name.
+     * @deprecated Instead this method use
+     *             <code>@ContextParam(ResourceDispatcher.CONTEXT_PARAM_HOST)</code>.
+     */
+    @Deprecated
     public String getServerName() {
-      return identifier.getHost();
-    }
-    
-    public String getContextHref() {
-      return identifier.getBaseURI();      
-    }
-    
-    /**
-     * Retrun absolute location to the requested resource.
-     * @return the absolte location
-     */
-    public String getAbsLocation() {
-      return identifier.getBaseURI() + identifier.getURI();
+      return params_.get("host");
     }
 
     /**
-     * Add additation path to absolute loaction and return result.
-     * @param additionalPath the additional path
-     * @return absolute location
+     * @return the baseURI.
+     * @deprecated Instead this method use
+     *             <code>@ContextParam(ResourceDispatcher.CONTEXT_PARAM_BASE_URI)</code>.
      */
+    @Deprecated
+    public String getContextHref() {
+      return params_.get("baseURI");
+    }
+
+    /**
+     * Return absolute location to the requested resource.
+     * @return the absolute location.
+     */
+    @Deprecated
+    public String getAbsLocation() {
+      return params_.get("baseURI") + params_.get("URI");
+    }
+
+    /**
+     * Add additional path to absolute location and return result.
+     * @param additionalPath the additional path.
+     * @return absolute location.
+     */
+    @Deprecated
     public String createAbsLocation(String additionalPath) {
       return getAbsLocation() + additionalPath;
     }
 
-    private void setURIParam(String key, String value) {
-      uriParams.put(key, value);
-    }
-
-    private void setHeaderParam(String key, String value) {
-      headerParams.putSingle(key, value);
-    }
-
-    private void setQueryParam(String key, String value) {
-      queryParams.putSingle(key, value);
+    private String get(String key) {
+      return params_.get(key);
     }
   }
 

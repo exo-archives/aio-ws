@@ -9,16 +9,16 @@ import java.util.regex.Matcher;
 
 /**
  * This class has the set of utils for work with HTTP headers.
- * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 public class HeaderUtils {
-  
+
   /*
-   * Class has only static methods. 
+   * Class has only static methods.
    */
-  private HeaderUtils() {}
+  private HeaderUtils() {
+  }
 
   private static final Pattern SPACE_PATTERN = Pattern.compile("(\\s+)");
 
@@ -50,17 +50,17 @@ public class HeaderUtils {
   }
 
   /*
-   * Check if the quality beetwen 0 an 1. Otherwise IllegalArgumentException. 
+   * Check if the quality beetwen 0 an 1. Otherwise IllegalArgumentException.
    */
   private static float parseQuality(String s) {
     float q = Float.valueOf(s);
     if (q >= 0f && q <= 1.0f) {
       return q;
     }
-    throw new IllegalArgumentException("Invalid quality value " + q + ", must be between 0 and 1");
+    throw new IllegalArgumentException("Invalid quality value " + q +
+        ", must be between 0 and 1");
   }
 
-  
   /*
    * sort array by quality. The strings with higher quality go first.
    */

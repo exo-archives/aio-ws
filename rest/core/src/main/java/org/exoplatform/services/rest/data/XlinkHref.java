@@ -8,8 +8,8 @@ package org.exoplatform.services.rest.data;
 import org.w3c.dom.Element;
 
 /**
- * Created by The eXo Platform SAS.<br/>
- * Can add xlink:href into given Element of DOM structure.<br/>
+ * Created by The eXo Platform SAS.<br/> Can add xlink:href into given Element
+ * of DOM structure.<br/>
  * @author Gennady Azarenkov
  * @version $Id: $
  */
@@ -19,7 +19,7 @@ public class XlinkHref {
   private static final String XLINK_NAMESPACE_URL = "http://www.w3c.org/1999/xlink";
 
   private String uri;
-  
+
   /**
    * @param u new uri
    */
@@ -34,7 +34,7 @@ public class XlinkHref {
   public final String getURI() {
     return uri;
   }
-  
+
   /**
    * Add xlink to given element of DOM structure.
    * @param parent element
@@ -42,7 +42,7 @@ public class XlinkHref {
   public void putToElement(Element parent) {
     parent.setAttributeNS(XLINK_NAMESPACE_URL, XLINK_HREF, uri);
   }
-  
+
   /**
    * Add external suffix to uri an d then insert xlink into element of DOM.
    * @param parent element

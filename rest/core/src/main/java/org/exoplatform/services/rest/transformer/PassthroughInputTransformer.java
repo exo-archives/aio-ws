@@ -21,7 +21,8 @@ public class PassthroughInputTransformer extends InputEntityTransformer {
    * @see org.exoplatform.services.rest.transformer.InputEntityTransformer#readFrom(java.io.InputStream)
    */
   @Override
-  public final Object readFrom(InputStream entityDataStream) throws IOException {
+  public final Object readFrom(final InputStream entityDataStream)
+      throws IOException {
     return entityDataStream;
   }
 

@@ -12,16 +12,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Created by The eXo Platform SAS.<br/> HeaderParam define the names of
- * header from HTTP request. In this way ResourceContainer gets only header
- * parameters wich it needs. For example:<br/>
+ * Created by The eXo Platform SAS.<br/> HeaderParam define the names of header
+ * from HTTP request. In this way ResourceContainer gets only header parameters
+ * wich it needs. For example:<br/>
+ * 
  * <pre>
  * ...
  * public getMethod(@HeaderParam(&quot;accept&quot;) String accept_param) {
  * ...
  * }
- * </pre><br/>
- * Method getMethod gets header parameter "accept" as String accept_param.<br/>
+ * </pre>
+ * 
+ * <br/> Method getMethod gets header parameter "accept" as String accept_param.<br/>
  * @author Gennady Azarenkov
  * @version $Id: $
  */

@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.exoplatform.services.rest.HTTPMethod;
+import org.exoplatform.services.rest.MultivaluedMetadata;
+import org.exoplatform.services.rest.QueryTemplate;
 import org.exoplatform.services.rest.URIPattern;
 import org.exoplatform.services.rest.URITemplate;
 import org.exoplatform.services.rest.InputTransformer;
@@ -18,23 +20,25 @@ import org.exoplatform.services.rest.OutputTransformer;
 import org.exoplatform.services.rest.ConsumedMimeTypes;
 import org.exoplatform.services.rest.ProducedMimeTypes;
 import org.exoplatform.services.rest.data.MimeTypes;
+import org.exoplatform.services.rest.data.QueryUtils;
 import org.exoplatform.services.rest.transformer.InputEntityTransformer;
 import org.exoplatform.services.rest.transformer.OutputEntityTransformer;
 
 /**
- * Created by The eXo Platform SAS .
+ * Created by The eXo Platform SARL .
  * @author Gennady Azarenkov
  * @version $Id: $
  */
-public class HTTPAnnotatedContainerResolvingStrategy implements ResourceContainerResolvingStrategy {
+public class HTTPAnnotatedContainerResolvingStrategy implements
+    ResourceContainerResolvingStrategy {
 
   /*
    * (non-Javadoc)
    * @see org.exoplatform.services.rest.container.ResourceContainerResolvingStrategy#resolve
-   * (org.exoplatform.services.rest.container.ResourceContainer)
+   *      (org.exoplatform.services.rest.container.ResourceContainer)
    */
-  public List < ResourceDescriptor > resolve(ResourceContainer resourceContainer) {
-    List < ResourceDescriptor > resources = new ArrayList < ResourceDescriptor >();
+  final public List<ResourceDescriptor> resolve(final ResourceContainer resourceContainer) {
+    List<ResourceDescriptor> resources = new ArrayList<ResourceDescriptor>();
     for (Method method : resourceContainer.getClass().getMethods()) {
       HTTPResourceDescriptor descr = methodMapping(method, resourceContainer);
       if (descr != null) {
@@ -44,23 +48,25 @@ public class HTTPAnnotatedContainerResolvingStrategy implements ResourceContaine
     return resources;
   }
 
-  private HTTPResourceDescriptor methodMapping(Method method, ResourceContainer resourceCont) {
+  private HTTPResourceDescriptor methodMapping(final Method method,
+      final ResourceContainer resourceCont) {
     String middleUri = middleUri(resourceCont.getClass());
     HTTPMethod httpMethodAnnotation = method.getAnnotation(HTTPMethod.class);
     URITemplate uriTemplateAnnotation = method.getAnnotation(URITemplate.class);
     if (httpMethodAnnotation != null
         && (uriTemplateAnnotation != null || !"".equals(middleUri))) {
 
-      String uri = (!"".equals(middleUri)) ? glueUri(middleUri, uriTemplateAnnotation)
-          : uriTemplateAnnotation.value();
+      String uri = (!"".equals(middleUri)) ? glueUri(middleUri,
+          uriTemplateAnnotation) : uriTemplateAnnotation.value();
       String httpMethodName = httpMethodAnnotation.value();
-      return new HTTPResourceDescriptor(method, httpMethodName, uri, resourceCont);
+      return new HTTPResourceDescriptor(method, httpMethodName, uri,
+          resourceCont);
     }
     return null;
   }
 
   /*
-   * Glue two Strings in one. Is used for creation uri string. 
+   * Glue two Strings in one. Is used for creation uri string.
    */
   private String glueUri(String middleUri, URITemplate u) {
     if (u == null) {
@@ -78,9 +84,9 @@ public class HTTPAnnotatedContainerResolvingStrategy implements ResourceContaine
   }
 
   /*
-   * Get uri string from URITemplate annotation.
+   * Get URI string from URITemplate annotation.
    */
-  private String middleUri(Class < ? extends ResourceContainer > clazz) {
+  private String middleUri(Class<? extends ResourceContainer> clazz) {
     Annotation anno = clazz.getAnnotation(URITemplate.class);
     if (anno == null) {
       return "";
@@ -93,15 +99,47 @@ public class HTTPAnnotatedContainerResolvingStrategy implements ResourceContaine
    */
   public class HTTPResourceDescriptor implements ResourceDescriptor {
 
+    /**
+     * HTTP method name.
+     */
     private String httpMethodName;
+    /**
+     * @see org.exoplatform.services.rest.URIPattern.
+     */
     private URIPattern uriPattern;
+    /**
+     * MimeTypes which can be consumed by resource.
+     */
     private String consumedMimeTypes;
+    /**
+     * MimeTypes which can be produced by resource.
+     */
     private String producedMimeTypes;
-    private Class < ? extends InputEntityTransformer > inputTransformerType;
-    private Class < ? extends OutputEntityTransformer > outputTransformerType;
+    /**
+     * QueryPattern represented by MultivaluedMetadata object.
+     */
+    private MultivaluedMetadata queryPattern;
+    /**
+     * InputTransformer.
+     */
+    private Class<? extends InputEntityTransformer> inputTransformerType;
+    /**
+     * OutputTransformer.
+     */
+    private Class<? extends OutputEntityTransformer> outputTransformerType;
+    /**
+     * Method.
+     */
     private Method servingMethod;
+    /**
+     * Annotation of Method's parameters.
+     */
     private Annotation[] methodParameterAnnotations;
-    private Class < ? >[] methodParameters;
+    /**
+     * Method parameters.
+     */
+    private Class<?>[] methodParameters;
+    
     private ResourceContainer resourceContainer;
 
     /**
@@ -110,8 +148,8 @@ public class HTTPAnnotatedContainerResolvingStrategy implements ResourceContaine
      * @param uri URI for serving by current method of ResourceContainer
      * @param resourceContainer ResourceContainer
      */
-    public HTTPResourceDescriptor(Method method, String httpMethodName, String uri,
-        ResourceContainer resourceContainer) {
+    public HTTPResourceDescriptor(final Method method, final String httpMethodName,
+        final String uri, final ResourceContainer resourceContainer) {
 
       this.servingMethod = method;
       this.httpMethodName = httpMethodName;
@@ -121,25 +159,37 @@ public class HTTPAnnotatedContainerResolvingStrategy implements ResourceContaine
       methodParameters = servingMethod.getParameterTypes();
       methodParameterAnnotations = resolveParametersAnnotations();
 
-      ConsumedMimeTypes consumedMimeTypesAnnotation = method.getAnnotation(ConsumedMimeTypes.class);
-      ProducedMimeTypes producedMimeTypesAnnotation = method.getAnnotation(ProducedMimeTypes.class);
+      ConsumedMimeTypes consumedMimeTypesAnnotation = method
+          .getAnnotation(ConsumedMimeTypes.class);
+      ProducedMimeTypes producedMimeTypesAnnotation = method
+          .getAnnotation(ProducedMimeTypes.class);
       consumedMimeTypes = (consumedMimeTypesAnnotation != null) ? consumedMimeTypesAnnotation
-          .value() : MimeTypes.ALL;
+          .value()
+          : MimeTypes.ALL;
       producedMimeTypes = (producedMimeTypesAnnotation != null) ? producedMimeTypesAnnotation
-          .value() : MimeTypes.ALL;
+          .value()
+          : MimeTypes.ALL;
 
-      InputTransformer containerInputTransformer = resourceContainer.getClass().getAnnotation(
-          InputTransformer.class);
-      InputTransformer methodInputTransformer = method.getAnnotation(InputTransformer.class);
+      QueryTemplate queryParamFilter = method
+          .getAnnotation(QueryTemplate.class);
+      queryPattern = (queryParamFilter != null) ? QueryUtils
+          .parseQueryString(queryParamFilter.value())
+          : new MultivaluedMetadata();
+
+      InputTransformer containerInputTransformer = resourceContainer.getClass()
+          .getAnnotation(InputTransformer.class);
+      InputTransformer methodInputTransformer = method
+          .getAnnotation(InputTransformer.class);
       if (containerInputTransformer != null && methodInputTransformer == null) {
         inputTransformerType = containerInputTransformer.value();
       } else if (methodInputTransformer != null) {
         inputTransformerType = methodInputTransformer.value();
       }
 
-      OutputTransformer containerOutputTransformer = resourceContainer.getClass().getAnnotation(
-          OutputTransformer.class);
-      OutputTransformer methodOutputTransformer = method.getAnnotation(OutputTransformer.class);
+      OutputTransformer containerOutputTransformer = resourceContainer
+          .getClass().getAnnotation(OutputTransformer.class);
+      OutputTransformer methodOutputTransformer = method
+          .getAnnotation(OutputTransformer.class);
       if (containerOutputTransformer != null && methodOutputTransformer == null) {
         outputTransformerType = containerOutputTransformer.value();
       } else if (methodOutputTransformer != null) {
@@ -151,7 +201,7 @@ public class HTTPAnnotatedContainerResolvingStrategy implements ResourceContaine
      * (non-Javadoc)
      * @see org.exoplatform.services.rest.container.ResourceDescriptor#getResourceContainer()
      */
-    public ResourceContainer getResourceContainer() {
+    final public ResourceContainer getResourceContainer() {
       return resourceContainer;
     }
 
@@ -159,7 +209,7 @@ public class HTTPAnnotatedContainerResolvingStrategy implements ResourceContaine
      * (non-Javadoc)
      * @see org.exoplatform.services.rest.container.ResourceDescriptor#getServer()
      */
-    public Method getServer() {
+    final public Method getServer() {
       return servingMethod;
     }
 
@@ -167,7 +217,7 @@ public class HTTPAnnotatedContainerResolvingStrategy implements ResourceContaine
      * (non-Javadoc)
      * @see org.exoplatform.services.rest.container.ResourceDescriptor#getInputTransformerType()
      */
-    public Class < ? extends InputEntityTransformer > getInputTransformerType() {
+    final public Class<? extends InputEntityTransformer> getInputTransformerType() {
       return inputTransformerType;
     }
 
@@ -175,7 +225,7 @@ public class HTTPAnnotatedContainerResolvingStrategy implements ResourceContaine
      * (non-Javadoc)
      * @see org.exoplatform.services.rest.container.ResourceDescriptor#getOutputTransformerType()
      */
-    public Class < ? extends OutputEntityTransformer > getOutputTransformerType() {
+    final public Class<? extends OutputEntityTransformer> getOutputTransformerType() {
       return outputTransformerType;
     }
 
@@ -183,7 +233,7 @@ public class HTTPAnnotatedContainerResolvingStrategy implements ResourceContaine
      * (non-Javadoc)
      * @see org.exoplatform.services.rest.container.ResourceDescriptor#getMethodParameterAnnotations()
      */
-    public Annotation[] getMethodParameterAnnotations() {
+    final public Annotation[] getMethodParameterAnnotations() {
       return methodParameterAnnotations;
     }
 
@@ -191,7 +241,7 @@ public class HTTPAnnotatedContainerResolvingStrategy implements ResourceContaine
      * (non-Javadoc)
      * @see org.exoplatform.services.rest.container.ResourceDescriptor#getMethodParameters()
      */
-    public Class < ? >[] getMethodParameters() {
+    final public Class<?>[] getMethodParameters() {
       return methodParameters;
     }
 
@@ -199,7 +249,7 @@ public class HTTPAnnotatedContainerResolvingStrategy implements ResourceContaine
      * (non-Javadoc)
      * @see org.exoplatform.services.rest.container.ResourceDescriptor#getURIPattern()
      */
-    public URIPattern getURIPattern() {
+    final public URIPattern getURIPattern() {
       return uriPattern;
     }
 
@@ -207,7 +257,7 @@ public class HTTPAnnotatedContainerResolvingStrategy implements ResourceContaine
      * (non-Javadoc)
      * @see org.exoplatform.services.rest.container.ResourceDescriptor#getAcceptableMethod()
      */
-    public String getAcceptableMethod() {
+    final public String getAcceptableMethod() {
       return httpMethodName;
     }
 
@@ -215,7 +265,7 @@ public class HTTPAnnotatedContainerResolvingStrategy implements ResourceContaine
      * (non-Javadoc)
      * @see org.exoplatform.services.rest.container.ResourceDescriptor#getConsumedMimeTypes()
      */
-    public String getConsumedMimeTypes() {
+    final public String getConsumedMimeTypes() {
       return consumedMimeTypes;
     }
 
@@ -223,8 +273,16 @@ public class HTTPAnnotatedContainerResolvingStrategy implements ResourceContaine
      * (non-Javadoc)
      * @see org.exoplatform.services.rest.container.ResourceDescriptor#getProducedMimeTypes()
      */
-    public String getProducedMimeTypes() {
+    final public String getProducedMimeTypes() {
       return producedMimeTypes;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.exoplatform.services.rest.container.ResourceDescriptor#getAnnotaitedQueryParams()
+     */
+    final public MultivaluedMetadata getQueryPattern() {
+      return queryPattern;
     }
 
     private Annotation[] resolveParametersAnnotations() {

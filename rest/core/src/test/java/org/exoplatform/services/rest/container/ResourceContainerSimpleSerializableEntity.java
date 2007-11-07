@@ -2,27 +2,33 @@
  * Copyright 2001-2007 The eXo Platform SAS         All rights reserved.  *
  * Please look at license.txt in info directory for more license detail.   *
  **************************************************************************/
-package org.exoplatform.services.rest;
+package org.exoplatform.services.rest.container;
 
 import org.exoplatform.services.rest.container.ResourceContainer;
 import org.exoplatform.services.rest.transformer.DeserializableTransformer;
 import org.exoplatform.services.rest.transformer.SerializableTransformer;
+import org.exoplatform.services.rest.OutputTransformer;
+import org.exoplatform.services.rest.HTTPMethod;
+import org.exoplatform.services.rest.URITemplate;
+import org.exoplatform.services.rest.Response;
+import org.exoplatform.services.rest.InputTransformer;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class ResourceContainerSimpleSerializableEntity implements ResourceContainer {
-	
+public class ResourceContainerSimpleSerializableEntity implements
+    ResourceContainer {
+
   @HTTPMethod("GET")
   @URITemplate("/test/serializable/")
   @InputTransformer(DeserializableTransformer.class)
   @OutputTransformer(SerializableTransformer.class)
-	public Response method1(SimpleDeserializableEntity de) {
-  	System.out.println("\n>>> serializable entity: " + de.data);
-  	de.data = ">>> this is response data";
-  	SimpleSerializableEntity se = new SimpleSerializableEntity();
-  	se.data = "<<< this request data\n";
-		return Response.Builder.ok(se).build();
-	}
+  public Response method1(SimpleDeserializableEntity de) {
+    System.out.println("\n>>> serializable entity: " + de.data);
+    de.data = ">>> this is response data";
+    SimpleSerializableEntity se = new SimpleSerializableEntity();
+    se.data = "<<< this request data\n";
+    return Response.Builder.ok(se).build();
+  }
 }

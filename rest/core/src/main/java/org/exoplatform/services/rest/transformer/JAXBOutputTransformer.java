@@ -26,7 +26,8 @@ public class JAXBOutputTransformer extends OutputEntityTransformer {
    *      java.io.OutputStream)
    */
   @Override
-  public final void writeTo(Object entity, OutputStream entityDataStream) throws IOException {
+  public final void writeTo(final Object entity, final OutputStream entityDataStream)
+      throws IOException {
     try {
       JAXBContext jaxbContext = JAXBContext.newInstance(entity.getClass());
       jaxbContext.createMarshaller().marshal(entity, entityDataStream);

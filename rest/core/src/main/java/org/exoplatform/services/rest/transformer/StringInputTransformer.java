@@ -20,7 +20,7 @@ public class StringInputTransformer extends InputEntityTransformer {
    *      java.io.InputStream)
    */
   @Override
-  public final String readFrom(InputStream entityDataStream) throws IOException {
+  public final String readFrom(final InputStream entityDataStream) throws IOException {
     StringBuffer sb = new StringBuffer();
     int rd = -1;
     while ((rd = entityDataStream.read()) != -1) {

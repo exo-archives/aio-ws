@@ -2,14 +2,20 @@
  * Copyright 2001-2007 The eXo Platform SAS         All rights reserved.  *
  * Please look at license.txt in info directory for more license detail.   *
  **************************************************************************/
-package org.exoplatform.services.rest;
+package org.exoplatform.services.rest.container;
 
-
+import org.exoplatform.services.rest.HTTPMethod;
+import org.exoplatform.services.rest.URITemplate;
+import org.exoplatform.services.rest.URIParam;
 import org.exoplatform.services.rest.container.ResourceContainer;
 import org.exoplatform.services.rest.transformer.PassthroughOutputTransformer;
 import org.exoplatform.services.rest.transformer.PassthroughInputTransformer;
 import org.exoplatform.services.rest.transformer.StringInputTransformer;
 import org.exoplatform.services.rest.transformer.StringOutputTransformer;
+import org.exoplatform.services.rest.InputTransformer;
+import org.exoplatform.services.rest.OutputTransformer;
+import org.exoplatform.services.rest.Response;
+import org.exoplatform.services.rest.CacheControl;
 
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
@@ -20,39 +26,45 @@ import java.io.IOException;
  * @version $Id: $
  */
 @URITemplate("/level1/{id}/le vel3/")
-public class ResourceContainer3 implements ResourceContainer {
+public class ResourceContainer_2 implements ResourceContainer {
 
   @HTTPMethod("POST")
   @InputTransformer(StringInputTransformer.class)
-  public Response postMethod(String str, @URIParam("id") String param) {
+  public Response postMethod(String str, @URIParam("id")
+  String param) {
     System.out.println("--- POST method called: id = " + param);
-    System.out.println("--- request entity - type: " + str.getClass().toString()
-        + "; value: " + str);
-    Response resp = Response.Builder.created("http://localhost/test/_post").build(); 
+    System.out.println("--- request entity - type: " +
+        str.getClass().toString() + "; value: " + str);
+    Response resp = Response.Builder.created("http://localhost/test/_post")
+        .build();
     return resp;
   }
 
   @HTTPMethod("PUT")
   @InputTransformer(PassthroughInputTransformer.class)
   @OutputTransformer(StringOutputTransformer.class)
-  public Response putMethod(InputStream in, @URIParam("id") String param) throws IOException {
+  public Response putMethod(InputStream in, @URIParam("id")
+  String param) throws IOException {
     System.out.println("--- PUT method called: id = " + param);
-    System.out.print("--- entity type: " + in.getClass().toString() +", value: ");
-    PassthroughOutputTransformer tr = new PassthroughOutputTransformer(); 
+    System.out.print("--- entity type: " + in.getClass().toString() +
+        ", value: ");
+    PassthroughOutputTransformer tr = new PassthroughOutputTransformer();
     tr.writeTo(in, System.out);
     String entity = "--- PUT response\n";
-    String location = "http://localhost/test/_put"; 
-    Response resp =
-      Response.Builder.created(entity, location).mediaType("text/plain").build(); 
+    String location = "http://localhost/test/_put";
+    Response resp = Response.Builder.created(entity, location).mediaType(
+        "text/plain").build();
     return resp;
   }
 
   @HTTPMethod("DELETE")
   @URITemplate("/{myid}/")
   @InputTransformer(StringInputTransformer.class)
-  public Response delMethod(String str, @URIParam("myid") String param) {
+  public Response delMethod(String str, @URIParam("myid")
+  String param) {
     System.out.println("--- DELETE method called: id = " + param);
-    System.out.println("--- entity type: " + str.getClass().toString() + ", value: " + str);
+    System.out.println("--- entity type: " + str.getClass().toString() +
+        ", value: " + str);
     Response resp = Response.Builder.ok().build();
     return resp;
   }
@@ -60,19 +72,22 @@ public class ResourceContainer3 implements ResourceContainer {
   @HTTPMethod("GET")
   @InputTransformer(PassthroughInputTransformer.class)
   @OutputTransformer(PassthroughOutputTransformer.class)
-  public Response getMethod(InputStream in, @URIParam("id") String param) throws IOException {
+  public Response getMethod(InputStream in, @URIParam("id")
+  String param) throws IOException {
     System.out.println("--- GET method called: id = " + param);
-    System.out.print("--- entity type: " + in.getClass().toString() +", value: ");
-    PassthroughOutputTransformer tr = new PassthroughOutputTransformer(); 
+    System.out.print("--- entity type: " + in.getClass().toString() +
+        ", value: ");
+    PassthroughOutputTransformer tr = new PassthroughOutputTransformer();
     tr.writeTo(in, System.out);
-    String entity = "--- GET response\n This response is represented by Stream" +
-    		" , so Content-Length can't be counted!\n";
+    String entity = "--- GET response\n This response is represented by Stream"
+        + " , so Content-Length can't be counted!\n";
     CacheControl cache = new CacheControl();
     cache.setPublicCacheable(!cache.isPublicCacheable()); // ~:)
     cache.setPrivateCacheable(true);
     cache.setNoTransform(false);
-    Response resp = Response.Builder.ok(new ByteArrayInputStream(entity.getBytes()),
-        "text/plain").cacheControl(cache).build(); 
+    Response resp = Response.Builder.ok(
+        new ByteArrayInputStream(entity.getBytes()), "text/plain")
+        .cacheControl(cache).build();
     return resp;
   }
 }

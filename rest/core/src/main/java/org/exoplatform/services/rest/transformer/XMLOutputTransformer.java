@@ -27,11 +27,12 @@ public class XMLOutputTransformer extends OutputEntityTransformer {
    *      (java.lang.Object, java.io.OutputStream)
    */
   @Override
-  public final void writeTo(Object entity, OutputStream entityDataStream) throws IOException {
+  public final void writeTo(final Object entity, final OutputStream entityDataStream)
+      throws IOException {
     Document e = (Document) entity;
     try {
-      TransformerFactory.newInstance().newTransformer().transform(new DOMSource(e),
-          new StreamResult(entityDataStream));
+      TransformerFactory.newInstance().newTransformer().transform(
+          new DOMSource(e), new StreamResult(entityDataStream));
     } catch (TransformerException tre) {
       throw new IOException("Can't write to output stream " + tre);
     }
