@@ -48,12 +48,14 @@ public class ResourceDispatcher implements Connector {
    */
   public ResourceDispatcher(InitParams params, ResourceBinder binder)
       throws Exception {
-    PropertiesParam contextParam = params.getPropertiesParam("contex-params");
-    if (contextParam != null) {
-      Iterator<Property> iterator = contextParam.getPropertyIterator();
-      while (iterator.hasNext()) {
-        Property property = iterator.next();
-        contextParams_.put(property.getName(), property.getValue());
+    if (params != null) {
+      PropertiesParam contextParam = params.getPropertiesParam("contex-params");
+      if (contextParam != null) {
+        Iterator<Property> iterator = contextParam.getPropertyIterator();
+        while (iterator.hasNext()) {
+          Property property = iterator.next();
+          contextParams_.put(property.getName(), property.getValue());
+        }
       }
     }
     this.resourceDescriptors_ = binder.getAllDescriptors();
@@ -236,7 +238,7 @@ public class ResourceDispatcher implements Connector {
      */
     @Deprecated
     public String getServerName() {
-      return params_.get("host");
+      return params_.get(CONTEXT_PARAM_HOST);
     }
 
     /**
@@ -246,7 +248,7 @@ public class ResourceDispatcher implements Connector {
      */
     @Deprecated
     public String getContextHref() {
-      return params_.get("baseURI");
+      return params_.get(CONTEXT_PARAM_BASE_URI);
     }
 
     /**
@@ -255,7 +257,7 @@ public class ResourceDispatcher implements Connector {
      */
     @Deprecated
     public String getAbsLocation() {
-      return params_.get("baseURI") + params_.get("URI");
+      return params_.get(CONTEXT_PARAM_BASE_URI) + params_.get(CONTEXT_PARAM_REL_URI);
     }
 
     /**
