@@ -34,6 +34,7 @@ public class ResourceDispatcher implements Connector {
   public static final String CONTEXT_PARAM_HOST = "host";
   public static final String CONTEXT_PARAM_BASE_URI = "baseURI";
   public static final String CONTEXT_PARAM_REL_URI = "relURI";
+  public static final String CONTEXT_PARAM_ABSLOCATION = "absLocation";
 
   private List<ResourceDescriptor> resourceDescriptors_;
   private ThreadLocal<Context> contextHolder_ = new ThreadLocal<Context>();
@@ -229,6 +230,8 @@ public class ResourceDispatcher implements Connector {
       params_.put(CONTEXT_PARAM_HOST, identifier.getHost());
       params_.put(CONTEXT_PARAM_BASE_URI, identifier.getBaseURI());
       params_.put(CONTEXT_PARAM_REL_URI, identifier.getURI());
+      params_.put(CONTEXT_PARAM_ABSLOCATION,
+          identifier.getBaseURI() + identifier.getURI());
     }
 
     /**
