@@ -35,6 +35,12 @@
     <dependency>
       <groupId>org.codehaus.xfire</groupId>
       <artifactId>xfire-all</artifactId>
+        <exclusions>
+	  <exclusion>
+    	    <groupId>stax</groupId>
+    	    <artifactId>stax-api</artifactId>
+	  </exclusion>
+	</exclusions>
       <version>1.2.6</version>
     </dependency>
     <dependency>
