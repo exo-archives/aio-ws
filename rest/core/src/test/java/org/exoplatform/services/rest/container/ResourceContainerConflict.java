@@ -21,17 +21,31 @@ public class ResourceContainerConflict implements ResourceContainer {
   @HTTPMethod("GET")
   @URITemplate("/test/test1/{id1}/{id2}/test/test2")
   @OutputTransformer(StringOutputTransformer.class)
-  public Response method1(@URIParam("id1")
-  String id1) {
+  public Response method1(@URIParam("id1") String id1) {
     return Response.Builder.ok(id1).build();
   }
+
 
   @HTTPMethod("GET")
   @URITemplate("/test1/{id1}/{id2}/test2/")
   @OutputTransformer(StringOutputTransformer.class)
-  public Response method2(@URIParam("id1")
-  String id1) {
+  public Response method2(@URIParam("id1") String id1) {
     return Response.Builder.ok(id1).build();
   }
 
+  @HTTPMethod("GET")
+  @URITemplate("/test1/{id1}/{id2}/{id3}/")
+  @OutputTransformer(StringOutputTransformer.class)
+  public Response method3(@URIParam("id3") String id3) {
+//    System.err.println("This method should never be called!");
+    return Response.Builder.ok(id3).build();
+  }
+
+  @HTTPMethod("GET")
+  @URITemplate("/{id}/{id1}/{id2}/{id3}/")
+  @OutputTransformer(StringOutputTransformer.class)
+  public Response method4(@URIParam("id") String id) {
+//    System.err.println("This method should never be called!");
+    return Response.Builder.ok(id).build();
+  }
 }

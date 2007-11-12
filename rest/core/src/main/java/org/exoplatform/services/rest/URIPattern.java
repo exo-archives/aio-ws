@@ -135,8 +135,7 @@ public class URIPattern {
     return matches(p.matcher(another.getString()).replaceAll("x"));
 
 // int minSize = (tokens.length <= another.getTokens().length) ? tokens.length :
-// another
-// .getTokens().length;
+// another.getTokens().length;
 // for (int i = 0; i < minSize; i++) {
 // if (!tokens[i].equals(another.getTokens()[i])) {
 // return false;
@@ -151,6 +150,10 @@ public class URIPattern {
    */
   public String getString() {
     return pattern_;
+  }
+  
+  public String[] getTokens() {
+    return tokens_;
   }
 
 }

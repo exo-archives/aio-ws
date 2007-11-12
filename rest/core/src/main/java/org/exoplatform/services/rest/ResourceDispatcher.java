@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-// import org.apache.commons.logging.Log;
-// import org.exoplatform.services.log.ExoLogger;
+//import org.apache.commons.logging.Log;
+//import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.PropertiesParam;
 import org.exoplatform.container.xml.Property;
@@ -40,7 +40,7 @@ public class ResourceDispatcher implements Connector {
   private ThreadLocal<Context> contextHolder_ = new ThreadLocal<Context>();
   private final Map<String, String> contextParams_ = new HashMap<String, String>();
 
-// private static final Log LOGGER = ExoLogger.getLogger("ResourceDispatcher");
+//  private static final Log LOGGER = ExoLogger.getLogger("ResourceDispatcher");
 
   /**
    * Constructor gets all binded ResourceContainers from ResourceBinder.
@@ -71,48 +71,52 @@ public class ResourceDispatcher implements Connector {
   public Response dispatch(Request request) throws Exception {
     String requestedURI = request.getResourceIdentifier().getURI();
     String methodName = request.getMethodName();
-    String acceptedMimeTypes = (request.getHeaderParams().get("accept") != null) ? request
-        .getHeaderParams().get("accept")
+    String acceptedMimeTypes = (request.getHeaderParams().get("accept") != null)
+        ? request.getHeaderParams().get("accept")
         : MimeTypes.ALL;
     MimeTypes requestedMimeTypes = new MimeTypes(acceptedMimeTypes);
-    for (ResourceDescriptor resource : resourceDescriptors_) {
+    ResourceDescriptor resource = null;
+    for (ResourceDescriptor r : resourceDescriptors_) {
 
-      MimeTypes producedMimeTypes = new MimeTypes(resource
-          .getProducedMimeTypes());
-      MultivaluedMetadata annotatedQueryParams = resource.getQueryPattern();
+      MimeTypes producedMimeTypes = new MimeTypes(r.getProducedMimeTypes());
+      MultivaluedMetadata annotatedQueryParams = r.getQueryPattern();
 
       // Check is this ResourceContainer have appropriated parameters,
       // such URIPattern, HTTP method, QueryParamFilter and mimetype.
-      if (resource.getAcceptableMethod().equalsIgnoreCase(methodName) &&
-          resource.getURIPattern().matches(requestedURI) &&
-          (compareMimeTypes(requestedMimeTypes.getMimeTypes(),
-              producedMimeTypes.getMimeTypes())) &&
-          (isQueryParamsMatches(request.getQueryParams(), annotatedQueryParams))) {
-        ResourceIdentifier identifier = request.getResourceIdentifier();
-        identifier.initParameters(resource.getURIPattern());
+      if (r.getAcceptableMethod().equalsIgnoreCase(methodName)
+          && r.getURIPattern().matches(requestedURI)
+          && (compareMimeTypes(requestedMimeTypes.getMimeTypes(), producedMimeTypes.getMimeTypes()))
+          && (isQueryParamsMatches(request.getQueryParams(), annotatedQueryParams))) {
+        
+        if (resource == null
+            || resource.getURIPattern().getTokens().length > r.getURIPattern().getTokens().length) {
+            resource = r;
+        }
+      }
+    }
+    if (resource != null) {
+      ResourceIdentifier identifier = request.getResourceIdentifier();
+      identifier.initParameters(resource.getURIPattern());
+    
+      // set initialized context to thread local
+      contextHolder_.set(new Context(contextParams_, identifier));
 
-        // set initialized context to thread local
-        contextHolder_.set(new Context(contextParams_, identifier));
-
-        Annotation[] methodParametersAnnotations = resource
-            .getMethodParameterAnnotations();
-        Class<?>[] methodParameters = resource.getMethodParameters();
-        Object[] params = new Object[methodParameters.length];
-        // building array of parameters
-        for (int i = 0; i < methodParametersAnnotations.length; i++) {
-          if (methodParametersAnnotations[i] == null) {
-            EntityTransformerFactory factory = new EntityTransformerFactory(
-                resource.getInputTransformerType());
-            InputEntityTransformer transformer = (InputEntityTransformer) factory
-                .newTransformer();
-            transformer.setType(methodParameters[i]);
-            params[i] = transformer.readFrom(request.getEntityStream());
+      Annotation[] methodParametersAnnotations = resource.getMethodParameterAnnotations();
+      Class<?>[] methodParameters = resource.getMethodParameters();
+      Object[] params = new Object[methodParameters.length];
+      // building array of parameters
+      for (int i = 0; i < methodParametersAnnotations.length; i++) {
+        if (methodParametersAnnotations[i] == null) {
+          EntityTransformerFactory factory = new EntityTransformerFactory(
+              resource.getInputTransformerType());
+          InputEntityTransformer transformer = (InputEntityTransformer) factory.newTransformer();
+          transformer.setType(methodParameters[i]);
+          params[i] = transformer.readFrom(request.getEntityStream());
           } else {
             Annotation a = methodParametersAnnotations[i];
             if (a.annotationType().isAssignableFrom(URIParam.class)) {
               URIParam u = (URIParam) a;
-              params[i] = request.getResourceIdentifier().getParameters().get(
-                  u.value());
+              params[i] = request.getResourceIdentifier().getParameters().get(u.value());
             } else if (a.annotationType().isAssignableFrom(HeaderParam.class)) {
               HeaderParam h = (HeaderParam) a;
               params[i] = request.getHeaderParams().get(h.value());
@@ -127,13 +131,11 @@ public class ResourceDispatcher implements Connector {
         }
         Response resp = (Response) resource.getServer().invoke(
             resource.getResourceContainer(), params);
-
         if (!resp.isTransformerInitialized() && resp.isEntityInitialized()) {
           resp.setTransformer(getTransformer(resource));
         }
         return resp;
       }
-    }
     // if no one ResourceContainer found
     throw new NoSuchMethodException("No method found for " + methodName + " " +
         requestedURI + " " + acceptedMimeTypes);
@@ -142,8 +144,7 @@ public class ResourceDispatcher implements Connector {
   /**
    * Get runtime context.
    * @return the runtimeContext.
-   * @deprecated Instead of directly use <code>Context</code> should be user
-   *             <code>@ContextParam</code>.
+   * @deprecated Instead of directly use <code>Context</code> should be user <code>@ContextParam</code>.
    */
   @Deprecated
   public Context getRuntimeContext() {
