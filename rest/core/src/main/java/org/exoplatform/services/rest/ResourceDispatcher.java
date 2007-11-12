@@ -89,7 +89,7 @@ public class ResourceDispatcher implements Connector {
           && (isQueryParamsMatches(request.getQueryParams(), annotatedQueryParams))) {
         
         if (resource == null
-            || resource.getURIPattern().getTokens().length > r.getURIPattern().getTokens().length) {
+            /*|| resource.getURIPattern().getTokens().length > r.getURIPattern().getTokens().length*/) {
             resource = r;
         }
       }
