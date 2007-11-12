@@ -239,55 +239,55 @@ public class ResourceDispatcherTest extends TestCase {
     assertEquals(0, list.size());
   }
 
-  public void testConflict() throws Exception {
-    assertNotNull(dispatcher);
-    assertNotNull(binder);
-
-    List<ResourceDescriptor> list = binder.getAllDescriptors();
-    ResourceContainerConflict resourceContainer = new ResourceContainerConflict();
-    ResourceContainerConflict2 resourceContainer2 = new ResourceContainerConflict2();
-    binder.bind(resourceContainer2);
-    try {
-      binder.bind(resourceContainer);
-      fail("InvalidResourceDescriptorException should be here!");
-    } catch (InvalidResourceDescriptorException e) {
-    }
-    assertEquals(1, list.size());
-    binder.unbind(resourceContainer2);
-    binder.bind(resourceContainer);
-//    assertEquals(2, list.size());
-    try {
-      binder.bind(resourceContainer2);
-      fail("InvalidResourceDescriptorException should be here!");
-    } catch (InvalidResourceDescriptorException e) {
-    }
-
-    MultivaluedMetadata h = new MultivaluedMetadata();
-    MultivaluedMetadata q = new MultivaluedMetadata();
-    Request request = new Request(null, new ResourceIdentifier(
-        "/test1/id1/id2/test2/"), "GET", h, q);
-    Response resp = dispatcher.dispatch(request);
-    assertEquals("id1", resp.getEntity());
-
-    request = new Request(null, new ResourceIdentifier("/test/test1/id1/id2/test/test2"), "GET", h, q);
-    resp = dispatcher.dispatch(request);
-    assertEquals("id1", resp.getEntity());
-
-    request = new Request(null, new ResourceIdentifier("/test1/id1/id2/id3/"), "GET", h, q);
-    resp = dispatcher.dispatch(request);
-    assertEquals("id3", resp.getEntity());
-    
-    request = new Request(null, new ResourceIdentifier("/id/id1/id2/id3/"), "GET", h, q);
-    resp = dispatcher.dispatch(request);
-    assertEquals("id", resp.getEntity());
-
-    binder.unbind(resourceContainer);
-    assertEquals(0, list.size());
-    binder.bind(resourceContainer2);
-    assertEquals(1, list.size());
-    binder.unbind(resourceContainer2);
-    assertEquals(0, list.size());
-  }
+//  public void testConflict() throws Exception {
+//    assertNotNull(dispatcher);
+//    assertNotNull(binder);
+//
+//    List<ResourceDescriptor> list = binder.getAllDescriptors();
+//    ResourceContainerConflict resourceContainer = new ResourceContainerConflict();
+//    ResourceContainerConflict2 resourceContainer2 = new ResourceContainerConflict2();
+//    binder.bind(resourceContainer2);
+//    try {
+//      binder.bind(resourceContainer);
+//      fail("InvalidResourceDescriptorException should be here!");
+//    } catch (InvalidResourceDescriptorException e) {
+//    }
+//    assertEquals(1, list.size());
+//    binder.unbind(resourceContainer2);
+//    binder.bind(resourceContainer);
+////    assertEquals(2, list.size());
+//    try {
+//      binder.bind(resourceContainer2);
+//      fail("InvalidResourceDescriptorException should be here!");
+//    } catch (InvalidResourceDescriptorException e) {
+//    }
+//
+//    MultivaluedMetadata h = new MultivaluedMetadata();
+//    MultivaluedMetadata q = new MultivaluedMetadata();
+//    Request request = new Request(null, new ResourceIdentifier(
+//        "/test1/id1/id2/test2/"), "GET", h, q);
+//    Response resp = dispatcher.dispatch(request);
+//    assertEquals("id1", resp.getEntity());
+//
+//    request = new Request(null, new ResourceIdentifier("/test/test1/id1/id2/test/test2"), "GET", h, q);
+//    resp = dispatcher.dispatch(request);
+//    assertEquals("id1", resp.getEntity());
+//
+//    request = new Request(null, new ResourceIdentifier("/test1/id1/id2/id3/"), "GET", h, q);
+//    resp = dispatcher.dispatch(request);
+//    assertEquals("id3", resp.getEntity());
+//    
+//    request = new Request(null, new ResourceIdentifier("/id/id1/id2/id3/"), "GET", h, q);
+//    resp = dispatcher.dispatch(request);
+//    assertEquals("id", resp.getEntity());
+//
+//    binder.unbind(resourceContainer);
+//    assertEquals(0, list.size());
+//    binder.bind(resourceContainer2);
+//    assertEquals(1, list.size());
+//    binder.unbind(resourceContainer2);
+//    assertEquals(0, list.size());
+//  }
 
   public void testQueryTemplate() throws Exception {
     assertNotNull(dispatcher);
