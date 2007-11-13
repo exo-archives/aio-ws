@@ -5,7 +5,9 @@
 package org.exoplatform.services.rest.container;
 
 import org.exoplatform.services.rest.container.ResourceContainer;
+import org.exoplatform.services.rest.transformer.StringOutputTransformer;
 import org.exoplatform.services.rest.HTTPMethod;
+import org.exoplatform.services.rest.OutputTransformer;
 import org.exoplatform.services.rest.URITemplate;
 import org.exoplatform.services.rest.URIParam;
 import org.exoplatform.services.rest.Response;
@@ -17,10 +19,10 @@ import org.exoplatform.services.rest.Response;
 public class ResourceContainerConflict2 implements ResourceContainer {
 
   @HTTPMethod("GET")
-  @URITemplate("/{}/")
-  public Response method3(@URIParam("id1")
-  String id1) {
-    return null;
+  @URITemplate("/{id1}/")
+  @OutputTransformer(StringOutputTransformer.class)
+  public Response method3(@URIParam("id1") String id1) {
+    return Response.Builder.ok(id1).build();
   }
 
 }

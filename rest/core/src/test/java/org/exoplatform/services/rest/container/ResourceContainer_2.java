@@ -79,8 +79,7 @@ public class ResourceContainer_2 implements ResourceContainer {
         ", value: ");
     PassthroughOutputTransformer tr = new PassthroughOutputTransformer();
     tr.writeTo(in, System.out);
-    String entity = "--- GET response\n This response is represented by Stream"
-        + " , so Content-Length can't be counted!\n";
+    String entity = "--- GET response\n";
     CacheControl cache = new CacheControl();
     cache.setPublicCacheable(!cache.isPublicCacheable()); // ~:)
     cache.setPrivateCacheable(true);

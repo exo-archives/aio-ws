@@ -156,26 +156,15 @@ public class ResourceBinder implements Startable {
               isQueryPatternMatches(storedQueryPattern, newQueryPattern)) {
             throw new InvalidResourceDescriptorException(
                 "The ResourceContainer " +
-                    "\nmethod : " +
-                    newDescriptor.getServer().toGenericString() +
-                    "\nURITemplate : " +
-                    newDescriptor.getURIPattern().getString() +
-                    "\nHTTPMethod : " +
-                    newDescriptor.getAcceptableMethod() +
-                    "\nQueryTemplate : " +
-                    newDescriptor.getServer()
-                        .getAnnotation(QueryTemplate.class) +
-                    "\ncan not be defined because of existed ResourceContainer " +
-                    "\nmethod : " +
-                    storedDescriptor.getServer().toGenericString() +
-                    "\nURITemplate : " +
-                    storedDescriptor.getURIPattern().getString() +
-                    "\nHTTPMethod : " +
-                    storedDescriptor.getAcceptableMethod() +
-                    "\nQueryTemplate : " +
-                    storedDescriptor.getServer().getAnnotation(
-                        QueryTemplate.class));
-
+                "\nmethod : " + newDescriptor.getServer().toGenericString() +
+                "\nURITemplate : " + newDescriptor.getURIPattern().getString() +
+                "\nHTTPMethod : " + newDescriptor.getAcceptableMethod() +
+                "\nQueryTemplate : " + newDescriptor.getServer().getAnnotation(QueryTemplate.class) +
+                "\ncan not be defined because of existed ResourceContainer " +
+                "\nmethod : " + storedDescriptor.getServer().toGenericString() +
+                "\nURITemplate : " + storedDescriptor.getURIPattern().getString() +
+                "\nHTTPMethod : " + storedDescriptor.getAcceptableMethod() +
+                "\nQueryTemplate : " + storedDescriptor.getServer().getAnnotation(QueryTemplate.class));
           }
         }
       }

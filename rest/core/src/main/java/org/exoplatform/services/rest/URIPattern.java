@@ -107,6 +107,9 @@ public class URIPattern {
    * @return true if the string matches the pattern false otherwise
    */
   public boolean matches(String string) {
+    if (paramNames_.length == 0 && !pattern_.equals(string)) {
+      return false;
+    }
     if (string.indexOf(tokens_[0], 0) != 0) {
       return false;
     }
@@ -133,15 +136,6 @@ public class URIPattern {
   public boolean matches(URIPattern another) {
     Pattern p = Pattern.compile("\\{.*\\}");
     return matches(p.matcher(another.getString()).replaceAll("x"));
-
-// int minSize = (tokens.length <= another.getTokens().length) ? tokens.length :
-// another.getTokens().length;
-// for (int i = 0; i < minSize; i++) {
-// if (!tokens[i].equals(another.getTokens()[i])) {
-// return false;
-// }
-// }
-// return true;
   }
 
   /**

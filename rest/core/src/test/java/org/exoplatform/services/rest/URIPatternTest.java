@@ -23,6 +23,19 @@ public class URIPatternTest extends TestCase {
     assertFalse(pattern.matches("/level11/level2/level3/"));
   }
 
+  public void testParametrizedURIPattern() throws Exception {
+    URIPattern pattern1 = new URIPattern("/{id1}/");
+    assertTrue(pattern1.matches("/1/2/3/"));
+    pattern1 = new URIPattern("/id1/");
+    assertFalse(pattern1.matches("/id1/1/"));
+    assertTrue(pattern1.matches("/id1/"));
+    pattern1 = new URIPattern("/id1/{1}/2/");
+    assertTrue(pattern1.matches("/id1/1/2/"));
+    assertFalse(pattern1.matches("/id1/1/"));
+    pattern1 = new URIPattern("/{id1}/1/");
+    assertFalse(pattern1.matches("/id1/"));
+  }
+
   public void testParametrizedURIPattern1() throws Exception {
     // one parameter
     URIPattern pattern = new URIPattern("/level1/level2/{id}/");
@@ -99,5 +112,5 @@ public class URIPatternTest extends TestCase {
     assertFalse(pattern1.matches(pattern2));
     assertTrue(pattern2.matches(pattern1));
   }
-
+  
 }

@@ -88,9 +88,24 @@ public class ResourceDispatcher implements Connector {
           && (compareMimeTypes(requestedMimeTypes.getMimeTypes(), producedMimeTypes.getMimeTypes()))
           && (isQueryParamsMatches(request.getQueryParams(), annotatedQueryParams))) {
         
-        if (resource == null
-            /*|| resource.getURIPattern().getTokens().length > r.getURIPattern().getTokens().length*/) {
-            resource = r;
+        if (resource == null) {
+          // if no one resource found yet, remember this resource.
+          resource = r;
+          continue;
+        }
+        if (r.getURIPattern().matches(resource.getURIPattern())) {
+          // if URITemplate of candidate resource matches to remembered one, it can't be used.
+          // Example: URI /test1/test2/a/b/test3/test4/ and two templates 
+          // 1. /test1/test2/{id1}/{id2}/test3/test4/
+          // 2. test1/test2/{id1}/test3/test4/
+          // Template 1 will be first in the list and it is matched to requested URI,
+          // and template 2 also matched to URI (and has less parameters!), but
+          // template 2 matches to template 1, so it is more common. 
+          // It will not be used! 
+          continue;
+        }
+        if (r.getURIPattern().getTokens().length < resource.getURIPattern().getTokens().length) {
+          resource = r;
         }
       }
     }
