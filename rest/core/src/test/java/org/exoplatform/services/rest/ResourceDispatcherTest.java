@@ -7,7 +7,10 @@ package org.exoplatform.services.rest;
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.net.URI;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.exoplatform.container.StandaloneContainer;
 import org.exoplatform.services.rest.container.InvalidResourceDescriptorException;
@@ -393,5 +396,5 @@ public class ResourceDispatcherTest extends TestCase {
     binder.unbind(resourceContainer);
     assertEquals(0, list.size());
   }
-
+  
 }

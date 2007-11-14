@@ -5,6 +5,7 @@
 package org.exoplatform.services.rest;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -127,30 +128,42 @@ public class ResourceDispatcher implements Connector {
           InputEntityTransformer transformer = (InputEntityTransformer) factory.newTransformer();
           transformer.setType(methodParameters[i]);
           params[i] = transformer.readFrom(request.getEntityStream());
+        } else {
+          Constructor<?> constructor = methodParameters[i].getConstructor(String.class);
+          String constructorParam = null;
+          Annotation a = methodParametersAnnotations[i];
+          if (a.annotationType().isAssignableFrom(URIParam.class)) {
+            URIParam u = (URIParam) a;
+            constructorParam = request.getResourceIdentifier().getParameters().get(u.value());
+//            params[i] = request.getResourceIdentifier().getParameters().get(u.value());
+          } else if (a.annotationType().isAssignableFrom(HeaderParam.class)) {
+            HeaderParam h = (HeaderParam) a;
+            constructorParam = request.getHeaderParams().get(h.value());
+//            params[i] = request.getHeaderParams().get(h.value());
+          } else if (a.annotationType().isAssignableFrom(QueryParam.class)) {
+            QueryParam q = (QueryParam) a;
+            constructorParam = request.getQueryParams().get(q.value());
+//            params[i] = request.getQueryParams().get(q.value());
+          } else if (a.annotationType().isAssignableFrom(ContextParam.class)) {
+            ContextParam c = (ContextParam) a;
+            constructorParam = contextHolder_.get().get(c.value());
+//            params[i] = contextHolder_.get().get(c.value());
+          }
+          if (methodParameters[i].isAssignableFrom(String.class)) {
+            params[i] = constructorParam;
           } else {
-            Annotation a = methodParametersAnnotations[i];
-            if (a.annotationType().isAssignableFrom(URIParam.class)) {
-              URIParam u = (URIParam) a;
-              params[i] = request.getResourceIdentifier().getParameters().get(u.value());
-            } else if (a.annotationType().isAssignableFrom(HeaderParam.class)) {
-              HeaderParam h = (HeaderParam) a;
-              params[i] = request.getHeaderParams().get(h.value());
-            } else if (a.annotationType().isAssignableFrom(QueryParam.class)) {
-              QueryParam q = (QueryParam) a;
-              params[i] = request.getQueryParams().get(q.value());
-            } else if (a.annotationType().isAssignableFrom(ContextParam.class)) {
-              ContextParam c = (ContextParam) a;
-              params[i] = contextHolder_.get().get(c.value());
-            }
+            params[i] = (constructorParam != null) ? constructor.newInstance(constructorParam)
+                : null;
           }
         }
-        Response resp = (Response) resource.getServer().invoke(
-            resource.getResourceContainer(), params);
-        if (!resp.isTransformerInitialized() && resp.isEntityInitialized()) {
-          resp.setTransformer(getTransformer(resource));
-        }
-        return resp;
       }
+      Response resp = (Response) resource.getServer().invoke(
+          resource.getResourceContainer(), params);
+      if (!resp.isTransformerInitialized() && resp.isEntityInitialized()) {
+        resp.setTransformer(getTransformer(resource));
+      }
+      return resp;
+    }
     // if no one ResourceContainer found
     throw new NoSuchMethodException("No method found for " + methodName + " " +
         requestedURI + " " + acceptedMimeTypes);

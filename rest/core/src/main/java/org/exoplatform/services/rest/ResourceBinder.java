@@ -191,6 +191,14 @@ public class ResourceBinder implements Startable {
                 "Only one not annotated object with must represent HTTP Request.\n" +
                     "In method : " + method.toGenericString());
           }
+        } else {
+          try {
+            requestedParams[i].getConstructor(String.class);
+          } catch(NoSuchMethodException e) {
+            throw new InvalidResourceDescriptorException(
+                "All annotated parameters must have constructor with String or be the String.\n" +
+                    "In method : " + method.toGenericString());
+          }
         }
       }
     }

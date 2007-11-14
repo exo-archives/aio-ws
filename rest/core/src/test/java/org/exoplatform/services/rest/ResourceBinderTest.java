@@ -95,7 +95,9 @@ public class ResourceBinderTest extends TestCase {
     } catch (InvalidResourceDescriptorException e) {
       ;
     }
-
+    binder.unbind(resourceContainer);
+    binder.unbind(resourceContainer2);
+    assertEquals(0, list.size());
   }
 
 }
