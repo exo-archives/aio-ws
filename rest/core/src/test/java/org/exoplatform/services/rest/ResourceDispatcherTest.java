@@ -268,26 +268,34 @@ public class ResourceDispatcherTest extends TestCase {
     
     MultivaluedMetadata h = new MultivaluedMetadata();
     MultivaluedMetadata q = new MultivaluedMetadata();
-    Request request = new Request(null, new ResourceIdentifier("/test/test1/x/test2/"), "GET", h, q);
+    Request request = new Request(null, new ResourceIdentifier("/test/test1/id1/id2/test/test2/"), "GET", h, q);
     Response resp = dispatcher.dispatch(request);
-    assertEquals("x", resp.getEntity());
+    assertEquals("method1", resp.getEntity());
 
-    request = new Request(null, new ResourceIdentifier("/test/test1/x/y/test/test2/"), "GET", h, q);
+    request = new Request(null, new ResourceIdentifier("/test/test1/id1/test2/"), "GET", h, q);
     resp = dispatcher.dispatch(request);
-    assertEquals("y", resp.getEntity());
+    assertEquals("method2", resp.getEntity());
 
-    request = new Request(null, new ResourceIdentifier("/test1/x/y/z/"), "GET", h, q);
+    request = new Request(null, new ResourceIdentifier("/test1/id1/id2/id3/"), "GET", h, q);
     resp = dispatcher.dispatch(request);
-    assertEquals("z", resp.getEntity());
+    assertEquals("method3", resp.getEntity());
     
-    request = new Request(null, new ResourceIdentifier("/j/x/y/z/"), "GET", h, q);
+    request = new Request(null, new ResourceIdentifier("/id/id1/id2/id3/"), "GET", h, q);
     resp = dispatcher.dispatch(request);
-    assertEquals("j", resp.getEntity());
+    assertEquals("method4", resp.getEntity());
 
     request = new Request(null, new ResourceIdentifier("/test1/"), "GET", h, q);
     resp = dispatcher.dispatch(request);
     assertEquals("method5", resp.getEntity());
 
+    request = new Request(null, new ResourceIdentifier("/test/id1/id2/id3/"), "GET", h, q);
+    resp = dispatcher.dispatch(request);
+    assertEquals("method6", resp.getEntity());
+
+    request = new Request(null, new ResourceIdentifier("/test/id2/id3/"), "GET", h, q);
+    resp = dispatcher.dispatch(request);
+    assertEquals("method7", resp.getEntity());
+    
     binder.unbind(resourceContainer);
     assertEquals(0, list.size());
     binder.bind(resourceContainer2);

@@ -105,7 +105,8 @@ public class ResourceDispatcher implements Connector {
           // It will not be used! 
           continue;
         }
-        if (r.getURIPattern().getTokens().length < resource.getURIPattern().getTokens().length) {
+//        if (r.getURIPattern().getTokens().length < resource.getURIPattern().getTokens().length) {
+        if (r.getURIPattern().getTotalTokensLength() > resource.getURIPattern().getTotalTokensLength()) {
           resource = r;
         }
       }
@@ -135,19 +136,15 @@ public class ResourceDispatcher implements Connector {
           if (a.annotationType().isAssignableFrom(URIParam.class)) {
             URIParam u = (URIParam) a;
             constructorParam = request.getResourceIdentifier().getParameters().get(u.value());
-//            params[i] = request.getResourceIdentifier().getParameters().get(u.value());
           } else if (a.annotationType().isAssignableFrom(HeaderParam.class)) {
             HeaderParam h = (HeaderParam) a;
             constructorParam = request.getHeaderParams().get(h.value());
-//            params[i] = request.getHeaderParams().get(h.value());
           } else if (a.annotationType().isAssignableFrom(QueryParam.class)) {
             QueryParam q = (QueryParam) a;
             constructorParam = request.getQueryParams().get(q.value());
-//            params[i] = request.getQueryParams().get(q.value());
           } else if (a.annotationType().isAssignableFrom(ContextParam.class)) {
             ContextParam c = (ContextParam) a;
             constructorParam = contextHolder_.get().get(c.value());
-//            params[i] = contextHolder_.get().get(c.value());
           }
           if (methodParameters[i].isAssignableFrom(String.class)) {
             params[i] = constructorParam;

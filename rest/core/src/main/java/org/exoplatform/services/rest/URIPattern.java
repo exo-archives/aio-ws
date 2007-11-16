@@ -24,6 +24,12 @@ public class URIPattern {
   private String[] paramNames_;
   private String pattern_;
   private Set<String> params_;
+  /**
+   * Total length of all tokens. Used for searching priority
+   * Resources for some URI. The higher total length of tokens 
+   * the more precision URIPattern for one URI.
+   */
+  private int totalTokensLength_ = 0;
 
   /**
    * Creates a new instance of ParametrizedStringParser.
@@ -31,10 +37,11 @@ public class URIPattern {
    */
   public URIPattern(String patternString) {
     tokens_ = paramPattern_.split(patternString, -1);
-    for (int i = 0; i < tokens_.length; i++) {
-      if (tokens_[i].length() == 0) {
+    for (String t : tokens_) {
+      if (t.length() == 0) {
         throw new IllegalArgumentException("Invalid pattern:" + patternString);
       }
+      totalTokensLength_ += t.length(); 
     }
     int numParams = tokens_.length - 1;
     paramNames_ = new String[numParams];
@@ -134,8 +141,9 @@ public class URIPattern {
    * @return the result of comparison
    */
   public boolean matches(URIPattern another) {
-    Pattern p = Pattern.compile("\\{.*\\}");
-    return matches(p.matcher(another.getString()).replaceAll("x"));
+//    Pattern p = Pattern.compile("\\{.*\\}");
+//    return matches(p.matcher(another.getString()).replaceAll("x"));
+    return matches(another.getString());
   }
 
   /**
@@ -146,8 +154,12 @@ public class URIPattern {
     return pattern_;
   }
   
-  public String[] getTokens() {
-    return tokens_;
+//  public String[] getTokens() {
+//    return tokens_;
+//  }
+  
+  public int getTotalTokensLength() {
+    return totalTokensLength_;
   }
 
 }
