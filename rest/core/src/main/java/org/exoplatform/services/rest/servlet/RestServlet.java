@@ -45,6 +45,7 @@ public class RestServlet extends HttpServlet implements Connector {
   public void service(HttpServletRequest httpRequest,
       HttpServletResponse httpResponse) throws IOException, ServletException {
 // Current container must be set by filter.
+    httpRequest.setCharacterEncoding("UTF-8");
     ExoContainer container = ExoContainerContext.getCurrentContainer();
     LOGGER.debug("Current Container: " + container);
     ResourceBinder binder = (ResourceBinder) container
