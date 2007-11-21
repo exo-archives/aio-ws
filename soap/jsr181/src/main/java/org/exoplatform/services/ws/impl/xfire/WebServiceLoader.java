@@ -48,6 +48,9 @@ public class WebServiceLoader implements Startable {
     createFactory();
   }
   
+  /**
+   * Create new XFire instance.
+   */
   private void createXFire() {
     if (xfire == null) {
       this.xfire = XFireFactory.newInstance().getXFire();
@@ -64,6 +67,9 @@ public class WebServiceLoader implements Startable {
     return xfire.getServiceRegistry();
   }
   
+  /* (non-Javadoc)
+   * @see org.picocontainer.Startable#start()
+   */
   public void start() {
     services = container.getComponentInstancesOfType(AbstractWebService.class);
     for (AbstractWebService as : services) {
