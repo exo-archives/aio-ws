@@ -14,7 +14,7 @@ import org.exoplatform.services.rest.transformer.InputEntityTransformer;
 import org.exoplatform.services.rest.transformer.OutputEntityTransformer;
 
 /**
- * Created by The eXo Platform SARL. <br/> Abstraction of resource description.<br/>
+ * Created by The eXo Platform SAS. <br/> Abstraction of resource description.<br/>
  * @author Gennady Azarenkov
  * @version $Id: $
  */
