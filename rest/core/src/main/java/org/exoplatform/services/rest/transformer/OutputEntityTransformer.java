@@ -19,6 +19,8 @@ package org.exoplatform.services.rest.transformer;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Basic implementation of GenericOutputEntityTransformer.<br/>
@@ -27,6 +29,32 @@ import java.io.OutputStream;
  */
 public abstract class OutputEntityTransformer implements
     GenericOutputEntityTransformer {
+  
+  /**
+   * External parameters for transformation.
+   * In this Map parameters can be added by ResourceContainer. 
+   * @see org.exoplatform.services.rest.Response#setTransformerParameters().
+   * @see org.exoplatform.services.rest.Response#getTransformerParameters().
+   */
+  protected Map<String, String> transformerParameters_ = new HashMap<String, String>();
+  
+  /**
+   * With this constructor from ExoContainer can be got any Objects. 
+   * @param components the Objects from ExoContainer.
+   * @see EntityTransformerFactory#newTransformer(Class).
+   */
+  public OutputEntityTransformer(Object... components) {
+  }
+  
+  /**
+   * @param trfParams the new parameters for transformer.
+   *        Can be null if ResourceContainer does not set any parameters. 
+   */
+  public void addTransformerParameters(Map<String, String> trfParams) {
+    if (trfParams != null) 
+      transformerParameters_.putAll(trfParams);
+  }
+
   /**
    * Write entity to OutputStream.
    * @param entity the Object which should be writed

@@ -34,6 +34,14 @@ public abstract class InputEntityTransformer implements
   protected Class<?> entityType_;
 
   /**
+   * With this constructor from ExoContainer can be got any Objects. 
+   * @param components the Objects from ExoContainer.
+   * @see EntityTransformerFactory#newTransformer(Class).
+   */
+  public InputEntityTransformer(Object... components) {
+  }
+
+  /**
    * Set the type of Objects which should be serve by InputEntityTransformer.
    * @param entityType the type of entity
    */

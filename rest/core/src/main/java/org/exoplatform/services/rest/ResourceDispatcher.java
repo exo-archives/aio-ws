@@ -17,6 +17,9 @@
 
 package org.exoplatform.services.rest;
 
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.ExoContainer;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
@@ -53,6 +56,8 @@ public class ResourceDispatcher implements Connector {
   private List<ResourceDescriptor> resourceDescriptors_;
   private ThreadLocal<Context> contextHolder_ = new ThreadLocal<Context>();
   private final Map<String, String> contextParams_ = new HashMap<String, String>();
+          
+  private ExoContainer container_;
 
 //  private static final Log LOGGER = ExoLogger.getLogger("ResourceDispatcher");
 
@@ -61,8 +66,11 @@ public class ResourceDispatcher implements Connector {
    * @param containerContext ExoContainerContext
    * @throws Exception any Exception
    */
-  public ResourceDispatcher(InitParams params, ResourceBinder binder)
-      throws Exception {
+  public ResourceDispatcher(InitParams params, ResourceBinder binder,
+      ExoContainerContext containerContext) throws Exception {
+    
+    container_ = containerContext.getContainer();
+    
     if (params != null) {
       PropertiesParam contextParam = params.getPropertiesParam("contex-params");
       if (contextParam != null) {
@@ -136,9 +144,10 @@ public class ResourceDispatcher implements Connector {
       // building array of parameters
       for (int i = 0; i < methodParametersAnnotations.length; i++) {
         if (methodParametersAnnotations[i] == null) {
-          EntityTransformerFactory factory = new EntityTransformerFactory(
-              resource.getInputTransformerType());
-          InputEntityTransformer transformer = (InputEntityTransformer) factory.newTransformer();
+          EntityTransformerFactory factory = (EntityTransformerFactory)
+              container_.getComponentInstanceOfType(EntityTransformerFactory.class);
+          InputEntityTransformer transformer = (InputEntityTransformer) factory
+              .newTransformer(resource.getInputTransformerType());
           transformer.setType(methodParameters[i]);
           params[i] = transformer.readFrom(request.getEntityStream());
         } else {
@@ -169,7 +178,7 @@ public class ResourceDispatcher implements Connector {
       Response resp = (Response) resource.getServer().invoke(
           resource.getResourceContainer(), params);
       if (!resp.isTransformerInitialized() && resp.isEntityInitialized()) {
-        resp.setTransformer(getTransformer(resource));
+        resp.setTransformer(getTransformer(resource, resp.getTransformerParameters()));
       }
       return resp;
     }
@@ -188,16 +197,22 @@ public class ResourceDispatcher implements Connector {
     return contextHolder_.get();
   }
 
-  private OutputEntityTransformer getTransformer(ResourceDescriptor resource)
-      throws InvalidResourceDescriptorException {
+  /**
+   * Get OutputEntitytransformer if it was not set before.
+   */
+  private OutputEntityTransformer getTransformer(ResourceDescriptor resource,
+      Map<String, String> transformerParameters) throws InvalidResourceDescriptorException {
     try {
-      EntityTransformerFactory factory = new EntityTransformerFactory(resource
-          .getOutputTransformerType());
-      return (OutputEntityTransformer) factory.newTransformer();
+      EntityTransformerFactory factory = (EntityTransformerFactory)
+          container_.getComponentInstanceOfType(EntityTransformerFactory.class);
+      OutputEntityTransformer transformer = (OutputEntityTransformer) factory.newTransformer(
+          resource.getOutputTransformerType());
+      transformer.addTransformerParameters(transformerParameters);
+      return transformer;
     } catch (Exception e) {
       throw new InvalidResourceDescriptorException(
-          "Could not get EntityTransformer from Response" +
-              " or annotation to ResourceDescriptor. Exception: " + e);
+          "Could not get EntityTransformer from Response"
+          + " or annotation to ResourceDescriptor. Exception: " + e);
     }
   }
 
@@ -210,21 +225,18 @@ public class ResourceDispatcher implements Connector {
   private boolean isQueryParamsMatches(MultivaluedMetadata fromRequest,
       MultivaluedMetadata queryPattern) {
     // if resource has not any QueryPattern it accept all request
-    if (queryPattern.keys().size() == 0) {
+    if (queryPattern.keys().size() == 0)
       return true;
-    }
-    if (!fromRequest.keys().containsAll(queryPattern.keys())) {
+    if (!fromRequest.keys().containsAll(queryPattern.keys()))
       return false;
-    }
     Set<String> keys = queryPattern.keys();
     Iterator<String> iterator = keys.iterator();
     while (iterator.hasNext()) {
       String key = iterator.next();
       List<String> r = fromRequest.getList(key);
       List<String> p = queryPattern.getList(key);
-      if (!r.containsAll(p)) {
+      if (!r.containsAll(p))
         return false;
-      }
     }
     return true;
   }
@@ -238,15 +250,14 @@ public class ResourceDispatcher implements Connector {
   private boolean compareMimeTypes(String[] requested, String[] produced) {
     for (String r : requested) {
       for (String p : produced) {
-        if ("*/*".equals(p)) {
+        if ("*/*".equals(p))
           return true;
-        }
-        if (p.equals(r)) {
+        if (p.equals(r))
           return true;
-        }
         String[] rsubtype = r.split("/");
         String[] psubtype = p.split("/");
-        if (psubtype[0].equals(rsubtype[0]) && "*".equals(psubtype[1])) {
+        if (psubtype[0].equals(rsubtype[0])
+            && "*".equals(psubtype[1])) {
           return true;
         }
       }

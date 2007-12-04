@@ -327,7 +327,7 @@ public class ResourceBinder implements Startable {
         bind(c);
       } catch (InvalidResourceDescriptorException irde) {
         LOGGER.error("Can't add ResourceContainer Component: " +
-            c.getClass().getName());
+            c.getClass().getName() + ".\nException : " + irde);
       }
     }
   }

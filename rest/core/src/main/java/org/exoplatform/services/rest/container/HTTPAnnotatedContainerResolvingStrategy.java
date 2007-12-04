@@ -240,7 +240,7 @@ public class HTTPAnnotatedContainerResolvingStrategy implements
     final public Class<? extends OutputEntityTransformer> getOutputTransformerType() {
       return outputTransformerType;
     }
-
+    
     /*
      * (non-Javadoc)
      * @see org.exoplatform.services.rest.container.ResourceDescriptor#getMethodParameterAnnotations()

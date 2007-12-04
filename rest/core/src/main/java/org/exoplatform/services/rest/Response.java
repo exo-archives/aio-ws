@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.exoplatform.common.http.HTTPStatus;
 import org.exoplatform.services.rest.transformer.OutputEntityTransformer;
@@ -37,19 +38,22 @@ public class Response {
   private EntityMetadata metadata_;
   private Object entity_;
   private OutputEntityTransformer transformer_;
+  private Map<String, String> transformerParameters_;
   private MultivaluedMetadata responseHeaders_;
 
   /**
-   * @param status the HTTP status
-   * @param responseHeaders the HTTP headers
-   * @param entity the representation requested object
-   * @param transformer the entity serializator
+   * @param status the HTTP status.
+   * @param responseHeaders the HTTP headers.
+   * @param entity the representation requested object.
+   * @param transformer the entity seriallizator.
    */
   protected Response(int status, MultivaluedMetadata responseHeaders,
-      Object entity, OutputEntityTransformer transformer) {
+      Object entity, OutputEntityTransformer transformer,
+      Map<String, String> transformerParameters) {
     status_ = status;
     entity_ = entity;
     transformer_ = transformer;
+    transformerParameters_ = transformerParameters;
     responseHeaders_ = responseHeaders;
     metadata_ = new EntityMetadata(responseHeaders);
 
@@ -57,7 +61,7 @@ public class Response {
 
   /**
    * HTTP status of response.
-   * @return the HTTP status
+   * @return the HTTP status.
    */
   public int getStatus() {
     return status_;
@@ -72,7 +76,7 @@ public class Response {
   }
 
   /**
-   * Body of HTTP response. Entity is a representation of requeted resource.
+   * Body of HTTP response. Entity is a representation of requested resource.
    * @return the entity
    */
   public Object getEntity() {
@@ -87,7 +91,7 @@ public class Response {
    * metadata.getMediaType()
    * </pre> - Content-Type header.
    * @return
-   * @see org.exoplatform.services.rest.EntityMetadata
+   * @see org.exoplatform.services.rest.EntityMetadata.
    */
   public EntityMetadata getEntityMetadata() {
     return metadata_;
@@ -95,7 +99,7 @@ public class Response {
 
   /**
    * Is transformer initialized.
-   * @return the state of OutputEntityTransformer
+   * @return the state of OutputEntityTransformer.
    */
   public boolean isTransformerInitialized() {
     if (transformer_ != null) {
@@ -106,13 +110,22 @@ public class Response {
 
   /**
    * Is entity initialized. For HTTP it means has request entity body or not.
-   * @return the entity state
+   * @return the entity state.
    */
   public boolean isEntityInitialized() {
     if (entity_ != null) {
       return true;
     }
     return false;
+  }
+  
+  /**
+   * Get parameters for OutputEntityTransformer.
+   * This parameters can be set by ResourceContainer.
+   * @return OutputEntityTransformer parameters;
+   */
+  public Map<String, String> getTransformerParameters() {
+    return transformerParameters_;
   }
 
   /**
@@ -125,8 +138,8 @@ public class Response {
 
   /**
    * Write entity to output stream.
-   * @param outputEntityStream the output stream for writing entity
-   * @throws IOException Input/Output Exception
+   * @param outputEntityStream the output stream for writing entity.
+   * @throws IOException Input/Output Exception.
    */
   public void writeEntity(OutputStream outputEntityStream) throws IOException {
     if (transformer_ != null) {
@@ -143,13 +156,14 @@ public class Response {
     Object entity;
     MultivaluedMetadata responseHeaders = new MultivaluedMetadata();
     OutputEntityTransformer transformer;
+    Map<String, String> transformerParameters;
 
     protected Builder() {
     }
 
     /**
      * Create a new instance of builder.
-     * @return the new instance of Builder
+     * @return the new instance of Builder.
      */
     protected static synchronized Builder newInstance() {
       return new Builder();
@@ -157,16 +171,16 @@ public class Response {
 
     /**
      * create REST Response with parameters collected by Builder.
-     * @return the REST Response
+     * @return the REST Response.
      */
     public Response build() {
-      return new Response(status, responseHeaders, entity, transformer);
+      return new Response(status, responseHeaders, entity, transformer, transformerParameters);
     }
 
     /**
      * create Builder with selected status.
      * @param st the HTTP status
-     * @return the new instance of Builder with status: st
+     * @return the new instance of Builder with given status.
      */
     public static Builder withStatus(int st) {
       Builder b = newInstance();
@@ -176,8 +190,8 @@ public class Response {
 
     /**
      * create Builder with HTTP status 200 (OK) and entity.
-     * @param e the entity
-     * @return the new Builder instance with status 200 (OK) and entity
+     * @param e the entity.
+     * @return the new Builder instance with status 200 (OK) and entity.
      */
     public static Builder representation(Object e) {
       Builder b = newInstance();
@@ -188,10 +202,10 @@ public class Response {
 
     /**
      * create Builder with HTTP status 200 (OK), entity and set entity type.
-     * @param e the entity
-     * @param type the entity type
+     * @param e the entity.
+     * @param type the entity type.
      * @return the new instance of Builder with status 200 (OK), entity and
-     *         media type
+     *         media type.
      */
     public static Builder representation(Object e, String type) {
       Builder b = representation(e);
@@ -201,7 +215,7 @@ public class Response {
 
     /**
      * create Builder with HTTP status 200 (OK).
-     * @return new instance of Builder with status 200 (OK)
+     * @return new instance of Builder with status 200 (OK).
      */
     public static Builder ok() {
       Builder b = newInstance();
@@ -211,8 +225,8 @@ public class Response {
 
     /**
      * create Builder with HTTP status 200 (OK) and entity.
-     * @param e the entity
-     * @return the new Builder instance with status 200 (OK) and entity
+     * @param e the entity.
+     * @return the new Builder instance with status 200 (OK) and entity.
      */
     public static Builder ok(Object e) {
       Builder b = ok();
@@ -222,10 +236,10 @@ public class Response {
 
     /**
      * create Builder with HTTP status 200 (OK),entity and set entity type.
-     * @param e the entity
-     * @param mediaType the entity type
+     * @param e the entity.
+     * @param mediaType the entity type.
      * @return the new instance of Builder with status 200 (OK), entity and
-     *         media type
+     *         media type.
      */
     public static Builder ok(Object e, String mediaType) {
       Builder b = ok(e).mediaType(mediaType);
@@ -234,9 +248,9 @@ public class Response {
 
     /**
      * create Builder with status 201 (CREATED).
-     * @param location the location created resources
+     * @param location the location created resources.
      * @return the new instance of Builder with status 201 (CREATED) and header
-     *         Location
+     *         Location.
      */
     public static Builder created(String location) {
       Builder b = newInstance();
@@ -247,10 +261,10 @@ public class Response {
 
     /**
      * create Builder with status 201 (CREATED) and entity.
-     * @param e the entity
-     * @param location the location created resources
+     * @param e the entity.
+     * @param location the location created resources.
      * @return the new instance of Builder with status 201 (CREATED), header
-     *         Location and Location in entity body
+     *         Location and Location in entity body.
      */
     public static Builder created(Object e, String location) {
       Builder b = created(location);
@@ -260,7 +274,7 @@ public class Response {
 
     /**
      * create Builder with HTTP status 202 (ACCEPTED).
-     * @return the new instance of Builder with status 202 (ACCEPTED)
+     * @return the new instance of Builder with status 202 (ACCEPTED).
      */
     public static Builder accepted() {
       Builder b = newInstance();
@@ -270,7 +284,7 @@ public class Response {
 
     /**
      * create Builder with HTTP status 204 (NO CONTENT).
-     * @return the new instance of Builder with status 204 (NO CONTENT)
+     * @return the new instance of Builder with status 204 (NO CONTENT).
      */
     public static Builder noContent() {
       Builder b = newInstance();
@@ -280,8 +294,8 @@ public class Response {
 
     /**
      * created Builder with HTTP status 307 (TEMPORARY REDIRECT).
-     * @param location the new resource location
-     * @return the new instance of Builder with status 307 (TEMPORARY REDIRECT)
+     * @param location the new resource location.
+     * @return the new instance of Builder with status 307 (TEMPORARY REDIRECT).
      */
     public static Builder temporaryRedirect(String location) {
       Builder b = newInstance();
@@ -292,7 +306,7 @@ public class Response {
 
     /**
      * create Builder with HTTP status 304 (NOT MODIFIED).
-     * @return the new instance of Builder with status 304 (NOT MODIFIED)
+     * @return the new instance of Builder with status 304 (NOT MODIFIED).
      */
     public static Builder notModified() {
       Builder b = newInstance();
@@ -302,9 +316,9 @@ public class Response {
 
     /**
      * create Builder with HTTP status 304 (NOT MODIFIED) and HTTP EntityTag.
-     * @param tag the HTTP EntityTag
+     * @param tag the HTTP EntityTag.
      * @return the new instance of Builder with status 304 (NOT MODIFIED) and
-     *         HTTP EntityTag
+     *         HTTP EntityTag.
      */
     public static Builder notModified(String tag) {
       Builder b = notModified();
@@ -314,7 +328,7 @@ public class Response {
 
     /**
      * create Builder with HTTP status 403 (FORBIDDEN).
-     * @return the new instance of Builder with status 403 (FORBIDDEN)
+     * @return the new instance of Builder with status 403 (FORBIDDEN).
      */
     public static Builder forbidden() {
       Builder b = newInstance();
@@ -324,7 +338,7 @@ public class Response {
 
     /**
      * create Builder with HTTP status 404 (NOT FOUND).
-     * @return the new instance of Builder with status 404 (NOT FOUND)
+     * @return the new instance of Builder with status 404 (NOT FOUND).
      */
     public static Builder notFound() {
       Builder b = newInstance();
@@ -334,7 +348,7 @@ public class Response {
 
     /**
      * create Builder with HTTP status 400 (BAD REQUEST).
-     * @return the new instance of Builder with status 400 (BAD REQUEST)
+     * @return the new instance of Builder with status 400 (BAD REQUEST).
      */
     public static Builder badRequest() {
       Builder b = newInstance();
@@ -345,7 +359,7 @@ public class Response {
     /**
      * create Builder with HTTP status 500 (INTERNAL SERVER ERROR).
      * @return the new instance of Builder with status 500 (INTERNAL SERVER
-     *         ERROR)
+     *         ERROR).
      */
     public static Builder serverError() {
       Builder b = newInstance();
@@ -355,8 +369,8 @@ public class Response {
 
     /**
      * return Buider with changed status.
-     * @param st the HTTP status
-     * @return the Builder with changed status
+     * @param st the HTTP status.
+     * @return the Builder with changed status.
      */
     public Builder status(int st) {
       status = st;
@@ -365,8 +379,8 @@ public class Response {
 
     /**
      * add entity to the Builder.
-     * @param e the entity (object with represents requested resource)
-     * @return the Builder with added entity
+     * @param e the entity (object with represents requested resource).
+     * @return the Builder with added entity.
      */
     public Builder entity(Object e) {
       entity = e;
@@ -374,10 +388,10 @@ public class Response {
     }
 
     /**
-     * add entity to the Buider and set entity Content-Type.
-     * @param e the entity (object with represents requested resource)
-     * @param mediaType the entity media type
-     * @return the Builder with added entity and media type
+     * add entity to the Builder and set entity Content-Type.
+     * @param e the entity (object with represents requested resource).
+     * @param mediaType the entity media type.
+     * @return the Builder with added entity and media type.
      */
     public Builder entity(Object e, String mediaType) {
       entity = e;
@@ -387,8 +401,8 @@ public class Response {
 
     /**
      * set entity Content-Type.
-     * @param mediaType the entity media type
-     * @return the Builder with added media type
+     * @param mediaType the entity media type.
+     * @return the Builder with added media type.
      */
     public Builder mediaType(String mediaType) {
       this.responseHeaders.putSingle("Content-Type", mediaType);
@@ -397,8 +411,8 @@ public class Response {
 
     /**
      * set Content-Language.
-     * @param languages the List &lt; String &gt; of language
-     * @return the Builder with added header "Content-Language"
+     * @param languages the List &lt; String &gt; of language.
+     * @return the Builder with added header "Content-Language".
      */
     public Builder languages(List<String> languages) {
       this.responseHeaders.put("Content-Language", languages);
@@ -407,8 +421,8 @@ public class Response {
 
     /**
      * set Content-Encoding.
-     * @param encodings the List &lt; String &gt; of content encoding
-     * @return the Builder with added header "Content-Encoding"
+     * @param encodings the List &lt; String &gt; of content encoding.
+     * @return the Builder with added header "Content-Encoding".
      */
     public Builder encodings(List<String> encodings) {
       this.responseHeaders.put("Content-Encoding", encodings);
@@ -417,8 +431,8 @@ public class Response {
 
     /**
      * set Location header.
-     * @param location the Location string
-     * @return the Builder with added "Location" header
+     * @param location the Location string.
+     * @return the Builder with added "Location" header.
      */
     public Builder locations(String location) {
       this.responseHeaders.putSingle("Location", location);
@@ -427,8 +441,8 @@ public class Response {
 
     /**
      * set Last-Modified header.
-     * @param lastModified the date of last change in resource
-     * @return the Builder with added "Last-Modified" header
+     * @param lastModified the date of last change in resource.
+     * @return the Builder with added "Last-Modified" header.
      */
     public Builder lastModified(Date lastModified) {
       this.responseHeaders.putSingle("Last-Modified", DateFormat.getInstance()
@@ -438,8 +452,8 @@ public class Response {
 
     /**
      * set Content-Length header.
-     * @param Content-Length size of data in bytes
-     * @return the Builder with added "Content-Length" header
+     * @param Content-Length size of data in bytes.
+     * @return the Builder with added "Content-Length" header.
      */
     public Builder contentLenght(long length) {
       this.responseHeaders.putSingle("Content-Length", length + "");
@@ -448,8 +462,8 @@ public class Response {
 
     /**
      * set HTTP EntityTag header.
-     * @param tag the HTTP entity tag
-     * @return the Builder with added "ETag" header
+     * @param tag the HTTP entity tag.
+     * @return the Builder with added "ETag" header.
      */
     public Builder tag(String tag) {
       this.responseHeaders.putSingle("ETag", tag);
@@ -458,20 +472,30 @@ public class Response {
 
     /**
      * set OutputEntityTransformer.
-     * @param trf the output transformer
-     * @see org.exoplatform.services.rest.transformer.OutputEntityTransformer
-     * @return the Buider with added entity transformer
+     * @param trf the output transformer.
+     * @see org.exoplatform.services.rest.transformer.OutputEntityTransformer.
+     * @return the Builder with added entity transformer.
      */
     public Builder transformer(OutputEntityTransformer trf) {
       this.transformer = trf;
       return this;
     }
+    
+    /**
+     * set parameters for OutputEntityTransformer.
+     * @param trfParams parameters.
+     * @return the Builder with added transformer parameters.
+     */
+    public Builder setTransformerParameters(Map<String, String> trfParams) {
+      this.transformerParameters = trfParams;
+      return this;
+    }
 
     /**
      * add response single header.
-     * @param key the key
-     * @param value the value
-     * @return the Builder with added single header
+     * @param key the key.
+     * @param value the value.
+     * @return the Builder with added single header.
      */
     public Builder header(String key, String value) {
       this.responseHeaders.putSingle(key, value);
@@ -480,8 +504,8 @@ public class Response {
 
     /**
      * set response headers.
-     * @param headers key-values pair of HTTP reponse header
-     * @return the Builder with new sets of HTTP headers
+     * @param headers key-values pair of HTTP response header.
+     * @return the Builder with new sets of HTTP headers.
      */
     public Builder headers(MultivaluedMetadata headers) {
       this.responseHeaders = headers;
@@ -490,8 +514,8 @@ public class Response {
 
     /**
      * @param c
-     * @see org.exoplatform.services.rest.CacheControl
-     * @return the Builder with added Cache-Control header
+     * @see org.exoplatform.services.rest.CacheControl.
+     * @return the Builder with added Cache-Control header.
      */
     public Builder cacheControl(CacheControl c) {
       this.responseHeaders.putSingle("Cache-Control", c.getAsString());
@@ -500,7 +524,7 @@ public class Response {
 
     /**
      * Prepared error response and set transformer.
-     * @param message - error message
+     * @param message - error message.
      * @return the new instance of Builder with entity represented by String and
      *         StringOutputTransformer.
      */
