@@ -60,7 +60,6 @@ public class RestServlet extends HttpServlet implements Connector {
 // Current container must be set by filter.
     httpRequest.setCharacterEncoding("UTF-8");
     ExoContainer container = ExoContainerContext.getCurrentContainer();
-    System.out.println("QUERY: " + httpRequest.getQueryString());
     LOGGER.debug("Current Container: " + container);
     ResourceBinder binder = (ResourceBinder) container
         .getComponentInstanceOfType(ResourceBinder.class);
