@@ -75,6 +75,7 @@
 		  <properties-param>
 		    <name>xsl-source-urls</name>
 		    <property name="book" value="xslt/book.xsl"/>
+        <property name="test" value="xslt/test.xsl"/>
 		  </properties-param>
 		</init-params>
 	  </component-plugin>
