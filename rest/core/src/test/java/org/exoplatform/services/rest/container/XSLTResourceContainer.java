@@ -57,7 +57,7 @@ public class XSLTResourceContainer implements ResourceContainer {
     Map<String, String> p = new HashMap<String, String>();
     p.put(XSLTConstants.XSLT_TEMPLATE, schemaName);
     StreamSource s = new StreamSource(Thread.currentThread().getContextClassLoader()
-        .getResourceAsStream("book-in.xml"));
+        .getResourceAsStream("test.xml"));
     return Response.Builder.ok(s, "text/html").setTransformerParameters(p).build();
   }
 
