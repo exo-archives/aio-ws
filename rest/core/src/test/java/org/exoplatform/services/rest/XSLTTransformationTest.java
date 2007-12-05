@@ -65,7 +65,7 @@ public class XSLTTransformationTest extends TestCase {
   public void testTransformation2() throws Exception {
     XSLTResourceContainer xr = new XSLTResourceContainer();
     binder_.bind(xr);
-    Request req = new Request(null, new ResourceIdentifier("/test/xslt2/book/"), "GET",
+    Request req = new Request(null, new ResourceIdentifier("/test/xslt2/test/"), "GET",
         new MultivaluedMetadata(), new MultivaluedMetadata());
     Response res  = dispatcher_.dispatch(req);
     res.writeEntity(System.out);
