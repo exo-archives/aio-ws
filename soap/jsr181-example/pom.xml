@@ -2,12 +2,12 @@
    <parent>
     <groupId>org.exoplatform.ws</groupId>
     <artifactId>config</artifactId>
-    <version>0.1</version>
+    <version>trunk</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.exoplatform.ws.soap</groupId>
   <artifactId>exo.soap.xfire.jsr181-examples</artifactId>
-  <version>0.1</version>
+  <version>trunk</version>
   <name>SOAP XFire JSR181 impl examples</name>
   <description></description>
   <dependencies>
@@ -49,7 +49,7 @@
     <dependency>
 	<groupId>org.exoplatform.ws.soap</groupId>
   	<artifactId>exo.soap.xfire.jsr181</artifactId>
-  	<version>0.1</version>
+  	<version>trunk</version>
     </dependency>
   </dependencies>
   <build>
