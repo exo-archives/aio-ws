@@ -106,7 +106,7 @@ public class RequestFactory {
       String[] params = httpRequest.getParameterValues(k);
       for (int i = 0; i < params.length; i++) {
         queryParams.putSingle(k, params[i]);
-        System.out.println(k + " = " + params[i]);
+//        System.out.println(k + " = " + params[i]);
       }
     }
     return queryParams;
