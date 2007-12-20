@@ -17,9 +17,6 @@
 
 package org.exoplatform.services.rest;
 
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.container.ExoContainer;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
@@ -28,17 +25,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-//import org.apache.commons.logging.Log;
-//import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.PropertiesParam;
 import org.exoplatform.container.xml.Property;
 import org.exoplatform.services.rest.container.InvalidResourceDescriptorException;
 import org.exoplatform.services.rest.container.ResourceDescriptor;
 import org.exoplatform.services.rest.data.MimeTypes;
+import org.exoplatform.services.rest.transformer.EntityTransformerFactory;
 import org.exoplatform.services.rest.transformer.InputEntityTransformer;
 import org.exoplatform.services.rest.transformer.OutputEntityTransformer;
-import org.exoplatform.services.rest.transformer.EntityTransformerFactory;
 
 /**
  * Created by The eXo Platform SAS.<br/> ResourceDispatcher finds
@@ -57,19 +52,18 @@ public class ResourceDispatcher implements Connector {
   private ThreadLocal<Context> contextHolder_ = new ThreadLocal<Context>();
   private final Map<String, String> contextParams_ = new HashMap<String, String>();
           
-  private ExoContainer container_;
+//  private ExoContainer container_;
+  private EntityTransformerFactory factory;
 
 //  private static final Log LOGGER = ExoLogger.getLogger("ResourceDispatcher");
-
+  
   /**
    * Constructor gets all binded ResourceContainers from ResourceBinder.
    * @param containerContext ExoContainerContext
    * @throws Exception any Exception
    */
   public ResourceDispatcher(InitParams params, ResourceBinder binder,
-      ExoContainerContext containerContext) throws Exception {
-    
-    container_ = containerContext.getContainer();
+      EntityTransformerFactory factory) throws Exception {
     
     if (params != null) {
       PropertiesParam contextParam = params.getPropertiesParam("contex-params");
@@ -82,6 +76,7 @@ public class ResourceDispatcher implements Connector {
       }
     }
     this.resourceDescriptors_ = binder.getAllDescriptors();
+    this.factory = factory;
   }
 
   /**
@@ -144,8 +139,6 @@ public class ResourceDispatcher implements Connector {
       // building array of parameters
       for (int i = 0; i < methodParametersAnnotations.length; i++) {
         if (methodParametersAnnotations[i] == null) {
-          EntityTransformerFactory factory = (EntityTransformerFactory)
-              container_.getComponentInstanceOfType(EntityTransformerFactory.class);
           InputEntityTransformer transformer = (InputEntityTransformer) factory
               .newTransformer(resource.getInputTransformerType());
           transformer.setType(methodParameters[i]);
@@ -203,8 +196,6 @@ public class ResourceDispatcher implements Connector {
   private OutputEntityTransformer getTransformer(ResourceDescriptor resource,
       Map<String, String> transformerParameters) throws InvalidResourceDescriptorException {
     try {
-      EntityTransformerFactory factory = (EntityTransformerFactory)
-          container_.getComponentInstanceOfType(EntityTransformerFactory.class);
       OutputEntityTransformer transformer = (OutputEntityTransformer) factory.newTransformer(
           resource.getOutputTransformerType());
       transformer.addTransformerParameters(transformerParameters);
