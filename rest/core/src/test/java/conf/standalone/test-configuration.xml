@@ -28,7 +28,7 @@
   </component>
   <component>
     <type>org.exoplatform.services.rest.transformer.EntityTransformerFactory</type>
-    <multi-instance>true</multi-instance>
+    <!--multi-instance>true</multi-instance-->
   </component>
   <component>
     <type>org.exoplatform.services.rest.ResourceDispatcher</type>
@@ -48,6 +48,11 @@
     	</value-param>
     </init-params>
  	</component>
+	
+	<!--component>
+		<type>org.exoplaform.services.rest.test.SimpleRestResponse</type>
+	</component-->
+	
   <!-- for XSLT transformation -->
 	<component>
 		<type>org.exoplatform.services.xml.resolving.impl.XMLResolvingServiceImpl</type>
