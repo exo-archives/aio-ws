@@ -17,6 +17,8 @@
 
 package org.exoplatform.services.rest.frameworks.json.utils;
 
+import org.exoplatform.services.rest.frameworks.json.JSONConstants;
+
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
@@ -31,25 +33,25 @@ public class JSONUtils {
     char[] charArray = string.toCharArray();
     for (char c : charArray) {
       switch (c) {
-      case '\n':
+      case JSONConstants.NEW_LINE:
         sb.append("\\n");
         break;
-      case '\r':
+      case JSONConstants.CARRIAGE_RETURN:
         sb.append("\\r");
         break;
-      case '\t':
+      case JSONConstants.HORIZONTAL_TAB:
         sb.append("\\t");
         break;
-      case '\b':
+      case JSONConstants.BACKSPACE:
         sb.append("\\b");
         break;
-      case '\f':
+      case JSONConstants.FORM_FEED:
         sb.append("\\f");
         break;
-      case '\\':
+      case JSONConstants.ESCAPE:
         sb.append("\\\\");
         break;
-      case '"':
+      case JSONConstants.QUOTE:
         sb.append("\\\"");
         break;
       default:

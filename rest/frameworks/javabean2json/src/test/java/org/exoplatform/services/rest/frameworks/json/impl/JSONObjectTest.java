@@ -51,7 +51,7 @@ public class JSONObjectTest extends TestCase {
     Item childBean = new Item();
     childBean.setName("name");
     childBean.setValue("value");
-    rootBean.setBean(childBean);
+    rootBean.setItem(childBean);
     System.out.println("------------------ with child bean -------------------");
     Map<String, Object> m = new JSONObjectFactoryImpl().createJSONObject(rootBean);
     Set<String>  keys = m.keySet();
@@ -68,7 +68,7 @@ public class JSONObjectTest extends TestCase {
     bean.setDouble(121.121);
     bean.setString("test_string");
     bean.setStringArray(new String[] {"item1", "item2", "item3", "item4", "item5"});
-    bean.setBean(null); 
+    bean.setItem(null); 
     List<Item> l = new ArrayList<Item>();
     for (int i = 0; i < 5; i++) {
       Item item = new Item();

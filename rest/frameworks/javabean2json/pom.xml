@@ -19,4 +19,14 @@
 			<version>trunk</version>
 		</dependency>
 	</dependencies>
+	<build>
+    <testResources>                                                                                                                                                                                            
+        <testResource>                                                                                                                                                                                         
+        <directory>src/test/resources</directory>                                                                                                                                                               
+        <includes>                                                                                                                                                                                         
+          <include>**/*.jsn</include>                                                                                                                                                             
+        </includes>                                                                                                                                                                                        
+     </testResource>
+     </testResources>            	 
+	</build>
 </project>

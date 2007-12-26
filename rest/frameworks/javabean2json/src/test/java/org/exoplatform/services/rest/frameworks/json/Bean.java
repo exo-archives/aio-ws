@@ -25,33 +25,33 @@ import java.util.List;
  */
 public class Bean {
     
-    private boolean bool_;
-    private byte byt_;
-    private char ch_;
-    private int i_;
-    private double d_;
+    private boolean boolean_;
+    private byte byte_;
+    private char char_;
+    private int int_;
+    private double double_;
     private String string_;
     private String[] stringArray_;
-    private Item bean_;
+    private Item item_;
     private List<Item> items_;
     
     public Bean() {
     }
     
     public void setBoolean(boolean b) {
-      bool_ = b;
+      boolean_ = b;
     }
     public void setByte(byte b) {
-      byt_ = b;
+      byte_ = b;
     }
     public void setChar(char c) {
-      ch_ = c;
+      char_ = c;
     }
     public void setInt(int i) {
-      i_ = i;
+      int_ = i;
     }
     public void setDouble(double d) {
-      d_ = d;
+      double_ = d;
     }
     public void setString(String s) {
       string_ = s;
@@ -59,27 +59,27 @@ public class Bean {
     public void setStringArray(String[] s) {
       stringArray_ = s;
     }
-    public void setBean(Item bean) {
-      bean_ = bean;
+    public void setItem(Item item) {
+      item_ = item;
     }
     public void setItems(List<Item> i) {
       items_ = i;
     }
     
     public boolean getBoolean() {
-      return bool_;
+      return boolean_;
     }
     public byte getByte() {
-      return byt_;
+      return byte_;
     }
     public char getChar() {
-      return ch_;
+      return char_;
     }
     public int getInt() {
-      return i_;
+      return int_;
     }
     public double getDouble() {
-      return d_;
+      return double_;
     }
     public String getString() {
       return string_;
@@ -87,8 +87,8 @@ public class Bean {
     public String[] getStringArray() {
       return stringArray_;
     }
-    public Item getBean() {
-      return bean_;
+    public Item getItem() {
+      return item_;
     }
     public List<Item> getItems() {
       return items_;

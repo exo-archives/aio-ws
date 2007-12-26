@@ -28,6 +28,16 @@ import java.util.Stack;
 import org.exoplatform.services.rest.frameworks.json.JSONWriter;
 import org.exoplatform.services.rest.frameworks.json.utils.JSONUtils;
 
+import static org.exoplatform.services.rest.frameworks.json.JSONConstants.KEY;
+import static org.exoplatform.services.rest.frameworks.json.JSONConstants.OBJECT;
+import static org.exoplatform.services.rest.frameworks.json.JSONConstants.ARRAY;
+import static org.exoplatform.services.rest.frameworks.json.JSONConstants.START_OBJECT;
+import static org.exoplatform.services.rest.frameworks.json.JSONConstants.END_OBJECT;
+import static org.exoplatform.services.rest.frameworks.json.JSONConstants.START_ARRAY;
+import static org.exoplatform.services.rest.frameworks.json.JSONConstants.END_ARRAY;
+import static org.exoplatform.services.rest.frameworks.json.JSONConstants.COMMA;
+import static org.exoplatform.services.rest.frameworks.json.JSONConstants.COLON;
+
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
@@ -87,17 +97,19 @@ public class JSONWriterImpl implements JSONWriter {
    * @see org.exoplatform.services.rest.frameworks.json.JSONEncoder#writeStartObject()
    */
   public void writeStartObject() throws JSONException {
-    if (!stack_.isEmpty())
-    if (/*stack_.isEmpty() || */(stack_.peek() != 'k' && stack_.peek() != 'a'))
-      throw new JSONException("Wrong place start object.");
+    if (!stack_.isEmpty()) {
+      if (/*stack_.isEmpty() || */(stack_.peek() != KEY && stack_.peek() != ARRAY))
+        throw new JSONException("Wrong place start object.");
+    }
     try {
-      if (commaFirst_)
-        writer_.write(",{");
-      else
-        writer_.write("{");
-      if (!stack_.isEmpty() && stack_.peek() == 'k')
+      if (commaFirst_) {
+        writer_.write(COMMA);
+        writer_.write(START_OBJECT);
+      } else
+        writer_.write(START_OBJECT);
+      if (!stack_.isEmpty() && stack_.peek() == KEY)
         stack_.pop();
-      stack_.push('o');
+      stack_.push(OBJECT);
       commaFirst_ = false;
     } catch (IOException e) {
       throw new JSONException(e);
@@ -110,9 +122,9 @@ public class JSONWriterImpl implements JSONWriter {
    */
   public void writeEndObject() throws JSONException {
     try {
-      if (stack_.pop() != 'o')
+      if (stack_.pop() != OBJECT)
         throw new JSONException("Wrong place end object.");
-      writer_.write("}");
+      writer_.write(END_OBJECT);
       commaFirst_ = true;
     } catch (IOException e) {
       throw new JSONException(e);
@@ -124,16 +136,18 @@ public class JSONWriterImpl implements JSONWriter {
    * @see org.exoplatform.services.rest.frameworks.json.JSONEncoder#writeStartArray()
    */
   public void writeStartArray() throws JSONException {
-    if (stack_.isEmpty() || (stack_.peek() != 'k' && stack_.peek() != 'a'))
+    if (stack_.isEmpty() || (stack_.peek() != KEY && stack_.peek() != ARRAY))
       throw new JSONException("Wrong place start array.");
     try {
-      if (commaFirst_)
-        writer_.write(",[");
+      if (commaFirst_) {
+        writer_.write(COMMA);
+        writer_.write(START_ARRAY);
+      }
       else
-        writer_.write("[");
-      if (stack_.peek() == 'k')
+        writer_.write(START_ARRAY);
+      if (stack_.peek() == KEY)
         stack_.pop();
-      stack_.push('a');
+      stack_.push(ARRAY);
       commaFirst_ = false;
     } catch (IOException e) {
       throw new JSONException(e);
@@ -146,11 +160,11 @@ public class JSONWriterImpl implements JSONWriter {
    */
   public void writeEndArray() throws JSONException {
     try {
-      if (stack_.pop() != 'a')
+      if (stack_.pop() != ARRAY)
         throw new JSONException("Wrong place end array.");
-      writer_.write("]");
+      writer_.write(END_ARRAY);
       commaFirst_ = true;
-      if (stack_.peek() == 'k')
+      if (stack_.peek() == KEY)
         stack_.pop();
     } catch (IOException e) {
       throw new JSONException(e);
@@ -164,14 +178,15 @@ public class JSONWriterImpl implements JSONWriter {
   public void writeKey(String key) throws JSONException {
     if (key == null)
       throw new JSONException("Key is null.");
-    if (stack_.isEmpty() || stack_.peek() != 'o')
+    if (stack_.isEmpty() || stack_.peek() != OBJECT)
       throw new JSONException("Wrong place of key '" + key + "'.");
     try {
       if (commaFirst_)
-        writer_.write(",");
-      writer_.write(JSONUtils.getJSONString(key) + ":");
+        writer_.write(COMMA);
+      writer_.write(JSONUtils.getJSONString(key));
+      writer_.write(COLON);
       commaFirst_ = false;
-      stack_.push('k');
+      stack_.push(KEY);
     } catch (IOException e) {
       throw new JSONException(e);
     }
@@ -240,14 +255,15 @@ public class JSONWriterImpl implements JSONWriter {
 
   private void write(String value) throws JSONException {
     try {
-      if (stack_.isEmpty() || (stack_.peek() != 'k' && stack_.peek() != 'a'))
+      if (stack_.isEmpty() || (stack_.peek() != KEY && stack_.peek() != ARRAY))
         throw new JSONException("Wrong place of value '" + value + "'.");
-      if (commaFirst_)
-        writer_.write("," + value);
-      else
+      if (commaFirst_) {
+        writer_.write(COMMA);
+        writer_.write(value);
+      } else
         writer_.write(value);
       commaFirst_ = true;
-      if (stack_.peek() == 'k')
+      if (stack_.peek() == KEY)
         stack_.pop();
     } catch (IOException e) {
       throw new JSONException(e);

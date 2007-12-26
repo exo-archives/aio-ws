@@ -53,7 +53,7 @@ public class JSONEncoderTest extends TestCase {
       l.add(item);
     }
     rootBean.setItems(l);
-    rootBean.setBean(new Item());
+    rootBean.setItem(new Item());
     System.out.println("------------- JSONEncoderTest -------------");
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     new JSONEncoderImpl(out).writeObject(rootBean);

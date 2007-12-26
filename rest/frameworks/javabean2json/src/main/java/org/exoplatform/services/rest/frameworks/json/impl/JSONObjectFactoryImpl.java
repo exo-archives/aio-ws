@@ -37,7 +37,7 @@ public class JSONObjectFactoryImpl implements JSONObjectFactory{
 
   private final static String GET_METHOD_PREFIX = "get";
   private final static int GET_METHOD_PREFIX_LENGTH = GET_METHOD_PREFIX.length();
-  private final static String GET_CLASS_METHOD_PREFIX = "getClass";
+  private final static String GET_CLASS_METHOD = "getClass";
 
   protected JSONObjectFactoryImpl() throws JSONException {
   }
@@ -49,7 +49,7 @@ public class JSONObjectFactoryImpl implements JSONObjectFactory{
       String methodName = method.getName();
       if (methodName.startsWith(GET_METHOD_PREFIX) 
           && methodName.length() > GET_METHOD_PREFIX_LENGTH
-          && !GET_CLASS_METHOD_PREFIX.equals(methodName)) {
+          && !GET_CLASS_METHOD.equals(methodName)) {
 
         String key = methodName.substring(GET_METHOD_PREFIX_LENGTH);
         // first letter of key to lower case.
