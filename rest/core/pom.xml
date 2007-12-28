@@ -50,7 +50,7 @@
  	<dependency>
 	  <groupId>jetty</groupId>
  	  <artifactId>jetty-util</artifactId>
-      <version>6.1.5</version>
+          <version>6.1.5</version>
  	  <scope>provided</scope>
  	</dependency>
  	<dependency>
