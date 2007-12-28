@@ -1,0 +1,10 @@
+<configuration>
+  <component>
+    <type>org.exoplatform.services.ws.examples.jsr181.SayHelloWebService</type>
+    <multi-instance>true</multi-instance>
+  </component>
+  <component>
+  	<type>org.exoplatform.services.ws.examples.jsr181.CalculatorWebService</type>
+	  <!-- multi-instance>true</multi-instance-->
+  </component>
+</configuration>

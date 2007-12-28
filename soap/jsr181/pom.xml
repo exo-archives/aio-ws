@@ -1,0 +1,57 @@
+<project>
+  <parent>
+    <groupId>org.exoplatform.ws</groupId>
+    <artifactId>config</artifactId>
+    <version>trunk</version>
+  </parent>
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.exoplatform.ws.soap</groupId>
+  <artifactId>exo.soap.xfire.jsr181</artifactId>
+  <version>trunk</version>
+  <name>SOAP XFire JSR181 impl</name>
+  <description></description>
+  <dependencies>
+    <dependency>
+      <groupId>org.exoplatform.kernel</groupId>
+      <artifactId>exo.kernel.container</artifactId>
+      <version>${org.exoplatform.kernel.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.kernel</groupId>
+      <artifactId>exo.kernel.component.common</artifactId>
+      <version>${org.exoplatform.kernel.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.xfire</groupId>
+      <artifactId>xfire-jsr181-api</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.xfire</groupId>
+      <artifactId>xfire-all</artifactId>
+        <exclusions>
+	  		<exclusion>
+    	    	<groupId>stax</groupId>
+    	    	<artifactId>stax-api</artifactId>
+	  		</exclusion>
+		</exclusions>
+      <version>1.2.6</version>
+    </dependency>
+    <dependency>
+    	<groupId>stax</groupId>
+    	<artifactId>stax-api</artifactId>
+    	<version>1.0</version>
+    </dependency>
+    <dependency>
+    	<groupId>wsdl4j</groupId>
+    	<artifactId>wsdl4j</artifactId>
+    	<version>1.6.1</version>
+    </dependency>
+    <dependency>
+    	<groupId>jdom</groupId>
+    	<artifactId>jdom</artifactId>
+    	<version>1.0</version>
+    </dependency>
+  </dependencies>
+</project>
