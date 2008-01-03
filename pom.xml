@@ -129,7 +129,7 @@
                 <mkdir dir="target" />
                 <mkdir dir="target/classes" />
                 <mkdir dir="target/emma/classes" />
-                <!-- Do nothing if the directory already exist-->
+                <!-- Do nothing if the directory already exist -->
                 <copy todir="target/emma/classes" verbose="false" overwrite="true">
                   <fileset dir="target/classes" />
                 </copy>
