@@ -22,7 +22,7 @@ import java.util.List;
 import junit.framework.ComparisonFailure;
 import junit.framework.TestCase;
 
-import org.exoplaform.services.rest.test.SimpleRestResponse;
+import org.exoplatform.services.rest.test.SimpleRestResponse;
 import org.exoplatform.container.StandaloneContainer;
 import org.exoplatform.services.rest.container.ResourceContainer;
 import org.exoplatform.services.rest.container.ResourceDescriptor;
