@@ -28,7 +28,7 @@ import javax.servlet.ServletResponse;
 
 /**
  * Created by The eXo Platform SARL Author : Volodymyr Krasnikov
- * volodymyr.krasnikov@exoplatform.com.ua 21 Січ 2008
+ * volodymyr.krasnikov@exoplatform.com.ua 
  */
 public class RestEncodingFilter implements Filter {
 
