@@ -61,15 +61,15 @@ public class RestServlet extends HttpServlet implements Connector {
     
     ExoContainer container = ExoContainerContext.getCurrentContainer();
     LOGGER.debug("Current Container: " + container);
-    ResourceBinder binder = (ResourceBinder) container
-        .getComponentInstanceOfType(ResourceBinder.class);
+//    ResourceBinder binder = (ResourceBinder) container
+//        .getComponentInstanceOfType(ResourceBinder.class);
     ResourceDispatcher dispatcher = (ResourceDispatcher) container
         .getComponentInstanceOfType(ResourceDispatcher.class);
-    LOGGER.debug("ResourceBinder: " + binder);
+//    LOGGER.debug("ResourceBinder: " + binder);
     LOGGER.debug("ResourceDispatcher: " + dispatcher);
-    if (binder == null) {
-      throw new ServletException("ResourceBinder is null.");
-    }
+//    if (binder == null) {
+//      throw new ServletException("ResourceBinder is null.");
+//    }
     if (dispatcher == null) {
       throw new ServletException("ResourceDispatcher is null.");
     }
