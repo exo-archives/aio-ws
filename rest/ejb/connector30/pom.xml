@@ -6,7 +6,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.exoplatform.ws.rest</groupId>
-  <artifactId>exo.simple.rest.ejbconnector30</artifactId>
+  <artifactId>exo.ws.rest.ejbconnector30</artifactId>
   <version>trunk</version>
   <name>REST-EJB connector (ejb3.0)</name>
   <description></description>
@@ -19,7 +19,7 @@
   	</dependency>
   	<dependency>
   		<groupId>org.exoplatform.ws.rest</groupId>
-  		<artifactId>exo.rest.core</artifactId>
+  		<artifactId>exo.ws.rest.core</artifactId>
   		<version>trunk</version>
   	</dependency>
   </dependencies>

@@ -16,7 +16,7 @@
 	</component>
 	<component>
 		<type>org.exoplatform.services.rest.transformer.EntityTransformerFactory</type>
-		<multi-instance>true</multi-instance>
+		<!-- multi-instance>true</multi-instance -->
 	</component>
 	<!--component>
 		<type>org.exoplatform.services.rest.server.StandaloneRestServer</type>

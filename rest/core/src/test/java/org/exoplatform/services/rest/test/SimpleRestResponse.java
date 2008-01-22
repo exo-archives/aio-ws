@@ -27,9 +27,7 @@ import org.exoplatform.services.rest.transformer.StringOutputTransformer;
 
 /**
  * Created by The eXo Platform SARL
- * Author : Volodymyr Krasnikov
- *          volodymyr.krasnikov@exoplatform.com.ua
- * 18 Гру 2007  
+ * Author : Volodymyr Krasnikov  volodymyr.krasnikov@exoplatform.com.ua
  */
 
 @URITemplate("/getter/{path}/")

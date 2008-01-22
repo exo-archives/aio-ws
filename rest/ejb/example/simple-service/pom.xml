@@ -6,14 +6,14 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.exoplatform.ws.rest</groupId>
-  <artifactId>exo.simple.rest.service</artifactId>
+  <artifactId>exo.ws.simple.rest.service</artifactId>
   <version>trunk</version>
   <name>simple service</name>
   <description></description>
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.ws.rest</groupId>
-      <artifactId>exo.rest.core</artifactId>
+      <artifactId>exo.ws.rest.core</artifactId>
       <version>trunk</version>
     </dependency>
   </dependencies>

@@ -7,7 +7,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.exoplatform.ws.rest</groupId>
-  <artifactId>exo.rest.core</artifactId>
+  <artifactId>exo.ws.rest.core</artifactId>
   <packaging>jar</packaging>
   <version>trunk</version>
   <name>eXo REST Service</name>
@@ -102,10 +102,10 @@
                       <include name="org/**"/>
                     </fileset>
                 	</copy>
-                	<!--echo>Building documentation</echo>
+                	<!-- echo>Building documentation</echo>
                 	<javadoc destdir="target/javadoc"
                 	packagenames="org.exoplatform.services.rest.*"
-                	sourcepath="src/main/java"/-->
+                	sourcepath="src/main/java"/ -->
                 </tasks>
               </configuration>
             </execution>

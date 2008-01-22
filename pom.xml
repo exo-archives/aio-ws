@@ -9,6 +9,7 @@
   <modules>
     <module>commons</module>
     <module>rest/core</module>
+    <module>framework/json</module>
     <module>soap/jsr181</module>
     <module>rest/ejb/connector21</module>
     <module>rest/ejb/connector30</module>

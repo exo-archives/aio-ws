@@ -7,7 +7,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.exoplatform.ws.soap</groupId>
-  <artifactId>exo.soap.xfire.jsr181</artifactId>
+  <artifactId>exo.ws.soap.xfire.jsr181</artifactId>
   <version>trunk</version>
   <name>SOAP XFire JSR181 impl</name>
   <description></description>
@@ -31,11 +31,11 @@
       <groupId>org.codehaus.xfire</groupId>
       <artifactId>xfire-all</artifactId>
         <exclusions>
-	  		<exclusion>
-    	    	<groupId>stax</groupId>
-    	    	<artifactId>stax-api</artifactId>
-	  		</exclusion>
-		</exclusions>
+	  <exclusion>
+    	    <groupId>stax</groupId>
+    	    <artifactId>stax-api</artifactId>
+	  </exclusion>
+	</exclusions>
       <version>1.2.6</version>
     </dependency>
     <dependency>

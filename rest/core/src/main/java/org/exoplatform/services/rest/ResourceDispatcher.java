@@ -53,7 +53,7 @@ public class ResourceDispatcher implements Connector {
   private final Map<String, String> contextParams_ = new HashMap<String, String>();
           
 //  private ExoContainer container_;
-  private EntityTransformerFactory factory;
+  private EntityTransformerFactory factory_;
 
 //  private static final Log LOGGER = ExoLogger.getLogger("ResourceDispatcher");
   
@@ -66,7 +66,7 @@ public class ResourceDispatcher implements Connector {
       EntityTransformerFactory factory) throws Exception {
     
     if (params != null) {
-      PropertiesParam contextParam = params.getPropertiesParam("contex-params");
+      PropertiesParam contextParam = params.getPropertiesParam("context-params");
       if (contextParam != null) {
         Iterator<Property> iterator = contextParam.getPropertyIterator();
         while (iterator.hasNext()) {
@@ -76,7 +76,7 @@ public class ResourceDispatcher implements Connector {
       }
     }
     this.resourceDescriptors_ = binder.getAllDescriptors();
-    this.factory = factory;
+    this.factory_ = factory;
   }
 
   /**
@@ -139,7 +139,7 @@ public class ResourceDispatcher implements Connector {
       // building array of parameters
       for (int i = 0; i < methodParametersAnnotations.length; i++) {
         if (methodParametersAnnotations[i] == null) {
-          InputEntityTransformer transformer = (InputEntityTransformer) factory
+          InputEntityTransformer transformer = (InputEntityTransformer) factory_
               .newTransformer(resource.getInputTransformerType());
           transformer.setType(methodParameters[i]);
           params[i] = transformer.readFrom(request.getEntityStream());
@@ -168,12 +168,12 @@ public class ResourceDispatcher implements Connector {
           }
         }
       }
-      Response resp = (Response) resource.getServer().invoke(
+      Response response = (Response) resource.getServer().invoke(
           resource.getResourceContainer(), params);
-      if (!resp.isTransformerInitialized() && resp.isEntityInitialized()) {
-        resp.setTransformer(getTransformer(resource, resp.getTransformerParameters()));
+      if (!response.isTransformerInitialized() && response.isEntityInitialized()) {
+        response.setTransformer(getTransformer(resource, response.getTransformerParameters()));
       }
-      return resp;
+      return response;
     }
     // if no one ResourceContainer found
     throw new NoSuchMethodException("No method found for " + methodName + " " +
@@ -189,6 +189,18 @@ public class ResourceDispatcher implements Connector {
   public Context getRuntimeContext() {
     return contextHolder_.get();
   }
+  
+  /**
+   * Add new Context parameter. This method can be used to set some context
+   * parameter. Any Resources can get access to ResourceDispatcher through
+   * ExoContainer in runtime (Filter for example). Then this parameter can be
+   * used in end point service.
+   * @param key the key.
+   * @param value the value.
+   */
+  public void addContextParameter(String key, String value) {
+    contextHolder_.get().set(key, value);
+  }
 
   /**
    * Get OutputEntitytransformer if it was not set before.
@@ -196,7 +208,7 @@ public class ResourceDispatcher implements Connector {
   private OutputEntityTransformer getTransformer(ResourceDescriptor resource,
       Map<String, String> transformerParameters) throws InvalidResourceDescriptorException {
     try {
-      OutputEntityTransformer transformer = (OutputEntityTransformer) factory.newTransformer(
+      OutputEntityTransformer transformer = (OutputEntityTransformer) factory_.newTransformer(
           resource.getOutputTransformerType());
       transformer.addTransformerParameters(transformerParameters);
       return transformer;
@@ -315,6 +327,16 @@ public class ResourceDispatcher implements Connector {
 
     private String get(String key) {
       return params_.get(key);
+    }
+    
+    /**
+     * Add new parameter. Can be used in runtime to set any context parameter
+     * by if some resource can get access to ResourceDispatcher.
+     * @param key the key.
+     * @param value the value.
+     */
+    private void set(String key, String value) {
+      params_.put(key, value);
     }
   }
 

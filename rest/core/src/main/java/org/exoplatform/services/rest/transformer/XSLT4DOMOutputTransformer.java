@@ -32,7 +32,7 @@ import org.w3c.dom.Document;
 
 /**
  * This type of transformer can transform given XML to other mime-type 
- * and wtite it to output stream.
+ * and write it to output stream.
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */

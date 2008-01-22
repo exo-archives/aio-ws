@@ -10,8 +10,8 @@
 	<artifactId>exo.ws.frameworks.json</artifactId>
 	<packaging>jar</packaging>
 	<version>trunk</version>
-	<name>eXo REST JSON</name>
-	<description>eXo REST Java to JSON Transformation</description>
+	<name>eXo JSON</name>
+	<description>eXo Java Bean to JSON Transformation</description>
 	<dependencies>
 		<!--dependency>
 			<groupId>org.exoplatform.ws.rest</groupId>

@@ -29,7 +29,7 @@ import org.exoplatform.services.rest.container.ResourceDescriptor;
 
 /**
  * Created by The eXo Platform SARL Author : Volodymyr Krasnikov
- * volodymyr.krasnikov@exoplatform.com.ua 19 Гру 2007
+ * volodymyr.krasnikov@exoplatform.com.ua
  */
 public class StressRestResponseTest extends TestCase {
   

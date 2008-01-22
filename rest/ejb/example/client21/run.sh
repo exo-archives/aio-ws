@@ -13,5 +13,5 @@ $JONAS_ROOT/lib/apps/exo.kernel.component.common-2.0.3.jar:\
 $JONAS_ROOT/lib/apps/exo.ejb.loginmodule-0.1.jar \
 -Djava.security.manager=default \
 -Djava.security.policy=$JONAS_ROOT/conf/java.policy \
-target/exo.simple.rest.service.client21-jonas-0.1.jar
+target/exo.ws.rest.ejbconnector21.client21-jonas-trunk.jar
 
