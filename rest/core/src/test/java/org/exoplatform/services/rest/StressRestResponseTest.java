@@ -64,8 +64,7 @@ public class StressRestResponseTest extends TestCase {
     assertNotNull(binder);
 
     System.out.println("!!! === >>> Start of stress test");
-    ;
-
+    
     List<ResourceDescriptor> list = binder.getAllDescriptors();
     ResourceContainer resourceContainer = new SimpleRestResponse();
     binder.bind(resourceContainer);

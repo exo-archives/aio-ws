@@ -4,7 +4,7 @@
     <artifactId>config</artifactId>
     <version>trunk</version>
   </parent>
-
+  
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.exoplatform.ws.rest</groupId>
   <artifactId>exo.ws.rest.core</artifactId>
@@ -12,7 +12,7 @@
   <version>trunk</version>
   <name>eXo REST Service</name>
   <description>eXo REST</description>
-
+  
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
@@ -41,75 +41,81 @@
       <version>0.1</version>
       <scope>test</scope>
     </dependency>
- 	<dependency>
- 	  <groupId>jetty</groupId>
- 	  <artifactId>jetty</artifactId>
- 	  <version>6.1.5</version>
- 	  <scope>provided</scope>
- 	</dependency>
- 	<dependency>
-	  <groupId>jetty</groupId>
- 	  <artifactId>jetty-util</artifactId>
-          <version>6.1.5</version>
- 	  <scope>provided</scope>
- 	</dependency>
- 	<dependency>
- 	  <groupId>jetty</groupId>
- 	  <artifactId>jetty-plus</artifactId>
- 	  <version>6.1.5</version>
- 	  <scope>provided</scope>
- 	</dependency>
+    <dependency>
+      <groupId>jetty</groupId>
+      <artifactId>jetty</artifactId>
+      <version>6.1.5</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>jetty</groupId>
+      <artifactId>jetty-util</artifactId>
+      <version>6.1.5</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>jetty</groupId>
+      <artifactId>jetty-plus</artifactId>
+      <version>6.1.5</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.ws.framework</groupId>
+      <artifactId>exo.ws.frameworks.json</artifactId>
+      <version>trunk</version>
+    </dependency>
   </dependencies>
-
+  
   <build>
     <plugins>
-    	<plugin>
-      	<groupId>org.jvnet.jaxb2.maven2</groupId>
-        	<artifactId>maven-jaxb2-plugin</artifactId>
-        	<version>0.1</version>
-        	<executions>
-          	<execution>
-              <goals>
-              	<goal>generate</goal>
-              </goals>
-          	</execution>
-        	</executions>
-        	<configuration>
-          	<schemaDirectory>src/test/resources</schemaDirectory>
-          	<generateDirectory>target/generated</generateDirectory>
-          	<generatePackage>org.exoplatform.services.rest.generated</generatePackage>
-          	<args>
-              <arg>-extension</arg>
-          	</args>
+      <plugin>
+        <groupId>org.jvnet.jaxb2.maven2</groupId>
+        <artifactId>maven-jaxb2-plugin</artifactId>
+        <version>0.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <schemaDirectory>src/test/resources</schemaDirectory>
+          <generateDirectory>target/generated</generateDirectory>
+          <generatePackage>
+            org.exoplatform.services.rest.generated</generatePackage>
+          <args>
+            <arg>-extension</arg>
+          </args>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
         <version>1.2-SNAPSHOT</version>
-          <executions>
-            <execution>
+        <executions>
+          <execution>
             <id>0</id>
-              <goals>
-                <goal>run</goal>
-              </goals>
-              <phase>test-compile</phase>
-              <configuration>
-                <tasks>
-                  <echo>copy files gnerated by JAXB to test source directory</echo>
-                  <copy todir="src/test/java">
-                  	<fileset dir="target/generated">
-                      <include name="org/**"/>
-                    </fileset>
-                	</copy>
-                	<!-- echo>Building documentation</echo>
-                	<javadoc destdir="target/javadoc"
-                	packagenames="org.exoplatform.services.rest.*"
-                	sourcepath="src/main/java"/ -->
-                </tasks>
-              </configuration>
-            </execution>
-          </executions>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <phase>test-compile</phase>
+            <configuration>
+              <tasks>
+                <echo>copy files gnerated by JAXB to test source directory</echo>
+                <copy todir="src/test/java">
+                  <fileset dir="target/generated">
+                    <include name="org/**"/>
+                  </fileset>
+                </copy>
+                <!-- echo>Building documentation</echo>
+                <javadoc destdir="target/javadoc"
+                packagenames="org.exoplatform.services.rest.*"
+                sourcepath="src/main/java"/ -->
+              </tasks>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
