@@ -28,7 +28,7 @@ import javax.servlet.ServletResponse;
 
 /**
  * Created by The eXo Platform SARL Author : Volodymyr Krasnikov
- * volodymyr.krasnikov@exoplatform.com.ua 
+ * volodymyr.krasnikov@exoplatform.com.ua
  */
 public class RestEncodingFilter implements Filter {
 
@@ -40,10 +40,9 @@ public class RestEncodingFilter implements Filter {
 
   public void doFilter(ServletRequest req, ServletResponse resp, FilterChain filterChain)
       throws IOException, ServletException {
-    req.setCharacterEncoding(requestEncodings);
-
+    if (req.getCharacterEncoding() == null && requestEncodings != null)
+      req.setCharacterEncoding(requestEncodings);
     filterChain.doFilter(req, resp);
-    
   }
 
   public void init(FilterConfig config) throws ServletException {
