@@ -23,7 +23,7 @@ import org.exoplatform.services.rest.Response;
 import org.exoplatform.services.rest.URIParam;
 import org.exoplatform.services.rest.URITemplate;
 import org.exoplatform.services.rest.container.ResourceContainer;
-import org.exoplatform.services.rest.transformer.Pojo2JsonOutputTransformer;
+import org.exoplatform.services.rest.transformer.Bean2JsonOutputTransformer;
 
 /**
  * Created by The eXo Platform SARL Author : Volodymyr Krasnikov
@@ -34,7 +34,7 @@ public class JSONRestResponse implements ResourceContainer {
 
   @HTTPMethod("GET")
   @URITemplate("/json/{tail}/")
-  @OutputTransformer(Pojo2JsonOutputTransformer.class)
+  @OutputTransformer(Bean2JsonOutputTransformer.class)
   public Response method(@URIParam("tail")String tail) {
     return Response.Builder.ok(new PojoTest()).build();
   }
