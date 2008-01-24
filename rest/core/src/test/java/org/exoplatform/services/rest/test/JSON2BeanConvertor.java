@@ -18,39 +18,31 @@
 package org.exoplatform.services.rest.test;
 
 import org.exoplatform.services.rest.HTTPMethod;
+import org.exoplatform.services.rest.InputTransformer;
 import org.exoplatform.services.rest.OutputTransformer;
 import org.exoplatform.services.rest.Response;
-import org.exoplatform.services.rest.URIParam;
 import org.exoplatform.services.rest.URITemplate;
 import org.exoplatform.services.rest.container.ResourceContainer;
 import org.exoplatform.services.rest.transformer.Bean2JsonOutputTransformer;
+import org.exoplatform.services.rest.transformer.Json2BeanInputTransformer;
 
 /**
- * Created by The eXo Platform SARL Author : Volodymyr Krasnikov
- * volodymyr.krasnikov@exoplatform.com.ua
+ * Created by The eXo Platform SARL
+ * Author : Volodymyr Krasnikov
+ *          volodymyr.krasnikov@exoplatform.com.ua
  */
 
-public class JSONRestResponse implements ResourceContainer {
-
+public class JSON2BeanConvertor implements ResourceContainer {
+  
+  @URITemplate("/json/test/")
   @HTTPMethod("GET")
-  @URITemplate("/json/{tail}/")
+  @InputTransformer(Json2BeanInputTransformer.class)
   @OutputTransformer(Bean2JsonOutputTransformer.class)
-  public Response method(@URIParam("tail")String tail) {
-    return Response.Builder.ok(new PojoTest()).build();
-  }
-
-  public class PojoTest {
-    private long   id   = 007;
-
-    private String name = "James Bond";
-
-    public long getId() {
-      return id;
-    }
-
-    public String getName() {
-      return name;
-    }
+  public Response method(Book book){
+    
+    System.out.println(book.toString());
+    
+    return Response.Builder.ok(book).build();
   }
 
 }
