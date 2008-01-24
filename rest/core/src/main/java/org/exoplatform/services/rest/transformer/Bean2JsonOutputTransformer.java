@@ -31,7 +31,7 @@ import org.exoplatform.ws.framework.json.value.JsonValue;
  * volodymyr.krasnikov@exoplatform.com.ua
  */
 
-public class Pojo2JsonOutputTransformer extends OutputEntityTransformer {
+public class Bean2JsonOutputTransformer extends OutputEntityTransformer {
 
   @Override
   public void writeTo(Object entity, OutputStream entityDataStream) throws IOException {
@@ -40,7 +40,6 @@ public class Pojo2JsonOutputTransformer extends OutputEntityTransformer {
       JsonValue jv = new JsonGeneratorImpl().createJsonObject(entity);
       JsonWriter jsonWriter = new JsonWriterImpl(entityDataStream);
       jv.writeTo(jsonWriter);
-      jsonWriter.flush();
     } catch (JsonException e) {
       e.printStackTrace();
       throw new IOException("Error while converting POJO to JSON");
