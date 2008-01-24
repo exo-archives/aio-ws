@@ -27,21 +27,17 @@ import org.exoplatform.services.rest.transformer.Bean2JsonOutputTransformer;
 import org.exoplatform.services.rest.transformer.Json2BeanInputTransformer;
 
 /**
- * Created by The eXo Platform SARL
- * Author : Volodymyr Krasnikov
- *          volodymyr.krasnikov@exoplatform.com.ua
+ * Created by The eXo Platform SARL Author : Volodymyr Krasnikov
+ * volodymyr.krasnikov@exoplatform.com.ua
  */
 
 public class JSON2BeanConvertor implements ResourceContainer {
-  
+
   @URITemplate("/json/test/")
   @HTTPMethod("GET")
   @InputTransformer(Json2BeanInputTransformer.class)
   @OutputTransformer(Bean2JsonOutputTransformer.class)
-  public Response method(Book book){
-    
-    System.out.println(book.toString());
-    
+  public Response method(Book book) {
     return Response.Builder.ok(book).build();
   }
 

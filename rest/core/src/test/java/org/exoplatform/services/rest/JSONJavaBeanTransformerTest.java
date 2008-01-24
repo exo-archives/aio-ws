@@ -17,7 +17,9 @@
 
 package org.exoplatform.services.rest;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import junit.framework.ComparisonFailure;
 import junit.framework.TestCase;
@@ -32,7 +34,7 @@ import org.exoplatform.services.rest.test.JSON2BeanConvertor;
  */
 
 public class JSONJavaBeanTransformerTest extends TestCase {
-  
+
   private StandaloneContainer container;
 
   private ResourceBinder      binder;
@@ -58,20 +60,16 @@ public class JSONJavaBeanTransformerTest extends TestCase {
 
     assertNotNull(dispatcher);
     assertNotNull(binder);
-    
-    //ResourceContainer resourceContainer = new JSONRestResponse();
+
     ResourceContainer resourceContainer = new JSON2BeanConvertor();
     binder.bind(resourceContainer);
 
-    MultivaluedMetadata mv = new MultivaluedMetadata();
-    
-    String extURI = "/json/test/";
-
-    InputStream entityStream = getClass().getResourceAsStream("/BookStorage.txt");
-    
+    InputStream entityStream = getClass().getResourceAsStream("/book.txt");
     assertNotNull(entityStream);
-    
-    Request request = new Request(entityStream, new ResourceIdentifier(extURI), "GET", mv, null);
+
+    String extURI = "/json/test/";
+    Request request = new Request(entityStream, new ResourceIdentifier(extURI), "GET",
+        new MultivaluedMetadata(), null);
     Response response = null;
     try {
       response = dispatcher.dispatch(request);
@@ -83,14 +81,16 @@ public class JSONJavaBeanTransformerTest extends TestCase {
     try {
       assertEquals(200, response.getStatus());
       System.out.println("JSON test !! - START");
-      
-      response.writeEntity(System.out);
-            
+
+      System.out.println(response.getEntity());
+
       System.out.println("\nJSON test !! - END");
     } catch (ComparisonFailure e) {
       e.printStackTrace();
       fail("!!! === >> Comparision failure");
     }
+
+    entityStream.close();
 
   }
 
