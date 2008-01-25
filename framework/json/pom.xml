@@ -13,11 +13,11 @@
 	<name>eXo JSON</name>
 	<description>eXo Java Bean to JSON Transformation</description>
 	<dependencies>
-		<!--dependency>
+		<dependency>
 			<groupId>org.exoplatform.ws.rest</groupId>
 			<artifactId>exo.ws.rest.core</artifactId>
 			<version>trunk</version>
-		</dependency-->
+		</dependency>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.component.common</artifactId>
