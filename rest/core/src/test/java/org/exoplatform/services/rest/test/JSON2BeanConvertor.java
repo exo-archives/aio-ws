@@ -23,8 +23,8 @@ import org.exoplatform.services.rest.OutputTransformer;
 import org.exoplatform.services.rest.Response;
 import org.exoplatform.services.rest.URITemplate;
 import org.exoplatform.services.rest.container.ResourceContainer;
-import org.exoplatform.ws.framework.json.transformer.Bean2JsonOutputTransformer;
-import org.exoplatform.ws.framework.json.transformer.Json2BeanInputTransformer;
+import org.exoplatform.services.rest.transformer.Bean2JsonOutputTransformer;
+import org.exoplatform.services.rest.transformer.Json2BeanInputTransformer;
 
 /**
  * Created by The eXo Platform SARL Author : Volodymyr Krasnikov
