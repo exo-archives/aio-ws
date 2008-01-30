@@ -17,6 +17,8 @@
 
 package org.exoplatform.ws.frameworks.json.value.impl;
 
+import org.exoplatform.ws.framework.json.JsonWriter;
+import org.exoplatform.ws.framework.json.impl.JsonException;
 import org.exoplatform.ws.frameworks.json.value.JsonValue;
 
 /**
@@ -30,11 +32,17 @@ public abstract class NumericValue extends JsonValue {
     return true;
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#toString()
-   */
-  @Override
-  public abstract String toString();
+//  /* (non-Javadoc)
+//   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#toString()
+//   */
+//  @Override
+//  public abstract String toString();
+//
+//  /* (non-Javadoc)
+//   * @see org.exoplatform.ws.frameworks.json.value.JsonValue#writeTo(org.exoplatform.ws.frameworks.json.JsonWriter)
+//   */
+//  @Override
+//  public abstract void writeTo(JsonWriter writer) throws JsonException; 
 
 }
 

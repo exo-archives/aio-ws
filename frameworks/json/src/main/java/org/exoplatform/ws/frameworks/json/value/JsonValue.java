@@ -20,7 +20,6 @@ package org.exoplatform.ws.frameworks.json.value;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.exoplatform.ws.framework.json.value.JsonValue;
 import org.exoplatform.ws.frameworks.json.JsonWriter;
 import org.exoplatform.ws.frameworks.json.impl.JsonException;
 
@@ -145,7 +144,6 @@ public abstract class JsonValue {
   }
   
   //  must be implemented
-  @Override
   public abstract String toString(); 
   
   public abstract void writeTo(JsonWriter writer) throws JsonException; 

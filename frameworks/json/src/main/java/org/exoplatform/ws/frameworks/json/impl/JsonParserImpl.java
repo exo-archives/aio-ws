@@ -25,8 +25,8 @@ import java.io.PushbackReader;
 import java.io.Reader;
 import java.util.Stack;
 
-import org.exoplatform.ws.framework.json.impl.JsonDefaultHandler;
-import org.exoplatform.ws.framework.json.impl.JsonException;
+import org.exoplatform.ws.frameworks.json.impl.JsonDefaultHandler;
+import org.exoplatform.ws.frameworks.json.impl.JsonException;
 import org.exoplatform.ws.frameworks.json.JsonHandler;
 import org.exoplatform.ws.frameworks.json.JsonParser;
 import org.exoplatform.ws.frameworks.json.impl.JsonUtils.JsonToken;

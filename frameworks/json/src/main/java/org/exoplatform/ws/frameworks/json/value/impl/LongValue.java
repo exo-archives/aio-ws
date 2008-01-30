@@ -17,7 +17,7 @@
 
 package org.exoplatform.ws.frameworks.json.value.impl;
 
-import org.exoplatform.ws.framework.json.value.impl.NumericValue;
+import org.exoplatform.ws.frameworks.json.value.impl.NumericValue;
 import org.exoplatform.ws.frameworks.json.JsonWriter;
 import org.exoplatform.ws.frameworks.json.impl.JsonException;
 
@@ -107,8 +107,7 @@ public class LongValue extends NumericValue {
   }
 
   /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#writeTo(
-   * org.exoplatform.services.rest.frameworks.json.JsonWriter)
+   * @see org.exoplatform.ws.framework.json.value.JsonValue#writeTo(org.exoplatform.ws.framework.json.JsonWriter)
    */
   @Override
   public void writeTo(JsonWriter writer) throws JsonException {

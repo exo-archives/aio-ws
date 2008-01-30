@@ -20,7 +20,7 @@ package org.exoplatform.ws.frameworks.json;
 import java.io.InputStream;
 import java.io.Reader;
 
-import org.exoplatform.ws.framework.json.JsonHandler;
+import org.exoplatform.ws.frameworks.json.JsonHandler;
 import org.exoplatform.ws.frameworks.json.impl.JsonException;
 
 /**

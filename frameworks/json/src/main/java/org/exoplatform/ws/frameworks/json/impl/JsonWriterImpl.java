@@ -23,8 +23,8 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Stack;
 
-import org.exoplatform.ws.framework.json.impl.JsonException;
-import org.exoplatform.ws.framework.json.impl.JsonUtils;
+import org.exoplatform.ws.frameworks.json.impl.JsonException;
+import org.exoplatform.ws.frameworks.json.impl.JsonUtils;
 import org.exoplatform.ws.frameworks.json.JsonWriter;
 import org.exoplatform.ws.frameworks.json.impl.JsonUtils.JsonToken;
 
