@@ -19,8 +19,6 @@ package org.exoplatform.ws.frameworks.json.impl;
 
 import java.util.Stack;
 
-                                                                              // org.exoplatform.services.rest.frameworks.json.value.impl.FloatValue;
-// import org.exoplatform.services.rest.frameworks.json.value.impl.IntValue;
 import org.exoplatform.ws.frameworks.json.JsonHandler;
 import org.exoplatform.ws.frameworks.json.value.JsonValue;
 import org.exoplatform.ws.frameworks.json.value.impl.ArrayValue;

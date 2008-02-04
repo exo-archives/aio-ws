@@ -20,7 +20,6 @@ package org.exoplatform.ws.frameworks.json;
 import java.io.InputStream;
 import java.io.Reader;
 
-import org.exoplatform.ws.frameworks.json.JsonHandler;
 import org.exoplatform.ws.frameworks.json.impl.JsonException;
 
 /**
@@ -34,27 +33,14 @@ public interface JsonParser {
    * @param reader the Stream Reader.
    * @throws JsonException
    */
-  void parse(Reader reader) throws JsonException;
+  void parse(Reader reader, JsonHandler handler) throws JsonException;
   
   /**
    * Parse given character stream and build object.  
    * @param reader the Input Stream.
    * @throws JsonException
    */
-  void parse(InputStream in) throws JsonException;
+  void parse(InputStream in, JsonHandler handler) throws JsonException;
 
-  /**
-   * Set handler for JSON parser.
-   * @param handler the JsonHandler.
-   * @throws JsonNException.
-   */
-  void setHandler(JsonHandler handler) throws JsonException;
-  
-  /**
-   * Get JsonHandler.
-   * @return the JsonHandler.
-   */
-  JsonHandler getJsonHandler();
-  
 }
 

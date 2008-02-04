@@ -21,10 +21,10 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 
-import org.exoplatform.ws.frameworks.json.impl.JsonParserImpl;
 import org.exoplatform.ws.frameworks.json.value.JsonValue;
 
 import junit.framework.TestCase;
+import org.exoplatform.ws.frameworks.json.JsonHandler;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -39,6 +39,7 @@ public class JavaNumericTypeTest extends TestCase {
   
   public void testLong() throws Exception {
     JsonParserImpl jsonParser = new JsonParserImpl();
+    JsonHandler jsonHandler = new JsonDefaultHandler();
     String jsonString = "{" +
     		"\"long\":[" +
     		"1, 0xAA, 077, 123, 32765, 77787, 123456789," +
@@ -46,22 +47,29 @@ public class JavaNumericTypeTest extends TestCase {
     		"]" +
     		"}";
     
-    jsonParser.parse(new InputStreamReader(new ByteArrayInputStream(jsonString.getBytes())));
-    JsonValue jv = jsonParser.getJsonHandler().getJsonObject();
+    jsonParser.parse(new InputStreamReader(new ByteArrayInputStream(jsonString.getBytes())), jsonHandler);
+    JsonValue jv = jsonHandler.getJsonObject();
     assertTrue(jv.getElement("long").isArray());
     Iterator<JsonValue> values = jv.getElement("long").getElements();
+    int i = 0;
     while (values.hasNext()) {
       JsonValue v = values.next(); 
       assertTrue(v.isNumeric());
       assertTrue(v.isLong());
       assertFalse(v.isDouble());
-      System.out.print((v.getLongValue() - 1) + ", ");
+      if (i == 0)
+        assertEquals(1L, v.getLongValue());
+      if (i == 3)
+        assertEquals(123L, v.getLongValue());
+      if (i == 6)
+        assertEquals(123456789L, v.getLongValue());
+      i++;
     }
-    System.out.println();
   }
   
   public void testDouble() throws Exception {
     JsonParserImpl jsonParser = new JsonParserImpl();
+    JsonHandler jsonHandler = new JsonDefaultHandler();
     String jsonString = "{" +
             "\"double\":[" +
             "1.0, 0.0006382746, 111111.2222222, 9999999999999.9999999999999," +
@@ -71,18 +79,24 @@ public class JavaNumericTypeTest extends TestCase {
             "]" +
             "}";
     
-    jsonParser.parse(new InputStreamReader(new ByteArrayInputStream(jsonString.getBytes())));
-    JsonValue jv = jsonParser.getJsonHandler().getJsonObject();
+    jsonParser.parse(new InputStreamReader(new ByteArrayInputStream(jsonString.getBytes())), jsonHandler);
+    JsonValue jv = jsonHandler.getJsonObject();
     assertTrue(jv.getElement("double").isArray());
     Iterator<JsonValue> values = jv.getElement("double").getElements();
+    int i = 0;
     while (values.hasNext()) {
       JsonValue v = values.next(); 
       assertTrue(v.isNumeric());
       assertFalse(v.isLong());
       assertTrue(v.isDouble());
-      System.out.print(v.getDoubleValue() + ", ");
+      if (i == 0)
+        assertEquals(1.0, v.getDoubleValue());
+      if (i == 2)
+        assertEquals(111111.2222222, v.getDoubleValue());
+      if (i == 9)
+        assertEquals(0.00000000000023456789E8, v.getDoubleValue());
+      i++;
     }
-    System.out.println();
   }
 
 }

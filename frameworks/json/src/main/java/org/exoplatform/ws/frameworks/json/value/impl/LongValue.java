@@ -17,7 +17,6 @@
 
 package org.exoplatform.ws.frameworks.json.value.impl;
 
-import org.exoplatform.ws.frameworks.json.value.impl.NumericValue;
 import org.exoplatform.ws.frameworks.json.JsonWriter;
 import org.exoplatform.ws.frameworks.json.impl.JsonException;
 

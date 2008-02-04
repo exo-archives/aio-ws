@@ -19,137 +19,213 @@ package org.exoplatform.ws.frameworks.json.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.exoplatform.ws.frameworks.json.Book;
 import org.exoplatform.ws.frameworks.json.BookStorage;
-import org.exoplatform.ws.frameworks.json.BookStorage2;
 import org.exoplatform.ws.frameworks.json.JavaCollectionBean;
 import org.exoplatform.ws.frameworks.json.JavaMapBean;
 import org.exoplatform.ws.frameworks.json.JsonParser;
-import org.exoplatform.ws.frameworks.json.impl.BeanBuilder;
-import org.exoplatform.ws.frameworks.json.impl.JsonParserImpl;
 import org.exoplatform.ws.frameworks.json.value.JsonValue;
 
 import junit.framework.TestCase;
+import org.exoplatform.ws.frameworks.json.JsonHandler;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 public class JsonParserTest extends TestCase {
+  
+  ArrayList<Book> sourceCollection_;
 
   @Override
   protected void setUp() throws Exception {
     super.setUp();
+    sourceCollection_ = new ArrayList<Book>(3);
+    Book book = new Book();
+    book.setAuthor("Vincent Masson");
+    book.setTitle("JUnit in Action");
+    book.setPages(386);
+    book.setPrice(19.37);
+    book.setIsdn(93011099534534L);
+    sourceCollection_.add(book);
+    Book book1 = new Book();
+    book1.setAuthor("Christian Gross");
+    book1.setTitle("Beginning C# 2008 from novice to professional");
+    book1.setPages(511);
+    book1.setPrice(23.56);
+    book1.setIsdn(9781590598696L);
+    sourceCollection_.add(book1);
+    Book book2 = new Book();
+    book2.setAuthor("Chuck Easttom");
+    book2.setTitle("Advanced JavaScript. Third Edition");
+    book2.setPages(617);
+    book2.setPrice(25.99);
+    book2.setIsdn(9781598220339L);
+    sourceCollection_.add(book2);
   }
 
   public void testCollection() throws Exception {
     // test restore Collection of standard Java Object from JSON source
-    System.out.println("--------------------Simple Collection--------------------");
     JsonParserImpl jsonParser = new JsonParserImpl();
     String jsonString = "{"
-        + "\"strings\":[\"JUnit in Action\",\"Advanced JavaScript\",\"Beginning C# 2008 \"]," 
+        + "\"strings\":[\"JUnit in Action\",\"Advanced JavaScript\",\"Beginning C# 2008\"]," 
         + "\"chars\":[\"b\",\"o\",\"o\",\"k\"]," 
         + "\"integers\":[386, 421, 565]"
         + "}";
+    JsonHandler jsonHandler = new JsonDefaultHandler();
     jsonParser.parse(new InputStreamReader(new ByteArrayInputStream(jsonString
-        .getBytes())));
-    JsonValue jv = jsonParser.getJsonHandler().getJsonObject();
-    Object o = new BeanBuilder().createObject(JavaCollectionBean.class, jv);
-    System.out.println("Strings:      " + ((JavaCollectionBean) o).getStrings());
-    System.out.println("Characters:   " + ((JavaCollectionBean) o).getChars());
-    System.out.println("Integers:     " + ((JavaCollectionBean) o).getIntegers());
+        .getBytes())), jsonHandler);
+    JsonValue jsonValue = jsonHandler.getJsonObject();
+    Object o = new BeanBuilder().createObject(JavaCollectionBean.class, jsonValue);
+    List<String> s = ((JavaCollectionBean) o).getStrings();
+    assertEquals(3, s.size());
+    assertEquals("JUnit in Action", s.get(0));
+    assertEquals("Advanced JavaScript", s.get(1));
+    assertEquals("Beginning C# 2008", s.get(2));
+    List<Character> c = ((JavaCollectionBean) o).getChars();
+    assertEquals('b', c.get(0).charValue());
+    assertEquals('o', c.get(1).charValue());
+    assertEquals('o', c.get(2).charValue());
+    assertEquals('k', c.get(3).charValue());
+    List<Integer> i = ((JavaCollectionBean) o).getIntegers();
+    assertEquals(386, i.get(0).intValue());
+    assertEquals(421, i.get(1).intValue());
+    assertEquals(565, i.get(2).intValue());
     // more testing for other type of Collection with custom object
   }
   
   public void testCollection2() throws Exception {
     // test restore Collection of other Java Object from JSON source
-    System.out.println("---------------------Other Collection---------------------");
     JsonParserImpl jsonParser = new JsonParserImpl();
     // check restore different type of Collection
+    JsonHandler jsonHandler = new JsonDefaultHandler();
     jsonParser.parse(new InputStreamReader(Thread.currentThread()
-        .getContextClassLoader().getResourceAsStream("CollectionTest.txt")));
-    JsonValue jv = jsonParser.getJsonHandler().getJsonObject();
-    Object o = new BeanBuilder().createObject(JavaCollectionBean.class, jv);
-    System.out.println("\tArrayList:\n" + ((JavaCollectionBean) o).getArrayList());
-    System.out.println("\tVector:\n" + ((JavaCollectionBean) o).getVector());
-    System.out.println("\tLinkedList:\n" + ((JavaCollectionBean) o).getLinkedList());
-    System.out.println("\tLinkedHashSet:\n" + ((JavaCollectionBean) o).getLinkedHashSet());
-    System.out.println("\tHashSet:\n" + ((JavaCollectionBean) o).getHashSet());
-    System.out.println("\tList:\n" + ((JavaCollectionBean) o).getList());
-    System.out.println("\tSet:\n" + ((JavaCollectionBean) o).getSet());
-    System.out.println("\tQueue:\n" + ((JavaCollectionBean) o).getQueue());
-    System.out.println("\tArray[Object]:\n");
-    for (Book i : ((JavaCollectionBean) o).getArray())
-      System.out.print(i);
+        .getContextClassLoader().getResourceAsStream("CollectionTest.txt")), jsonHandler);
+    JsonValue jsonValue = jsonHandler.getJsonObject();
+    Object o = new BeanBuilder().createObject(JavaCollectionBean.class, jsonValue);
+    
+    assertEquals(3, ((JavaCollectionBean) o).getArrayList().size());
+    assertTrue(((JavaCollectionBean) o).getArrayList().get(0).equals(sourceCollection_.get(0)));
+    assertTrue(((JavaCollectionBean) o).getArrayList().get(1).equals(sourceCollection_.get(1)));
+    assertTrue(((JavaCollectionBean) o).getArrayList().get(2).equals(sourceCollection_.get(2)));
+
+    assertEquals(3, ((JavaCollectionBean) o).getVector().size());
+    assertTrue(((JavaCollectionBean) o).getVector().get(0).equals(sourceCollection_.get(0)));
+    assertTrue(((JavaCollectionBean) o).getVector().get(1).equals(sourceCollection_.get(1)));
+    assertTrue(((JavaCollectionBean) o).getVector().get(2).equals(sourceCollection_.get(2)));
+    
+    assertEquals(3, ((JavaCollectionBean) o).getLinkedList().size());
+    assertTrue(((JavaCollectionBean) o).getLinkedList().get(0).equals(sourceCollection_.get(0)));
+    assertTrue(((JavaCollectionBean) o).getLinkedList().get(1).equals(sourceCollection_.get(1)));
+    assertTrue(((JavaCollectionBean) o).getLinkedList().get(2).equals(sourceCollection_.get(2)));
+    
+    assertEquals(3, ((JavaCollectionBean) o).getLinkedHashSet().size());
+    
+    assertEquals(3, ((JavaCollectionBean) o).getHashSet().size());
+    
+    assertEquals(3, ((JavaCollectionBean) o).getList().size());
+    assertTrue(((JavaCollectionBean) o).getList().get(0).equals(sourceCollection_.get(0)));
+    assertTrue(((JavaCollectionBean) o).getList().get(1).equals(sourceCollection_.get(1)));
+    assertTrue(((JavaCollectionBean) o).getList().get(2).equals(sourceCollection_.get(2)));
+
+    assertEquals(3, ((JavaCollectionBean) o).getSet().size());
+    
+    assertEquals(3, ((JavaCollectionBean) o).getQueue().size());
+
+    assertEquals(3, ((JavaCollectionBean) o).getCollection().size());
+
+    assertEquals(3, ((JavaCollectionBean) o).getArray().length);
+    assertTrue(((JavaCollectionBean) o).getArray()[0].equals(sourceCollection_.get(0)));
+    assertTrue(((JavaCollectionBean) o).getArray()[1].equals(sourceCollection_.get(1)));
+    assertTrue(((JavaCollectionBean) o).getArray()[2].equals(sourceCollection_.get(2)));
   }
   
   public void testMap() throws Exception {
-    System.out.println("-----------------------Simple Map-----------------------");
     JsonParserImpl jsonParser = new JsonParserImpl();
+    JsonHandler jsonHandler = new JsonDefaultHandler();
     String jsonString = "{"
             + "\"strings\":{"
-            + "\"book\":\"Beginning C# 2008 \","
+            + "\"book\":\"Beginning C# 2008\","
             + "\"author\":\"Christian Gross\"" + "},"
             + "\"integers\":{"
-            + "\"one\":11111,"
-            + "\"two\":22222,"
-            + "\"three\":33333" + "},"
+            + "\"one\":1,"
+            + "\"two\":2,"
+            + "\"three\":3" + "},"
             + "\"booleans\":{"
             + "\"true\":true,"
             + "\"false\":false" + "}"
             + "}";
-    jsonParser.parse(new InputStreamReader(new ByteArrayInputStream(jsonString.getBytes())));
-    JsonValue jv = jsonParser.getJsonHandler().getJsonObject();
-    Object o = new BeanBuilder().createObject(JavaMapBean.class, jv);
-    System.out.println("Strings:     " + ((JavaMapBean)o).getStrings());
-    System.out.println("Integers:    " + ((JavaMapBean)o).getIntegers());
-    System.out.println("Booleans:    " + ((JavaMapBean)o).getBooleans());
+    jsonParser.parse(new InputStreamReader(new ByteArrayInputStream(jsonString.getBytes())), jsonHandler);
+    JsonValue jsonValue = jsonHandler.getJsonObject();
+    Object o = new BeanBuilder().createObject(JavaMapBean.class, jsonValue);
+
+    assertEquals("Beginning C# 2008", ((JavaMapBean)o).getStrings().get("book"));
+    assertEquals("Christian Gross", ((JavaMapBean)o).getStrings().get("author"));
+
+    assertEquals(1, ((JavaMapBean)o).getIntegers().get("one").intValue());
+    assertEquals(2, ((JavaMapBean)o).getIntegers().get("two").intValue());
+    assertEquals(3, ((JavaMapBean)o).getIntegers().get("three").intValue());
+
+    assertTrue(((JavaMapBean)o).getBooleans().get("true"));
+    assertFalse(((JavaMapBean)o).getBooleans().get("false"));
   }
 
   public void testMap2() throws Exception {
-    System.out.println("---------------------Other Map---------------------------");
     JsonParserImpl jsonParser = new JsonParserImpl();
+    JsonHandler jsonHandler = new JsonDefaultHandler();
     jsonParser.parse(new InputStreamReader(Thread.currentThread()
-        .getContextClassLoader().getResourceAsStream("MapTest.txt")));
-    JsonValue jv = jsonParser.getJsonHandler().getJsonObject();
+        .getContextClassLoader().getResourceAsStream("MapTest.txt")), jsonHandler);
+    JsonValue jv = jsonHandler.getJsonObject();
     Object o = new BeanBuilder().createObject(JavaMapBean.class, jv);
-    System.out.println("\tMap:\n" + ((JavaMapBean)o).getMap());
-    System.out.println("\tHashMap:\n" + ((JavaMapBean)o).getHashMap());
-    System.out.println("\tHashtable:\n" + ((JavaMapBean)o).getHashtable());
-    System.out.println("\tLinkedHashMap:\n" + ((JavaMapBean)o).getLinkedHashMap());
+
+    assertTrue(((JavaMapBean)o).getMap().get("JUnit").equals(sourceCollection_.get(0)));
+    assertTrue(((JavaMapBean)o).getMap().get("C#").equals(sourceCollection_.get(1)));
+    assertTrue(((JavaMapBean)o).getMap().get("JavaScript").equals(sourceCollection_.get(2)));
+
+    assertTrue(((JavaMapBean)o).getHashMap().get("JUnit").equals(sourceCollection_.get(0)));
+    assertTrue(((JavaMapBean)o).getHashMap().get("C#").equals(sourceCollection_.get(1)));
+    assertTrue(((JavaMapBean)o).getHashMap().get("JavaScript").equals(sourceCollection_.get(2)));
+    
+    assertTrue(((JavaMapBean)o).getHashtable().get("JUnit").equals(sourceCollection_.get(0)));
+    assertTrue(((JavaMapBean)o).getHashtable().get("C#").equals(sourceCollection_.get(1)));
+    assertTrue(((JavaMapBean)o).getHashtable().get("JavaScript").equals(sourceCollection_.get(2)));
+    
+    assertTrue(((JavaMapBean)o).getLinkedHashMap().get("JUnit").equals(sourceCollection_.get(0)));
+    assertTrue(((JavaMapBean)o).getLinkedHashMap().get("C#").equals(sourceCollection_.get(1)));
+    assertTrue(((JavaMapBean)o).getLinkedHashMap().get("JavaScript").equals(sourceCollection_.get(2)));
+    
   }
   
   public void testBean() throws Exception {
-    System.out.println("------------------------Bean----------------------------");
     JsonParserImpl jsonParser = new JsonParserImpl();
+    JsonHandler jsonHandler = new JsonDefaultHandler();
     jsonParser.parse(new InputStreamReader(Thread.currentThread()
-        .getContextClassLoader().getResourceAsStream("BookStorage.txt")));
-    JsonValue jv = jsonParser.getJsonHandler().getJsonObject();
+        .getContextClassLoader().getResourceAsStream("BookStorage.txt")), jsonHandler);
+    JsonValue jv = jsonHandler.getJsonObject();
     Object o = new BeanBuilder().createObject(BookStorage.class, jv);
-    System.out.println(((BookStorage)o).toString());
+    assertTrue(((BookStorage)o).getBooks().get(0).equals(sourceCollection_.get(0)));
+    assertTrue(((BookStorage)o).getBooks().get(1).equals(sourceCollection_.get(1)));
+    assertTrue(((BookStorage)o).getBooks().get(2).equals(sourceCollection_.get(2)));
   }
   
   public void testMultiDimensionArray() throws Exception {
-    System.out.println("-----------------Multi-Dimension Array------------------");
     JsonParser jsonParser = new JsonParserImpl();
+    JsonHandler jsonHandler = new JsonDefaultHandler();
     jsonParser.parse(new InputStreamReader(Thread.currentThread()
-        .getContextClassLoader().getResourceAsStream("MultiDimension.txt")));
-    JsonValue jsonValue = jsonParser.getJsonHandler().getJsonObject();
-    System.out.println(jsonValue);
-    Object o = new BeanBuilder().createObject(BookStorage2.class, jsonValue);
-    Book[][][] array = ((BookStorage2)o).getBooks();
-    for (int i = 0; i < array.length; i++) {
-      for (int j = 0; j < array[i].length; j++) {
-        for (int k = 0; k < array[i][j].length; k++) {
-          if (k > 0)
-            System.out.print(",");
-          System.out.print(array[i][j][k]);
-        }
-        System.out.println();
-      }
-      System.out.println();
-    }
+        .getContextClassLoader().getResourceAsStream("MultiDimension.txt")), jsonHandler);
+    JsonValue jsonValue = jsonHandler.getJsonObject();
+//    System.out.println(jsonValue);
+    assertTrue(jsonValue.isObject());
+    assertTrue(jsonValue.getElement("books").isArray());
+    assertTrue(jsonValue.getElement("books").getElements().next().isArray());
+    assertTrue(jsonValue.getElement("books").getElements().next().getElements().next().isArray());
+    assertTrue(jsonValue.getElement("books").getElements().next().getElements().next().getElements().next().isObject());
+    assertEquals("JUnit in Action",
+            jsonValue.getElement("books").getElements().next().getElements().next().getElements().next()
+            .getElement("title").getStringValue());
   }
   
 }

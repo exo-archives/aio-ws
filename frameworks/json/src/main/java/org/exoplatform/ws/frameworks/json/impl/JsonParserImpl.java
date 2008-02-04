@@ -25,8 +25,6 @@ import java.io.PushbackReader;
 import java.io.Reader;
 import java.util.Stack;
 
-import org.exoplatform.ws.frameworks.json.impl.JsonDefaultHandler;
-import org.exoplatform.ws.frameworks.json.impl.JsonException;
 import org.exoplatform.ws.frameworks.json.JsonHandler;
 import org.exoplatform.ws.frameworks.json.JsonParser;
 import org.exoplatform.ws.frameworks.json.impl.JsonUtils.JsonToken;
@@ -47,31 +45,14 @@ public class JsonParserImpl implements JsonParser {
    * Default constructor.
    */
   public JsonParserImpl() {
-    jsonHandler_ = new JsonDefaultHandler();
   }
 
   /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.JsonParser#setHandler(
-   * org.exoplatform.services.rest.frameworks.json.JsonHandler)
-   */
-  public void setHandler(JsonHandler handler) throws JsonException {
-    if (handler == null)
-      throw new JsonException("JsonHandler is null!");
-    jsonHandler_ = handler;
-  }
-  
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.JsonParser#getJsonHandler()
-   */
-  public JsonHandler getJsonHandler() {
-    return jsonHandler_;
-  }
-  
-  /* (non-Javadoc)
    * @see org.exoplatform.services.rest.frameworks.json.JsonParser#parse(java.io.Reader)
    */
-  public void parse(Reader reader) throws JsonException {
-    this.reader_ = new PushbackReader(reader);
+  public void parse(Reader reader, JsonHandler handler) throws JsonException {
+    jsonHandler_ = handler;
+    reader_ = new PushbackReader(reader);
     try {
       char c = 0;
       while ((c = next()) != 0) {
@@ -90,11 +71,10 @@ public class JsonParserImpl implements JsonParser {
   /* (non-Javadoc)
    * @see org.exoplatform.services.rest.frameworks.json.JsonParser#parse(java.io.InputStream)
    */
-  public void parse(InputStream sream) throws JsonException {
-    parse(new InputStreamReader(sream));
+  public void parse(InputStream sream, JsonHandler handler) throws JsonException {
+    parse(new InputStreamReader(sream), handler);
   }
   
-
   /**
    * Read JSON object token, it minds all characters
    * from '{' to '}'.

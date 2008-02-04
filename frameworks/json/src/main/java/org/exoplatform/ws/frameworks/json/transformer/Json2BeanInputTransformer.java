@@ -21,8 +21,10 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.exoplatform.services.rest.transformer.InputEntityTransformer;
+import org.exoplatform.ws.frameworks.json.JsonHandler;
 import org.exoplatform.ws.frameworks.json.JsonParser;
 import org.exoplatform.ws.frameworks.json.impl.BeanBuilder;
+import org.exoplatform.ws.frameworks.json.impl.JsonDefaultHandler;
 import org.exoplatform.ws.frameworks.json.impl.JsonException;
 import org.exoplatform.ws.frameworks.json.impl.JsonParserImpl;
 import org.exoplatform.ws.frameworks.json.value.JsonValue;
@@ -45,8 +47,9 @@ public class Json2BeanInputTransformer extends InputEntityTransformer {
 
     JsonParser jsonParser = new JsonParserImpl();
     try {
-      jsonParser.parse(entityDataStream);
-      JsonValue jsonValue = jsonParser.getJsonHandler().getJsonObject();
+      JsonHandler jsonHandler = new JsonDefaultHandler();
+      jsonParser.parse(entityDataStream, jsonHandler);
+      JsonValue jsonValue = jsonHandler.getJsonObject();
       targetObject = new BeanBuilder().createObject(this.getType(),jsonValue);
     } catch (JsonException e) {
       e.printStackTrace();

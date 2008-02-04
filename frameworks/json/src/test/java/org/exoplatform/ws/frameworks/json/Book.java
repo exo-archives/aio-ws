@@ -64,14 +64,21 @@ public class Book {
   @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
-    sb.append("Book:\n")
-    .append("Author: ").append(author).append("\n")
-    .append("Title: ").append(title).append("\n")
-    .append("Pages: ").append(pages).append("\n")
-    .append("Price: ").append(price).append("\n")
-    .append("ISDN: ").append(isdn).append("\n");
+    sb.append("Book:{")
+    .append("Author: ").append(author).append(" ")
+    .append("Title: ").append(title).append(" ")
+    .append("Pages: ").append(pages).append(" ")
+    .append("Price: ").append(price).append(" ")
+    .append("ISDN: ").append(isdn).append("} ");
     return sb.toString();
-    
+  }
+  
+  public boolean equals(Book book) {
+    return book.getAuthor().equals(author)
+      && book.getTitle().equals(title)
+      && book.getIsdn() == isdn
+      && book.getPages() == pages
+      && book.getPrice() == price;
   }
 }
 

@@ -23,13 +23,10 @@ import java.io.ByteArrayOutputStream;
 import org.exoplatform.ws.frameworks.json.Book;
 import org.exoplatform.ws.frameworks.json.JsonParser;
 import org.exoplatform.ws.frameworks.json.JsonWriter;
-import org.exoplatform.ws.frameworks.json.impl.BeanBuilder;
-import org.exoplatform.ws.frameworks.json.impl.JsonGeneratorImpl;
-import org.exoplatform.ws.frameworks.json.impl.JsonParserImpl;
-import org.exoplatform.ws.frameworks.json.impl.JsonWriterImpl;
 import org.exoplatform.ws.frameworks.json.value.JsonValue;
 
 import junit.framework.TestCase;
+import org.exoplatform.ws.frameworks.json.JsonHandler;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -66,8 +63,10 @@ public class TransferJavaBeanTest extends TestCase {
     
     ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
     JsonParser jsonParser = new JsonParserImpl();
-    jsonParser.parse(in);
-    JsonValue jsonValue = jsonParser.getJsonHandler().getJsonObject();
+    JsonHandler jsonHandler = new JsonDefaultHandler();
+
+    jsonParser.parse(in, jsonHandler);
+    JsonValue jsonValue = jsonHandler.getJsonObject();
     Book newBook = (Book)new BeanBuilder().createObject(Book.class, jsonValue);
     assertEquals(author, newBook.getAuthor());
     assertEquals(title, newBook.getTitle());

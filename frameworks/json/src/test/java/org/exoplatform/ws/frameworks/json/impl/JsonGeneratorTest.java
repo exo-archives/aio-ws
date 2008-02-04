@@ -17,18 +17,13 @@
 
 package org.exoplatform.ws.frameworks.json.impl;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.exoplatform.ws.frameworks.json.Book;
 import org.exoplatform.ws.frameworks.json.BookStorage;
 import org.exoplatform.ws.frameworks.json.BookWrapper;
-import org.exoplatform.ws.frameworks.json.BookWrapper2;
-import org.exoplatform.ws.frameworks.json.BookWrapper3;
-import org.exoplatform.ws.frameworks.json.JsonWriter;
-import org.exoplatform.ws.frameworks.json.impl.JsonGeneratorImpl;
-import org.exoplatform.ws.frameworks.json.impl.JsonWriterImpl;
 import org.exoplatform.ws.frameworks.json.value.JsonValue;
 
 import junit.framework.TestCase;
@@ -39,50 +34,55 @@ import junit.framework.TestCase;
  */
 public class JsonGeneratorTest extends TestCase {
 
-  private JsonWriter jsonWriter_;
-  private ByteArrayOutputStream out_;
-  
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    out_ = new ByteArrayOutputStream();
-    jsonWriter_ = new JsonWriterImpl(out_);
   }
   
   public void testSimpleObject() throws Exception {
+    int _pages = 386;
+    long _isdn = 93011099534534L;
+    double _price = 19.37;
+    String _title = "JUnit in Action"; 
+    String _author = "Vincent Masson";
     Book book = new Book();
-    book.setAuthor("Vincent Masson");
-    book.setTitle("JUnit in Action");
-    book.setPages(386);
-    book.setPrice(19.37);
-    book.setIsdn(930110995);
-    JsonValue jv = new JsonGeneratorImpl().createJsonObject(book);
-    jv.writeTo(jsonWriter_);
-    jsonWriter_.flush();
-    jsonWriter_.close();
+    book.setAuthor(_author);
+    book.setTitle(_title);
+    book.setPages(_pages);
+    book.setPrice(_price);
+    book.setIsdn(_isdn);
+    
+    JsonValue jsonValue = new JsonGeneratorImpl().createJsonObject(book);
+    assertTrue(jsonValue.isObject());
+    assertEquals(_author, jsonValue.getElement("author").getStringValue());
+    assertEquals(_title, jsonValue.getElement("title").getStringValue());
+    assertEquals(_pages, jsonValue.getElement("pages").getIntValue());
+    assertEquals(_price, jsonValue.getElement("price").getDoubleValue());
+    assertEquals(_isdn, jsonValue.getElement("isdn").getLongValue());
   }
   
   public void testSimpleObject2() throws Exception {
+    int _pages = 386;
+    int _isdn = 930110995;
+    double _price = 19.37;
+    String _title = "JUnit in Action"; 
+    String _author = "Vincent Masson";
     Book book = new Book();
-    book.setAuthor("Vincent Masson");
-    book.setTitle("JUnit in Action");
-    book.setPages(386);
-    book.setPrice(19.37);
-    book.setIsdn(930110995);
+    book.setAuthor(_author);
+    book.setTitle(_title);
+    book.setPages(_pages);
+    book.setPrice(_price);
+    book.setIsdn(_isdn);
+
     BookWrapper bookWrapper = new BookWrapper();
     bookWrapper.setBook(book);
-    JsonValue jv = new JsonGeneratorImpl().createJsonObject(bookWrapper);
-    System.out.println(jv);
-    // more includes
-    BookWrapper2 bookWrapper2 = new BookWrapper2();
-    bookWrapper2.setBookWrapper(bookWrapper);
-    jv = new JsonGeneratorImpl().createJsonObject(bookWrapper2);
-    System.out.println(jv);
-    // more more includes
-    BookWrapper3 bookWrapper3 = new BookWrapper3();
-    bookWrapper3.setBookWrapper2(bookWrapper2);
-    jv = new JsonGeneratorImpl().createJsonObject(bookWrapper3);
-    System.out.println(jv);
+    JsonValue jsonValue = new JsonGeneratorImpl().createJsonObject(bookWrapper);
+    assertTrue(jsonValue.isObject());
+    assertEquals(_author, jsonValue.getElement("book").getElement("author").getStringValue());
+    assertEquals(_title, jsonValue.getElement("book").getElement("title").getStringValue());
+    assertEquals(_pages, jsonValue.getElement("book").getElement("pages").getIntValue());
+    assertEquals(_price, jsonValue.getElement("book").getElement("price").getDoubleValue());
+    assertEquals(_isdn, jsonValue.getElement("book").getElement("isdn").getLongValue());
   }
 
   public void testSimpleObject3() throws Exception {
@@ -108,13 +108,14 @@ public class JsonGeneratorTest extends TestCase {
     book.setPrice(25.99);
     book.setIsdn(9781598220339L);
     l.add(book);
-    BookStorage bookViewer = new BookStorage();
-    bookViewer.setBooks(l);
-    JsonValue jv = new JsonGeneratorImpl().createJsonObject(bookViewer);
-    jv.writeTo(jsonWriter_);
-    jsonWriter_.flush();
-    jsonWriter_.close();
-    System.out.println(new String(out_.toByteArray()));
+    BookStorage bookStorage = new BookStorage();
+    bookStorage.setBooks(l);
+    JsonValue jsonValue = new JsonGeneratorImpl().createJsonObject(bookStorage);
+    assertTrue(jsonValue.isObject());
+    Iterator<JsonValue> iterator = jsonValue.getElement("books").getElements();
+    assertEquals(l.get(0).getTitle(), iterator.next().getElement("title").getStringValue());
+    assertEquals(l.get(1).getTitle(), iterator.next().getElement("title").getStringValue());
+    assertEquals(l.get(2).getTitle(), iterator.next().getElement("title").getStringValue());
   }
 
 }

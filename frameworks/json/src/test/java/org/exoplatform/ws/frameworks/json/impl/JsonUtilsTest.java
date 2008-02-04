@@ -17,8 +17,6 @@
 
 package org.exoplatform.ws.frameworks.json.impl;
 
-import org.exoplatform.ws.frameworks.json.impl.JsonUtils;
-
 import junit.framework.TestCase;
 
 /**

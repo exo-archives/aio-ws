@@ -19,8 +19,6 @@ package org.exoplatform.ws.frameworks.json.impl;
 
 import java.io.ByteArrayOutputStream;
 
-import org.exoplatform.ws.frameworks.json.impl.JsonWriterImpl;
-
 import junit.framework.TestCase;
 
 /**
@@ -65,6 +63,10 @@ public class JsonWriterTest extends TestCase {
     jsw.writeStartArray();
     for (int i = 0; i <= 5; i++)
       jsw.writeString(value + i);
+//    try {
+//      jsw.writeEndObject();
+//      fail("JsonException should be here.");
+//    } catch(JsonException e) {}
     jsw.writeEndArray();
     jsw.writeEndObject();
     jsw.flush();

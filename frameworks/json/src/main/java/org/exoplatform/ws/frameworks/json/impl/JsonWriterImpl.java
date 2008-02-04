@@ -23,8 +23,6 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Stack;
 
-import org.exoplatform.ws.frameworks.json.impl.JsonException;
-import org.exoplatform.ws.frameworks.json.impl.JsonUtils;
 import org.exoplatform.ws.frameworks.json.JsonWriter;
 import org.exoplatform.ws.frameworks.json.impl.JsonUtils.JsonToken;
 
@@ -58,17 +56,15 @@ public class JsonWriterImpl implements JsonWriter {
   public void writeStartObject() throws JsonException {
     if (!jsonTokens_.isEmpty()) {
       // Object can be stated after key with followed ':' or as array item.  
-      if (jsonTokens_.peek() != JsonToken.key
-          && jsonTokens_.peek() != JsonToken.array)
+      if (jsonTokens_.peek() != JsonToken.key && jsonTokens_.peek() != JsonToken.array)
         throw new JsonException("Syntax error. Unexpected element '{'.");
     }
     try {
       if (commaFirst_) // needed ',' before 
         writer_.write(',');
       writer_.write('{');
-      if (!jsonTokens_.isEmpty()
-          && jsonTokens_.peek() == JsonToken.key)
      // if at the top of stack is 'key' then remove it.
+      if (!jsonTokens_.isEmpty() && jsonTokens_.peek() == JsonToken.key)
         jsonTokens_.pop(); 
       jsonTokens_.push(JsonToken.object); // remember new object opened
       commaFirst_ = false;
@@ -98,8 +94,7 @@ public class JsonWriterImpl implements JsonWriter {
    */
   public void writeStartArray() throws JsonException {
     if (jsonTokens_.isEmpty()
-        || (jsonTokens_.peek() != JsonToken.key
-            && jsonTokens_.peek() != JsonToken.array))
+        || (jsonTokens_.peek() != JsonToken.key && jsonTokens_.peek() != JsonToken.array))
       throw new JsonException("Sysntax error. Unexpected element '['..");
     try {
       if (commaFirst_) // needed ',' before 
