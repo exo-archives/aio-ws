@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.exoplatform.ws.soap</groupId>
   <artifactId>exo.soap.xfire.jsr181-examples</artifactId>
-  <version>trunk</version>
+  <version>${org.exoplatform.ws.version}</version>
   <name>SOAP XFire JSR181 impl examples</name>
   <description></description>
   <dependencies>
@@ -49,7 +49,7 @@
     <dependency>
 	<groupId>org.exoplatform.ws.soap</groupId>
   	<artifactId>exo.ws.soap.xfire.jsr181</artifactId>
-  	<version>trunk</version>
+  	<version>${org.exoplatform.ws.version}</version>
     </dependency>
   </dependencies>
   <build>
@@ -75,7 +75,7 @@
   				<version>1.1</version>
   			</dependency>
 			</dependencies>
-			<!-- 
+			<!--
   		<executions>
   			<execution>
  					<phase>package</phase>
@@ -87,32 +87,32 @@
  						<tasks>
  							<echo>Run client code generator</echo>
  							<delete dir="${basedir}/client"/>
-							<taskdef name="wsgen" classname="org.codehaus.xfire.gen.WsGenTask" 
+							<taskdef name="wsgen" classname="org.codehaus.xfire.gen.WsGenTask"
      						classpathref="maven.compile.classpath"/>
-     						
+
 							<wsgen outputDirectory="${basedir}/target/client/generated-src"
   							wsdl="${basedir}/target/CalculatorService.wsdl"
   							package="org.exoplatform.services.ws.examples.jsr181.client.calculator" overwrite="true"/>
-  							
+
 							<wsgen outputDirectory="${basedir}/target/client/generated-src"
   							wsdl="${basedir}/target/SayHelloService.wsdl"
   							package="org.exoplatform.services.ws.examples.jsr181.client.hello" overwrite="true"/>
-  							
+
   						<mkdir dir="${basedir}/target/client/classes"/>
-  						
+
   						<property name="compile_classpath" refid="maven.compile.classpath"/>
   						<property name="build.compiler" value="extJavac"/>
   						<javac srcdir="${basedir}/target/client/generated-src"
   						destdir="${basedir}/target/client/classes" source="1.5"
   						classpath="${compile_classpath}"/>
-  						
+
   						<jar destfile="${basedir}/target/client/jsr181.client-examples.jar">
   							<fileset dir="${basedir}/target/client/classes" includes="**/*.class"/>
   						</jar>
  						</tasks>
  					</configuration>
-  		<!-- 
-  			</execution>	
+  		<!--
+  			</execution>
   		</executions>
   		-->
   	</plugin>

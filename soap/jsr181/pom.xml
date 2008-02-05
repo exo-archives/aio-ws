@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.exoplatform.ws.soap</groupId>
   <artifactId>exo.ws.soap.xfire.jsr181</artifactId>
-  <version>trunk</version>
+  <version>${org.exoplatform.ws.version}</version>
   <name>SOAP XFire JSR181 impl</name>
   <description></description>
   <dependencies>

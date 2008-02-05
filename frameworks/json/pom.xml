@@ -12,29 +12,29 @@
   <version>trunk</version>
   <name>eXo JSON</name>
   <description>eXo Java Bean to JSON Transformation</description>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.ws.rest</groupId>
       <artifactId>exo.ws.rest.core</artifactId>
-      <version>trunk</version>
+      <version>${org.exoplatform.ws.version}</version>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.component.common</artifactId>
       <version>${org.exoplatform.kernel.version}</version>
     </dependency>
-    
+
   </dependencies>
   <build>
-    <testResources>                                                                                                                                                                                            
-        <testResource>                                                                                                                                                                                         
-        <directory>src/test/resources</directory>                                                                                                                                                               
-        <includes>                                                                                                                                                                                         
-          <include>**/*.json</include>                                                                                                                                                             
-          <include>**/*.txt</include>                                                                                                                                                             
-        </includes>                                                                                                                                                                                        
+    <testResources>
+        <testResource>
+        <directory>src/test/resources</directory>
+        <includes>
+          <include>**/*.json</include>
+          <include>**/*.txt</include>
+        </includes>
      </testResource>
-     </testResources>            	 
+     </testResources>
   </build>
 </project>
