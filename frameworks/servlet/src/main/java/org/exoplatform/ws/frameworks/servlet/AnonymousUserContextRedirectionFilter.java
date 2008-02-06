@@ -29,13 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
-import org.exoplatform.container.ExoContainer;
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.services.jcr.ext.app.ThreadLocalSessionProviderService;
-import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.organization.auth.AuthenticationService;
-import org.exoplatform.services.organization.auth.Identity;
 
 /**
  * Checks out if username present in HttpServletRequest then initializes 
@@ -58,10 +52,6 @@ public class AnonymousUserContextRedirectionFilter implements Filter {
   
   private String contextName;
   
-  private AuthenticationService authenticationService;
-
-  private ThreadLocalSessionProviderService providerService;
-  
   /* (non-Javadoc)
    * @see javax.servlet.Filter#destroy()
    */
@@ -74,48 +64,18 @@ public class AnonymousUserContextRedirectionFilter implements Filter {
    */
   public void doFilter(ServletRequest request, ServletResponse response,
       FilterChain filterChain) throws IOException, ServletException {
-    ExoContainer container = ExoContainerContext.getCurrentContainer();
-    
-    authenticationService = (AuthenticationService) container
-        .getComponentInstanceOfType(AuthenticationService.class);
-    providerService = (ThreadLocalSessionProviderService) container
-        .getComponentInstanceOfType(ThreadLocalSessionProviderService.class);
-    
     HttpServletRequest httpRequest = (HttpServletRequest) request;
     String user = httpRequest.getRemoteUser();
-
-    SessionProvider provider = null;
-
-    LOGGER.debug("Current user : " + user);
-    
-    // initialize thread local SessionProvider
+    LOGGER.debug("Current user '" + user + "'.");
     if (user != null) {
-      Identity identity = null;
-      try {
-        identity = authenticationService.getIdentityBySessionId(user);
-      } catch (Exception e) {
-        throw new ServletException(e);
-      }
-      
-      if(identity != null)       
-        provider = new SessionProvider(null);
-      else {
-        LOGGER.warn("Identity is null from Authentication Service for " 
-            + user + ".");
-        provider = SessionProvider.createAnonimProvider();
-      }
-      
-      providerService.setSessionProvider(null, provider);
       filterChain.doFilter(request, response);
-      // remove session provider
-      providerService.removeSessionProvider(null);
     } else {
+      LOGGER.debug("Redirect user to context '" + contextName + "'.");
       String pathInfo = httpRequest.getPathInfo();
       String query = httpRequest.getQueryString();
       ((HttpServletResponse) response).sendRedirect(
           contextName + "/" + pathInfo + ((query != null) ? "?" + query : ""));
     }
-
   }
 
   /* (non-Javadoc)
