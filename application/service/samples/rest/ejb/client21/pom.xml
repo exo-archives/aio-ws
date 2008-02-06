@@ -26,7 +26,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>org.exoplatform.services.rest.ejb21.client.Main</mainClass>
+              <mainClass>org.exoplatform.services.ws.rest.ejb21.Main</mainClass>
             </manifest>
           </archive>
         </configuration>

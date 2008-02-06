@@ -1,7 +1,5 @@
 #!/bin/sh
 
-mvn clean install
-
 if ( test -z "$JONAS_ROOT" ); then
   echo "ERROR: set \$JONAS_ROOT first"
   exit 1

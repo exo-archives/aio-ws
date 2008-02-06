@@ -17,8 +17,6 @@
 
 package org.exoplatform.services.ws.rest.ejb21;
 
-import org.exoplatform.services.ws.rest.ejb21_.RestEJBConnectorHome;
-import org.exoplatform.services.ws.rest.ejb21_.RestEJBConnector;
 import static java.lang.System.out;
 
 import javax.ejb.EJBException;

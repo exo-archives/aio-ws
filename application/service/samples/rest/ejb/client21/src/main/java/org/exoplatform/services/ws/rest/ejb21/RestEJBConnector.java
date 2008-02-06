@@ -15,7 +15,7 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
 */
 
-package org.exoplatform.services.ws.rest.ejb21_;
+package org.exoplatform.services.ws.rest.ejb21;
 
 import java.rmi.RemoteException;
 import java.util.HashMap;
