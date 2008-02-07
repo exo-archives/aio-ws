@@ -1,8 +1,21 @@
-/***************************************************************************
- * Copyright 2001-2007 The eXo Platform SAS         All rights reserved.  *
- * Please look at license.txt in info directory for more license detail.   *
- **************************************************************************/
-package org.exoplatform.services.rest.ejb3;
+/**
+ * Copyright (C) 2003-2008 eXo Platform SAS.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, see<http://www.gnu.org/licenses/>.
+*/
+
+package org.exoplatform.services.ws.rest.ejb3;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -18,7 +31,6 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.rest.MultivaluedMetadata;
 import org.exoplatform.services.rest.Request;
-import org.exoplatform.services.rest.ResourceBinder;
 import org.exoplatform.services.rest.ResourceDispatcher;
 import org.exoplatform.services.rest.ResourceIdentifier;
 import org.exoplatform.services.rest.Response;
@@ -35,34 +47,26 @@ public class RestEJBConnectorBean implements RestEJBConnectorRemote,
 
   private ResourceDispatcher resDispatcher;
 
-  private ResourceBinder resBinder;
-
   private static final Log LOGGER = ExoLogger.getLogger(RestEJBConnectorBean.class);
 
   /*
    * (non-Javadoc)
-   * 
    * @see org.exoplatform.services.rest.ejb3.RestEJBConnector#service(java.lang.String,
-   *      java.lang.String, java.lang.String, java.util.HashMap,
-   *      java.util.HashMap)
+   *      java.lang.String, java.lang.String, java.util.HashMap, java.util.HashMap)
    */
   public String service(String str, String method, String url,
       HashMap < String, List < String >> headers, HashMap < String, List < String >> queries) {
 
     try {
-      container = ExoContainerContext.getCurrentContainer();
+      // =========== temporary ============
+      // TODO: change to get actual container
+      container = ExoContainerContext.getContainerByName("portal");
     } catch (Exception e) {
       LOGGER.error("Can't get current container!");
       throw new EJBException("Can't get current container!", e);
     }
-    resBinder = (ResourceBinder) container.getComponentInstanceOfType(ResourceBinder.class);
     resDispatcher = (ResourceDispatcher) container
         .getComponentInstanceOfType(ResourceDispatcher.class);
-
-    if (resBinder == null) {
-      LOGGER.error("ResourceBinder not found in container!");
-      throw new EJBException("ResourceBinder not found in container!");
-    }
     if (resDispatcher == null) {
       LOGGER.error("ResourceDispatcher not found in container!");
       throw new EJBException("ResourceDispatcher not found in container!");
@@ -92,9 +96,8 @@ public class RestEJBConnectorBean implements RestEJBConnectorRemote,
 
   /*
    * (non-Javadoc)
-   * 
-   * @see org.exoplatform.services.rest.ejb3.RestEJBConnector#service(java.lang.String,
-   *      java.lang.String, java.lang.String)
+   * @see org.exoplatform.services.rest.ejb3.RestEJBConnector#service
+   * (java.lang.String, java.lang.String, java.lang.String)
    */
   public String service(String str, String method, String url) {
     return service(str, method, url, new HashMap < String, List < String > >(),
@@ -103,9 +106,7 @@ public class RestEJBConnectorBean implements RestEJBConnectorRemote,
 
   /*
    * (non-Javadoc)
-   * 
-   * @see org.exoplatform.services.rest.ejb3.RestEJBConnector#service(java.lang.String,
-   *      java.lang.String)
+   * @see org.exoplatform.services.rest.ejb3.RestEJBConnector#service(java.lang.String, java.lang.String)
    */
   public String service(String method, String url) {
     return service(null, method, url, new HashMap < String, List < String > >(),
