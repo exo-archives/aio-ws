@@ -2,7 +2,7 @@
  * Copyright 2001-2007 The eXo Platform SAS         All rights reserved.  *
  * Please look at license.txt in info directory for more license detail.   *
  **************************************************************************/
-package org.exoplatform.services.rest.ejb21;
+package org.exoplatform.services.ws.rest.ejb21;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -19,7 +19,6 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.rest.MultivaluedMetadata;
 import org.exoplatform.services.rest.Request;
-import org.exoplatform.services.rest.ResourceBinder;
 import org.exoplatform.services.rest.ResourceDispatcher;
 import org.exoplatform.services.rest.ResourceIdentifier;
 import org.exoplatform.services.rest.Response;
@@ -36,10 +35,7 @@ public class RestEJBConnectorBean implements SessionBean {
 
   private ResourceDispatcher resDispatcher;
 
-  private ResourceBinder resBinder;
-
-  private static final Log LOGGER = ExoLogger
-      .getLogger(RestEJBConnectorBean.class);
+  private static final Log LOGGER = ExoLogger.getLogger(RestEJBConnectorBean.class);
 
   SessionContext context;
 
@@ -57,21 +53,16 @@ public class RestEJBConnectorBean implements SessionBean {
 
     try {
 //      container = ExoContainerContext.getCurrentContainer();
-      // >>> temporary
+      // =========== temporary ============
+      // TODO: change to get actual container
       container = ExoContainerContext.getContainerByName("portal");
     } catch (Exception e) {
       LOGGER.error("Can't get current container!");
       throw new EJBException("Can't get current container!", e);
     }
-    resBinder = (ResourceBinder) container
-        .getComponentInstanceOfType(ResourceBinder.class);
     resDispatcher = (ResourceDispatcher) container
         .getComponentInstanceOfType(ResourceDispatcher.class);
 
-    if (resBinder == null) {
-      LOGGER.error("ResourceBinder not found in container!");
-      throw new EJBException("ResourceBinder not found in container!");
-    }
     if (resDispatcher == null) {
       LOGGER.error("ResourceDispatcher not found in container!");
       throw new EJBException("ResourceDispatcher not found in container!");
