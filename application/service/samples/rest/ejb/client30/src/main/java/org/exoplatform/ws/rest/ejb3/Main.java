@@ -2,15 +2,12 @@
  * Copyright 2001-2007 The eXo Platform SAS         All rights reserved.  *
  * Please look at license.txt in info directory for more license detail.   *
  **************************************************************************/
-package org.exoplatform.services.rest.ejb3.client;
+package org.exoplatform.services.ws.rest.ejb3;
 
 import static java.lang.System.out;
 
 import javax.ejb.EJBException;
 import javax.naming.InitialContext;
-
-import org.exoplatform.services.rest.ejb3.RestEJBConnector;
-import org.exoplatform.services.rest.ejb3.RestEJBConnectorRemote;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -21,7 +18,7 @@ public class Main {
   private static final String URL = "/ejb/simple-service/";
   // only for easybeans container on Jonas
   private static final String BEAN_NAME =
-    "org.exoplatform.services.rest.ejb3.RestEJBConnectorBean";
+    "org.exoplatform.services.ws.rest.ejb3.RestEJBConnectorBean";
   // for JBoss
 //  private static final String BEAN_NAME = "RestEJBConnectorBean/remote";
   private static final String BEAN_REMOTE_SUFFIX = "@Remote";
