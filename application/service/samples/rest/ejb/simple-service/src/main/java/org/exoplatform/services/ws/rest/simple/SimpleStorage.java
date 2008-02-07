@@ -15,19 +15,9 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.ws.rest.ejb21;
+package org.exoplatform.services.ws.rest.simple;
 
-import java.rmi.RemoteException;
+import java.util.ArrayList;
 
-import javax.ejb.CreateException;
-import javax.ejb.EJBHome;
-
-/**
- * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
- * @version $Id: $
- */
-public interface RestEJBConnectorHome extends EJBHome {
-  
-  public RestEJBConnector create() throws RemoteException, CreateException;
-  
+public class SimpleStorage extends ArrayList < String > {
 }
