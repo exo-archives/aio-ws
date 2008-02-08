@@ -1,6 +1,0 @@
-<configuration>
-  <component>
-    <type>org.exoplatform.services.ws.soap.jsr181.TicketOrderService</type>
-    <multi-instance>true</multi-instance>
-  </component>
-</configuration>
