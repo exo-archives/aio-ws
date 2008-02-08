@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.exoplatform.ws.commons</groupId>
   <artifactId>exo.ws.commons</artifactId>
-  <version>trunk</version>
+  <version>1.1</version>
   <name>HTTP commons utils</name>
   <description></description>
 </project>
