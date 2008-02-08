@@ -40,7 +40,6 @@ public class RestEncodingFilter implements Filter {
 
   public void doFilter(ServletRequest req, ServletResponse resp, FilterChain filterChain)
       throws IOException, ServletException {
-      System.out.println("RestEncodingFilter");
     if (req.getCharacterEncoding() == null && requestEncodings != null)
       req.setCharacterEncoding(requestEncodings);
     filterChain.doFilter(req, resp);
