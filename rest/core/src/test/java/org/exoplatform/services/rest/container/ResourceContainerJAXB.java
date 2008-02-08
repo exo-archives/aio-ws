@@ -21,7 +21,6 @@ import java.math.BigDecimal;
 
 import org.exoplatform.services.rest.transformer.JAXBInputTransformer;
 import org.exoplatform.services.rest.transformer.JAXBOutputTransformer;
-import org.exoplatform.services.rest.container.ResourceContainer;
 import org.exoplatform.services.rest.generated.*;
 
 import org.exoplatform.services.rest.OutputTransformer;
