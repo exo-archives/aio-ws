@@ -1,7 +1,7 @@
 <project name="simple.jonas.ejb3.client" basedir=".">
 
 	<echo>Run Simple Example</echo>
-	<property name="mainclass" value="org.exoplatform.services.rest.ejb3.client.Main"/>
+	<property name="mainclass" value="org.exoplatform.services.ws.rest.ejb3.Main"/>
 	<property name="version" value="0.1"/>
 	<path id="jonas.classpath">
 		<fileset dir="${jonas.home}/work/rars/jonas">
