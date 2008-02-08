@@ -34,7 +34,6 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.rest.Connector;
 import org.exoplatform.services.rest.MultivaluedMetadata;
-import org.exoplatform.services.rest.ResourceBinder;
 import org.exoplatform.services.rest.ResourceDispatcher;
 import org.exoplatform.services.rest.Response;
 
@@ -61,15 +60,9 @@ public class RestServlet extends HttpServlet implements Connector {
     
     ExoContainer container = ExoContainerContext.getCurrentContainer();
     LOGGER.debug("Current Container: " + container);
-//    ResourceBinder binder = (ResourceBinder) container
-//        .getComponentInstanceOfType(ResourceBinder.class);
     ResourceDispatcher dispatcher = (ResourceDispatcher) container
         .getComponentInstanceOfType(ResourceDispatcher.class);
-//    LOGGER.debug("ResourceBinder: " + binder);
     LOGGER.debug("ResourceDispatcher: " + dispatcher);
-//    if (binder == null) {
-//      throw new ServletException("ResourceBinder is null.");
-//    }
     if (dispatcher == null) {
       throw new ServletException("ResourceDispatcher is null.");
     }
