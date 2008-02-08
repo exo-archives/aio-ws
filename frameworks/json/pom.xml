@@ -9,7 +9,7 @@
   <groupId>org.exoplatform.ws.rest</groupId>
   <artifactId>exo.ws.rest.json.bean</artifactId>
   <packaging>jar</packaging>
-  <version>trunk</version>
+  <version>${org.exoplatform.ws.version}</version>
   <name>eXo JSON</name>
   <description>eXo Java Bean to JSON Transformation</description>
 
