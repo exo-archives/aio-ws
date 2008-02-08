@@ -1,9 +1,6 @@
 <configuration>
   <component>
-    <type>org.exoplatform.services.ws.soap.jsr181.SayHelloWebService</type>
+    <type>org.exoplatform.services.ws.soap.jsr181.TicketOrderService</type>
     <multi-instance>true</multi-instance>
-  </component>
-  <component>
-  	<type>org.exoplatform.services.ws.soap.jsr181.CalculatorWebService</type>
   </component>
 </configuration>

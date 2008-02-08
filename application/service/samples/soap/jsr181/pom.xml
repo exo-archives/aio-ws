@@ -91,13 +91,9 @@
               classpathref="maven.compile.classpath"/>
             
             <wsgen outputDirectory="${basedir}/target/client/generated-src"
-            wsdl="${basedir}/target/CalculatorService.wsdl"
+            wsdl="${basedir}/target/TicketOrderService.wsdl"
             package="org.exoplatform.services.ws.soap.jsr181.client" overwrite="true"/>
-            
-            <wsgen outputDirectory="${basedir}/target/client/generated-src"
-            wsdl="${basedir}/target/SayHelloService.wsdl"
-            package="org.exoplatform.services.ws.soap.jsr181.client" overwrite="true"/>
-            
+
             <mkdir dir="${basedir}/target/client/classes"/>
             
             <property name="compile_classpath" refid="maven.compile.classpath"/>
@@ -106,7 +102,7 @@
              destdir="${basedir}/target/client/classes" source="1.5"
              classpath="${compile_classpath}"/>
             
-            <jar destfile="${basedir}/target/client/exo.ws.soap.xfire.jsr181.samples-${org.exoplatform.ws.version}.jar">
+            <jar destfile="${basedir}/target/client/exo.ws.soap.xfire.jsr181.samples.client-${org.exoplatform.ws.version}.jar">
               <fileset dir="${basedir}/target/client/classes" includes="**/*.class"/>
             </jar>
           </tasks>

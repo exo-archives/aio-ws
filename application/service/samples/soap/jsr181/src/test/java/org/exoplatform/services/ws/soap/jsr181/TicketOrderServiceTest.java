@@ -35,10 +35,10 @@ import java.util.List;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class CalculatorWebServiceTest extends TestCase {
+public class TicketOrderServiceTest extends TestCase {
 
   private StandaloneContainer container;
-  private final static String SERVICE_NAME = "CalculatorService";
+  private final static String SERVICE_NAME = "TicketOrderService";
   
   @Override
   public void setUp() throws Exception {
@@ -57,9 +57,9 @@ public class CalculatorWebServiceTest extends TestCase {
         Service s = annotationServiceFactory.create(sc.getClass());
         xfire.getServiceRegistry().register(s);
         assertTrue(xfire.getServiceRegistry().hasService(SERVICE_NAME));
-        System.out.println("CalculatorService, name: "
+        System.out.println("TicketOrderService, name: "
             + xfire.getServiceRegistry().getService(SERVICE_NAME).getName());
-        xfire.generateWSDL(s.getSimpleName(), new FileOutputStream("target/CalculatorService.wsdl"));
+        xfire.generateWSDL(s.getSimpleName(), new FileOutputStream("target/TicketOrderService.wsdl"));
       }
     }
   }
