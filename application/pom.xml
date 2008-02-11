@@ -17,6 +17,6 @@
     <module>services/samples/rest/ejb/client30</module>
     <module>services/samples/rest/ejb/simple-service</module>
     <module>services/samples/rest/services</module>
-    <module>services/samples/soap/jsr181</module>
+    <!--module>services/samples/soap/jsr181</module-->
   </modules>
 </project>
