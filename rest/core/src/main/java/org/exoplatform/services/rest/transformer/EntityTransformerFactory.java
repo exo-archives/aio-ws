@@ -50,7 +50,7 @@ public class EntityTransformerFactory {
    */
   public final GenericEntityTransformer newTransformer(
       Class<? extends GenericEntityTransformer> transformerType) throws Exception {
-    Constructor<? extends GenericEntityTransformer>[] constructors = transformerType.getConstructors();
+    Constructor<? extends GenericEntityTransformer>[] constructors = (Constructor<? extends GenericEntityTransformer>[])transformerType.getConstructors();
     // Sort constructors by number of parameters.
     // With more parameters must be first.
     sortConstructorsByParamsLength(constructors, 0, constructors.length - 1);
