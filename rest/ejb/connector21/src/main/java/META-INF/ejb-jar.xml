@@ -23,10 +23,10 @@
   </enterprise-beans>
   <assembly-descriptor>
     <security-role>
-      <role-name>user</role-name>
+      <role-name>users</role-name>
     </security-role>
     <method-permission>
-      <role-name>user</role-name>
+      <role-name>users</role-name>
       <method>
         <ejb-name>RestEJBConnector</ejb-name>
         <method-name>*</method-name>

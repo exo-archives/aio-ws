@@ -2,7 +2,7 @@
   <parent>
     <groupId>org.exoplatform.ws</groupId>
     <artifactId>config</artifactId>
-    <version>trunk</version>
+    <version>1.1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.exoplatform.ws.rest</groupId>
@@ -16,5 +16,12 @@
       <artifactId>exo.ws.rest.core</artifactId>
       <version>${org.exoplatform.ws.version}</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.exoplatform.core</groupId>
+      <artifactId>exo.core.component.security</artifactId>
+      <version>${org.exoplatform.core.version}</version>
+    </dependency>
   </dependencies>
 </project>
+

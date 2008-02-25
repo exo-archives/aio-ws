@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.organization.auth.AuthenticationService;
 import org.exoplatform.services.rest.HTTPMethod;
 import org.exoplatform.services.rest.InputTransformer;
 import org.exoplatform.services.rest.OutputTransformer;
@@ -40,9 +41,16 @@ public class SimpleService implements ResourceContainer {
   }
 
   private SimpleStorage getStorage() throws Exception {
-//    ExoContainer container = ExoContainerContext.getCurrentContainer();
+    // ExoContainer container = ExoContainerContext.getCurrentContainer();
     // >>> temporary
     ExoContainer container = ExoContainerContext.getContainerByName("portal");
+    
+    // Display the current identity
+    AuthenticationService auth = (AuthenticationService)
+      container.getComponentInstanceOfType(AuthenticationService.class);
+    System.out.println("Identity used to retrieve the storage = " +
+                       auth.getCurrentIdentity().getUsername());
+    
     return (SimpleStorage) container.getComponentInstanceOfType(SimpleStorage.class);
   }
 
