@@ -135,6 +135,14 @@ public class Response {
   public void setTransformer(OutputEntityTransformer transformer) {
     this.transformer_ = transformer;
   }
+  
+  /**
+   * Get an entity transformer.
+   * @return transformer the transformer which can serialize entity
+   */
+  public OutputEntityTransformer getTransformer(){
+    return transformer_;
+  }
 
   /**
    * Write entity to output stream.

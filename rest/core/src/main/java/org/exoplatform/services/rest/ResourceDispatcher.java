@@ -173,6 +173,9 @@ public class ResourceDispatcher implements Connector {
       if (!response.isTransformerInitialized() && response.isEntityInitialized()) {
         response.setTransformer(getTransformer(resource, response.getTransformerParameters()));
       }
+      else{
+        response.getTransformer().addTransformerParameters(response.getTransformerParameters());
+      }
       return response;
     }
     // if no one ResourceContainer found
