@@ -5,8 +5,7 @@
 		<version>trunk</version>
 	</parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.exoplatform.ws.rest</groupId>
-  <artifactId>exo.ws.rest.ejbconnector30.client30-jonas</artifactId>
+  <artifactId>exo.ws.application.ejbconnector30.client30</artifactId>
   <version>trunk</version>
   <name>REST-EJB simple client (ejb3.0)</name>
   <description></description>

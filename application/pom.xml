@@ -5,8 +5,7 @@
     <version>trunk</version>                                                                                                                            
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.exoplatform.ws.application</groupId>
-  <artifactId>config</artifactId>
+  <artifactId>exo.ws.application.config</artifactId>
   <name>eXo WS applications</name>
   <version>trunk</version>
   <packaging>pom</packaging>

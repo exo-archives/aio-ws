@@ -5,7 +5,6 @@
     <version>trunk</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.exoplatform.ws.rest</groupId>
   <artifactId>exo.ws.rest.ejbconnector21</artifactId>
   <version>${org.exoplatform.ws.version}</version>
   <name>REST-EJB connector (ejb2.1)</name>
@@ -18,7 +17,7 @@
       <version>2.1</version>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.ws.rest</groupId>
+      <groupId>org.exoplatform.ws</groupId>
       <artifactId>exo.ws.rest.core</artifactId>
       <version>${org.exoplatform.ws.version}</version>
     </dependency>
