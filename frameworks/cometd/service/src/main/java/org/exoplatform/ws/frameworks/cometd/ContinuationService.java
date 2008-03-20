@@ -1,4 +1,4 @@
-package org.exoplatform.services.cometd;
+package org.exoplatform.ws.frameworks.cometd;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.container.ExoContainer;
@@ -24,10 +24,7 @@ public class ContinuationService {
 
         ExoContainer container = RootContainer.getInstance();
         container = ((RootContainer)container).getPortalContainer("portal");
-
-        LOGGER.debug("ContinuationService - Current Container: " + container);
         EXoContinuationBayeux bayeux = (EXoContinuationBayeux) container.getComponentInstanceOfType(AbstractBayeux.class);
-        LOGGER.debug("ContinuationService - -->AbstractBayeux=" + bayeux);
         return bayeux;
     }
 
