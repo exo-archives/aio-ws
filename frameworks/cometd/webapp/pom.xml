@@ -1,55 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
-    <groupId>org.exoplatform.portal</groupId>
+    <groupId>org.exoplatform.ws</groupId>
     <artifactId>config</artifactId>
     <version>trunk</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.exoplatform.liveroom</groupId>
-  <artifactId>org.exoplatform.liveroom.cometd.webapp</artifactId>
-  <version>0.1</version>
+  <groupId>org.exoplatform.ws.frameworks.cometd</groupId>
+  <artifactId>cometd</artifactId>
+  <version>trunk</version>
   <name>cometd-webapp</name>
   <packaging>war</packaging>
   <description></description>
-
-  <!--build>
-    <defaultGoal>install</defaultGoal>
-    <plugins>
-      <plugin>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>maven-jetty-plugin</artifactId>
-        <version>6.2-SNAPSHOT</version>
-        <configuration>
-        <scanIntervalSeconds>2</scanIntervalSeconds>
-	    <contextPath>/</contextPath>         
-	      <scanTargets>
-            <scanTarget>src/main/webapp/WEB-INF/filters.json</scanTarget>  
-	      </scanTargets>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build-->
   <dependencies>
-	<dependency>
-      <groupId>org.exoplatform.kernel</groupId>
-      <artifactId>exo.kernel.container</artifactId>
-      <version>trunk</version>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.kernel</groupId>
-      <artifactId>exo.kernel.component.common</artifactId>
-      <version>trunk</version>
-    </dependency>
-    <dependency>
-      <groupId>org.mortbay.jetty</groupId>
-      <artifactId>cometd-bayeux</artifactId>
-      <version>6.2-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.mortbay.jetty</groupId>
-      <artifactId>jetty</artifactId>
-      <version>6.2-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
   </dependencies>
 </project>
