@@ -6,7 +6,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.exoplatform.ws.frameworks.cometd</groupId>
-  <artifactId>cometd</artifactId>
+  <artifactId>exo.ws.frameworks.cometd.webapp</artifactId>
   <version>trunk</version>
   <name>cometd-webapp</name>
   <packaging>war</packaging>

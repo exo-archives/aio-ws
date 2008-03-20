@@ -2,7 +2,7 @@
 
 <configuration>
  <component>
-    <type>org.exoplatform.services.cometd.ContinuationService</type>
+    <type>org.exoplatform.ws.frameworks.cometd.ContinuationService</type>
   </component>
 
  <component>
