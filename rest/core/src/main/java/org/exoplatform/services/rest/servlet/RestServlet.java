@@ -46,8 +46,10 @@ import org.exoplatform.services.rest.Response;
  * @version $Id: $
  */
 public class RestServlet extends HttpServlet implements Connector {
+  
+  private static final long serialVersionUID = 4074373310499651151L;
 
-  private static final Log LOGGER = ExoLogger.getLogger("RestServlet");
+  private static final Log LOGGER = ExoLogger.getLogger("ws.RestServlet");
 
   /*
    * (non-Javadoc)
