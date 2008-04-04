@@ -122,7 +122,7 @@ public class EXoContinuationBayeux extends ContinuationBayeux {
         reply.put(Bayeux.DATA_FIELD,data);
         if (id!=null)
             reply.put(Bayeux.ID_FIELD,id);
-        deliver(fromClient  ,toClient,onChannel,reply);
+        deliver(fromClient, toClient, onChannel, reply);
         ((MessageImpl)reply).decRef();
     }
 

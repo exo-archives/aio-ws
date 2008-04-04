@@ -40,6 +40,22 @@ public class ContinuationService {
         bayeux.sendMessage(eXoId, channel, data);
     }
 
+    /*    public boolean isSubscribe(String eXoId, String channel) {
+        throw new Exception();
+    }
+
+	public boolean isConnected(String eXoId) {
+		throw new Exception();
+	}
+	
+	public boolean sendMessageOnChannel(String channel, Object data) {
+		throw new Exception();
+	}
+	
+	public boolean sendMessageToGroup(String group, String channel, Object data) {
+		throw new Exception();
+		}*/
+
     public String getUserToken(String eXoId) {
         EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
         return bayeux.getUserToken(eXoId);
