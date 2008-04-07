@@ -126,6 +126,12 @@ public class MultivaluedMetadata {
   public Set<String> keys() {
     return data.keySet();
   }
+  
+  public boolean has(String key) {
+    if (data.get(key) != null)
+      return true;
+    return false;
+  }
 
   private String convertToString(List<String> list) {
     if (list.size() == 0) {
@@ -134,7 +140,8 @@ public class MultivaluedMetadata {
     StringBuffer sb = new StringBuffer();
     for (String t : list) {
       if (sb.length() > 0) {
-        sb.append(", ");
+        sb.append(',');
+        sb.append(' ');
       }
       sb.append(t);
     }

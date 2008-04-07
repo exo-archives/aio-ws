@@ -39,32 +39,36 @@ import org.exoplatform.services.rest.Response;
 
 /**
  * This servlet is front-end for the REST engine. Servlet get HTTP request then
- * produce REST request with helps by
- * org.exoplatform.services.rest.servlet.RequestFactory. <br/>
+ * produce REST request with helps by org.exoplatform.services.rest.servlet.RequestFactory. <br/>
  * @see org.exoplatform.services.rest.servlet.RequestFactory<br/>
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 public class RestServlet extends HttpServlet implements Connector {
-  
-  private static final long serialVersionUID = 4074373310499651151L;
 
-  private static final Log LOGGER = ExoLogger.getLogger("ws.RestServlet");
+  private static final long serialVersionUID = 2152962763071591181L;
+
+  private static final Log LOGGER = ExoLogger.getLogger("ws.rest.core.RestServlet");
 
   /*
    * (non-Javadoc)
    * @see javax.servlet.http.HttpServlet#service(javax.servlet.http.HttpServletRequest,
    *      javax.servlet.http.HttpServletResponse)
    */
+  @Override
   public void service(HttpServletRequest httpRequest,
       HttpServletResponse httpResponse) throws IOException, ServletException {
     // Current container must be set by filter.
     
     ExoContainer container = ExoContainerContext.getCurrentContainer();
-    LOGGER.debug("Current Container: " + container);
+    if (LOGGER.isDebugEnabled()) { 
+      LOGGER.debug("Current Container: " + container);
+    }
     ResourceDispatcher dispatcher = (ResourceDispatcher) container
         .getComponentInstanceOfType(ResourceDispatcher.class);
-    LOGGER.debug("ResourceDispatcher: " + dispatcher);
+    if (LOGGER.isDebugEnabled()) { 
+      LOGGER.debug("ResourceDispatcher: " + dispatcher);
+    }
     if (dispatcher == null) {
       throw new ServletException("ResourceDispatcher is null.");
     }
@@ -78,7 +82,7 @@ public class RestServlet extends HttpServlet implements Connector {
       out.flush();
       out.close();
     } catch (Exception e) {
-      LOGGER.error("dispatch method error!");
+      LOGGER.error("Dispatch method error!");
       e.printStackTrace();
       httpResponse.sendError(500, "This request can't be serve by service.\n"
           + "Check request parameters and try again.");
@@ -86,9 +90,9 @@ public class RestServlet extends HttpServlet implements Connector {
   }
 
   /**
-   * Tune HTTP response
-   * @param httpResponse HTTP response
-   * @param responseHeaders HTTP response headers
+   * Tune HTTP response.
+   * @param httpResponse HTTP response.
+   * @param responseHeaders HTTP response headers.
    */
   private void tuneResponse(HttpServletResponse httpResponse,
       MultivaluedMetadata responseHeaders) {

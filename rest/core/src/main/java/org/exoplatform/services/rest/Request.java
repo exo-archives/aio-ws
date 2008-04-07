@@ -34,13 +34,12 @@ public class Request {
   private InputStream entityDataStream;
 
   /**
-   * @param entityDataStream input data stream from http request (http methods
-   *            POST, PUT)
-   * @param resourceIdentifier
-   * @see org.exoplatform.services.rest.ResourceIdentifier
-   * @param methodName the HTTP method (GET, POST, DELETE, etc)
-   * @param httpHeaderParams the HTTP headers
-   * @param httpQueryParams the query parameters
+   * @param entityDataStream input data stream from HTTP request (HTTP methods
+   *            POST, PUT).
+   * @param resourceIdentifier @see org.exoplatform.services.rest.ResourceIdentifier.
+   * @param methodName the HTTP method (GET, POST, DELETE, etc).
+   * @param httpHeaderParams the HTTP headers.
+   * @param httpQueryParams the query parameters.
    */
   public Request(InputStream entityDataStream,
       ResourceIdentifier resourceIdentifier, String methodName,
@@ -54,7 +53,7 @@ public class Request {
 
   /**
    * Retrun entity body represented by InputStream.
-   * @return the entity data stream
+   * @return the entity data stream.
    */
   public InputStream getEntityStream() {
     return this.entityDataStream;
@@ -62,8 +61,8 @@ public class Request {
 
   /**
    * get ResourceIdentifier.
-   * @see org.exoplatform.services.rest.ResourceIdentifier
-   * @return the ResourceIdentifier
+   * @see org.exoplatform.services.rest.ResourceIdentifier.
+   * @return the ResourceIdentifier.
    */
   public ResourceIdentifier getResourceIdentifier() {
     return resourceIdentifier;
@@ -71,8 +70,8 @@ public class Request {
 
   /**
    * set ResourceIdentifier.
-   * @see org.exoplatform.services.rest.ResourceIdentifier
-   * @param resourceIdentifier the ResourceIdentifier
+   * @see org.exoplatform.services.rest.ResourceIdentifier.
+   * @param resourceIdentifier the ResourceIdentifier.
    */
   public void setResourceIdentifier(ResourceIdentifier resourceIdentifier) {
     this.resourceIdentifier = resourceIdentifier;
@@ -80,7 +79,7 @@ public class Request {
 
   /**
    * HTTP method name.
-   * @return the HTTP method name
+   * @return the HTTP method name.
    */
   public String getMethodName() {
     return methodName;
@@ -88,7 +87,7 @@ public class Request {
 
   /**
    * Return a map of key-values pair of header parameters.
-   * @see org.exoplatform.services.rest.MultivaluedMetadata
+   * @see org.exoplatform.services.rest.MultivaluedMetadata.
    * @return the all key-values pair of headers
    */
   public MultivaluedMetadata getHeaderParams() {
@@ -97,8 +96,8 @@ public class Request {
 
   /**
    * Return a map of key-values pair of query parameters.
-   * @see org.exoplatform.services.rest.MultivaluedMetadata
-   * @return the all key-values pair of query parameters
+   * @see org.exoplatform.services.rest.MultivaluedMetadata.
+   * @return the all key-values pair of query parameters.
    */
   public MultivaluedMetadata getQueryParams() {
     return this.queryParams;

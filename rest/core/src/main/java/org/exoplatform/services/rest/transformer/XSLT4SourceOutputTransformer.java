@@ -41,6 +41,10 @@ public class XSLT4SourceOutputTransformer extends OutputEntityTransformer {
     templatesService_ = templatesService;
   }
 
+  /* (non-Javadoc)
+   * @see org.exoplatform.services.rest.transformer.OutputEntityTransformer#writeTo(
+   * java.lang.Object, java.io.OutputStream)
+   */
   @Override
   public void writeTo(Object entity, OutputStream entityDataStream)
       throws IOException {

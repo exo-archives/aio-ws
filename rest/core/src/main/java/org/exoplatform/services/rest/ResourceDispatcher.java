@@ -52,11 +52,8 @@ public class ResourceDispatcher implements Connector {
   private ThreadLocal<Context> contextHolder_ = new ThreadLocal<Context>();
   private final Map<String, String> contextParams_ = new HashMap<String, String>();
           
-//  private ExoContainer container_;
   private EntityTransformerFactory factory_;
 
-//  private static final Log LOGGER = ExoLogger.getLogger("ResourceDispatcher");
-  
   /**
    * Constructor gets all binded ResourceContainers from ResourceBinder.
    * @param containerContext ExoContainerContext
@@ -88,10 +85,13 @@ public class ResourceDispatcher implements Connector {
   public Response dispatch(Request request) throws Exception {
     String requestedURI = request.getResourceIdentifier().getURI();
     String methodName = request.getMethodName();
-    String acceptedMimeTypes = (request.getHeaderParams().get("accept") != null)
-        ? request.getHeaderParams().get("accept")
-        : MimeTypes.ALL;
-    MimeTypes requestedMimeTypes = new MimeTypes(acceptedMimeTypes);
+
+    MimeTypes requestedMimeTypes;
+    if (request.getHeaderParams().has("accept"))
+      requestedMimeTypes = new MimeTypes(request.getHeaderParams().get("accept"));
+    else
+      requestedMimeTypes = new MimeTypes(MimeTypes.ALL);
+    
     ResourceDescriptor resource = null;
     for (ResourceDescriptor r : resourceDescriptors_) {
 
@@ -102,35 +102,38 @@ public class ResourceDispatcher implements Connector {
       // such URIPattern, HTTP method, QueryParamFilter and mimetype.
       if (r.getAcceptableMethod().equalsIgnoreCase(methodName)
           && r.getURIPattern().matches(requestedURI)
-          && (compareMimeTypes(requestedMimeTypes.getMimeTypes(), producedMimeTypes.getMimeTypes()))
-          && (isQueryParamsMatches(request.getQueryParams(), annotatedQueryParams))) {
+          && compareMimeTypes(requestedMimeTypes.getAsArray(), producedMimeTypes.getAsArray())
+          && isQueryParamsMatches(request.getQueryParams(), annotatedQueryParams)) {
         
         if (resource == null) {
-          // if no one resource found yet, remember this resource.
+          // If no one resource found yet, remember this resource.
           resource = r;
           continue;
         }
         if (r.getURIPattern().matches(resource.getURIPattern())) {
-          // if URITemplate of candidate resource matches to remembered one, it can't be used.
+          // If URITemplate of candidate resource matches to remembered one, it can't be used.
           // Example: URI /test1/test2/a/b/test3/test4/ and two templates 
           // 1. /test1/test2/{id1}/{id2}/test3/test4/
           // 2. test1/test2/{id1}/test3/test4/
           // Template 1 will be first in the list and it is matched to requested URI,
           // and template 2 also matched to URI (and has less parameters!), but
-          // template 2 matches to template 1, so it is more common. 
+          // template 2 matches to template 1, so template 1 is more common. 
           // It will not be used! 
           continue;
         }
-        if (r.getURIPattern().getTotalTokensLength() > resource.getURIPattern().getTotalTokensLength()) {
+        // More tokens then less parameters, new template is better. Change old one.
+        if (r.getURIPattern().getTotalTokensLength()
+            > resource.getURIPattern().getTotalTokensLength()) {
           resource = r;
-        }
+        } 
       }
     }
+
     if (resource != null) {
       ResourceIdentifier identifier = request.getResourceIdentifier();
       identifier.initParameters(resource.getURIPattern());
     
-      // set initialized context to thread local
+      // Set initialized context to thread local
       contextHolder_.set(new Context(contextParams_, identifier));
 
       Annotation[] methodParametersAnnotations = resource.getMethodParameterAnnotations();
@@ -172,8 +175,7 @@ public class ResourceDispatcher implements Connector {
           resource.getResourceContainer(), params);
       if (!response.isTransformerInitialized() && response.isEntityInitialized()) {
         response.setTransformer(getTransformer(resource, response.getTransformerParameters()));
-      }
-      else{
+      } else {
         OutputEntityTransformer transformer = response.getTransformer();
         if(transformer != null)
           transformer.addTransformerParameters(response.getTransformerParameters());
@@ -182,13 +184,14 @@ public class ResourceDispatcher implements Connector {
     }
     // if no one ResourceContainer found
     throw new NoSuchMethodException("No method found for " + methodName + " " +
-        requestedURI + " " + acceptedMimeTypes);
+        requestedURI);
   }
 
   /**
    * Get runtime context.
    * @return the runtimeContext.
-   * @deprecated Instead of directly use <code>Context</code> should be user <code>@ContextParam</code>.
+   * @deprecated Instead of directly use <code>Context</code> should be user
+   * <code>@ContextParam</code>.
    */
   @Deprecated
   public Context getRuntimeContext() {
@@ -343,6 +346,7 @@ public class ResourceDispatcher implements Connector {
     private void set(String key, String value) {
       params_.put(key, value);
     }
+    
   }
 
 }

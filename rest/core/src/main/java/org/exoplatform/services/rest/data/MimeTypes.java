@@ -16,6 +16,11 @@
  */
 package org.exoplatform.services.rest.data;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
@@ -23,44 +28,103 @@ package org.exoplatform.services.rest.data;
 public class MimeTypes {
 
   public static final String ALL = "*/*";
-  private String[] mimeTypes;
 
-  /**
-   * @param s the Content-Type HTTP header
-   */
-  public MimeTypes(String s) {
-    mimeTypes = HeaderUtils.parse(s);
+  private String[] mimeTypes_;
+  
+  private static final Pattern SPACE_PATTERN = Pattern.compile("(\\s+)");
+  
+  private static final QualityComparator COMPARATOR = new QualityComparator();
+  
+  private static class QualityComparator implements Comparator<String> {
+
+    /* (non-Javadoc)
+     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+     */
+    public int compare(String mimeType1, String mimeType2) {
+      float q1 = getQvalue(mimeType1);
+      float q2 = getQvalue(mimeType2);
+      if (q1 < q2)
+        return 1;
+      if (q1 > q2)
+        return -1;
+      return 0;
+    }
+    
+    private Float getQvalue(String s) {
+      float q = 1.0F;
+      int t = s.indexOf(';');
+      
+      if (t > 0) {
+        String qstring = s.substring(t + 1);
+        if (qstring.startsWith("q=")) {
+          q = Float.valueOf(qstring.substring(3));
+          if (q >= 0F && q <= 1.0F)
+            return q;
+          throw new IllegalArgumentException("Invalid quality value "
+              + q + ", must be between 0 and 1");
+        }
+      }
+      return q;
+    }
+
   }
 
+  /**
+   * @param mimeTypeHeader the Content-Type HTTP header.
+   */
+  public MimeTypes(String mimeTypeHeader) {
+    Matcher m = SPACE_PATTERN.matcher(mimeTypeHeader);
+    mimeTypeHeader = m.replaceAll("");
+    mimeTypes_ = mimeTypeHeader.split(",");
+    Arrays.sort(mimeTypes_, COMPARATOR);
+    for (int i = 0; i < mimeTypes_.length; i++) {
+      String t = mimeTypes_[i];
+      mimeTypes_[i] = removeQvalue(t);
+    }
+  }
+  
   /**
    * @return sorted array of mimetype.
-   * @see org.exoplatform.services.rest.data.HeaderUtils
+   * @see org.exoplatform.services.rest.data.HeaderUtils.
    */
-  public String[] getMimeTypes() {
-    return mimeTypes;
-  }
-
-  /**
-   * Get mimetype by index.
-   * @param i index of mimetype in array
-   * @return mimetype
-   */
-  public String getMimeType(int i) {
-    return mimeTypes[i];
+  public String[] getAsArray() {
+    return mimeTypes_;
   }
 
   /**
    * Check does array has requested mimetype.
-   * @param s requested mimetype
-   * @return result
+   * @param s requested mimetype.
+   * @return result.
    */
   public boolean hasMimeType(String s) {
-    for (String m : mimeTypes) {
+    for (String m : mimeTypes_) {
+      m = removeQvalue(m);
       if (m.equalsIgnoreCase(s)) {
         return true;
       }
     }
     return false;
+  }
+  
+  /*
+   * Remove q value from given string.
+   * Example text/xml;q=0.9 will be change to text/xml.
+   * @param m the source string.
+   * @return result string.
+   */
+  private static String removeQvalue(String m) {
+    int q = m.indexOf(";q=");
+    if (q > 0)
+      m = m.substring(0, q);
+    return m;
+  }
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return mimeTypes_.toString();
   }
 
 }

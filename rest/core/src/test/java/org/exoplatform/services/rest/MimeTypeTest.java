@@ -37,9 +37,14 @@ public class MimeTypeTest extends TestCase {
     assertTrue(mt.hasMimeType("image/gif"));
     assertTrue(mt.hasMimeType("image/png"));
     assertFalse(mt.hasMimeType("image/jpg"));
-    assertEquals("image/png", mt.getMimeType(0));
-    for (String t : mt.getMimeTypes())
-      System.out.print(t + ",");
+    int k = 0;
+    for (String s: mt.getAsArray()) {
+      if (k > 0)
+        System.out.print(',');
+      System.out.print(s);
+      k++;
+    }
+    System.out.println();
   }
 
 }

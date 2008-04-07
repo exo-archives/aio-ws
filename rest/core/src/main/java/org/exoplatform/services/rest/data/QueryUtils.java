@@ -22,7 +22,13 @@ import org.exoplatform.services.rest.MultivaluedMetadata;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class QueryUtils {
+public final class QueryUtils {
+  
+  /*
+   * Class has only static methods.
+   */
+  private QueryUtils() {
+  }
 
   public static MultivaluedMetadata parseQueryString(String queryString) {
     String[] p = queryString.split("&");

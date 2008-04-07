@@ -26,7 +26,7 @@ public class EntityMetadata {
 
   /**
    * Constructor for EntityMetadata.
-   * @param headers MultivaluedMetadata object with HTTP headers
+   * @param headers MultivaluedMetadata object with HTTP headers.
    */
   public EntityMetadata(MultivaluedMetadata headers) {
     this.metadata = headers;
@@ -36,7 +36,7 @@ public class EntityMetadata {
    * The Content-Location entity-header field MAY be used to supply the resource
    * location for the entity enclosed in the message when that entity is
    * accessible from a location separate from the requested resource's URI.
-   * @return Content-Location header
+   * @return Content-Location header.
    */
   public String getContentLocation() {
     return metadata.getFirst("Content-Location");
@@ -50,7 +50,7 @@ public class EntityMetadata {
    * the Content-Type header field. Content-Encoding is primarily used to allow
    * a document to be compressed without losing the identity of its underlying
    * media type.
-   * @return Content-Encoding header
+   * @return Content-Encoding header.
    */
   public String getEncodings() {
     return metadata.get("Content-Encoding");
@@ -60,7 +60,7 @@ public class EntityMetadata {
    * The Content-Language entity-header field describes the natural language(s)
    * of the intended audience for the enclosed entity. Note that this might not
    * be equivalent to all the languages used within the entity-body.
-   * @return Content-Language header
+   * @return Content-Language header.
    */
   public String getLanguages() {
     return metadata.get("Content-Language");
@@ -69,7 +69,7 @@ public class EntityMetadata {
   /**
    * The Last-Modified entity-header field indicates the date and time at which
    * the origin server believes the variant was last modified.
-   * @return Last-Modified header
+   * @return Last-Modified header.
    */
   public String getLastModified() {
     return metadata.getFirst("Last-Modified");
@@ -80,7 +80,7 @@ public class EntityMetadata {
    * entity-body, in decimal number of OCTETs, sent to the recipient or, in the
    * case of the HEAD method, the size of the entity-body that would have been
    * sent had the request been a GET.
-   * @return Content-Length leader
+   * @return Content-Length leader.
    */
   public int getLength() {
     if (metadata.getFirst("Content-Length") != null) {
@@ -93,7 +93,7 @@ public class EntityMetadata {
    * The Content-Type entity-header field indicates the media type of the
    * entity-body sent to the recipient or, in the case of the HEAD method, the
    * media type that would have been sent had the request been a GET.
-   * @return Content-Type header
+   * @return Content-Type header.
    */
   public String getMediaType() {
     return metadata.getFirst("Content-Type");
@@ -102,4 +102,5 @@ public class EntityMetadata {
   public String getCacheControl() {
     return metadata.getFirst("Cache-Control");
   }
+  
 }

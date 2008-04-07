@@ -44,7 +44,7 @@ public class ResourceIdentifier {
    * @param relURI the relative URI
    */
   public ResourceIdentifier(String baseURI, String relURI) {
-    this.uri = (relURI.endsWith("/")) ? relURI : (relURI + "/");
+    this.uri = (relURI.endsWith("/")) ? relURI : (relURI + '/');
     this.baseURI = baseURI;
   }
 
@@ -93,7 +93,7 @@ public class ResourceIdentifier {
   public Map<String, String> getParameters() throws IllegalStateException {
     if (parameters == null) {
       throw new IllegalStateException(
-          "Prarameters are not initialized. Call initParameters(pattern) first");
+          "Parameters are not initialized. Call initParameters(pattern) first");
     }
     return parameters;
   }

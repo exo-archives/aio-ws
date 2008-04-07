@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2003-2007 eXo Platform SAS.
  *
  * This program is free software; you can redistribute it and/or
@@ -15,12 +15,12 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 package org.exoplatform.services.rest.servlet;
+
 /**
  * Created by The eXo Platform SAS        .
  * @author <a href="mailto:gennady.azarenkov@exoplatform.com">Gennady Azarenkov</a>
  * @version $Id: WebConstants.java 5800 2006-05-28 18:03:31Z geaz $
  */
-
 public interface WebConstants {
   public static final String APP_CONTEXT = "org.exoplatform.frameworks.web.appContext";
   public static final String REPOSITORY_JNDI_NAME = "org.exoplatform.frameworks.web.repositoryJNDIName";

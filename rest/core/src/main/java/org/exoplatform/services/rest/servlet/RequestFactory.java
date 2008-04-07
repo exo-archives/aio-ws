@@ -23,12 +23,14 @@ import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.rest.MultivaluedMetadata;
 import org.exoplatform.services.rest.Request;
 import org.exoplatform.services.rest.ResourceIdentifier;
 
 /**
- * RequestFactory helps create REST request from HttpServletRequest
+ * RequestFactory helps create REST request from HttpServletRequest.
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
@@ -39,12 +41,14 @@ public class RequestFactory {
    */
   private RequestFactory() {
   }
+  
+  private static final Log LOGGER = ExoLogger.getLogger("ws.rest.core.RequestFactory");
 
   /**
    * Create REST request.
-   * @param httpRequest HTTP request
-   * @return REST request REST request
-   * @throws IOException Input/Output Exception
+   * @param httpRequest HTTP request.
+   * @return REST request REST request.
+   * @throws IOException Input/Output Exception.
    */
   public static Request createRequest(HttpServletRequest httpRequest)
       throws IOException {
@@ -54,13 +58,7 @@ public class RequestFactory {
     MultivaluedMetadata queryParams = parseQueryParams(httpRequest);
 
     InputStream in = httpRequest.getInputStream();
-    // // TODO Apply Entity resolving strategy here
-    // String contentType = httpRequest.getContentType();
-    // if(contentType == null)
-    // contentType = "application/octet-stream";
-    // //
-    String port = (httpRequest.getServerPort() == 80) ? "" : ":" +
-        httpRequest.getServerPort();
+    String port = (httpRequest.getServerPort() == 80) ? "" : ":" + httpRequest.getServerPort();
 
     String baseURI = httpRequest.getScheme() + "://" +
         httpRequest.getServerName() + port + httpRequest.getContextPath() +
@@ -73,40 +71,45 @@ public class RequestFactory {
 
   /**
    * Parse headers from http request.
-   * @param httpRequest HttpServletRequest
+   * @param httpRequest HttpServletRequest.
    * @return Map provide http header in structure Map &lt; String, Enumeration
-   *         &lt; String &gt; &gt;
+   *         &lt; String &gt; &gt;.
    */
   private static MultivaluedMetadata parseHttpHeaders(
       HttpServletRequest httpRequest) {
     MultivaluedMetadata headerParams = new MultivaluedMetadata();
-    Enumeration temp = httpRequest.getHeaderNames();
+    Enumeration<?> temp = httpRequest.getHeaderNames();
     while (temp.hasMoreElements()) {
       String k = (String) temp.nextElement();
-      Enumeration e = httpRequest.getHeaders(k);
+      Enumeration<?> e = httpRequest.getHeaders(k);
       while (e.hasMoreElements()) {
         headerParams.putSingle(k, (String) e.nextElement());
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug(k + " = " + headerParams.get(k));
+        }
       }
     }
     return headerParams;
   }
 
   /**
-   * Parse query parameters from http request
-   * @param httpRequest HttpServletRequest
+   * Parse query parameters from http request.
+   * @param httpRequest HttpServletRequest.
    * @return Map provide http query params in structure Map &gt; String,
-   *         String[] &gt;
+   *         String[] &gt;.
    */
   private static MultivaluedMetadata parseQueryParams(
       HttpServletRequest httpRequest) {
     MultivaluedMetadata queryParams = new MultivaluedMetadata();
-    Enumeration temp = httpRequest.getParameterNames();
+    Enumeration<?> temp = httpRequest.getParameterNames();
     while (temp.hasMoreElements()) {
       String k = (String) temp.nextElement();
       String[] params = httpRequest.getParameterValues(k);
       for (int i = 0; i < params.length; i++) {
         queryParams.putSingle(k, params[i]);
-//        System.out.println(k + " = " + params[i]);
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug(k + " = " + params[i]);
+        }
       }
     }
     return queryParams;

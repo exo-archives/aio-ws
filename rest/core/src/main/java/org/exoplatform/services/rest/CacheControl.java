@@ -423,7 +423,8 @@ public class CacheControl {
 
   private void appendString(StringBuffer buff, String s) {
     if (buff.length() > 0) {
-      buff.append(", ");
+      buff.append(',');
+      buff.append(' ');
     }
     buff.append(s);
   }
@@ -433,7 +434,7 @@ public class CacheControl {
     StringBuffer localBuff = new StringBuffer();
     localBuff.append(s);
     if (param != null && param.length() > 0) {
-      localBuff.append("=");
+      localBuff.append('=');
       localBuff.append(addQuotes(param));
     }
     appendString(buff, localBuff.toString());
@@ -444,19 +445,20 @@ public class CacheControl {
     appendString(buff, s);
     if (params.size() > 0) {
       StringBuffer localBuff = new StringBuffer();
-      buff.append("=\"");
+      buff.append('=');
+      buff.append('"');
       for (String t : params) {
         appendString(localBuff, t);
       }
       buff.append(localBuff.toString());
-      buff.append("\"");
+      buff.append('"');
     }
   }
 
   private String addQuotes(String s) {
     Matcher macther = SPACES_PATTERN.matcher(s);
     if (macther.find()) {
-      return "\"" + s + "\"";
+      return '"' + s + '"';
     }
     return s;
   }

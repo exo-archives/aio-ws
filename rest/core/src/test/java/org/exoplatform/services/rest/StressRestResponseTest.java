@@ -113,7 +113,7 @@ public class StressRestResponseTest extends TestCase {
         } catch (Exception e) {
           e.printStackTrace();
           dispose();
-          stop();
+//          stop();
           fail("!!! === >>> Cannot dispatch request !!!");
         }
         
@@ -126,7 +126,7 @@ public class StressRestResponseTest extends TestCase {
           
           e.printStackTrace();
           dispose();
-          stop();
+//          stop();
           
           fail("!!! === >> Comparision failure : Request: " + str+ " Response : "+response_str);
           

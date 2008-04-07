@@ -18,6 +18,8 @@
 package org.exoplatform.services.rest;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Iterator;
 import java.util.Set;
@@ -48,8 +50,31 @@ public class ResourceBinder implements Startable {
   private List<ResourceContainerResolvingStrategy> bindStrategies_;
   private ExoContainerContext containerContext_;
   private ExoContainer container_;
-  private static final Log LOGGER = ExoLogger.getLogger("ResourceBinder");
+  private static final Log LOGGER = ExoLogger.getLogger("ws.rest.core.ResourceBinder");
 
+  private static final ResourceDescriptorComparator comparator = new ResourceDescriptorComparator();
+  
+  /** 
+   * Comparator for sorting List of ResourceDescriptors. 
+   */
+  private static class ResourceDescriptorComparator implements Comparator<ResourceDescriptor> {
+
+    /* (non-Javadoc)
+     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+     */
+    public int compare(ResourceDescriptor resourceDescriptor1,
+        ResourceDescriptor resourceDescriptor2) {
+      int u1 = resourceDescriptor1.getURIPattern().getParamNames().size();
+      int u2 = resourceDescriptor2.getURIPattern().getParamNames().size();
+      if (u1 < u2)
+        return 1;
+      if (u1 > u2)
+        return -1;
+      return 0;
+    }
+    
+  }
+  
   /**
    * Constructor sets the resolving strategy. Currently
    * HTTPAnnotatedContainerResolvingStrategy (annotations used for description
@@ -104,7 +129,7 @@ public class ResourceBinder implements Startable {
       validate(resList);
       resourceDescriptors_.addAll(resList);
       LOGGER.info("Bind new ResourceContainer: " + resourceCont);
-      sortResourcesByURIParams(0, resourceDescriptors_.size() - 1);
+      Collections.sort(resourceDescriptors_, comparator);
     }
   }
 
@@ -114,14 +139,12 @@ public class ResourceBinder implements Startable {
    */
   final public void unbind(final ResourceContainer resourceCont) {
     int i = 0;
-    List<ResourceDescriptor> tmp = new ArrayList<ResourceDescriptor>(
-        resourceDescriptors_);
-    for (ResourceDescriptor resource : tmp) {
-      if (resource.getResourceContainer().equals(resourceCont)) {
+    List<ResourceDescriptor> temp = new ArrayList<ResourceDescriptor>(resourceDescriptors_);
+    for (ResourceDescriptor resource : temp) {
+      if (resource.getResourceContainer().equals(resourceCont))
         resourceDescriptors_.remove(i);
-      } else {
+      else
         i++;
-      }
     }
   }
 
@@ -144,8 +167,7 @@ public class ResourceBinder implements Startable {
    * with the same URIPatterns. And ALL ResourceContainers must have the
    * required annotation .
    * @param newDescriptors descriptors of ResourceContainer for binding.
-   * @throws InvalidResourceDescriptorException if ResourceContainer is not
-   *             valid.
+   * @throws InvalidResourceDescriptorException if ResourceContainer is not valid.
    */
   private void validate(final List<ResourceDescriptor> newDescriptors)
       throws InvalidResourceDescriptorException {
@@ -261,9 +283,8 @@ public class ResourceBinder implements Startable {
       // get list of query parameters value
       List<String> s = storedQueryPattern.getList(key);
       List<String> n = newQueryPattern.getList(key);
-      // If candidate has not one of query parameter continue check other
-      // parameter.
-      // It is not enough to stop checking.
+      // If candidate has no one of query parameter continue check other
+      // parameter. It is not enough to stop checking.
       if (n == null) {
         continue;
       }
@@ -272,46 +293,6 @@ public class ResourceBinder implements Startable {
       }
     }
     return true;
-  }
-
-  /**
-   * @param i0 - index of start element.
-   * @param k0 - index of end element.
-   */
-  private void sortResourcesByURIParams(int i0, int k0) {
-    int i = i0;
-    int k = k0;
-    if (k0 > i0) {
-      int middleElementParameterArrayLength = resourceDescriptors_.get(
-          (i0 + k0) / 2).getURIPattern().getParamNames().size();
-      while (i <= k) {
-        while ((i < k0) &&
-            (resourceDescriptors_.get(i).getURIPattern().getParamNames().size() > middleElementParameterArrayLength)) {
-          i++;
-        }
-        while ((k > i0) &&
-            (resourceDescriptors_.get(k).getURIPattern().getParamNames().size() < middleElementParameterArrayLength)) {
-          k--;
-        }
-        if (i <= k) {
-          swapResources(i, k);
-          i++;
-          k--;
-        }
-      }
-      if (i0 < k) {
-        sortResourcesByURIParams(i0, k);
-      }
-      if (i < k0) {
-        sortResourcesByURIParams(i, k0);
-      }
-    }
-  }
-
-  private void swapResources(int i, int k) {
-    ResourceDescriptor temp = resourceDescriptors_.get(i);
-    resourceDescriptors_.set(i, resourceDescriptors_.get(k));
-    resourceDescriptors_.set(k, temp);
   }
 
   /*

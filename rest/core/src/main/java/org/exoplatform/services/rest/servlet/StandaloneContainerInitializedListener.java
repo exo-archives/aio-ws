@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2003-2007 eXo Platform SAS.
+/**
+ * Copyright (C) 2003-2008 eXo Platform SAS.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
@@ -16,12 +16,6 @@
  */
 package org.exoplatform.services.rest.servlet;
 
-/**
- * Created by The eXo Platform SAS        .
- * @author <a href="mailto:gennady.azarenkov@exoplatform.com">Gennady Azarenkov</a>
- * @version $Id: WebConstants.java 5800 2006-05-28 18:03:31Z geaz $
- */
-
 import java.net.MalformedURLException;
 
 import javax.servlet.ServletContextEvent;
@@ -29,6 +23,11 @@ import javax.servlet.ServletContextListener;
 import org.exoplatform.container.StandaloneContainer;
 import org.exoplatform.services.naming.InitialContextInitializer;
 
+/**
+ * Created by The eXo Platform SAS        .
+ * @author <a href="mailto:gennady.azarenkov@exoplatform.com">Gennady Azarenkov</a>
+ * @version $Id: WebConstants.java 5800 2006-05-28 18:03:31Z geaz $
+ */
 public class StandaloneContainerInitializedListener implements ServletContextListener {
 
   private static final String CONF_URL_PARAMETER = "org.exoplatform.container.standalone.config";
@@ -36,8 +35,6 @@ public class StandaloneContainerInitializedListener implements ServletContextLis
   private StandaloneContainer container;
 
   public void contextDestroyed(ServletContextEvent event) {
-    // TODO Auto-generated method stub
-
   }
 
   public void contextInitialized(ServletContextEvent event) {

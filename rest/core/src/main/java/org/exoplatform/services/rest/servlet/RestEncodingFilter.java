@@ -32,21 +32,30 @@ import javax.servlet.ServletResponse;
  */
 public class RestEncodingFilter implements Filter {
 
-  private String requestEncodings;
+  private String requestEncodings_;
 
+  /* (non-Javadoc)
+   * @see javax.servlet.Filter#destroy()
+   */
   public void destroy() {
-
   }
 
+  /* (non-Javadoc)
+   * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
+   * javax.servlet.ServletResponse, javax.servlet.FilterChain)
+   */
   public void doFilter(ServletRequest req, ServletResponse resp, FilterChain filterChain)
       throws IOException, ServletException {
-    if (req.getCharacterEncoding() == null && requestEncodings != null)
-      req.setCharacterEncoding(requestEncodings);
+    if (req.getCharacterEncoding() == null && requestEncodings_ != null)
+      req.setCharacterEncoding(requestEncodings_);
     filterChain.doFilter(req, resp);
   }
 
+  /* (non-Javadoc)
+   * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
+   */
   public void init(FilterConfig config) throws ServletException {
-    requestEncodings = config.getInitParameter("REQUEST_ENCODING");
+    requestEncodings_ = config.getInitParameter("REQUEST_ENCODING");
   }
 
 }

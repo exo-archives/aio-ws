@@ -23,7 +23,9 @@ package org.exoplatform.services.rest.container;
  * @version $Id: $
  */
 
-public class InvalidResourceDescriptorException extends Exception {
+public final class InvalidResourceDescriptorException extends Exception {
+
+  private static final long serialVersionUID = -6361776433189551150L;
 
   public InvalidResourceDescriptorException() {
     super();

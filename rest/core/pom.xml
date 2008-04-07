@@ -62,6 +62,15 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/*StressRestResponseTest.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>org.jvnet.jaxb2.maven2</groupId>
         <artifactId>maven-jaxb2-plugin</artifactId>
         <version>0.1</version>
@@ -75,8 +84,7 @@
         <configuration>
           <schemaDirectory>src/test/resources</schemaDirectory>
           <generateDirectory>target/generated</generateDirectory>
-          <generatePackage>
-            org.exoplatform.services.rest.generated</generatePackage>
+          <generatePackage>org.exoplatform.services.rest.generated</generatePackage>
           <args>
             <arg>-extension</arg>
           </args>
@@ -98,13 +106,13 @@
                 <echo>copy files gnerated by JAXB to test source directory</echo>
                 <copy todir="src/test/java">
                   <fileset dir="target/generated">
-                    <include name="org/**"/>
+                    <include name="org/**" />
                   </fileset>
                 </copy>
                 <!-- echo>Building documentation</echo>
-                <javadoc destdir="target/javadoc"
-                packagenames="org.exoplatform.services.rest.*"
-                sourcepath="src/main/java"/ -->
+                  <javadoc destdir="target/javadoc"
+                  packagenames="org.exoplatform.services.rest.*"
+                  sourcepath="src/main/java"/ -->
               </tasks>
             </configuration>
           </execution>
