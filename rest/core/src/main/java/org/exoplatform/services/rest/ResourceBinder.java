@@ -52,7 +52,7 @@ public class ResourceBinder implements Startable {
   private ExoContainer container_;
   private static final Log LOGGER = ExoLogger.getLogger("ws.rest.core.ResourceBinder");
 
-  private static final ResourceDescriptorComparator comparator = new ResourceDescriptorComparator();
+  private static final ResourceDescriptorComparator COMPARATOR = new ResourceDescriptorComparator();
   
   /** 
    * Comparator for sorting List of ResourceDescriptors. 
@@ -129,7 +129,7 @@ public class ResourceBinder implements Startable {
       validate(resList);
       resourceDescriptors_.addAll(resList);
       LOGGER.info("Bind new ResourceContainer: " + resourceCont);
-      Collections.sort(resourceDescriptors_, comparator);
+      Collections.sort(resourceDescriptors_, COMPARATOR);
     }
   }
 
