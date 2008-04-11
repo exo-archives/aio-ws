@@ -147,6 +147,14 @@ public class Response {
     }
   }
 
+  /**                                                                                                                                 
+   * Get an entity transformer.
+   * @return transformer the transformer which can serialize entity                                                                                              
+   */
+  public OutputEntityTransformer getTransformer() {
+     return transformer_;
+  } 
+
   /**
    * REST Response builder.
    */
