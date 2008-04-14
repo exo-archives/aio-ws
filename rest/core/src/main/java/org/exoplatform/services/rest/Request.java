@@ -18,6 +18,8 @@
 package org.exoplatform.services.rest;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by The eXo Platform SAS.<br/> Request represents REST request (not
@@ -27,11 +29,35 @@ import java.io.InputStream;
  */
 public class Request {
 
-  private String methodName; // HTTP Method
-  private ResourceIdentifier resourceIdentifier;
-  private MultivaluedMetadata headerParams;
-  private MultivaluedMetadata queryParams;
-  private InputStream entityDataStream;
+  private String methodName_; // HTTP Method
+  private ResourceIdentifier resourceIdentifier_;
+  private MultivaluedMetadata headerParams_;
+  private MultivaluedMetadata queryParams_;
+  private InputStream entityDataStream_;
+  private Map<String, org.exoplatform.services.rest.Cookie> cookies_;
+
+  /**
+   * Constructor with cookie support.
+   * @param entityDataStream input data stream from HTTP request (HTTP methods
+   *            POST, PUT).
+   * @param resourceIdentifier @see org.exoplatform.services.rest.ResourceIdentifier.
+   * @param methodName the HTTP method (GET, POST, DELETE, etc).
+   * @param httpHeaderParams the HTTP headers.
+   * @param httpQueryParams the query parameters.
+   * @param cookies the cookies.
+   */
+  public Request(InputStream entityDataStream,
+      ResourceIdentifier resourceIdentifier, String methodName,
+      MultivaluedMetadata httpHeaderParams, MultivaluedMetadata httpQueryParams,
+      Map<String, org.exoplatform.services.rest.Cookie> cookies) {
+    
+    methodName_ = methodName;
+    resourceIdentifier_ = resourceIdentifier;
+    entityDataStream_ = entityDataStream;
+    queryParams_ = httpQueryParams;
+    headerParams_ = httpHeaderParams;
+    cookies_ = cookies;
+  }
 
   /**
    * @param entityDataStream input data stream from HTTP request (HTTP methods
@@ -44,11 +70,12 @@ public class Request {
   public Request(InputStream entityDataStream,
       ResourceIdentifier resourceIdentifier, String methodName,
       MultivaluedMetadata httpHeaderParams, MultivaluedMetadata httpQueryParams) {
-    this.methodName = methodName;
-    this.resourceIdentifier = resourceIdentifier;
-    this.entityDataStream = entityDataStream;
-    this.queryParams = httpQueryParams;
-    this.headerParams = httpHeaderParams;
+    
+    methodName_ = methodName;
+    resourceIdentifier_ = resourceIdentifier;
+    entityDataStream_ = entityDataStream;
+    queryParams_ = httpQueryParams;
+    headerParams_ = httpHeaderParams;
   }
 
   /**
@@ -56,7 +83,7 @@ public class Request {
    * @return the entity data stream.
    */
   public InputStream getEntityStream() {
-    return this.entityDataStream;
+    return entityDataStream_;
   }
 
   /**
@@ -65,7 +92,7 @@ public class Request {
    * @return the ResourceIdentifier.
    */
   public ResourceIdentifier getResourceIdentifier() {
-    return resourceIdentifier;
+    return resourceIdentifier_;
   }
 
   /**
@@ -74,7 +101,7 @@ public class Request {
    * @param resourceIdentifier the ResourceIdentifier.
    */
   public void setResourceIdentifier(ResourceIdentifier resourceIdentifier) {
-    this.resourceIdentifier = resourceIdentifier;
+    resourceIdentifier_ = resourceIdentifier;
   }
 
   /**
@@ -82,7 +109,7 @@ public class Request {
    * @return the HTTP method name.
    */
   public String getMethodName() {
-    return methodName;
+    return methodName_;
   }
 
   /**
@@ -91,7 +118,7 @@ public class Request {
    * @return the all key-values pair of headers
    */
   public MultivaluedMetadata getHeaderParams() {
-    return this.headerParams;
+    return headerParams_;
   }
 
   /**
@@ -100,7 +127,16 @@ public class Request {
    * @return the all key-values pair of query parameters.
    */
   public MultivaluedMetadata getQueryParams() {
-    return this.queryParams;
+    return queryParams_;
+  }
+  
+  /**
+   * @return the map of cookies, key is cookie name. 
+   */
+  public org.exoplatform.services.rest.Cookie getCookie(String name) {
+    if (cookies_ == null)
+      return null;
+    return cookies_.get(name.toLowerCase());
   }
 
 }

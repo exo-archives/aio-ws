@@ -49,7 +49,7 @@ import org.mortbay.jetty.servlet.ServletHolder;
  */
 public class StandaloneRestServer implements Startable {
 
-  private static final Log LOGGER = ExoLogger.getLogger("StandaloneRestServer");
+  private static final Log log = ExoLogger.getLogger("StandaloneRestServer");
   private static final String[] DUMMY_ROLES = new String[] { "user" };
   private static final String REALM = "exo-realm";
   private static final String CONFIG_FILTER_NAME_PREFIX = "filter-class";
@@ -82,44 +82,56 @@ public class StandaloneRestServer implements Startable {
       String pname = f.getName();
       if (pname.startsWith(CONFIG_FILTER_NAME_PREFIX)) {
         filters.add(f.getValue());
-        LOGGER.info("Filter: " + f.getValue());
+        log.info("Filter: " + f.getValue());
         String fmap = params.getProperty(CONFIG_FILTER_MAPPING_PREFIX +
             pname.substring(CONFIG_FILTER_NAME_PREFIX.length()));
         filterURIPatterns.add((fmap != null) ? fmap : "/*");
-        LOGGER.info("Filter mapping: " + fmap);
+        log.info("Filter mapping: " + fmap);
       }
     }
 
     port = (params.getProperty(CONFIG_SERVER_PORT) != null) ? Integer
         .valueOf(params.getProperty(CONFIG_SERVER_PORT)) : 8080;
-    LOGGER.debug("port: " + port);
+    if (log.isDebugEnabled()) {
+      log.debug("port: " + port);
+    }
 
     servletContextPath = params.getProperty(CONFIG_CONTEXT_PATH);
     if (servletContextPath == null) {
       throw new NullPointerException("ContextPath is null");
     }
-    LOGGER.debug("RestServlet ContextPath: " + servletContextPath);
+    if (log.isDebugEnabled()) {
+      log.debug("RestServlet ContextPath: " + servletContextPath);
+    }
 
     servletURIPattern = (params.getProperty(CONFIG_SERVLET_MAPPING) != null) ? params
         .getProperty(CONFIG_SERVLET_MAPPING)
         : "/*";
-    LOGGER.debug("RestServlet URI pattern: " + servletURIPattern);
+    if (log.isDebugEnabled()) {
+      log.debug("RestServlet URI pattern: " + servletURIPattern);
+    }
 
     authentication = (params.getProperty(CONFIG_AUTHENTICATION) != null) ? params
         .getProperty(CONFIG_AUTHENTICATION)
         : "BASIC";
-    LOGGER.debug("Authentication: " + authentication);
+    if (log.isDebugEnabled()) {
+      log.debug("Authentication: " + authentication);
+    }
 
     loginModuleName = (params.getProperty(CONFIG_LOGIN_MODULE_NAME) != null) ? params
         .getProperty(CONFIG_LOGIN_MODULE_NAME)
         : "exo-domain";
-    LOGGER.debug("Login module: " + loginModuleName);
+    if (log.isDebugEnabled()) {
+      log.debug("Login module: " + loginModuleName);
+    }
 
     securityConstraintURIPattern = (params
         .getProperty(CONFIG_SECURITY_CONSTRAINT_MAPPING) != null) ? params
         .getProperty(CONFIG_SECURITY_CONSTRAINT_MAPPING) : "/*";
-    LOGGER.debug("Security constraint URI pattern: " +
-        securityConstraintURIPattern);
+    if (log.isDebugEnabled()) {
+      log.debug("Security constraint URI pattern: " +
+          securityConstraintURIPattern);
+    }
   }
 
   /*
@@ -130,9 +142,9 @@ public class StandaloneRestServer implements Startable {
     server = createServer();
     try {
       server.start();
-      LOGGER.info("StandaloneRestServer started.");
+      log.info("StandaloneRestServer started.");
     } catch (Exception e) {
-      LOGGER.error("Start StandaloneRestServer failed!");
+      log.error("Start StandaloneRestServer failed!");
       e.printStackTrace();
     }
   }
@@ -144,9 +156,9 @@ public class StandaloneRestServer implements Startable {
   public void stop() {
     try {
       server.stop();
-      LOGGER.info("StandaloneRestServer stoped.");
+      log.info("StandaloneRestServer stoped.");
     } catch (Exception e) {
-      LOGGER.error("Stop StandaloneRestServer failed!");
+      log.error("Stop StandaloneRestServer failed!");
     }
   }
 

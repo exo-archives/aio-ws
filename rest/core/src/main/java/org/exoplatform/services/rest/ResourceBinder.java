@@ -50,7 +50,7 @@ public class ResourceBinder implements Startable {
   private List<ResourceContainerResolvingStrategy> bindStrategies_;
   private ExoContainerContext containerContext_;
   private ExoContainer container_;
-  private static final Log LOGGER = ExoLogger.getLogger("ws.rest.core.ResourceBinder");
+  private static final Log log = ExoLogger.getLogger("ws.rest.core.ResourceBinder");
 
   private static final ResourceDescriptorComparator COMPARATOR = new ResourceDescriptorComparator();
   
@@ -128,7 +128,7 @@ public class ResourceBinder implements Startable {
       List<ResourceDescriptor> resList = strategy.resolve(resourceCont);
       validate(resList);
       resourceDescriptors_.addAll(resList);
-      LOGGER.info("Bind new ResourceContainer: " + resourceCont);
+      log.info("Bind new ResourceContainer: " + resourceCont);
       Collections.sort(resourceDescriptors_, COMPARATOR);
     }
   }
@@ -204,28 +204,52 @@ public class ResourceBinder implements Startable {
       }
 
       Method method = newDescriptor.getServer();
-      Class<?>[] requestedParams = method.getParameterTypes();
-      Annotation[][] paramAnno = method.getParameterAnnotations();
+      
+      Class<? extends ResourceContainer> newContainer =
+        newDescriptor.getResourceContainer().getClass();
+
+      Class<?> [] requestedParams = newDescriptor.getMethodParameters();
+      
+      Annotation[] paramAnno = newDescriptor.getMethodParameterAnnotations(); 
+      
       boolean hasRequestEntity = false;
       // check method parameters
       for (int i = 0; i < paramAnno.length; i++) {
-        if (paramAnno[i].length == 0) {
+        if (paramAnno[i] == null) {
+
+          /* We have at least one not annotated object.
+           * Check is input transformer specified.  
+           */
           if (method.getAnnotation(InputTransformer.class) == null &&
-              newDescriptor.getResourceContainer().getClass().getAnnotation(
-                  InputTransformer.class) == null) {
+              newContainer.getAnnotation(InputTransformer.class) == null) {
             throw new InvalidResourceDescriptorException(
                 "One not annotated object found, but transformer in method : \n" +
                     method.toGenericString() +
                     "\nInputTransformer annotation is not specified. This is not allowed!");
+            
           }
+          
           if (!hasRequestEntity) {
             hasRequestEntity = true;
           } else {
+            // We already found one not annotated object. This is entity.
             throw new InvalidResourceDescriptorException(
                 "Only one not annotated object with must represent HTTP Request.\n" +
                     "In method : " + method.toGenericString());
           }
+          
         } else {
+          /* If parameter annotated, then it SHOULD be String or MUST has
+           * constructor with String as parameter or it MUST be a
+           * org.exoplatform.services.rest.Cookie object.
+           * The other types is NOT allowed.
+           */
+          if (AnnotationUtils.Anno.COOKIE_PARAM == AnnotationUtils.getType(
+              paramAnno[i].annotationType())) {
+            if (requestedParams[i].isAssignableFrom(Cookie.class))
+              continue;
+          }
+          //   
           try {
             requestedParams[i].getConstructor(String.class);
           } catch(NoSuchMethodException e) {
@@ -275,16 +299,18 @@ public class ResourceBinder implements Startable {
     if (!storedKeys.containsAll(newKeys) && !newKeys.containsAll(storedKeys)) {
       return false;
     }
-    // Get iterator from stored keys, it is already binded,
-    // so it will be user like pattern for candidate for binding.
+    /* Get iterator from stored keys, it is already binded,
+     * so it will be user like pattern for candidate for binding.
+     */
     Iterator<String> iterator = storedKeys.iterator();
     while (iterator.hasNext()) {
       String key = iterator.next();
       // get list of query parameters value
       List<String> s = storedQueryPattern.getList(key);
       List<String> n = newQueryPattern.getList(key);
-      // If candidate has no one of query parameter continue check other
-      // parameter. It is not enough to stop checking.
+      /* If candidate has no one of query parameter continue check other
+       * parameter. It is not enough to stop checking.
+       */
       if (n == null) {
         continue;
       }
@@ -307,7 +333,7 @@ public class ResourceBinder implements Startable {
       try {
         bind(c);
       } catch (InvalidResourceDescriptorException irde) {
-        LOGGER.error("Can't add ResourceContainer Component: " +
+        log.error("Can't add ResourceContainer Component: " +
             c.getClass().getName() + ".\nException : " + irde);
       }
     }

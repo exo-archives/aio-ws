@@ -20,6 +20,7 @@ package org.exoplatform.services.rest;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -35,28 +36,29 @@ import org.exoplatform.services.rest.transformer.StringOutputTransformer;
  */
 public class Response {
   private int status_;
-  private EntityMetadata metadata_;
   private Object entity_;
+  private EntityMetadata metadata_;
+  private MultivaluedMetadata responseHeaders_;
+  private List<Cookie> cookies_;
   private OutputEntityTransformer transformer_;
   private Map<String, String> transformerParameters_;
-  private MultivaluedMetadata responseHeaders_;
 
   /**
    * @param status the HTTP status.
    * @param responseHeaders the HTTP headers.
    * @param entity the representation requested object.
-   * @param transformer the entity seriallizator.
+   * @param transformer the entity serializator.
    */
   protected Response(int status, MultivaluedMetadata responseHeaders,
-      Object entity, OutputEntityTransformer transformer,
+      Object entity, List<Cookie> cookies, OutputEntityTransformer transformer,
       Map<String, String> transformerParameters) {
     status_ = status;
+    responseHeaders_ = responseHeaders;
     entity_ = entity;
+    cookies_ = cookies;
     transformer_ = transformer;
     transformerParameters_ = transformerParameters;
-    responseHeaders_ = responseHeaders;
     metadata_ = new EntityMetadata(responseHeaders);
-
   }
 
   /**
@@ -82,6 +84,13 @@ public class Response {
   public Object getEntity() {
     return entity_;
   }
+  
+  /**
+   * @return the cookies that will be added to response. 
+   */
+  public List<Cookie> getCookies() {
+    return cookies_;
+  }
 
   /**
    * EntityMetadata gives possibility to view some response headers by use
@@ -102,10 +111,11 @@ public class Response {
    * @return the state of OutputEntityTransformer.
    */
   public boolean isTransformerInitialized() {
-    if (transformer_ != null) {
-      return true;
-    }
-    return false;
+    return transformer_ != null;
+//    if (transformer_ != null) {
+//      return true;
+//    }
+//    return false;
   }
 
   /**
@@ -113,10 +123,11 @@ public class Response {
    * @return the entity state.
    */
   public boolean isEntityInitialized() {
-    if (entity_ != null) {
-      return true;
-    }
-    return false;
+    return entity_ != null;
+//    if (entity_ != null) {
+//      return true;
+//    }
+//    return false;
   }
   
   /**
@@ -142,7 +153,8 @@ public class Response {
    * @throws IOException Input/Output Exception.
    */
   public void writeEntity(OutputStream outputEntityStream) throws IOException {
-    if (transformer_ != null) {
+//    if (transformer_ != null) {
+    if (isTransformerInitialized()) {
       transformer_.writeTo(entity_, outputEntityStream);
     }
   }
@@ -160,9 +172,10 @@ public class Response {
    */
   public static class Builder {
 
-    int status = -1;
+    int status;
     Object entity;
     MultivaluedMetadata responseHeaders = new MultivaluedMetadata();
+    List<Cookie> cookies;
     OutputEntityTransformer transformer;
     Map<String, String> transformerParameters;
 
@@ -182,7 +195,8 @@ public class Response {
      * @return the REST Response.
      */
     public Response build() {
-      return new Response(status, responseHeaders, entity, transformer, transformerParameters);
+      return new Response(status, responseHeaders, entity, cookies,
+          transformer, transformerParameters);
     }
 
     /**
@@ -529,11 +543,24 @@ public class Response {
       this.responseHeaders.putSingle("Cache-Control", c.getAsString());
       return this;
     }
+    
+    /**
+     * Add new cookies.
+     * @param cookies the new cookies that will be added to response.
+     * @return the Builder instance.
+     */
+    public Builder cookies(Cookie... cookies) {
+      if (this.cookies == null)
+        this.cookies = new ArrayList<Cookie>(cookies.length);
+      for (Cookie c : cookies)
+        this.cookies.add(c);
+      return this;
+    }
 
     /**
      * Prepared error response and set transformer.
      * @param message - error message.
-     * @return the new instance of Builder with entity represented by String and
+     * @return the instance of Builder with entity represented by String and
      *         StringOutputTransformer.
      */
     public Builder errorMessage(String message) {
@@ -541,7 +568,7 @@ public class Response {
       this.transformer = new StringOutputTransformer();
       return this;
     }
-
+    
   }
 
 }

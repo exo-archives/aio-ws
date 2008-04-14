@@ -98,8 +98,9 @@ public class ResourceDispatcher implements Connector {
       MimeTypes producedMimeTypes = new MimeTypes(r.getProducedMimeTypes());
       MultivaluedMetadata annotatedQueryParams = r.getQueryPattern();
 
-      // Check is this ResourceContainer have appropriated parameters,
-      // such URIPattern, HTTP method, QueryParamFilter and mimetype.
+      /* Check is this ResourceContainer have appropriated parameters,
+       * such URIPattern, HTTP method, QueryParamFilter and mimetype.
+       */
       if (r.getAcceptableMethod().equalsIgnoreCase(methodName)
           && r.getURIPattern().matches(requestedURI)
           && compareMimeTypes(requestedMimeTypes.getAsArray(), producedMimeTypes.getAsArray())
@@ -111,14 +112,15 @@ public class ResourceDispatcher implements Connector {
           continue;
         }
         if (r.getURIPattern().matches(resource.getURIPattern())) {
-          // If URITemplate of candidate resource matches to remembered one, it can't be used.
-          // Example: URI /test1/test2/a/b/test3/test4/ and two templates 
-          // 1. /test1/test2/{id1}/{id2}/test3/test4/
-          // 2. test1/test2/{id1}/test3/test4/
-          // Template 1 will be first in the list and it is matched to requested URI,
-          // and template 2 also matched to URI (and has less parameters!), but
-          // template 2 matches to template 1, so template 1 is more common. 
-          // It will not be used! 
+          /* If URITemplate of candidate resource matches to remembered one, it can't be used.
+           * Example: URI /test1/test2/a/b/test3/test4/ and two templates 
+           * 1. /test1/test2/{id1}/{id2}/test3/test4/
+           * 2. test1/test2/{id1}/test3/test4/
+           * Template 1 will be first in the list and it is matched to requested URI,
+           * and template 2 also matched to URI (and has less parameters!), but
+           * template 2 matches to template 1, so template 1 is more common. 
+           * It will not be used!
+           */ 
           continue;
         }
         // More tokens then less parameters, new template is better. Change old one.
@@ -147,27 +149,48 @@ public class ResourceDispatcher implements Connector {
           transformer.setType(methodParameters[i]);
           params[i] = transformer.readFrom(request.getEntityStream());
         } else {
-          Constructor<?> constructor = methodParameters[i].getConstructor(String.class);
+          
           String constructorParam = null;
           Annotation a = methodParametersAnnotations[i];
-          if (a.annotationType().isAssignableFrom(URIParam.class)) {
-            URIParam u = (URIParam) a;
-            constructorParam = request.getResourceIdentifier().getParameters().get(u.value());
-          } else if (a.annotationType().isAssignableFrom(HeaderParam.class)) {
-            HeaderParam h = (HeaderParam) a;
-            constructorParam = request.getHeaderParams().get(h.value());
-          } else if (a.annotationType().isAssignableFrom(QueryParam.class)) {
-            QueryParam q = (QueryParam) a;
-            constructorParam = request.getQueryParams().get(q.value());
-          } else if (a.annotationType().isAssignableFrom(ContextParam.class)) {
-            ContextParam c = (ContextParam) a;
-            constructorParam = contextHolder_.get().get(c.value());
+          switch (AnnotationUtils.getType(a.annotationType())) {
+            case URI_PARAM:
+              URIParam u = (URIParam) a;
+              constructorParam = request.getResourceIdentifier().getParameters().get(u.value());
+              break;
+            case HEADER_PARAM:
+              HeaderParam h = (HeaderParam) a;
+              constructorParam = request.getHeaderParams().get(h.value());
+              break;
+            case QUERY_PARAM:
+              QueryParam q = (QueryParam) a;
+              constructorParam = request.getQueryParams().get(q.value());
+              break;
+            case CONTEXT_PARAM:
+              ContextParam c = (ContextParam) a;
+              constructorParam = contextHolder_.get().get(c.value());
+              break;
+            case COOKIE_PARAM:
+              CookieParam k = (CookieParam) a;
+              /* Not check the type of parameter, it MUST be Cookie.
+               * It was checked at binding time.
+               */
+              params[i] = request.getCookie(k.value());
+              // Go to the next iteration.
+              continue;
+            default:
+              /* Unknown annotation's type.
+               * Must not be here. If annotation is unknown must be NullPointerException
+               * at the start of switch. 
+               */
+              break;
           }
           if (methodParameters[i].isAssignableFrom(String.class)) {
             params[i] = constructorParam;
           } else {
-            params[i] = (constructorParam != null) ? constructor.newInstance(constructorParam)
-                : null;
+            // Constructor MUST presents, it was checked on binding time.
+            Constructor<?> constructor = methodParameters[i].getConstructor(String.class);
+            params[i] = (constructorParam != null)
+                ? constructor.newInstance(constructorParam) : null;
           }
         }
       }

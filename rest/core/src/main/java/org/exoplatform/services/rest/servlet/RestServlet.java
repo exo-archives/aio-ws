@@ -20,6 +20,7 @@ package org.exoplatform.services.rest.servlet;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.HashMap;
 
@@ -48,7 +49,7 @@ public class RestServlet extends HttpServlet implements Connector {
 
   private static final long serialVersionUID = 2152962763071591181L;
 
-  private static final Log LOGGER = ExoLogger.getLogger("ws.rest.core.RestServlet");
+  private static final Log log = ExoLogger.getLogger("ws.rest.core.RestServlet");
 
   /*
    * (non-Javadoc)
@@ -61,13 +62,13 @@ public class RestServlet extends HttpServlet implements Connector {
     // Current container must be set by filter.
     
     ExoContainer container = ExoContainerContext.getCurrentContainer();
-    if (LOGGER.isDebugEnabled()) { 
-      LOGGER.debug("Current Container: " + container);
+    if (log.isDebugEnabled()) { 
+      log.debug("Current Container: " + container);
     }
     ResourceDispatcher dispatcher = (ResourceDispatcher) container
         .getComponentInstanceOfType(ResourceDispatcher.class);
-    if (LOGGER.isDebugEnabled()) { 
-      LOGGER.debug("ResourceDispatcher: " + dispatcher);
+    if (log.isDebugEnabled()) { 
+      log.debug("ResourceDispatcher: " + dispatcher);
     }
     if (dispatcher == null) {
       throw new ServletException("ResourceDispatcher is null.");
@@ -76,13 +77,13 @@ public class RestServlet extends HttpServlet implements Connector {
       Response response = dispatcher.dispatch(RequestFactory
           .createRequest(httpRequest));
       httpResponse.setStatus(response.getStatus());
-      tuneResponse(httpResponse, response.getResponseHeaders());
+      tuneResponse(httpResponse, response.getResponseHeaders(), response.getCookies());
       OutputStream out = httpResponse.getOutputStream();
       response.writeEntity(out);
       out.flush();
       out.close();
     } catch (Exception e) {
-      LOGGER.error("Dispatch method error!");
+      log.error("Dispatch method error!");
       e.printStackTrace();
       httpResponse.sendError(500, "This request can't be serve by service.\n"
           + "Check request parameters and try again.");
@@ -93,9 +94,11 @@ public class RestServlet extends HttpServlet implements Connector {
    * Tune HTTP response.
    * @param httpResponse HTTP response.
    * @param responseHeaders HTTP response headers.
+   * @param cookies
    */
   private void tuneResponse(HttpServletResponse httpResponse,
-      MultivaluedMetadata responseHeaders) {
+      MultivaluedMetadata responseHeaders,
+      List<org.exoplatform.services.rest.Cookie> cookies) {
     if (responseHeaders != null) {
       HashMap<String, String> headers = responseHeaders.getAll();
       Set<String> keys = headers.keySet();
@@ -103,6 +106,20 @@ public class RestServlet extends HttpServlet implements Connector {
       while (ikeys.hasNext()) {
         String key = ikeys.next();
         httpResponse.setHeader(key, headers.get(key));
+      }
+    }
+    if (cookies != null && cookies.size() > 0) {
+      for (org.exoplatform.services.rest.Cookie c : cookies) {
+        javax.servlet.http.Cookie sc = new javax.servlet.http.Cookie(c.getName(), c.getValue());
+        sc.setMaxAge(c.getMaxAge());
+        sc.setVersion(c.getVersion());
+        if (c.getComment() != null)
+          sc.setComment(c.getComment());
+        if (c.getDomain() != null)
+          sc.setDomain(c.getDomain());
+        if (c.getPath() != null)
+          sc.setPath(c.getPath());
+        httpResponse.addCookie(sc);
       }
     }
   }
