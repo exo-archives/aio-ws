@@ -132,6 +132,8 @@ public class RequestFactory {
       if (log.isDebugEnabled()) {
         log.debug("Cookie found in request: " + c);
       }
+      /* Cookie name to lower case, it must be case insensitive.
+       */
       cookies.put(cookie.getName().toLowerCase(), cookie);
     }
     return cookies;
