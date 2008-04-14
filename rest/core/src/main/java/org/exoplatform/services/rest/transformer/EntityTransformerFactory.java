@@ -19,6 +19,8 @@ package org.exoplatform.services.rest.transformer;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import org.exoplatform.container.ExoContainer;
@@ -32,6 +34,27 @@ import org.exoplatform.container.ExoContainerContext;
 public class EntityTransformerFactory {
 
   private ExoContainer container_;
+  
+  private static final ConstructorsComparator COMPARATOR = new ConstructorsComparator(); 
+  
+  private static class ConstructorsComparator
+      implements Comparator<Constructor<? extends GenericEntityTransformer>> {
+
+    /* (non-Javadoc)
+     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+     */
+    public int compare(Constructor<? extends GenericEntityTransformer> constructor1,
+        Constructor<? extends GenericEntityTransformer> constructor2) {
+      int c1 = constructor1.getParameterTypes().length;
+      int c2 = constructor2.getParameterTypes().length;
+      if (c1 < c2)
+        return 1;
+      if (c1 > c2)
+        return -1;
+      return 0;
+    }
+    
+  }
   
   /**
    * Create a new instance of GenericEntityTransformer.<br/>
@@ -50,10 +73,15 @@ public class EntityTransformerFactory {
    */
   public final GenericEntityTransformer newTransformer(
       Class<? extends GenericEntityTransformer> transformerType) throws Exception {
-    Constructor<? extends GenericEntityTransformer>[] constructors = (Constructor<? extends GenericEntityTransformer>[])transformerType.getConstructors();
-    // Sort constructors by number of parameters.
-    // With more parameters must be first.
-    sortConstructorsByParamsLength(constructors, 0, constructors.length - 1);
+
+    Constructor<? extends GenericEntityTransformer>[] constructors =
+      (Constructor<? extends GenericEntityTransformer>[])transformerType.getConstructors();
+
+    /* Sort constructors by number of parameters.
+     * With more parameters must be first.
+     */
+    Arrays.sort(constructors, COMPARATOR);
+//    sortConstructorsByParamsLength(constructors, 0, constructors.length - 1);
       
     l:for (Constructor<? extends GenericEntityTransformer> c : constructors) {
       Class<?>[] parameterTypes = c.getParameterTypes();
@@ -72,45 +100,45 @@ public class EntityTransformerFactory {
     return null;
   }
 
-  /**
-   * @param i0 - index of start element.
-   * @param k0 - index of end element.
-   */
-  private void sortConstructorsByParamsLength(
-      Constructor<? extends GenericEntityTransformer>[] constructors, int i0, int k0) {
-    int i = i0;
-    int k = k0;
-    if (k0 > i0) {
-      int middleElementParameterArrayLength = constructors[(i0 + k0) / 2].getParameterTypes().length;
-      while (i <= k) {
-        while ((i < k0) &&
-            (constructors[i].getParameterTypes().length > middleElementParameterArrayLength)) {
-          i++;
-        }
-        while ((k > i0) &&
-            (constructors[k].getParameterTypes().length < middleElementParameterArrayLength)) {
-          k--;
-        }
-        if (i <= k) {
-          swapResources(constructors, i, k);
-          i++;
-          k--;
-        }
-      }
-      if (i0 < k) {
-        sortConstructorsByParamsLength(constructors, i0, k);
-      }
-      if (i < k0) {
-        sortConstructorsByParamsLength(constructors, i, k0);
-      }
-    }
-  }
-
-  private void swapResources(Constructor<? extends GenericEntityTransformer>[] constructors,
-      int i, int k) {
-    Constructor<? extends GenericEntityTransformer> temp = constructors[i];
-    constructors[i] = constructors[k];
-    constructors[k] = temp;
-  }
+//  /**
+//   * @param i0 - index of start element.
+//   * @param k0 - index of end element.
+//   */
+//  private void sortConstructorsByParamsLength(
+//      Constructor<? extends GenericEntityTransformer>[] constructors, int i0, int k0) {
+//    int i = i0;
+//    int k = k0;
+//    if (k0 > i0) {
+//      int middleElementParameterArrayLength = constructors[(i0 + k0) / 2].getParameterTypes().length;
+//      while (i <= k) {
+//        while ((i < k0) &&
+//            (constructors[i].getParameterTypes().length > middleElementParameterArrayLength)) {
+//          i++;
+//        }
+//        while ((k > i0) &&
+//            (constructors[k].getParameterTypes().length < middleElementParameterArrayLength)) {
+//          k--;
+//        }
+//        if (i <= k) {
+//          swapResources(constructors, i, k);
+//          i++;
+//          k--;
+//        }
+//      }
+//      if (i0 < k) {
+//        sortConstructorsByParamsLength(constructors, i0, k);
+//      }
+//      if (i < k0) {
+//        sortConstructorsByParamsLength(constructors, i, k0);
+//      }
+//    }
+//  }
+//
+//  private void swapResources(Constructor<? extends GenericEntityTransformer>[] constructors,
+//      int i, int k) {
+//    Constructor<? extends GenericEntityTransformer> temp = constructors[i];
+//    constructors[i] = constructors[k];
+//    constructors[k] = temp;
+//  }
 
 }
