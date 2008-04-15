@@ -28,7 +28,6 @@ import org.exoplatform.services.rest.transformer.StringOutputTransformer;
  */
 public class ResponseBuilderTest extends TestCase {
 
-  private final static String TEST_NAME = ">>>ResponseBuilderTest: ";
   StringOutputTransformer transformer = new StringOutputTransformer();
 
   public void testError() {
@@ -46,12 +45,11 @@ public class ResponseBuilderTest extends TestCase {
     Response response = Response.Builder.ok().build();
     assertEquals(HTTPStatus.OK, response.getStatus());
 
-    String entity = "oktest\n";
+    String entity = "oktest";
     response = Response.Builder.ok(entity).transformer(transformer).build();
     assertEquals(HTTPStatus.OK, response.getStatus());
-    assertEquals("oktest\n", response.getEntity());
-    System.out.print("\n" + TEST_NAME);
-    response.writeEntity(System.out);
+    assertEquals("oktest", response.getEntity());
+    assertNotNull(response.getTransformer());
 
     response = Response.Builder.ok(entity, "text/plain").build();
     assertEquals("text/plain", response.getEntityMetadata().getMediaType());
@@ -65,10 +63,9 @@ public class ResponseBuilderTest extends TestCase {
 
     response = Response.Builder.created(location, location).transformer(
         transformer).build();
+    assertNotNull(response.getTransformer());
     assertEquals(location, response.getResponseHeaders().getFirst("Location"));
     assertEquals(location, response.getEntity());
-    System.out.print("\n" + TEST_NAME);
-    response.writeEntity(System.out);
   }
 
   public void testCustom() throws Exception {
@@ -79,10 +76,10 @@ public class ResponseBuilderTest extends TestCase {
     response = Response.Builder.withStatus(st).entity(entity, "text/plain")
         .transformer(transformer).build();
 
+    assertNotNull(response.getTransformer());
+    assertEquals(st, response.getStatus());
     assertEquals("customtest", response.getEntity());
     assertEquals("text/plain", response.getEntityMetadata().getMediaType());
-    System.out.print("\n" + TEST_NAME);
-    response.writeEntity(System.out);
   }
 
 }

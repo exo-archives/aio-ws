@@ -23,7 +23,7 @@ import org.exoplatform.container.StandaloneContainer;
 import org.exoplatform.services.rest.container.InvalidResourceDescriptorException;
 import org.exoplatform.services.rest.container.ResourceContainerMimeTypes;
 import org.exoplatform.services.rest.container.ResourceContainerQueryTemplate;
-import org.exoplatform.services.rest.container.ResourceContainerQueryTemplate2;
+import org.exoplatform.services.rest.container.ResourceContainerQueryTemplate;
 import org.exoplatform.services.rest.container.ResourceContainerQueryTemplateFail;
 import org.exoplatform.services.rest.container.ResourceContainer_2;
 import org.exoplatform.services.rest.container.ResourceContainer_3;
@@ -40,14 +40,11 @@ public class ResourceBinderTest extends TestCase {
   private StandaloneContainer container;
   private ResourceBinder binder;
 
-// private ResourceDispatcher dispatcher;
-
   public void setUp() throws Exception {
     StandaloneContainer
         .setConfigurationPath("src/test/java/conf/standalone/test-configuration.xml");
     container = StandaloneContainer.getInstance();
-    binder = (ResourceBinder) container
-        .getComponentInstanceOfType(ResourceBinder.class);
+    binder = (ResourceBinder) container.getComponentInstanceOfType(ResourceBinder.class);
     binder.clear();
   }
 
@@ -87,7 +84,6 @@ public class ResourceBinderTest extends TestCase {
     int i = 5;
     for (ResourceDescriptor rd : list) {
       assertEquals(i, rd.getURIPattern().getParamNames().size());
-      System.out.println(rd.getURIPattern().getString());
       i--;
     }
     binder.unbind(resourceContainer);
@@ -97,11 +93,12 @@ public class ResourceBinderTest extends TestCase {
   public void testBindResourceContainerWithQueryTemplate() throws Exception {
     List<ResourceDescriptor> list = binder.getAllDescriptors();
     ResourceContainerQueryTemplate resourceContainer = new ResourceContainerQueryTemplate();
-    ResourceContainerQueryTemplate2 resourceContainer2 = new ResourceContainerQueryTemplate2();
+    ResourceContainerQueryTemplate resourceContainer2 = new ResourceContainerQueryTemplate();
     binder.bind(resourceContainer2);
     binder.bind(resourceContainer);
     assertEquals(3, list.size());
-    ResourceContainerQueryTemplateFail containerQueryTemplateFail = new ResourceContainerQueryTemplateFail();
+    ResourceContainerQueryTemplateFail containerQueryTemplateFail =
+      new ResourceContainerQueryTemplateFail();
     try {
       binder.bind(containerQueryTemplateFail);
       fail("Binding for this component shoud be failed!");

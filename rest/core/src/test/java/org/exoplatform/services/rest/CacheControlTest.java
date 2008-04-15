@@ -43,38 +43,33 @@ public class CacheControlTest extends TestCase {
     assertTrue(cacheControl.isNoTransform());
     assertFalse(cacheControl.isMustRevalidate());
     assertFalse(cacheControl.isProxyRevalidate());
-    System.out.println(">>>CacheControlTest, default settings: " +
-        cacheControl.getAsString());
+    assertEquals("public, no-transform", cacheControl.getAsString());
   }
 
   public void testPrivate() {
     cacheControl.setPublicCacheable(false);
     cacheControl.setPrivateCacheable(true);
     cacheControl.setNoTransform(false);
-    System.out.println(">>>CacheControlTest, private (no parameters): " +
-        cacheControl.getAsString());
+    assertEquals("private", cacheControl.getAsString());
     List<String> params = new ArrayList<String>();
     params.add("param1");
     params.add("param2");
     params.add("param3");
     cacheControl.setPrivateCacheable(true, params);
-    System.out.println(">>>CacheControlTest, private (with parameters): " +
-        cacheControl.getAsString());
+    assertEquals("private=\"param1, param2, param3\"", cacheControl.getAsString());
   }
 
   public void testNoCache() {
     cacheControl.setPublicCacheable(false);
     cacheControl.setNoCache(true);
     cacheControl.setNoTransform(false);
-    System.out.println(">>>CacheControlTest, no-cache (no parameters): " +
-        cacheControl.getAsString());
+    assertEquals("no-cache", cacheControl.getAsString());
     List<String> params = new ArrayList<String>();
     params.add("param1");
     params.add("param2");
     params.add("param3");
     cacheControl.setNoCache(true, params);
-    System.out.println(">>>CacheControlTest, no-cache (with parameters): " +
-        cacheControl.getAsString());
+    assertEquals("no-cache=\"param1, param2, param3\"", cacheControl.getAsString());
   }
 
   public void testNoCachePrivate() {
@@ -84,9 +79,9 @@ public class CacheControlTest extends TestCase {
     params.add("param3");
     cacheControl.setPrivateCacheable(true, params);
     cacheControl.setNoCache(true, params);
-    System.out
-        .println(">>>CacheControlTest, no-cache and private (with parameters): " +
-            cacheControl.getAsString());
+    assertEquals("public, private=\"param1, param2, param3\", "
+    		+ "no-cache=\"param1, param2, param3\", "
+    		+ "no-transform", cacheControl.getAsString());
   }
 
   public void testOther() {
@@ -94,7 +89,7 @@ public class CacheControlTest extends TestCase {
     cacheControl.setSMaxAge(100);
     cacheControl.setMustRevalidate(true);
     cacheControl.setProxyRevalidate(true);
-    System.out.println(">>>CacheControlTest, test other: " +
+    assertEquals("public, no-transform, must-revalidate, proxy-revalidate, 10, 100",
         cacheControl.getAsString());
   }
 
@@ -104,8 +99,8 @@ public class CacheControlTest extends TestCase {
     map.put("extension2", "value2");
     map.put("extension3", "value 3");
     cacheControl.setCacheExtension(map);
-    System.out.println(">>>CacheControlTest, cache extensions: " +
-        cacheControl.getAsString());
+    assertEquals("public, no-transform, extension3=\"value 3\", extension1=value1, "
+        + "extension2=value2", cacheControl.getAsString());
   }
 
 }

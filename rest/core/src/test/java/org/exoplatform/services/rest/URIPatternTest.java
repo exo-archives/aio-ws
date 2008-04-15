@@ -27,6 +27,7 @@ import junit.framework.TestCase;
  * @version $Id: $
  */
 public class URIPatternTest extends TestCase {
+  
   public void testParametrizedURIPattern0() throws Exception {
     // no parameters
     URIPattern pattern = new URIPattern("/level1/level2/");

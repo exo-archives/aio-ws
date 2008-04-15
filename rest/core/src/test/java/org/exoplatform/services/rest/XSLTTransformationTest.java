@@ -34,6 +34,10 @@ public class XSLTTransformationTest extends TestCase {
   private ResourceBinder binder_;
   private ResourceDispatcher dispatcher_;
   
+  /* (non-Javadoc)
+   * @see junit.framework.TestCase#setUp()
+   */
+  @Override
   public void setUp() throws Exception {
     StandaloneContainer.setConfigurationPath("src/test/java/conf/standalone/test-configuration.xml");
     container_ = StandaloneContainer.getInstance();
