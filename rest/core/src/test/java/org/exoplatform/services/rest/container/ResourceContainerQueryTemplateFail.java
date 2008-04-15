@@ -43,8 +43,6 @@ public class ResourceContainerQueryTemplateFail implements ResourceContainer {
   public Response method1(@QueryParam("method")
   String method, @QueryParam("param1")
   String param1) {
-    System.out.println(".. method=" + method);
-    System.out.println(".. param1=" + param1);
     return Response.Builder.ok("method1", "text/plain").build();
   }
 

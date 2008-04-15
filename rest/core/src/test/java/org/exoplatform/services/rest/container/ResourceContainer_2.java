@@ -53,7 +53,6 @@ public class ResourceContainer_2 implements ResourceContainer {
   }
 
   @HTTPMethod("DELETE")
-  @URITemplate("/delete resource/")
   public Response delMethod(@URIParam("myid") String param) {
     Response resp = Response.Builder.noContent().build();
     return resp;

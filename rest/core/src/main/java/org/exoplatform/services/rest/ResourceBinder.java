@@ -70,6 +70,28 @@ public class ResourceBinder implements Startable {
         return 1;
       if (u1 > u2)
         return -1;
+      // For greed behavior QueryTemplate mechanism.
+      int q1 = resourceDescriptor1.getQueryPattern().getAll().size();
+      int q2 = resourceDescriptor2.getQueryPattern().getAll().size();
+      if (q1 < q2)
+        return 1;
+      if (q1 > q2)
+        return -1;
+      //
+      /* Few query parameters can have the same name, for us this means 
+       * we can get parameters as list: key=value1, value2,... .
+       * We don't care about this when sorting, we are waiting for next:
+       * key=value. 
+       * 
+       * EXPLANATION.
+       * 1. param1=1, 2 and param2=3
+       * 2. param1=1    and param2=2, 3  
+       * What resource must be first ? 
+       * So if request has parameters: param1=1, 2 and param2=2, 3
+       * we can't guaranty which resource will be first in the list
+       * and can't guaranty which resource will be called.  
+       */
+      
       return 0;
     }
     
@@ -131,6 +153,11 @@ public class ResourceBinder implements Startable {
       log.info("Bind new ResourceContainer: " + resourceCont);
       Collections.sort(resourceDescriptors_, COMPARATOR);
     }
+//    int i = 1;
+//    for (ResourceDescriptor r : resourceDescriptors_) {
+//      log.info(i++ + ". " + r.getURIPattern().getString() + " : "
+//          + r.getQueryPattern().getAll());
+//    }
   }
 
   /**
@@ -289,14 +316,73 @@ public class ResourceBinder implements Startable {
    * @param newQueryPattern the candidate QueryParameters.
    * @return true if QeuryPattern matches, false otherwise.
    */
+//  private boolean isQueryPatternMatches(MultivaluedMetadata storedQueryPattern,
+//      MultivaluedMetadata newQueryPattern) {
+//    Set<String> storedKeys = storedQueryPattern.keys();
+//    Set<String> newKeys = newQueryPattern.keys();
+//    if (newKeys.size() == 0 || storedKeys.size() == 0) {
+//      return true;
+//    }
+//    if (!storedKeys.containsAll(newKeys) && !newKeys.containsAll(storedKeys)) {
+//      return false;
+//    }
+//    /* Get iterator from stored keys, it is already binded,
+//     * so it will be user like pattern for candidate for binding.
+//     */
+//    Iterator<String> iterator = storedKeys.iterator();
+//    while (iterator.hasNext()) {
+//      String key = iterator.next();
+//      // get list of query parameters value
+//      List<String> s = storedQueryPattern.getList(key);
+//      List<String> n = newQueryPattern.getList(key);
+//      /* If candidate has no one of query parameter continue check other
+//       * parameter. It is not enough to stop checking.
+//       */
+//      if (n == null) {
+//        continue;
+//      }
+//      if (!s.containsAll(n) || !n.containsAll(s)) {
+//        return false;
+//      }
+//    }
+//    return true;
+//  } 
+
+  /*
+   * For greed behavior QueryTemplate mechanism.
+   */
+  /**
+   * If two Resources has the same URIPattern then they must be sorted by
+   * QueryPatter, Resource which has more query parameters in the pattern should 
+   * be firsts. And binding other components with the same URITemplate, HTTPMethod
+   * and the same QueryTemplate should be filed. Not allowed to have two resources
+   * with the same URI, HTTP method and QueryPattern. If first set of query
+   * parameters name does not consist <b>all</b> query parameters name from
+   * second set <b>or</b> second one does consist <b>all</b> query parameters
+   * name from the first one then return false. <br/> Otherwise query parameters
+   * value must be checked. <br/> This example explain that: <br/> <code>
+   * First query string :  param1=param1&param2=param2.
+   * Second query string : param1=param1&param2=param2&param3=param3.
+   * First set of query parameters name  : param1, param2.
+   * Second set of query parameters name : param1, param2, param3.
+   * First set does not consist all keys from second one.
+   * Then value of query parameters must not be checked.
+   * If Resources has the same URITemplate second Resource in example will be
+   * higher in the list. ResourceDispatcher will get it first. 
+   * </code>
+   * @param storedQueryPattern the binded QueryParameters (QueryTemplate in this
+   *            case).
+   * @param newQueryPattern the candidate QueryParameters.
+   * @return true if QeuryPattern matches, false otherwise.
+   */
   private boolean isQueryPatternMatches(MultivaluedMetadata storedQueryPattern,
       MultivaluedMetadata newQueryPattern) {
     Set<String> storedKeys = storedQueryPattern.keys();
     Set<String> newKeys = newQueryPattern.keys();
-    if (newKeys.size() == 0 || storedKeys.size() == 0) {
-      return true;
+    if (newKeys.size() != storedKeys.size()) {
+      return false;
     }
-    if (!storedKeys.containsAll(newKeys) && !newKeys.containsAll(storedKeys)) {
+    if (!storedKeys.containsAll(newKeys) || !newKeys.containsAll(storedKeys)) {
       return false;
     }
     /* Get iterator from stored keys, it is already binded,
@@ -308,11 +394,11 @@ public class ResourceBinder implements Startable {
       // get list of query parameters value
       List<String> s = storedQueryPattern.getList(key);
       List<String> n = newQueryPattern.getList(key);
-      /* If candidate has no one of query parameter continue check other
-       * parameter. It is not enough to stop checking.
+      /* If candidate has no one of query parameter
+       * then stop checking. Template are not matched.
        */
       if (n == null) {
-        continue;
+        return false;
       }
       if (!s.containsAll(n) || !n.containsAll(s)) {
         return false;

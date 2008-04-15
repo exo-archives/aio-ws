@@ -34,6 +34,21 @@ public class ResourceContainerQueryTemplate implements ResourceContainer {
 
   @HTTPMethod("GET")
   @URITemplate("/test/qeuryfilter/")
+  @QueryTemplate("method=method1&param1=param1&param2=param2")
+  @OutputTransformer(StringOutputTransformer.class)
+  public Response method2(@QueryParam("method") String method,
+      @QueryParam("param1") String param1,
+      @QueryParam("param2") String param2) {
+    
+    StringBuffer sb = new StringBuffer();
+    sb.append("method=").append(method)
+      .append(", param1=").append(param1)
+      .append(", param2=").append(param2);
+    return Response.Builder.ok(sb.toString(), "text/plain").build();
+  }
+
+  @HTTPMethod("GET")
+  @URITemplate("/test/qeuryfilter/")
   @QueryTemplate("method=method2&param3=param3&param2=param2&param1=param1")
   @OutputTransformer(StringOutputTransformer.class)
   public Response method3(@QueryParam("method") String method,
@@ -48,21 +63,6 @@ public class ResourceContainerQueryTemplate implements ResourceContainer {
       .append(", param2=").append(param2)
       .append(", param3=").append(param3)
       .append(", param4=").append(param4);
-    return Response.Builder.ok(sb.toString(), "text/plain").build();
-  }
-
-  @HTTPMethod("GET")
-  @URITemplate("/test/qeuryfilter/")
-  @QueryTemplate("method=method1&param1=param1&param2=param2")
-  @OutputTransformer(StringOutputTransformer.class)
-  public Response method2(@QueryParam("method") String method,
-      @QueryParam("param1") String param1,
-      @QueryParam("param2") String param2) {
-    
-    StringBuffer sb = new StringBuffer();
-    sb.append("method=").append(method)
-      .append(", param1=").append(param1)
-      .append(", param2=").append(param2);
     return Response.Builder.ok(sb.toString(), "text/plain").build();
   }
 

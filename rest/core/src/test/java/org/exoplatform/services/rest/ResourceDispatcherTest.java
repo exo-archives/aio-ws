@@ -27,9 +27,11 @@ import org.exoplatform.services.rest.container.InvalidResourceDescriptorExceptio
 import org.exoplatform.services.rest.container.ResourceContainerConflict;
 import org.exoplatform.services.rest.container.ResourceContainerConflict2;
 import org.exoplatform.services.rest.container.ResourceContainerContextParameter;
+import org.exoplatform.services.rest.container.ResourceContainerGreedQueryTemplate;
 import org.exoplatform.services.rest.container.ResourceContainerJAXB;
 import org.exoplatform.services.rest.container.ResourceContainerMimeTypes;
 import org.exoplatform.services.rest.container.ResourceContainerQueryTemplate;
+import org.exoplatform.services.rest.container.ResourceContainerQueryTemplateFail;
 import org.exoplatform.services.rest.container.ResourceContainerSimpleSerializableEntity;
 import org.exoplatform.services.rest.container.ResourceContainer_2;
 import org.exoplatform.services.rest.container.ResourceContainer_3;
@@ -389,6 +391,51 @@ public class ResourceDispatcherTest extends TestCase {
     assertEquals(p, dispatcher.dispatch(request).getEntity());
     binder.unbind(resourceContainer);
     assertEquals(0, list.size());
+  } 
+  
+  public void testGreedQueryTemplate() throws Exception {
+    assertNotNull(dispatcher);
+    assertNotNull(binder);
+
+    ResourceContainerGreedQueryTemplate resourceContainer =
+      new ResourceContainerGreedQueryTemplate();
+    
+    binder.bind(resourceContainer);
+    assertEquals(6, binder.getAllDescriptors().size());
+    binder.bind(new ResourceContainerQueryTemplateFail());
+    
+    MultivaluedMetadata h = new MultivaluedMetadata();
+    MultivaluedMetadata q = new MultivaluedMetadata();
+
+    Request request = new Request(null, new ResourceIdentifier(
+    "/test/greed_query/"), "GET", h, q);
+
+    Response resp = dispatcher.dispatch(request);
+    assertEquals("method0", resp.getEntity());
+    
+    q.putSingle("param1", "param1");
+
+    resp = dispatcher.dispatch(request);
+    assertEquals("method1", resp.getEntity());
+
+    q.putSingle("param2", "test2");
+    q.putSingle("param2", "param2");
+    q.putSingle("test1", "test1");
+    resp = dispatcher.dispatch(request);
+    assertEquals("method2", resp.getEntity());
+
+    q.putSingle("param3", "param3");
+    resp = dispatcher.dispatch(request);
+    assertEquals("method3", resp.getEntity());
+    
+    q.putSingle("param4", "param4");
+    resp = dispatcher.dispatch(request);
+    assertEquals("method4", resp.getEntity());
+
+    q.putSingle("param5", "param5");
+    resp = dispatcher.dispatch(request);
+    assertEquals("method5", resp.getEntity());
+
   }
 
   public void testContextParam() throws Exception {
