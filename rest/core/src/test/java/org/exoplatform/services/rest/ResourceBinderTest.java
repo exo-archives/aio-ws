@@ -92,10 +92,8 @@ public class ResourceBinderTest extends TestCase {
   public void testBindResourceContainerWithQueryTemplate() throws Exception {
     List<ResourceDescriptor> list = binder.getAllDescriptors();
     ResourceContainerQueryTemplate resourceContainer = new ResourceContainerQueryTemplate();
-    ResourceContainerQueryTemplate resourceContainer2 = new ResourceContainerQueryTemplate();
-    binder.bind(resourceContainer2);
     binder.bind(resourceContainer);
-    assertEquals(3, list.size());
+    assertEquals(2, list.size());
     ResourceContainerQueryTemplateFail containerQueryTemplateFail =
       new ResourceContainerQueryTemplateFail();
     try {
@@ -105,7 +103,6 @@ public class ResourceBinderTest extends TestCase {
       ;
     }
     binder.unbind(resourceContainer);
-    binder.unbind(resourceContainer2);
     assertEquals(0, list.size());
   }
 
