@@ -402,7 +402,6 @@ public class ResourceDispatcherTest extends TestCase {
     
     binder.bind(resourceContainer);
     assertEquals(6, binder.getAllDescriptors().size());
-    binder.bind(new ResourceContainerQueryTemplateFail());
     
     MultivaluedMetadata h = new MultivaluedMetadata();
     MultivaluedMetadata q = new MultivaluedMetadata();
