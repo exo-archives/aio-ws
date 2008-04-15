@@ -30,7 +30,6 @@ import org.exoplatform.services.rest.container.ResourceContainerContextParameter
 import org.exoplatform.services.rest.container.ResourceContainerJAXB;
 import org.exoplatform.services.rest.container.ResourceContainerMimeTypes;
 import org.exoplatform.services.rest.container.ResourceContainerQueryTemplate;
-import org.exoplatform.services.rest.container.ResourceContainerQueryTemplate;
 import org.exoplatform.services.rest.container.ResourceContainerSimpleSerializableEntity;
 import org.exoplatform.services.rest.container.ResourceContainer_2;
 import org.exoplatform.services.rest.container.ResourceContainer_3;

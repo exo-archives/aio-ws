@@ -23,7 +23,6 @@ import org.exoplatform.container.StandaloneContainer;
 import org.exoplatform.services.rest.container.InvalidResourceDescriptorException;
 import org.exoplatform.services.rest.container.ResourceContainerMimeTypes;
 import org.exoplatform.services.rest.container.ResourceContainerQueryTemplate;
-import org.exoplatform.services.rest.container.ResourceContainerQueryTemplate;
 import org.exoplatform.services.rest.container.ResourceContainerQueryTemplateFail;
 import org.exoplatform.services.rest.container.ResourceContainer_2;
 import org.exoplatform.services.rest.container.ResourceContainer_3;

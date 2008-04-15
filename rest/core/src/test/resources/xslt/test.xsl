@@ -24,8 +24,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink">
   </xsl:template>
   
   <xsl:template match="sv:node">
-    <a>
-      <xsl:attribute name="href">
+    <a><xsl:attribute name="href">
         <xsl:value-of select="./@xlink:href"/>
       </xsl:attribute>
       <xsl:value-of select="./@sv:name"/>

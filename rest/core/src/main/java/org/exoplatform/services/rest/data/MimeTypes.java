@@ -124,7 +124,13 @@ public class MimeTypes {
    */
   @Override
   public String toString() {
-    return mimeTypes_.toString();
+    StringBuffer sb = new StringBuffer();
+    for (String m : mimeTypes_) {
+      if (sb.length() > 0)
+        sb.append(',').append(' ');
+      sb.append(m);
+    }
+    return sb.toString();
   }
 
 }
