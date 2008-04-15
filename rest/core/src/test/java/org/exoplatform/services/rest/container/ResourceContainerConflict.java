@@ -34,7 +34,6 @@ public class ResourceContainerConflict implements ResourceContainer {
   @URITemplate("/test/test1/{id1}/{id2}/test/test2/")
   @OutputTransformer(StringOutputTransformer.class)
   public Response method1() {
-    System.out.println(">>> method1");
     return Response.Builder.ok("method1").build();
   }
 
@@ -42,7 +41,6 @@ public class ResourceContainerConflict implements ResourceContainer {
   @URITemplate("/test/test1/{id1}/test2/")
   @OutputTransformer(StringOutputTransformer.class)
   public Response method2() {
-    System.out.println(">>> method2");
     return Response.Builder.ok("method2").build();
   }
 
@@ -50,7 +48,6 @@ public class ResourceContainerConflict implements ResourceContainer {
   @URITemplate("/test1/{id1}/{id2}/{id3}/")
   @OutputTransformer(StringOutputTransformer.class)
   public Response method3() {
-    System.out.println(">>> method3");
     return Response.Builder.ok("method3").build();
   }
 
@@ -58,7 +55,6 @@ public class ResourceContainerConflict implements ResourceContainer {
   @URITemplate("/{id}/{id1}/{id2}/{id3}/")
   @OutputTransformer(StringOutputTransformer.class)
   public Response method4() {
-    System.out.println(">>> method4");
     return Response.Builder.ok("method4").build();
   }
   
@@ -66,7 +62,6 @@ public class ResourceContainerConflict implements ResourceContainer {
   @URITemplate("/test1/")
   @OutputTransformer(StringOutputTransformer.class)
   public Response method5() {
-    System.out.println(">>> method5");
     return Response.Builder.ok("method5").build();
   }
 
@@ -74,7 +69,6 @@ public class ResourceContainerConflict implements ResourceContainer {
   @URITemplate("/test/{id1}/{id2}/{id3}/")
   @OutputTransformer(StringOutputTransformer.class)
   public Response method6() {
-    System.out.println(">>> method6");
     return Response.Builder.ok("method6").build();
   }
   
@@ -82,7 +76,6 @@ public class ResourceContainerConflict implements ResourceContainer {
   @URITemplate("/test/{id1}/{id2}/")
   @OutputTransformer(StringOutputTransformer.class)
   public Response method7() {
-    System.out.println(">>> method7");
     return Response.Builder.ok("method7").build();
   }
 

@@ -41,16 +41,18 @@ public class ResourceContainerJAXB implements ResourceContainer {
   @OutputTransformer(JAXBOutputTransformer.class)
   public Response method1(Book book) throws Exception {
 
-    System.out.println(">>> JAXBTransformation");
-    System.out.println("==Book Card==");
-    System.out.println("===> tittle: " + book.getTitle());
-    System.out.println("===> author: " + book.getAuthor());
-    System.out.println("===> currency price: " + book.getPrice().getCurrency());
-    System.out.println("===> currency member price: " +
+    System.out.println("---------------------------------------------");
+    System.out.println("|                  Book Card                |");
+    System.out.println("---------------------------------------------");
+    System.out.println("\tTittle: " + book.getTitle());
+    System.out.println("\tAuthor: " + book.getAuthor());
+    System.out.println("\tCurrency price: " + book.getPrice().getCurrency());
+    System.out.println("\tCurrency member price: " +
         book.getMemberPrice().getCurrency());
-    System.out.println("===> price: " + book.getPrice().getValue());
-    System.out
-        .println("===> member price: " + book.getMemberPrice().getValue());
+    System.out.println("\tPrice: " + book.getPrice().getValue());
+    System.out.println("\tMember price: " + book.getMemberPrice().getValue());
+    System.out.println("---------------------------------------------");
+    
     book.setTitle("Red Hat Enterprise Linux 5 Administration Unleashed");
     book.setAuthor("Tammy Fox");
     book.setSendByPost(false);

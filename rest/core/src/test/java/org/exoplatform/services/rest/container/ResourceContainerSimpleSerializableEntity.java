@@ -38,10 +38,10 @@ public class ResourceContainerSimpleSerializableEntity implements
   @InputTransformer(DeserializableTransformer.class)
   @OutputTransformer(SerializableTransformer.class)
   public Response method1(SimpleDeserializableEntity de) {
-    System.out.println("\n>>> serializable entity: " + de.data);
-    de.data = ">>> this is response data";
+    StringBuffer sb = new StringBuffer();
+    sb.append(de.data);
     SimpleSerializableEntity se = new SimpleSerializableEntity();
-    se.data = "<<< this request data\n";
+    se.data = sb.reverse().toString();
     return Response.Builder.ok(se).build();
   }
 }

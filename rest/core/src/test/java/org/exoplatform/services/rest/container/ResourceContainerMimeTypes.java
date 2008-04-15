@@ -45,14 +45,11 @@ public class ResourceContainerMimeTypes implements ResourceContainer {
   @ProducedMimeTypes("text/*")
   @InputTransformer(StringInputTransformer.class)
   @OutputTransformer(StringOutputTransformer.class)
-  public Response method1(String str, @URIParam("id")
-  String param, @HeaderParam("tESt")
-  String test) {
-    System.out.println(">>> method1 called: id = " + param);
-    System.out.println(">>> request entity - type: " +
-        str.getClass().toString() + "; value: " + str);
-    System.out.println(">>> header test: " + test);
-    String e = ">>> this is response entity\n";
+  public Response method1(String str,
+      @URIParam("id") String param,
+      @HeaderParam("tESt") String test) {
+
+    String e = "uriparam=" + param + ", entity=" + str + ", header=" + test;
     Response resp = Response.Builder.ok(e, "text/plain").build();
     return resp;
   }
@@ -66,15 +63,13 @@ public class ResourceContainerMimeTypes implements ResourceContainer {
   String param, @HeaderParam("tESt")
   String test) throws Exception {
 
-    System.out.println("<<< method1 called: id = " + param);
-    System.out.println("<<< request entity - type: " +
-        str.getClass().toString() + "; value: " + str);
-    System.out.println("<<< header test: " + test);
     Document document = DocumentBuilderFactory.newInstance()
         .newDocumentBuilder().newDocument();
 
     Element element = document.createElement("test");
-    document.appendChild(element);
+    Element data = document.createElement("data");
+    data.setTextContent("uriparam=" + param + ", entity=" + str + ", header=" + test);
+    document.appendChild(element).appendChild(data);
     Response resp = Response.Builder.ok(document, "text/xml").build();
     return resp;
   }

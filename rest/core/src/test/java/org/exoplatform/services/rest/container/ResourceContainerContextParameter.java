@@ -40,11 +40,12 @@ public class ResourceContainerContextParameter implements ResourceContainer {
   String relURI, @ContextParam(ResourceDispatcher.CONTEXT_PARAM_BASE_URI)
   String baseURI, @ContextParam(ResourceDispatcher.CONTEXT_PARAM_HOST)
   String host) {
-    System.out.println(">>> " + host);
-    System.out.println(">>> " + baseURI);
-    System.out.println(">>> " + relURI);
-    System.out.println(">>> " + test);
-    return Response.Builder.ok(baseURI, "text/plain").build();
+    StringBuffer sb = new StringBuffer();
+    sb.append("host=").append(host)
+      .append(", baseURI=").append(baseURI)
+      .append(", relURI=").append(relURI)
+      .append(", test=").append(test);
+    return Response.Builder.ok(sb.toString(), "text/plain").build();
   }
 
 }
