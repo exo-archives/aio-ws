@@ -119,7 +119,7 @@ public class JsonParserImpl implements JsonParser {
       case '[':
         readArray();
         break;
-      case ',': // nothing to do just must not be default
+      case ',': // nothing to do just must not be default is switch
         break;
       default:
         back(c);
