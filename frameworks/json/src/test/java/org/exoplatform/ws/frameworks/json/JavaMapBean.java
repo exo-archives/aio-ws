@@ -20,6 +20,7 @@ package org.exoplatform.ws.frameworks.json;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,6 +34,16 @@ public class JavaMapBean {
   private HashMap<String, Book> hashMap_items;
   private Hashtable<String, Book> hashtable_items;
   private LinkedHashMap<String, Book> linkedHashMap_items;
+
+  // --------------------------
+  private Map<String, List<Book>> map_list;
+  public void setMapList(Map<String, List<Book>> hu){
+    this.map_list = hu;
+  }
+  public Map<String, List<Book>> getMapList() {
+    return map_list;
+  }
+  // --------------------------
   
   private Map<String, String> map_strings;
   private Map<String, Integer> map_integers;
