@@ -6,8 +6,8 @@ import org.exoplatform.container.RootContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.mortbay.cometd.AbstractBayeux;
 import org.mortbay.cometd.continuation.EXoContinuationBayeux;
-import java.util.Map;
-import java.util.HashMap;
+import org.mortbay.cometd.continuation.EXoContinuationClient;
+
 
 
 /**
@@ -39,6 +39,16 @@ public class ContinuationService {
         EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
         bayeux.sendMessage(eXoId, channel, data);
     }
+    
+    public EXoContinuationClient getClientByExoId(String exoId) {
+      EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
+      return bayeux.getClientByEXoId(exoId);
+    }
+    
+    public long getTimeout(){
+      EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
+      return bayeux.getTimeout();
+    }
 
     /*    public boolean isSubscribe(String eXoId, String channel) {
         throw new Exception();
@@ -55,6 +65,28 @@ public class ContinuationService {
 	public boolean sendMessageToGroup(String group, String channel, Object data) {
 		throw new Exception();
 		}*/
+    
+    
+//    public boolean isClientAlive(String eXoId) throws NullPointerException{
+//      EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
+//      Set<EXoContinuationClient> set = bayeux.getClientByEXoId(eXoId);
+//      Date date = new Date();
+//      for (EXoContinuationClient exoClient : set) {
+//       try{ 
+////        exoClient.getContinuation().isPending();
+////        exoClient.getContinuation().isExpired();
+//        long l = date.getTime() - exoClient.lastAccessed();
+//        System.out.println("exoClient.lastAccessed() = " + l + " : " + new Date(exoClient.lastAccessed())) ;
+//        System.out.println("timeout " + exoClient._timeout.isExpired());
+//        System.out.println("timeout " + exoClient._timeout.isScheduled());
+//        System.out.println("timeout " + exoClient._timeout.getTimestamp());
+//       } catch (Exception e) {
+//         e.printStackTrace();
+//         throw(new NullPointerException());
+//      }
+//      }
+//      return true;
+//    }
 
     public String getUserToken(String eXoId) {
         EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();

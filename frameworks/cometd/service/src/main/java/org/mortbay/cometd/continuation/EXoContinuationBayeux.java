@@ -1,8 +1,10 @@
 package org.mortbay.cometd.continuation;
 
 import dojox.cometd.*;
+
 import org.mortbay.cometd.ClientImpl;
 import org.mortbay.cometd.MessageImpl;
+import org.mortbay.cometd.SuspendingBayeux;
 import org.mortbay.cometd.Transport;
 import org.mortbay.cometd.ChannelId;
 
@@ -12,16 +14,18 @@ import java.io.IOException;
 import java.security.SecureRandom;
 
 
-public class EXoContinuationBayeux extends ContinuationBayeux {
+public class EXoContinuationBayeux extends ContinuationBayeux{
 
     // need to clean the map if an element hasn't been accessed for x min
     private static Map userToken = new HashMap();
     transient Random _random;
+    private long timeout;
 
     public EXoContinuationBayeux()
     {
         super();
-        setSecurityPolicy(new EXoSecurityPolicy());
+        this.setSecurityPolicy(new EXoSecurityPolicy());
+        
     }
 
     public ClientImpl newRemoteClient() {
@@ -29,7 +33,15 @@ public class EXoContinuationBayeux extends ContinuationBayeux {
 
         return client;
     }
-
+    
+    public void setTimeout(long timeout) {
+      this.timeout = timeout;
+    }
+    
+    public long getTimeout() {
+      return timeout;
+    } 
+    
     /* ------------------------------------------------------------ */
     long getRandom(long variation)
     {
@@ -72,30 +84,44 @@ public class EXoContinuationBayeux extends ContinuationBayeux {
      * @param eXoID
      * @return
      */
-    public Set<EXoContinuationClient> getClientByEXoId(String eXoID){
-        Set<String> ids = getClientIDs();
-        Set<EXoContinuationClient> clients = new HashSet<EXoContinuationClient>();
+//    public Set<EXoContinuationClient> getClientByEXoId(String eXoID){
+//        Set<String> ids = getClientIDs();
+//        Set<EXoContinuationClient> clients = new HashSet<EXoContinuationClient>();
+//
+//        for(String id:ids) {
+//            Client client = getClient(id);
+//            if(client instanceof EXoContinuationClient) {
+//                EXoContinuationClient exoClient = (EXoContinuationClient) client;
+//                if (exoClient.getEXoId() != null && exoClient.getEXoId().equals(eXoID))
+//                    clients.add(exoClient);
+//            }
+//
+//        }
+//        return clients;
+//    }
+    
+    public EXoContinuationClient getClientByEXoId(String eXoID){
+      Set<String> ids = getClientIDs();
+      for(String id:ids) {
+          Client client = getClient(id);
+          if(client instanceof EXoContinuationClient) {
+              EXoContinuationClient exoClient = (EXoContinuationClient) client;
+              if (exoClient.getEXoId() != null && exoClient.getEXoId().equals(eXoID))
+                  return exoClient;
+          }
 
-        for(String id:ids) {
-            Client client = getClient(id);
-            if(client instanceof EXoContinuationClient) {
-                EXoContinuationClient exoClient = (EXoContinuationClient) client;
-                if (exoClient.getEXoId() != null && exoClient.getEXoId().equals(eXoID))
-                    clients.add(exoClient);
-            }
+      }
+      return null;
+  }
 
-        }
-        return clients;
-    }
 
 
 
     public void sendMessage(String eXoId, String channel, Object data) {
-        Set<EXoContinuationClient> toClients = getClientByEXoId(eXoId);
-        for(EXoContinuationClient toClient:toClients) {
-            //TODO: verify if the user has registered to this channel
-            send(toClient, channel, data, null);
-        }
+      EXoContinuationClient toClient = getClientByEXoId(eXoId);
+      send(toClient, channel, data, null);
+      System.out.println("toClient._timeout.getTimestamp() = " + toClient._timeout.getTimestamp());
+      System.out.println("toClient._timeout.getAge() = " + toClient._timeout.getAge());
     } 
 
 
@@ -117,7 +143,7 @@ public class EXoContinuationBayeux extends ContinuationBayeux {
      */
     protected void send(Client toClient, String onChannel, Object data, String id)
     {
-        ClientImpl fromClient = (ClientImpl) newClient("EXoContinuationBayeux", null);
+        ClientImpl fromClient = (ClientImpl) newClient("EXoContinuationBayeux",null);
         Message reply = newMessage();
         reply.put(Bayeux.DATA_FIELD,data);
         if (id!=null)
@@ -127,10 +153,17 @@ public class EXoContinuationBayeux extends ContinuationBayeux {
     }
 
 
+    
+    
+    
         /* ------------------------------------------------------------ */
     /* ------------------------------------------------------------ */
     public static class EXoSecurityPolicy implements SecurityPolicy
     {
+      public EXoSecurityPolicy() {
+        super();
+      }
+      
         public boolean canHandshake(Message message)
         {
             return checkUser(message);
@@ -150,11 +183,13 @@ public class EXoContinuationBayeux extends ContinuationBayeux {
             if (((EXoContinuationClient)client).getEXoId() == null) {
                 ((EXoContinuationClient)client).setEXoId((String) message.get("exoId"));
             }
+            
             return client!=null && !channel.startsWith("/meta/");
         }
 
         public boolean canPublish(Client client, String channel, Message message)
         {
+          
             return client!=null && !channel.startsWith("/meta/");
         }
 

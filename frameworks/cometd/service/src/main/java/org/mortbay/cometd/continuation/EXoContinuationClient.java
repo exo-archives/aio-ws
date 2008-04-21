@@ -1,5 +1,11 @@
 package org.mortbay.cometd.continuation;
 
+import org.mortbay.cometd.SuspendingClient;
+
+import dojox.cometd.Listener;
+
+
+
 
 public class EXoContinuationClient extends ContinuationClient {
 
