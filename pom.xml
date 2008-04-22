@@ -3,7 +3,7 @@
   <groupId>org.exoplatform.ws</groupId>
   <artifactId>config</artifactId>
   <name>eXo WebServices Config</name>
-  <version>1.1</version>
+  <version>1.1.1</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -249,8 +249,8 @@
       <properties>
         <org.exoplatform.tool.version>trunk</org.exoplatform.tool.version>
         <org.exoplatform.kernel.version>2.0</org.exoplatform.kernel.version>
-        <org.exoplatform.core.version>2.0</org.exoplatform.core.version>
-        <org.exoplatform.ws.version>1.1</org.exoplatform.ws.version>
+        <org.exoplatform.core.version>2.0.1</org.exoplatform.core.version>
+        <org.exoplatform.ws.version>1.1.1</org.exoplatform.ws.version>
       </properties>
     </profile>
   </profiles>
