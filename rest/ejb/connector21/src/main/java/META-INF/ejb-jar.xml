@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ejb-jar xmlns="http://java.sun.com/xml/ns/j2ee" version="2.1"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/ejb-jar_2_1.xsd">
+  
+  <display-name>Rest EJB Connector</display-name>
+  <enterprise-beans>
+    <session>      
+      <ejb-name>RestEJBConnector</ejb-name>
+      <home>org.exoplatform.services.ws.rest.ejb21.RestEJBConnectorHome</home>
+      <remote>org.exoplatform.services.ws.rest.ejb21.RestEJBConnector</remote>
+      <ejb-class>org.exoplatform.services.ws.rest.ejb21.RestEJBConnectorBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Bean</transaction-type>
+      <!-- security-role-ref>
+      	<role-name>admin</role-name>
+      	<role-link>admin</role-link>
+      </security-role-ref-->
+      <security-identity>
+        <use-caller-identity/>              
+      </security-identity>
+    </session>
+  </enterprise-beans>
+  <assembly-descriptor>
+    <security-role>
+      <role-name>user</role-name>
+    </security-role>
+    <method-permission>
+      <role-name>user</role-name>
+      <method>
+        <ejb-name>RestEJBConnector</ejb-name>
+        <method-name>*</method-name>
+      </method>
+    </method-permission>
+  </assembly-descriptor>
+</ejb-jar>

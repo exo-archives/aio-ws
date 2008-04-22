@@ -1,0 +1,5 @@
+<configuration>
+  <component>
+    <type>org.exoplatform.services.ws.impl.xfire.WebServiceLoader</type>
+  </component>
+</configuration>

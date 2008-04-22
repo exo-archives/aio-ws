@@ -1,0 +1,16 @@
+<project>
+  <parent>                                                                                                                                              
+    <groupId>org.exoplatform.ws</groupId>                                                                                                               
+    <artifactId>config</artifactId>                                                                                                                     
+    <version>1.1.2</version>                                                                                                                            
+  </parent>  
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.exoplatform.ws</groupId>
+  <artifactId>exo.ws.samples</artifactId>
+  <packaging>war</packaging>
+  <version>${org.exoplatform.ws.version}</version>
+  <name>eXo WS samples</name>
+  <build>
+    <finalName>ws_examples</finalName>
+  </build>
+</project>

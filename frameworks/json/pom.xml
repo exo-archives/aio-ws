@@ -1,0 +1,40 @@
+<project>
+  <parent>
+    <groupId>org.exoplatform.ws</groupId>
+    <artifactId>config</artifactId>
+    <version>1.1.2</version>
+  </parent>
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.exoplatform.ws.frameworks</groupId>
+  <artifactId>exo.ws.frameworks.json.bean</artifactId>
+  <packaging>jar</packaging>
+  <version>${org.exoplatform.ws.version}</version>
+  <name>eXo JSON</name>
+  <description>eXo Java Bean to JSON Transformation</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.exoplatform.ws.rest</groupId>
+      <artifactId>exo.ws.rest.core</artifactId>
+      <version>${org.exoplatform.ws.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.kernel</groupId>
+      <artifactId>exo.kernel.component.common</artifactId>
+      <version>${org.exoplatform.kernel.version}</version>
+    </dependency>
+
+  </dependencies>
+  <build>
+    <testResources>
+        <testResource>
+        <directory>src/test/resources</directory>
+        <includes>
+          <include>**/*.json</include>
+          <include>**/*.txt</include>
+        </includes>
+     </testResource>
+     </testResources>
+  </build>
+</project>
