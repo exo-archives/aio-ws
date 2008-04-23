@@ -57,7 +57,12 @@ public class MimeTypes {
       if (t > 0) {
         String qstring = s.substring(t + 1);
         if (qstring.startsWith("q=")) {
-          q = Float.valueOf(qstring.substring(3));
+          // Quality string can starts form '.', for example q=.3
+          // It is the same to q=0.3
+          String t2 = qstring.substring(2);
+          if (t2.charAt(0) == '.')
+            t2 = '0' + t2;
+          q = Float.valueOf(t2);
           if (q >= 0F && q <= 1.0F)
             return q;
           throw new IllegalArgumentException("Invalid quality value "

@@ -33,7 +33,7 @@ public class MimeTypeTest extends TestCase {
    */
   @Override
   public void setUp() {
-    mt = new MimeTypes("image/jpeg;q=0.8,image/gif;q=0.7,image/png;q=0.9");
+    mt = new MimeTypes("image/jpeg;q=0.8,image/gif;q=.7,image/png;q=.9");
   }
 
   public void testMimeTypes() {
