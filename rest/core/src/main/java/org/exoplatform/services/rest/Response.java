@@ -154,7 +154,7 @@ public class Response {
    */
   public void writeEntity(OutputStream outputEntityStream) throws IOException {
 //    if (transformer_ != null) {
-    if (isTransformerInitialized()) {
+    if (isTransformerInitialized() && isEntityInitialized()) {
       transformer_.writeTo(entity_, outputEntityStream);
     }
   }
