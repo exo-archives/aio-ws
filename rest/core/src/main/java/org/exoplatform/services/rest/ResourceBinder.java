@@ -165,13 +165,11 @@ public class ResourceBinder implements Startable {
    * @param resourceCont the ResourceContainer which should be unbinded.
    */
   final public void unbind(final ResourceContainer resourceCont) {
-    int i = 0;
-    List<ResourceDescriptor> temp = new ArrayList<ResourceDescriptor>(resourceDescriptors_);
-    for (ResourceDescriptor resource : temp) {
+    Iterator<ResourceDescriptor> iter = resourceDescriptors_.iterator();
+    while (iter.hasNext()) {
+      ResourceDescriptor resource = iter.next();
       if (resource.getResourceContainer().equals(resourceCont))
-        resourceDescriptors_.remove(i);
-      else
-        i++;
+        iter.remove();
     }
   }
 
