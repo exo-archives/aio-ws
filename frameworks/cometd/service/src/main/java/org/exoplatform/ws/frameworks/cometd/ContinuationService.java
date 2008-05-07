@@ -45,6 +45,11 @@ public class ContinuationService {
       return bayeux.getClientByEXoId(exoId);
     }
     
+    public EXoContinuationClient getClient(String id) {
+      EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
+      return (EXoContinuationClient) bayeux.getClient(id);
+    }
+    
     public long getTimeout(){
       EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
       return bayeux.getTimeout();

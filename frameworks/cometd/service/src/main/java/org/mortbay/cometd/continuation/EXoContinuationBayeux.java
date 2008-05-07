@@ -120,8 +120,6 @@ public class EXoContinuationBayeux extends ContinuationBayeux{
     public void sendMessage(String eXoId, String channel, Object data) {
       EXoContinuationClient toClient = getClientByEXoId(eXoId);
       send(toClient, channel, data, null);
-      System.out.println("toClient._timeout.getTimestamp() = " + toClient._timeout.getTimestamp());
-      System.out.println("toClient._timeout.getAge() = " + toClient._timeout.getAge());
     } 
 
 
