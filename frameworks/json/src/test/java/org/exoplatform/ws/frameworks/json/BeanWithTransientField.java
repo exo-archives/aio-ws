@@ -1,16 +1,16 @@
 /**
- * Copyright (C) 2003-2007 eXo Platform SAS.
+ * Copyright (C) 2003-2008 eXo Platform SAS.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; either version 3
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
@@ -21,25 +21,23 @@ package org.exoplatform.ws.frameworks.json;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class SimpleBean {
+public class BeanWithTransientField {
+
+  private String field = "visible";
+  transient private String transientField = "invisible";
   
-  private String name;
-  private String value;
+  public String getField() {
+    return field;
+  }
+  public void setField(String field) {
+    this.field = field;
+  }
+  public String getTransientField() {
+    return transientField;
+  }
+  public void setTransientField(String transientField) {
+    this.transientField = transientField;
+  }
   
-  public void setName(String name) {
-    this.name = name;
-  }
-  public void setValue(String value) {
-    this.value = value;
-  }
-  public String getName() {
-    return name;
-  }
-  public String getValue() {
-    return value;
-  }
-  @Override
-  public String toString() {
-    return "Item:{name=" + name + ",value=" + value + "}";
-  }
 }
+

@@ -18,8 +18,10 @@
 package org.exoplatform.ws.frameworks.json.impl;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,14 +46,13 @@ import org.exoplatform.ws.frameworks.json.value.impl.StringValue;
  */
 public class JsonGeneratorImpl implements JsonGenerator {
 
-//  public JsonGeneratorImpl() throws JsonException {
-//  }
-
   /* (non-Javadoc)
    * @see org.exoplatform.ws.frameworks.json.JsonGenerator#createJsonObject(java.lang.Object)
    */
   public JsonValue createJsonObject(Object object) throws JsonException {
     Method[] methods = object.getClass().getMethods();
+    
+    List<String> transientFields = getTransientFields(object.getClass());
 
     JsonValue jsonRootValue = new ObjectValue();
 
@@ -71,6 +72,10 @@ public class JsonGeneratorImpl implements JsonGenerator {
         // first letter of key to lower case.
         key = (key.length() > 1) ? Character.toLowerCase(key.charAt(0)) + key.substring(1)
             : key.toLowerCase();
+        
+        // Check is this field in list of transient field.
+        if (transientFields.contains(key))
+          continue;
 
         try {
           // get result of invoke method get...
@@ -233,6 +238,17 @@ public class JsonGeneratorImpl implements JsonGenerator {
         return null;
     }
     
+  }
+  
+  private static List<String> getTransientFields(Class<?> clazz) {
+    List<String> l = new ArrayList<String>();
+    Field[] fields = clazz.getDeclaredFields();
+    for (Field f : fields) {
+      if (Modifier.isTransient(f.getModifiers())) {
+        l.add(f.getName());
+      }
+    }
+    return l;
   }
   
 }
