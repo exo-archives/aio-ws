@@ -72,26 +72,6 @@ public class ContinuationService {
 		}*/
     
     
-//    public boolean isClientAlive(String eXoId) throws NullPointerException{
-//      EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
-//      Set<EXoContinuationClient> set = bayeux.getClientByEXoId(eXoId);
-//      Date date = new Date();
-//      for (EXoContinuationClient exoClient : set) {
-//       try{ 
-////        exoClient.getContinuation().isPending();
-////        exoClient.getContinuation().isExpired();
-//        long l = date.getTime() - exoClient.lastAccessed();
-//        System.out.println("exoClient.lastAccessed() = " + l + " : " + new Date(exoClient.lastAccessed())) ;
-//        System.out.println("timeout " + exoClient._timeout.isExpired());
-//        System.out.println("timeout " + exoClient._timeout.isScheduled());
-//        System.out.println("timeout " + exoClient._timeout.getTimestamp());
-//       } catch (Exception e) {
-//         e.printStackTrace();
-//         throw(new NullPointerException());
-//      }
-//      }
-//      return true;
-//    }
 
     public String getUserToken(String eXoId) {
         EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
