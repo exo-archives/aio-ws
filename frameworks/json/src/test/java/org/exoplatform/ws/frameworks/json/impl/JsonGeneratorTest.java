@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.exoplatform.ws.frameworks.json.BeanWithTransientField;
 import org.exoplatform.ws.frameworks.json.Book;
 import org.exoplatform.ws.frameworks.json.BookStorage;
 import org.exoplatform.ws.frameworks.json.BookWrapper;
@@ -172,6 +173,17 @@ public class JsonGeneratorTest extends TestCase {
     assertEquals("JUnit in Action", jsonValue.getElement("mapList").getElement("3")
         .getElements().next().getElement("title").getStringValue());
 //    System.out.println(jsonValue);
+  }
+  
+  public void testBeanWithTransientField() throws Exception {
+    BeanWithTransientField trBean = new BeanWithTransientField();
+    JsonValue jsonValue = new JsonGeneratorImpl().createJsonObject(trBean);
+    assertEquals("visible", jsonValue.getElement("field").getStringValue());
+    try {
+      assertEquals("invisible", jsonValue.getElement("transientField").getStringValue());
+      fail("It must not be serialized");
+    } catch (NullPointerException e) {
+    }
   }
 
 }
