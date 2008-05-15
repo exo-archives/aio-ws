@@ -54,7 +54,7 @@ public class StringValue extends JsonValue {
    */
   @Override
   public String toString() {
-    return value_;
+    return '"' + value_ + '"';
   }
   
   /* (non-Javadoc)

@@ -78,7 +78,7 @@ public class ObjectValue extends JsonValue {
       if (i > 0)
         sb.append(",");
       i++;
-      sb.append(key);
+      sb.append('"').append(key).append('"');
       sb.append(":");
       sb.append(children_.get(key).toString());
     }
