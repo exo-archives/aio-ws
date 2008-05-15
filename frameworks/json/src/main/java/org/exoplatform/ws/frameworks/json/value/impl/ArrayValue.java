@@ -72,15 +72,15 @@ public class ArrayValue extends JsonValue {
   @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
-    sb.append("[");
+    sb.append('[');
     int i = 0;
     for (JsonValue v : children_) {
       if (i > 0)
-        sb.append(",");
+        sb.append(',');
       i++;
       sb.append(v.toString());
     }
-    sb.append("]");
+    sb.append(']');
     return sb.toString();
   }
 

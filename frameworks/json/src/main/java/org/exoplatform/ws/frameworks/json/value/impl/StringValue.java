@@ -19,6 +19,7 @@ package org.exoplatform.ws.frameworks.json.value.impl;
 
 import org.exoplatform.ws.frameworks.json.JsonWriter;
 import org.exoplatform.ws.frameworks.json.impl.JsonException;
+import org.exoplatform.ws.frameworks.json.impl.JsonUtils;
 import org.exoplatform.ws.frameworks.json.value.JsonValue;
 
 /**
@@ -54,7 +55,7 @@ public class StringValue extends JsonValue {
    */
   @Override
   public String toString() {
-    return '"' + value_ + '"';
+    return JsonUtils.getJsonString(value_);
   }
   
   /* (non-Javadoc)

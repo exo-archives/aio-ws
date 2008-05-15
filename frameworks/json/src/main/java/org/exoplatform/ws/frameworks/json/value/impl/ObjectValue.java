@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.exoplatform.ws.frameworks.json.JsonWriter;
 import org.exoplatform.ws.frameworks.json.impl.JsonException;
+import org.exoplatform.ws.frameworks.json.impl.JsonUtils;
 import org.exoplatform.ws.frameworks.json.value.JsonValue;
 
 /**
@@ -72,17 +73,17 @@ public class ObjectValue extends JsonValue {
   @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
-    sb.append("{");
+    sb.append('{');
     int i = 0;
     for (String key : children_.keySet()) {
       if (i > 0)
-        sb.append(",");
+        sb.append(',');
       i++;
-      sb.append('"').append(key).append('"');
-      sb.append(":");
+      sb.append(JsonUtils.getJsonString(key));
+      sb.append(':');
       sb.append(children_.get(key).toString());
     }
-    sb.append("}");
+    sb.append('}');
     return sb.toString();
   }
 
