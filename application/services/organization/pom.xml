@@ -32,7 +32,7 @@
     <dependency>
       <groupId>org.exoplatform.core</groupId>
       <artifactId>exo.core.component.organization.api</artifactId>
-      <version>trunk</version>
+      <version>${org.exoplatform.kernel.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
@@ -56,32 +56,4 @@
     </dependency>
   </dependencies>
   
-  <build>
-	<sourceDirectory>src/main/java</sourceDirectory>
-    <outputDirectory>target/classes</outputDirectory>
-    <testSourceDirectory>src/test/java</testSourceDirectory>
-    <testOutputDirectory>target/test-classes</testOutputDirectory>
-    
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-          <optimize>true</optimize>
-        </configuration>
-      </plugin>
-      
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <testFailureIgnore>${exo.test.failure.ignore}</testFailureIgnore>
-          <forkMode>${exo.test.forkmode}</forkMode>
-        </configuration>
-      </plugin>
-      
-    </plugins>
-  </build>
 </project>
