@@ -18,6 +18,8 @@
 package org.exoplatform.ws.frameworks.servlet;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -66,18 +68,62 @@ public class AnonymousUserContextRedirectionFilter implements Filter {
       FilterChain filterChain) throws IOException, ServletException {
     HttpServletRequest httpRequest = (HttpServletRequest) request;
     String user = httpRequest.getRemoteUser();
-    LOGGER.debug("Current user '" + user + "'.");
+    
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Current user '" + user + "'.");
+    }
+    
     if (user != null) {
       filterChain.doFilter(request, response);
     } else {
-      LOGGER.debug("Redirect user to context '" + contextName + "'.");
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Redirect user to context '" + contextName + "'.");
+      }
+      
       String pathInfo = httpRequest.getPathInfo();
       String query = httpRequest.getQueryString();
+      
+      /* Problem with LinkGenerator required to do this!
+       * It is necessary to encode URI before redirect, otherwise
+       * we get invalid URL (if it contains not ASCII characters).
+       * When client (MS Word, for example) we get unparsed 'plus'
+       * in URL in webdav server.  Currently it works and best
+       * solution for now.
+       *
+       * ******************************************************
+       * NOTE: We are not care about query parameters here!!!
+       * 
+       * j2ee documentation says about method HttpServletRequest#getQueryString():
+       * "The value is not decoded by the container."
+       * This string must be encoded by client, for LinkGenerator.
+       */
       ((HttpServletResponse) response).sendRedirect(
-          contextName + "/" + pathInfo + ((query != null) ? "?" + query : ""));
+          encodeURL(contextName + pathInfo) + ((query != null) ? "?" + query : ""));
+      
     }
   }
+  
+  /*
+   * Encode URL by URLEncoder#encode(url), then replace all '+' by '%20'
+   */
+  private static String encodeURL(String url)
+      throws UnsupportedEncodingException {
+    
+    StringBuffer sb = new StringBuffer();
+    String[] paths = url.split("/");
+    for (int i = 0; i < paths.length; i++) {
+      if ("".equals(paths[i]))
+        continue;
 
+      String t = URLEncoder.encode(paths[i], "UTF-8");
+      t = t.replace("+", "%20");
+      sb.append('/').append(t);
+
+    }
+
+    return sb.toString();
+  }
+  
   /* (non-Javadoc)
    * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
    */

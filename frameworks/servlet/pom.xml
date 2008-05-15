@@ -6,7 +6,6 @@
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.exoplatform.ws.frameworks</groupId>
   <artifactId>exo.ws.frameworks.servlet</artifactId>
   <packaging>jar</packaging>
   <version>${org.exoplatform.ws.version}</version>

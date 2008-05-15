@@ -5,7 +5,6 @@
     <version>1.1.2</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.exoplatform.ws.rest</groupId>
   <artifactId>exo.ws.rest.ejbconnector21.client21-jonas</artifactId>
   <version>${org.exoplatform.ws.version}</version>
   <name>REST-EJB simple client (ejb2.1)</name>

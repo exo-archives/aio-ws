@@ -5,7 +5,6 @@
     <version>1.1.2</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.exoplatform.ws.soap</groupId>
   <artifactId>exo.ws.soap.xfire.jsr181.samples</artifactId>
   <version>${org.exoplatform.ws.version}</version>
   <name>SOAP XFire JSR181 impl examples</name>
@@ -47,7 +46,7 @@
       <version>1.0</version>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.ws.soap</groupId>
+      <groupId>org.exoplatform.ws</groupId>
       <artifactId>exo.ws.soap.xfire.jsr181</artifactId>
       <version>${org.exoplatform.ws.version}</version>
     </dependency>
