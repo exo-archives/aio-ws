@@ -1,8 +1,0 @@
-<project>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.exoplatform.ws</groupId>
-  <artifactId>exo.ws.commons</artifactId>
-  <version>trunk</version>
-  <name>HTTP commons utils</name>
-  <description></description>
-</project>
