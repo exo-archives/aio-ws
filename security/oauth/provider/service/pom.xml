@@ -7,7 +7,8 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>exo.ws.security.oauth.provider.service</artifactId>
   <version>${org.exoplatform.ws.version}</version>
-  <description>OAuth Provider</description>
+  <name>OAuth provider</name>
+  <description>OAuth Provider service</description>
   <dependencies>
     <dependency>
       <groupId>net.oauth</groupId>

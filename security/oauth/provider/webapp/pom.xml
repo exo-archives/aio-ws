@@ -8,7 +8,8 @@
   <artifactId>exo.ws.security.oauth.provider.webapp</artifactId>
   <version>${org.exoplatform.ws.version}</version>
   <packaging>war</packaging>
-  <description>OAuth Provider war</description>
+  <name>OAuth provider webapp</name>
+  <description>OAuth Provider web application</description>
   <dependencies>
     <dependency>
       <groupId>taglibs</groupId>

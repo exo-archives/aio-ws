@@ -7,7 +7,8 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>exo.ws.security.oauth.consumer</artifactId>
   <version>${org.exoplatform.ws.version}</version>
-  <description></description>
+  <name>OAuth consumer</name>
+  <description>OAuth client side</description>
   <dependencies>
     <dependency>
       <groupId>net.oauth</groupId>
