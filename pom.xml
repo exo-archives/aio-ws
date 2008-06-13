@@ -16,6 +16,9 @@
     <module>rest/ejb/connector30</module>
     <module>frameworks/cometd/service</module>
     <module>frameworks/cometd/webapp</module>
+    <module>security/oauth/consumer</module>
+    <module>security/oauth/provider/service</module>
+    <module>security/oauth/provider/webapp</module>
     <module>application/config</module>
     <module>application/java/web/samples</module>
     <module>application/java/services/samples/rest/ejb/client21</module>
