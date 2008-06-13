@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <component>
+    <type>org.exoplatform.ws.security.oauth.impl.OAuthConsumerServiceImpl</type>
+    <init-params>
+      <value-param>
+        <!-- this parameter MUST be set in minutes -->
+        <name>tokenAliveTime</name>
+        <value>300</value>
+      </value-param>
+      <properties-param>
+        <name>exo1</name>
+        <property name="secret" value="81d1b5d080d1" />
+        <property name="description" value="description" />
+        <property name="provider.tokenRequestURL" value="http://ubu.exoua-int:8080/provider/request_token" />
+        <property name="provider.authorizationURL" value="http://ubu.exoua-int:8080/provider/authorize" />
+        <property name="provider.accessTokenURL" value="http://ubu.exoua-int:8080/provider/access_token" />
+      </properties-param>
+      <properties-param>
+        <name>portal</name>
+        <property name="secret" value="portal" />
+        <property name="description" value="description" />
+        <property name="provider.tokenRequestURL" value="http://ubu.exoua-int:8080/provider/request_token" />
+        <property name="provider.authorizationURL" value="http://ubu.exoua-int:8080/provider/authorize" />
+        <property name="provider.accessTokenURL" value="http://ubu.exoua-int:8080/provider/access_token" />
+      </properties-param>
+    </init-params>
+  </component>
+  <component>
+    <type>org.exoplatform.ws.security.oauth.impl.OAuthClientHttpImpl</type>
+  </component>
+  <component>
+    <type>org.exoplatform.ws.security.oauth.impl.OAuthTokenCleanerImpl</type>
+    <init-params>
+    <value-param>
+      <!-- this parameter MUST be set in minutes -->
+      <name>tokenCleanerTimeout</name>
+      <value>3</value>
+    </value-param>
+    </init-params>
+  </component>
+</configuration>
