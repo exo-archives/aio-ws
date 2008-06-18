@@ -5,7 +5,6 @@
     <version>trunk</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.exoplatform.core</groupId>
   <artifactId>exo.ws.security.cas.client</artifactId>
   <version>${org.exoplatform.ws.version}</version>
   <name>CAS authentication (client side)</name>
