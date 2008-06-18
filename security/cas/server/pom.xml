@@ -16,4 +16,12 @@
       <version>3.2.1</version>
     </dependency>
   </dependencies>
+    <repositories>
+      <repository>
+        <id>ja-sig</id>
+        <name>ja-sig maven repository</name>
+        <url>http://developer.ja-sig.org/maven2</url>
+        <layout>default</layout>
+      </repository>
+    </repositories>
 </project>
