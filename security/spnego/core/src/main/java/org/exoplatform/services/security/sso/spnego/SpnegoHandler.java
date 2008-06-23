@@ -1,0 +1,361 @@
+/*
+ * Copyright 2006 Taglab Limited
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License
+ */
+package org.exoplatform.services.security.sso.spnego;
+
+import org.ietf.jgss.GSSContext;
+import org.ietf.jgss.GSSCredential;
+import org.ietf.jgss.GSSException;
+import org.ietf.jgss.GSSManager;
+import org.ietf.jgss.Oid;
+
+import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.security.sso.spnego.message.AbstractMessagePart;
+import org.exoplatform.services.security.sso.spnego.message.ApplicationConstructedObject;
+import org.exoplatform.services.security.sso.spnego.message.ContextFlags;
+import org.exoplatform.services.security.sso.spnego.message.MechTypeList;
+import org.exoplatform.services.security.sso.spnego.message.NegResult;
+import org.exoplatform.services.security.sso.spnego.message.NegTokenInit;
+import org.exoplatform.services.security.sso.spnego.message.NegTokenTarg;
+import org.exoplatform.services.security.sso.spnego.message.OctetString;
+
+/**
+ * Thin Spnego wrapping mechanism for <code>org.ietf.jgss</code> GSS-API.
+ * <p>
+ * Spnego is not supported by Java 5, but is in Java 6, however Spnego in itself
+ * is very simple and is just a thin wrapper over GSS-API, and this class
+ * provides support for Spnego in Java 5.
+ * <p>
+ * The implementation is a generic implementation, which means that it works
+ * with more than Kerberos as the underlying GSS-API mechanism (however Kerberos
+ * is the only one that Java 5 JAAS supports anyway).
+ * <p>
+ * This class needs two things to work:
+ * <ol>
+ * <li>System property <code>javax.security.auth.useSubjectCredsOnly</code>
+ * set to <code>false</code>.
+ * <li>System property <code>java.security.auth.login.config</code> to point
+ * to a file with JAAS login configuration. The login configuration needs to
+ * contain this:
+ * 
+ * <pre><code>
+ *   com.sun.security.jgss.accept {
+ *     com.sun.security.auth.module.Krb5LoginModule 
+ *     required 
+ *     storeKey=true 
+ *     keyTab=&quot;/etc/krb5.keytab&quot;
+ *     doNotPrompt=true 
+ *     useKeyTab=true 
+ *     realm=&quot;SALAD.TAGLAB.COM&quot; 
+ *     principal=&quot;HTTP/banana.salad.taglab.com@SALAD.TAGLAB.COM&quot; 
+ *     debug=true;
+ *   };
+ * </code></pre>
+ * 
+ * Where you would need to adjust <code>/etc/krb5.keytab</code> to point to a
+ * keytab containing the principal pointed out by principal=. Please note that
+ * the service principal must be named <code>HTTP/servername@REALM</code>.
+ * Where servername MUST be the name you are typing into the URL-bar of the
+ * browser AND is the reverse lookup name for the IP that corresponds to what
+ * was typed in.
+ * </ol>
+ * <p>
+ * XXX The class should be updated to use Java 6 Spnego once generally in use.
+ * <p>
+ * This implementation was made following: <a
+ * href="http://msdn2.microsoft.com/en-us/library/ms995330.aspx">http://msdn2.microsoft.com/en-us/library/ms995330.aspx</a>
+ * @author Martin Algesten
+ */
+public class SpnegoHandler {
+
+  final static Log logger = ExoLogger.getLogger("core.sso.SpnegoHandler");
+
+  /**
+   * The parser to use.
+   */
+  private SpnegoParser parser = new SpnegoParser();
+
+  /**
+   * Tells if we are strict rfc4178 or not. Default is true.
+   */
+  private boolean rfc4178 = true;
+
+  // flag to only warn once.
+  private static boolean doWarnings = true;
+
+  /**
+   * State of the SpnegoHandler.
+   */
+  public enum State {
+    UNINITIALIZED, INITIALIZED, NEGOTIATING, ESTABLISHED, FAILED, UNAUTHORIZED
+  }
+
+  /**
+   * The GSSContext, set in init().
+   */
+  private GSSContext context;
+
+  /**
+   * The current state of this object.
+   */
+  private State state = State.UNINITIALIZED;
+
+  /**
+   * Creates a new SpnegoHandler
+   * @throws GSSSpnegoException If we failed to establish the GSS-API context.
+   */
+  public SpnegoHandler() throws GSSSpnegoException {
+    testSetup();
+  }
+
+  private void testSetup() {
+
+    String tmp = System.getProperty("javax.security.auth.useSubjectCredsOnly");
+    if (tmp == null) {
+      if (doWarnings)
+        logger.warn("javax.security.auth.useSubjectCredsOnly is not set "
+            + "which makes it default to true. SpnegoHandler will not work.");
+      state = State.FAILED;
+    }
+
+    if ("true".equalsIgnoreCase(tmp)) {
+      if (doWarnings)
+        logger.warn("javax.security.auth.useSubjectCredsOnly is set to true. "
+            + "SpnegoHandler will not work.");
+      state = State.FAILED;
+    }
+
+    tmp = System.getProperty("java.security.auth.login.config");
+
+    if (tmp == null) {
+      if (doWarnings)
+        logger.warn("java.security.auth.login.config is not set. "
+            + "This property needs to point to a JAAS config file. "
+            + "SpnegoHandler will not work.");
+      state = State.FAILED;
+    }
+
+    doWarnings = false;
+
+  }
+
+  private void init(ContextFlags flags) throws GSSException {
+
+    // Oid spnegoOid = new Oid("1.3.6.1.5.5.2"); // java 6 has this.
+
+    // testSetup() in constructor might indicate setup error.
+    if (state == State.FAILED)
+      return;
+
+    GSSManager manager = GSSManager.getInstance();
+
+    // principal is set in JAAS config, which means we can send in null
+    // here to pick that up. Likewise setting the Oid to null defaults to
+    // Kerberos (not Spnego).
+    GSSCredential cred = manager.createCredential(null,
+        GSSCredential.INDEFINITE_LIFETIME, (Oid) null,
+        GSSCredential.ACCEPT_ONLY);
+
+    context = manager.createContext(cred);
+
+    if (flags != null && !rfc4178) {
+
+      // rfc 4178 says we MUST ignore the flags.
+
+      context.requestAnonymity(flags.isAnonFlag());
+      context.requestConf(flags.isConfigFlag());
+      context.requestCredDeleg(flags.isDelegFlag());
+      context.requestInteg(flags.isIntegFlag());
+      context.requestMutualAuth(flags.isMutualFlag());
+      context.requestReplayDet(flags.isReplayFlag());
+      context.requestSequenceDet(flags.isSequenceFlag());
+
+    }
+
+    state = State.INITIALIZED;
+
+  }
+
+  /**
+   * Performs the actual authentication against the GSS-API. The authentication
+   * might take several roundtrips to the server (with Kerberos this doesn't
+   * happen) which means that depending on the result there might be more
+   * roundtrips.
+   * <p>
+   * The method unwraps the nested GSS-API token from the Spnego token and
+   * passes that into the {@link GSSContext} that was established in the
+   * constructor.
+   * @param token the spnego message.
+   * @throws SpnegoException if an exception is encountered whilst doing the
+   *             authentication.
+   */
+  public byte[] authenticate(byte[] token) throws SpnegoException {
+
+    if (!isComplete())
+      state = State.NEGOTIATING;
+
+    if (token == null)
+      return null;
+
+    NegTokenInit negTokenInit;
+    boolean isKerberosMicrosoft = false;
+
+    try {
+      ApplicationConstructedObject appObj = parser.parseInitToken(token);
+      if (appObj == null) {
+        // failed to parse...
+        state = State.FAILED;
+        return null;
+      }
+      negTokenInit = appObj.getNegTokenInit();
+      if (negTokenInit.getMechTypes() != null) {
+        MechTypeList list = negTokenInit.getMechTypes();
+        if (list.getMechs().size() == 0) {
+          logger.info("No mech in mech list");
+          state = State.FAILED;
+          return null;
+        } else {
+          boolean hasKerberos = false;
+          for (org.exoplatform.services.security.sso.spnego.message.Oid oid
+              : list.getMechs()) {
+            if (oid.isKerberos() || oid.isKerberosMicrosoft()) {
+              hasKerberos = true;
+              isKerberosMicrosoft = oid.isKerberosMicrosoft();
+              break;
+            }
+          }
+          if (!hasKerberos) {
+            logger.info("Mech list does not contain kerberos!");
+            state = State.FAILED;
+            return null;
+          }
+        }
+      }
+      if (context == null) {
+        init(negTokenInit.getContextFlags());
+        if (context == null)
+          return null; // SpnegoHandler not setup.
+      }
+
+      OctetString mechToken = negTokenInit.getMechToken();
+      token = context.acceptSecContext(token, mechToken.getSourceStart(),
+          mechToken.getSourceLength());
+      if (context.isEstablished()) {
+        if (logger.isDebugEnabled()) {
+          logger.debug("Accepted Spnego negotiation. Authenticated user: "
+              + context.getSrcName());
+        }
+        // in theory SPNEGO allows for several roundtrips between client
+        // and server to establish the context. However in practice with
+        // Kerberos, this doesn't happen.
+        state = State.ESTABLISHED;
+      } else {
+        throw new SpnegoException("Several roundtrips to SpnegoHandler "
+            + "is not currently supported");
+      }
+    } catch (GSSException gsse) {
+      gsse.printStackTrace();
+      state = State.FAILED;
+      throw new GSSSpnegoException(gsse);
+    }
+    if (token == null)
+      return null;
+    token = constructResponse(isKerberosMicrosoft, token);
+    return token;
+  }
+
+  /**
+   * Constructs the response byte array from the give input.
+   */
+  protected byte[] constructResponse(boolean isKerberosMicrosoft,
+      byte[] gssApiToken) {
+
+    NegTokenTarg negTokenTarg = new NegTokenTarg();
+
+    // Kerberos has no more round trips.
+    negTokenTarg.setNegResult(new NegResult(NegResult.ACCEPT_COMPLETED));
+
+    org.exoplatform.services.security.sso.spnego.message.Oid oid =
+      new org.exoplatform.services.security.sso.spnego.message.Oid();
+    if (isKerberosMicrosoft) {
+      oid.setOid(org.exoplatform.services.security.sso.spnego.message.Oid
+          .OID_KERBEROS_MICROSOFT);
+    } else {
+      oid.setOid(org.exoplatform.services.security.sso.spnego.message.Oid
+          .OID_KERBEROS);
+    }
+    negTokenTarg.setSupportedMech(oid);
+
+    OctetString responseToken = new OctetString();
+    int[] tmp = new int[gssApiToken.length];
+    AbstractMessagePart.arraycopy(gssApiToken, 0, tmp, 0, gssApiToken.length);
+    responseToken.setData(tmp);
+    negTokenTarg.setResponseToken(responseToken);
+
+    tmp = negTokenTarg.toDer();
+    byte[] token = new byte[tmp.length];
+    AbstractMessagePart.arraycopy(tmp, 0, token, 0, tmp.length);
+
+    return token;
+
+  }
+
+  /**
+   * Tells if negotiation is complete or if more roundtrips to authenticate() is
+   * expected.
+   */
+  public boolean isComplete() {
+    return state == State.ESTABLISHED || state == State.FAILED ||
+        state == State.UNAUTHORIZED;
+  }
+
+  /**
+   * Returns the current state.
+   */
+  public State getState() {
+    return state;
+  }
+
+  /**
+   * Sets the state to UNAUTHORIZED. This might be interesting to a user of the
+   * object, it has no effect on the handler itself.
+   */
+  public void setUnauthorized() {
+    this.state = State.UNAUTHORIZED;
+  }
+
+  /**
+   * Returns the GSSContext.
+   */
+  public GSSContext getGSSContext() {
+    return context;
+  }
+
+  /**
+   * Tells if the credentials have been established.
+   */
+  public boolean isEstablished() {
+    return state == State.ESTABLISHED;
+  }
+
+  /**
+   * Tells if the negotiation has failed.
+   */
+  public boolean isFailed() {
+    return state == State.FAILED;
+  }
+
+}
