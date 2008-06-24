@@ -5,7 +5,13 @@
   <module>
     <web>
       <web-uri>exo.ws.application.webapps-trunk.war</web-uri>
-      <context-root>ws_examples</context-root>
+      <context-root>ws-examples</context-root>
+    </web>
+  </module>
+  <module>
+    <web>
+      <web-uri>exo.ws.security.oauth.provider.webapp-trunk.war</web-uri>
+      <context-root>oauthprovider</context-root>
     </web>
   </module>
 </application>
