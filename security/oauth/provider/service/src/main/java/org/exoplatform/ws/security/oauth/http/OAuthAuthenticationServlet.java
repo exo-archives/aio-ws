@@ -37,7 +37,7 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.security.Authenticator;
 import org.exoplatform.services.security.Credential;
-import org.exoplatform.services.security.IdentityRegistry;
+//import org.exoplatform.services.security.IdentityRegistry;
 import org.exoplatform.services.security.PasswordCredential;
 import org.exoplatform.services.security.UsernameCredential;
 import org.exoplatform.ws.security.oauth.OAuthProviderService;
@@ -109,14 +109,15 @@ public class OAuthAuthenticationServlet extends HttpServlet {
       String userId = null;
       Authenticator authenticator = (Authenticator) container
           .getComponentInstanceOfType(Authenticator.class);
-      IdentityRegistry identityRegistry = (IdentityRegistry) container
-          .getComponentInstanceOfType(IdentityRegistry.class);
+//      IdentityRegistry identityRegistry = (IdentityRegistry) container
+//          .getComponentInstanceOfType(IdentityRegistry.class);
       Credential[] credentials = new Credential[]{ new UsernameCredential(username),
           new PasswordCredential(password) };
       
       try {
         userId = authenticator.validateUser(credentials);
-        identityRegistry.register(authenticator.createIdentity(userId));
+        // Identity will be not created here. Instead this must be used filter on consumer side.
+//        identityRegistry.register(authenticator.createIdentity(userId));
       } catch (Exception e) {
         e.printStackTrace();
         httpRequest.getRequestDispatcher(loginPage + "?usename=" + username).forward(
