@@ -92,6 +92,7 @@ public class OAuthRequestWrapperFilter implements Filter {
     /* (non-Javadoc)
      * @see javax.servlet.http.HttpServletRequestWrapper#getUserPrincipal()
      */
+    @Override
     public Principal getUserPrincipal() {
         return this.principal;
     }
@@ -99,6 +100,7 @@ public class OAuthRequestWrapperFilter implements Filter {
     /* (non-Javadoc)
      * @see javax.servlet.http.HttpServletRequestWrapper#getRemoteUser()
      */
+    @Override
     public String getRemoteUser() {
         return getUserPrincipal().getName();
     }
