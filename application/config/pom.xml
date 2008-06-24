@@ -88,6 +88,32 @@
       <version>${org.exoplatform.ws.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.exoplatform.ws</groupId>
+      <artifactId>exo.ws.security.oauth.consumer</artifactId>
+      <version>${org.exoplatform.ws.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.ws</groupId>
+      <artifactId>exo.ws.security.oauth.provider.webapp</artifactId>
+      <version>${org.exoplatform.ws.version}</version>
+      <type>war</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.ws</groupId>
+      <artifactId>exo.ws.security.oauth.provider.service</artifactId>
+      <version>${org.exoplatform.ws.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.ws</groupId>
+      <artifactId>exo.ws.security.samples</artifactId>
+      <version>${org.exoplatform.ws.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    
 
   </dependencies>
 
