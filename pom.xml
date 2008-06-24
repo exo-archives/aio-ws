@@ -30,6 +30,7 @@
     <module>application/java/services/samples/rest/ejb/simple-service</module>
     <module>application/java/services/samples/rest/services</module>
     <!--module>application/java/services/samples/soap/jsr181</module-->
+    <module>application/java/services/samples/security</module>
 
   </modules>
   <dependencies>
