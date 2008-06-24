@@ -1,0 +1,19 @@
+<project>
+<parent>
+    <groupId>org.exoplatform.ws</groupId>
+        <artifactId>config</artifactId>
+	    <version>trunk</version>
+</parent>
+  <modelVersion>4.0.0</modelVersion>
+    <artifactId>exo.ws.security.samples</artifactId>
+      <version>${org.exoplatform.ws.version}</version>
+        <name>WS security samples</name>
+<dependencies>
+    <dependency>
+          <groupId>org.exoplatform.core</groupId>
+	        <artifactId>exo.core.component.security.core</artifactId>
+		      <version>${org.exoplatform.core.version}</version>
+		          </dependency>
+			    </dependencies>
+			    
+</project>
