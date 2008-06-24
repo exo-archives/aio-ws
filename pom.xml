@@ -21,6 +21,8 @@
     <module>security/oauth/provider/webapp</module>
     <module>security/cas/server</module>
     <module>security/cas/client</module>
+    <module>security/spnego/core</module>
+    <module>security/spnego/tomcat</module>
     <module>application/config</module>
     <module>application/java/web/samples</module>
     <module>application/java/services/samples/rest/ejb/client21</module>
