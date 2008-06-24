@@ -77,7 +77,11 @@
               <mapper>
                 <chainedmapper>
                   <flattenmapper />
-                  <globmapper from="exo.ws.application.webapps-${org.exoplatform.ws.version}.war" to="ws_examples.war" casesensitive="no" />
+                  <globmapper from="exo.ws.application.webapps-${org.exoplatform.ws.version}.war" to="ws-examples.war" casesensitive="no" />
+                </chainedmapper>
+                <chainedmapper>
+                  <flattenmapper />
+                  <globmapper from="exo.ws.security.oauth.provider.webapp-${org.exoplatform.ws.version}.war" to="oauthprovider.war" casesensitive="no" />
                 </chainedmapper>
               </mapper>
             </move>
