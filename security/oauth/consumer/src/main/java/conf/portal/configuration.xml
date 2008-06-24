@@ -12,17 +12,9 @@
         <name>exo1</name>
         <property name="secret" value="81d1b5d080d1" />
         <property name="description" value="description" />
-        <property name="provider.tokenRequestURL" value="http://ubu.exoua-int:8080/provider/request_token" />
-        <property name="provider.authorizationURL" value="http://ubu.exoua-int:8080/provider/authorize" />
-        <property name="provider.accessTokenURL" value="http://ubu.exoua-int:8080/provider/access_token" />
-      </properties-param>
-      <properties-param>
-        <name>portal</name>
-        <property name="secret" value="portal" />
-        <property name="description" value="description" />
-        <property name="provider.tokenRequestURL" value="http://ubu.exoua-int:8080/provider/request_token" />
-        <property name="provider.authorizationURL" value="http://ubu.exoua-int:8080/provider/authorize" />
-        <property name="provider.accessTokenURL" value="http://ubu.exoua-int:8080/provider/access_token" />
+        <property name="provider.tokenRequestURL" value="http://localhost:8080/oauthprovider/request_token" />
+        <property name="provider.authorizationURL" value="http://localhost:8080/oauthprovider/authorize" />
+        <property name="provider.accessTokenURL" value="http://localhost:8080/oauthprovider/access_token" />
       </properties-param>
     </init-params>
   </component>
