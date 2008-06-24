@@ -2,6 +2,7 @@
 <!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 <web-app>
   <display-name>eXo WS Samples</display-name>
+  
   <filter>                                                                                                                                        
     <filter-name>RestContentFilter</filter-name>                                                                                                
     <filter-class>org.exoplatform.services.rest.servlet.RestEncodingFilter</filter-class>                                                       
@@ -9,7 +10,31 @@
       <param-name>REQUEST_ENCODING</param-name>                                                                                               
       <param-value>UTF-8</param-value>                                                                                                        
     </init-param>                                                                                                                               
-  </filter> 
+  </filter>
+
+  <filter>
+    <filter-name>OAuthConsumerFilter</filter-name>
+    <filter-class>org.exoplatform.ws.security.oauth.http.OAuthConsumerFilter</filter-class>
+    <init-param>
+      <param-name>consumer</param-name>
+      <param-value>exo1</param-value>
+    </init-param>
+  </filter>
+  
+  <filter>
+    <filter-name>OAuthRequestWrapperFilter</filter-name>
+    <filter-class>org.exoplatform.ws.security.oauth.http.OAuthRequestWrapperFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>OAuthConsumerFilter</filter-name>
+    <url-pattern>/oauth/protected/*</url-pattern>
+  </filter-mapping>
+  
+  <filter-mapping>
+    <filter-name>OAuthRequestWrapperFilter</filter-name>
+    <url-pattern>/oauth/protected/*</url-pattern>
+  </filter-mapping>
   
   <filter-mapping>
     <filter-name>RestContentFilter</filter-name>
@@ -32,6 +57,11 @@
     <display-name>XFire Servlet</display-name>                                                                                                          
     <servlet-class>org.exoplatform.services.ws.impl.xfire.transport.http.XFireServlet</servlet-class>                                                   
   </servlet>                                                                                                                                            
+
+  <servlet>
+    <servlet-name>OAuthCallbackServlet</servlet-name>
+    <servlet-class>org.exoplatform.ws.security.oauth.http.OAuthCallbackServlet</servlet-class>
+  </servlet>
   
   <servlet-mapping>                                                                                                                                     
     <servlet-name>XFireServlet</servlet-name>                                                                                                           
@@ -48,4 +78,9 @@
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
   
+  <servlet-mapping>
+    <servlet-name>OAuthCallbackServlet</servlet-name>
+    <url-pattern>/callback/*</url-pattern>
+  </servlet-mapping>
+
 </web-app>
