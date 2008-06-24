@@ -36,7 +36,7 @@ public final class BaseHTTPUsernamePasswordValidatorImpl
   private static final long serialVersionUID = 1218562187483098721L;
 
   /* (non-Javadoc)
-   * @see org.exoplatform.services.security.cas3.AbstractHTTPAuthenticator#sendSuccessMessage(javax.servlet.http.HttpServletResponse, java.lang.String)
+   * @see org.exoplatform.services.security.cas.client.AbstractHTTPUsernamePasswordValidator#sendSuccessMessage(javax.servlet.http.HttpServletResponse, java.lang.String)
    */
   @Override
   protected void sendSuccessMessage(HttpServletResponse httpResponse,
@@ -50,7 +50,7 @@ public final class BaseHTTPUsernamePasswordValidatorImpl
   }
 
   /* (non-Javadoc)
-   * @see org.exoplatform.services.security.cas3.AbstractHTTPAuthenticator#sendFailMessage(javax.servlet.http.HttpServletResponse, java.lang.String)
+   * @see org.exoplatform.services.security.cas.client.AbstractHTTPUsernamePasswordValidator#sendFailMessage(javax.servlet.http.HttpServletResponse, java.lang.String)
    */
   @Override
   protected void sendFailMessage(HttpServletResponse httpResponse,
