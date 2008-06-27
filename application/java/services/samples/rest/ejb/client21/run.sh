@@ -9,9 +9,9 @@ fi
 
 export PATH=$PATH:$JONAS_ROOT/bin/unix
 
-#-cp $JONAS_ROOT/lib/apps/exo.core.component.security.core-2.1.jar \
+#
 jclient \
--cp $JONAS_ROOT/lib/apps/exo.core.component.organization.api-trunk.jar \
+-cp $JONAS_ROOT/lib/apps/exo.core.component.security.core-2.1.jar \
 -Djava.security.manager=default \
 -Djava.security.policy=$JONAS_ROOT/conf/java.policy \
 target/exo.ws.application.ejbconnector21.client21-$VERSION.jar

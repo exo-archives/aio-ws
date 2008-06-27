@@ -30,8 +30,7 @@ public class SimpleUsernamePasswordAuthenticator implements Authenticator {
    * @see org.exoplatform.services.security.Authenticator#createIdentity(java.lang.String)
    */
   public Identity createIdentity(String arg0) throws Exception {
-    throw new UnsupportedOperationException("This is simple authenticator, "
-        + "can only validate username and password!");
+    return new Identity(arg0);
   }
 
   /*

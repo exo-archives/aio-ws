@@ -2,7 +2,7 @@
 
 	<echo>Run Simple Example</echo>
 	<property name="mainclass" value="org.exoplatform.services.ws.rest.ejb3.Main"/>
-	<property name="version" value="trunk"/>
+	<property name="version" value="1.2"/>
 	<path id="jonas.classpath">
 		<fileset dir="${jonas.home}/work/rars/jonas">
 			<include name="**/*easybeans*.jar"/>
