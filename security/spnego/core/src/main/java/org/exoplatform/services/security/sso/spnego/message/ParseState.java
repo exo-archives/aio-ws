@@ -79,8 +79,16 @@ public class ParseState {
    * Calculates the der encoded length at the current position and moves the
    * index counter forward.
    */
+  /*
+   * 8 April 2008. Changed by <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
+   * Was error as gives negative results of DerLenght.
+   * Tested under Ubuntu 7.10 (jdk 1.5.0_11) as web server.
+   */
   public int parseDerLength() {
+    // fix
+//    int b = token[index];
     int b = token[index] & 0xFF;
+    
     if ((b & 0x80) == 0x00) {
       index++;
       return b;
@@ -90,6 +98,8 @@ public class ParseState {
       index++;
       for (int i = 0; i < length; i++) {
         result = result << 8;
+        // fix
+//        result = result | (int)token[index++];
         result = result | token[index++] & 0xFF;
       }
       return result;
