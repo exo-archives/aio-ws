@@ -29,7 +29,7 @@
     <module>application/java/services/samples/rest/ejb/client30</module>
     <module>application/java/services/samples/rest/ejb/simple-service</module>
     <module>application/java/services/samples/rest/services</module>
-    <!--module>application/java/services/samples/soap/jsr181</module-->
+    <module>application/java/services/samples/soap/jsr181</module>
     <module>application/java/services/samples/security</module>
 
   </modules>
@@ -180,8 +180,8 @@
                 <taskdef resource="emma_ant.properties" classpathref="maven.dependency.classpath" />
                 <emma enabled="true">
                   <!-- merged file will be rewritted by last project -->
-                  <merge outfile="${exo.projects.directory.src}/ws/${org.exoplatform.ws.version}/target/coverage.es">
-                    <fileset dir="${exo.projects.directory.src}/ws/${org.exoplatform.ws.version}/">
+                  <merge outfile="${exo.projects.directory.src}/ws/tags/${org.exoplatform.ws.version}/target/coverage.es">
+                    <fileset dir="${exo.projects.directory.src}/ws/tags/${org.exoplatform.ws.version}/">
                       <include name="**/target/emma/*.e*" />
                       <include name="**/target/emma/*.e*" />
                     </fileset>
@@ -190,15 +190,15 @@
                   </merge>
                   <report>
                     <sourcepath>
-                      <dirset dir="${exo.projects.directory.src}/ws/${org.exoplatform.ws.version}/">
+                      <dirset dir="${exo.projects.directory.src}/ws/tags/${org.exoplatform.ws.version}/">
                         <include name="**/src/**/java" />
                       </dirset>
                     </sourcepath>
-                    <fileset dir="${exo.projects.directory.src}/ws/${org.exoplatform.ws.version}/target/">
+                    <fileset dir="${exo.projects.directory.src}/ws/tags/${org.exoplatform.ws.version}/target/">
                       <include name="*.es" />
                     </fileset>
-                    <html outfile="${exo.projects.directory.src}/ws/${org.exoplatform.ws.version}/target/coverage.html" />
-                    <xml outfile="${exo.projects.directory.src}/ws/${org.exoplatform.ws.version}/target/coverage.xml" />
+                    <html outfile="${exo.projects.directory.src}/ws/tags/${org.exoplatform.ws.version}/target/coverage.html" />
+                    <xml outfile="${exo.projects.directory.src}/ws/tags/${org.exoplatform.ws.version}/target/coverage.xml" />
                   </report>
                 </emma>
               </tasks>
