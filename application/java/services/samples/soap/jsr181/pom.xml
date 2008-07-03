@@ -74,16 +74,15 @@
             <version>1.1</version>
           </dependency>
         </dependencies>
-        <!-- 
-  		<executions>
-  			<execution>
- 					<phase>package</phase>
-	  			<goals>
-  					<goal>run</goal>
-  				</goals>
-  		-->
+        
+  	<executions>
+  	<execution>
+ 	  <phase>test-compile</phase>
+	  <goals>
+  	  <goal>run</goal>
+        </goals>
         <configuration>
-          <tasks>
+          <tasks if="generate.wsdl">
             <echo>Run client code generator</echo>
             <delete dir="${basedir}/client"/>
             <taskdef name="wsgen" classname="org.codehaus.xfire.gen.WsGenTask" 
@@ -106,10 +105,8 @@
             </jar>
           </tasks>
         </configuration>
-        <!-- 
-  			</execution>	
-  		</executions>
-  		-->
+  	</execution>	
+  	</executions>
       </plugin>
     </plugins>
   </build>
