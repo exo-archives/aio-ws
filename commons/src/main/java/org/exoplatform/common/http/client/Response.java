@@ -31,20 +31,20 @@
 
 package org.exoplatform.common.http.client;
 
-import java.io.InputStream;
-import java.io.SequenceInputStream;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InterruptedIOException;
+import java.io.SequenceInputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.net.ProtocolException;
+import java.net.URL;
 import java.util.Date;
-import java.util.Vector;
 import java.util.Hashtable;
-import java.util.StringTokenizer;
 import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 /**
  * This class represents an intermediate response. It's used internally by the

@@ -32,8 +32,8 @@
 
 package org.exoplatform.common.http.client;
 
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.BitSet;
 import java.util.Hashtable;
 

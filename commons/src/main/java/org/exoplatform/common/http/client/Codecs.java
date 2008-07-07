@@ -32,19 +32,19 @@
 
 package org.exoplatform.common.http.client;
 
-import java.util.BitSet;
-import java.util.Vector;
-import java.util.StringTokenizer;
-import java.io.IOException;
+import java.io.BufferedReader;
 import java.io.EOFException;
-import java.io.InputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLConnection;
+import java.util.BitSet;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 /**
  * This class collects various encoders and decoders.

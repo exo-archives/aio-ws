@@ -34,15 +34,15 @@ package org.exoplatform.common.http.client;
 
 import java.lang.reflect.Array;
 import java.net.URL;
-import java.util.Date;
-import java.util.BitSet;
-import java.util.Locale;
-import java.util.Vector;
-import java.util.Hashtable;
-import java.util.SimpleTimeZone;
-import java.util.StringTokenizer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.BitSet;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.Locale;
+import java.util.SimpleTimeZone;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 /**
  * This class holds various utility methods.

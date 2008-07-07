@@ -49,12 +49,15 @@ public class HierarchicalProperty {
 	 * @param name property name
 	 * @param value property value (can be null)
 	 */
-	public HierarchicalProperty(String name, String value) {
+	public HierarchicalProperty(String name, String value, String namespaceURI) {
 		String[] tmp = name.split(":");
 		if(tmp.length > 1 ) {
-		  this.name = new QName(tmp[0], tmp[1]);
+		  this.name = new QName(namespaceURI, tmp[1], tmp[0]);
 		} else {
-		  this.name = new QName(tmp[0]);
+		  if(namespaceURI == null)
+		    this.name = new QName(tmp[0]);
+		  else
+		    this.name = new QName(namespaceURI, tmp[0]);
 		}
 		this.value = value;
 		this.children = new ArrayList<HierarchicalProperty>();
@@ -178,4 +181,14 @@ public class HierarchicalProperty {
 	  return attributes;
 	}
 	
+	
+	/**
+	 * @return name as string prefix:localPart
+	 */
+	public String getStringName() {
+	  String str = "";
+	  if(name.getPrefix() != null) 
+	    str+=name.getPrefix()+":";
+	  return str+=name.getLocalPart();
+	}
 }

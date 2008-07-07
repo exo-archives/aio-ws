@@ -32,12 +32,12 @@
 
 package org.exoplatform.common.http.client;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.io.OutputStreamWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.Calendar;
 import java.util.TimeZone;
 

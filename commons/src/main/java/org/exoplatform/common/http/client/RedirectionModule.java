@@ -32,8 +32,8 @@
 
 package org.exoplatform.common.http.client;
 
-import java.net.ProtocolException;
 import java.io.IOException;
+import java.net.ProtocolException;
 import java.util.Hashtable;
 
 /**

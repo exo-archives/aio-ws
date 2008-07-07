@@ -32,11 +32,11 @@
 
 package org.exoplatform.common.http.client;
 
-import java.io.IOException;
 import java.io.EOFException;
-import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * This class decompresses an input stream containing data compressed with the

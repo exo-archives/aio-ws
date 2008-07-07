@@ -32,9 +32,9 @@
 
 package org.exoplatform.common.http.client;
 
-import java.io.InputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * This class is similar to java.io.BufferedInputStream, except that it fixes

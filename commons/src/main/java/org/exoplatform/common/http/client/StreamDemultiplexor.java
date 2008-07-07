@@ -32,8 +32,8 @@
 
 package org.exoplatform.common.http.client;
 
-import java.io.IOException;
 import java.io.EOFException;
+import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.Socket;
 import java.net.SocketException;

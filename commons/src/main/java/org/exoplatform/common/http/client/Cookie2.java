@@ -35,8 +35,8 @@ package org.exoplatform.common.http.client;
 import java.io.UnsupportedEncodingException;
 import java.net.ProtocolException;
 import java.util.Date;
-import java.util.Vector;
 import java.util.StringTokenizer;
+import java.util.Vector;
 
 /**
  * This class represents an http cookie as specified in the <A

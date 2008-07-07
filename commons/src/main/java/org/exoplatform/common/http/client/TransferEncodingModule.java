@@ -34,8 +34,8 @@ package org.exoplatform.common.http.client;
 
 import java.io.IOException;
 import java.util.Vector;
-import java.util.zip.InflaterInputStream;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.InflaterInputStream;
 
 /**
  * This module handles the TransferEncoding response header. It currently

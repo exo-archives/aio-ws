@@ -32,8 +32,8 @@
 
 package org.exoplatform.common.http.client;
 
-import java.util.Hashtable;
 import java.util.Enumeration;
+import java.util.Hashtable;
 
 /**
  * This class implements a Hashtable with case-insensitive Strings as keys.

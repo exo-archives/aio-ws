@@ -32,15 +32,15 @@
 
 package org.exoplatform.common.http.client;
 
-import java.net.URL;
-import java.net.ProtocolException;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.ByteArrayOutputStream;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.Enumeration;
+import java.util.Hashtable;
 
 /**
  * This class is a wrapper around HTTPConnection providing the interface defined

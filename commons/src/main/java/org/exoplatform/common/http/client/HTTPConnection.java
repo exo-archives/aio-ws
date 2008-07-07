@@ -32,21 +32,21 @@
 
 package org.exoplatform.common.http.client;
 
-import java.io.OutputStream;
+import java.applet.Applet;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.FilterOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InterruptedIOException;
-import java.net.URL;
-import java.net.Socket;
-import java.net.InetAddress;
-import java.net.SocketException;
+import java.io.OutputStream;
 import java.net.ConnectException;
-import java.net.UnknownHostException;
+import java.net.InetAddress;
 import java.net.NoRouteToHostException;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.Vector;
-import java.applet.Applet;
 
 /**
  * This class implements http protocol requests; it contains most of HTTP/1.1
