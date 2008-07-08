@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
 /**
  * Created by The eXo Platform SAS.<br/> HeaderParam define the names of header
  * from HTTP request. In this way ResourceContainer gets only header parameters
- * wich it needs. For example:<br/>
+ * which it needs. For example:<br/>
  * 
  * <pre>
  * ...

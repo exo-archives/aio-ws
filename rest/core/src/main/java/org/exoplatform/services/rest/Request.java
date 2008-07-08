@@ -79,7 +79,7 @@ public class Request {
   }
 
   /**
-   * Retrun entity body represented by InputStream.
+   * Return entity body represented by InputStream.
    * @return the entity data stream.
    */
   public InputStream getEntityStream() {
