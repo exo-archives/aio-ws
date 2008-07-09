@@ -64,11 +64,12 @@
             <copy todir="${exo.projects.directory.working}/exo-jonas/lib/apps/" verbose="true" overwrite="true">
               <fileset dir="${basedir}/target/lib-${org.exoplatform.ws.version}.dir">
                 <exclude name="**/*.war" />
-		<exclude name="**/exo.ws.rest.ejbconnector21-${org.exoplatform.ws.version}.jar" />
-		<exclude name="**/exo.ws.application.ejbconnector21.client21-${org.exoplatform.ws.version}.jar" />
+		<!--exclude name="**/exo.ws.rest.ejbconnector21-${org.exoplatform.ws.version}.jar" /-->
+		<!--exclude name="**/exo.ws.application.ejbconnector21.client21-${org.exoplatform.ws.version}.jar" /-->
                 <!--exclude name="**/*.rar" /-->
               </fileset>
 	    </copy>
+	    <!--
             <copy todir="${exo.projects.directory.working}/exo-jonas/ejbjars/autoload/" verbose="true" overwrite="true">
               <fileset dir="${basedir}/target/lib-${org.exoplatform.ws.version}.dir">
 		<include name="**/exo.ws.rest.ejbconnector21-${org.exoplatform.ws.version}.jar" />
@@ -79,6 +80,7 @@
 		<include name="exo.ws.application.ejbconnector21.client21-${org.exoplatform.ws.version}.jar" />
 	      </fileset>
 	    </copy>
+	    -->
             <!--copying patch directory-->
             <copy todir="${exo.projects.directory.working}/exo-jonas/" verbose="true" overwrite="true">
               <fileset dir="${basedir}/assembly/jonas/" />
