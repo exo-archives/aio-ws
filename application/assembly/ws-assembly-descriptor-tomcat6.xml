@@ -19,10 +19,12 @@
       <outputDirectory>/</outputDirectory>
 
       <excludes>
+      <!--
         <exclude>org.exoplatform.ws:exo.ws.rest.ejbconnector21</exclude>
         <exclude>org.exoplatform.ws:exo.ws.application.ejbconnector21.client21</exclude>
         <exclude>org.exoplatform.ws:exo.ws.rest.ejbconnector30</exclude>
         <exclude>org.exoplatform.ws:exo.ws.application.ejbconnector30.client30</exclude>
+	-->
         <!--exclude>org.exoplatform.ws:exo.ws.application.webapps</exclude-->
 
         <exclude>org.springframework:spring</exclude>
