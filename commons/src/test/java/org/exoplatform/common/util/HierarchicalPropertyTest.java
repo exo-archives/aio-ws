@@ -29,7 +29,7 @@ import junit.framework.TestCase;
  * @version $Id: $
  */
 
-public class TestHierarchicalProperty extends TestCase {
+public class HierarchicalPropertyTest extends TestCase {
   
   protected void setUp() throws Exception {}
   

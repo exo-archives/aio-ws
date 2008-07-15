@@ -1,28 +1,31 @@
 <project>
-  <parent>                                                                                                                       
-      <groupId>org.exoplatform.ws</groupId>                                                                                        
-      <artifactId>config</artifactId>                                                                                              
-      <version>trunk</version>                                                                                                     
-  </parent>    
+  <parent>
+    <groupId>org.exoplatform.ws</groupId>
+    <artifactId>config</artifactId>
+    <version>trunk</version>
+  </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.exoplatform.ws</groupId>
   <artifactId>exo.ws.commons</artifactId>
   <version>${org.exoplatform.ws.version}</version>
   <name>commons utils</name>
   <description>commons utils</description>
-  
-   <dependencies>                                                                                                                                          
-    <dependency>                                                                                                                                           
-      <groupId>junit</groupId>                                                                                                                            
-      <artifactId>junit</artifactId>                                                                                                                      
-      <version>3.8.1</version>                                                                                                                            
-      <scope>compile</scope>                                                                                                                               
-    </dependency>   
-   </dependencies>  
-     
-   <build>  
-   
-     <testResources>
+  <dependencies>
+    <dependency>
+      <groupId>org.exoplatform.kernel</groupId>
+      <artifactId>exo.kernel.component.common</artifactId>
+      <version>${org.exoplatform.kernel.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+  <!--
+  <build>
+    <testResources>
       <testResource>
         <directory>src/test/java</directory>
         <includes>
@@ -32,15 +35,15 @@
         </includes>
       </testResource>
     </testResources>
-                                                                                                                                                     
-    <plugins>                                                                                                                                                
-      <plugin>                                                                                                                                               
-        <groupId>org.apache.maven.plugins</groupId>                                                                                                          
-        <artifactId>maven-surefire-plugin</artifactId>                                                                                                       
-        <configuration> 
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
           <skip>false</skip>
-        </configuration>                                                                                                                                     
-      </plugin>                                                                                                                                              
-    </plugins>  
-  </build>         
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  -->
 </project>
