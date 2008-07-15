@@ -43,7 +43,6 @@ import java.io.InputStream;
  * unix "compress" utility (LZC, a LZW variant). This code is based heavily on
  * the <var>unlzw.c</var> code in <var>gzip-1.2.4</var> (written by Peter
  * Jannesen) and the original compress code.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  */
@@ -72,43 +71,43 @@ class UncompressInputStream extends FilterInputStream {
 
   private static final int TBL_FIRST = TBL_CLEAR + 1;
 
-  private int[]            tab_prefix;
+  private int[] tab_prefix;
 
-  private byte[]           tab_suffix;
+  private byte[] tab_suffix;
 
-  private int[]            zeros     = new int[256];
+  private int[] zeros = new int[256];
 
-  private byte[]           stack;
+  private byte[] stack;
 
   // various state
-  private boolean          block_mode;
+  private boolean block_mode;
 
-  private int              n_bits;
+  private int n_bits;
 
-  private int              maxbits;
+  private int maxbits;
 
-  private int              maxmaxcode;
+  private int maxmaxcode;
 
-  private int              maxcode;
+  private int maxcode;
 
-  private int              bitmask;
+  private int bitmask;
 
-  private int              oldcode;
+  private int oldcode;
 
-  private byte             finchar;
+  private byte finchar;
 
-  private int              stackp;
+  private int stackp;
 
-  private int              free_ent;
+  private int free_ent;
 
   // input buffer
-  private byte[]           data      = new byte[10000];
+  private byte[] data = new byte[10000];
 
-  private int              bit_pos   = 0, end = 0, got = 0;
+  private int bit_pos = 0, end = 0, got = 0;
 
-  private boolean          eof       = false;
+  private boolean eof = false;
 
-  private static final int EXTRA     = 64;
+  private static final int EXTRA = 64;
 
   public synchronized int read(byte[] buf, int off, int len) throws IOException {
     if (eof)
@@ -178,8 +177,8 @@ class UncompressInputStream extends FilterInputStream {
         // read next code
 
         int pos = l_bit_pos >> 3;
-        int code = (((l_data[pos] & 0xFF) | ((l_data[pos + 1] & 0xFF) << 8) | ((l_data[pos + 2] & 0xFF) << 16)) >> (l_bit_pos & 0x7))
-            & l_bitmask;
+        int code = (((l_data[pos] & 0xFF) | ((l_data[pos + 1] & 0xFF) << 8) | ((l_data[pos + 2] & 0xFF) << 16)) >> (l_bit_pos & 0x7)) &
+            l_bitmask;
         l_bit_pos += l_n_bits;
 
         // handle first iteration
@@ -324,17 +323,17 @@ class UncompressInputStream extends FilterInputStream {
     return in.available();
   }
 
-  private static final int LZW_MAGIC      = 0x1f9d;
+  private static final int LZW_MAGIC = 0x1f9d;
 
-  private static final int MAX_BITS       = 16;
+  private static final int MAX_BITS = 16;
 
-  private static final int INIT_BITS      = 9;
+  private static final int INIT_BITS = 9;
 
-  private static final int HDR_MAXBITS    = 0x1f;
+  private static final int HDR_MAXBITS = 0x1f;
 
-  private static final int HDR_EXTENDED   = 0x20;
+  private static final int HDR_EXTENDED = 0x20;
 
-  private static final int HDR_FREE       = 0x40;
+  private static final int HDR_FREE = 0x40;
 
   private static final int HDR_BLOCK_MODE = 0x80;
 
@@ -350,8 +349,8 @@ class UncompressInputStream extends FilterInputStream {
       throw new EOFException("Failed to read magic number");
     magic += t & 0xff;
     if (magic != LZW_MAGIC)
-      throw new IOException("Input not in compress format (read " + "magic number 0x"
-          + Integer.toHexString(magic) + ")");
+      throw new IOException("Input not in compress format (read " + "magic number 0x" +
+          Integer.toHexString(magic) + ")");
 
     // read in header byte
 
@@ -363,8 +362,8 @@ class UncompressInputStream extends FilterInputStream {
     maxbits = header & HDR_MAXBITS;
 
     if (maxbits > MAX_BITS)
-      throw new IOException("Stream compressed with " + maxbits + " bits, but can only handle "
-          + MAX_BITS + " bits");
+      throw new IOException("Stream compressed with " + maxbits + " bits, but can only handle " +
+          MAX_BITS + " bits");
 
     if ((header & HDR_EXTENDED) > 0)
       throw new IOException("Header extension bit set");

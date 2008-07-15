@@ -39,7 +39,6 @@ import java.io.InputStream;
 
 /**
  * This class de-chunks an input stream.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  */
@@ -61,9 +60,9 @@ class ChunkedInputStream extends FilterInputStream {
       return -1;
   }
 
-  private long    chunk_len = -1;
+  private long chunk_len = -1;
 
-  private boolean eof       = false;
+  private boolean eof = false;
 
   public synchronized int read(byte[] buf, int off, int len) throws IOException {
     if (eof)

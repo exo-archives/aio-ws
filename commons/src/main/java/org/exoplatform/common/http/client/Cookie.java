@@ -36,6 +36,9 @@ import java.io.Serializable;
 import java.net.ProtocolException;
 import java.util.Date;
 
+import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.ExoLogger;
+
 /**
  * This class represents an http cookie as specified in <a
  * href="http://home.netscape.com/newsref/std/cookie_spec.html">Netscape's
@@ -44,8 +47,8 @@ import java.util.Date;
  * look whether Netscape accepts their stuff, the Set-Cookie header field parser
  * actually tries to follow what Netscape has implemented, instead of what the
  * spec says. Additionally, the parser it will also recognize the Max-Age
- * parameter from <a href="http://www.ietf.org/rfc/rfc2109.txt">rfc-2109</a>,
- * as that uses the same header field (Set-Cookie).
+ * parameter from <a href="http://www.ietf.org/rfc/rfc2109.txt">rfc-2109</a>, as
+ * that uses the same header field (Set-Cookie).
  * <P>
  * Some notes about how Netscape (4.7) parses:
  * <ul>
@@ -58,7 +61,6 @@ import java.util.Date;
  * <LI>Commas and other delimiters: Netscape just parses until the next ';'.
  * This means will allow commas etc inside values.
  * </ul>
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  * @since V0.3
@@ -67,21 +69,22 @@ public class Cookie implements Serializable {
   /** Make this compatible with V0.3-2 */
   private static final long serialVersionUID = 8599975325569296615L;
 
-  protected String          name;
+  private static final Log log = ExoLogger.getLogger("ws.commons.httpclient.Cookie");
 
-  protected String          value;
+  protected String name;
 
-  protected Date            expires;
+  protected String value;
 
-  protected String          domain;
+  protected Date expires;
 
-  protected String          path;
+  protected String domain;
 
-  protected boolean         secure;
+  protected String path;
+
+  protected boolean secure;
 
   /**
    * Create a cookie.
-   * 
    * @param name the cookie name
    * @param value the cookie value
    * @param domain the host this cookie will be sent to
@@ -115,7 +118,6 @@ public class Cookie implements Serializable {
 
   /**
    * Use <code>parse()</code> to create cookies.
-   * 
    * @see #parse(java.lang.String, HTTPClient.RoRequest)
    */
   protected Cookie(RoRequest req) {
@@ -139,7 +141,6 @@ public class Cookie implements Serializable {
 
   /**
    * Parses the Set-Cookie header into an array of Cookies.
-   * 
    * @param set_cookie the Set-Cookie header received from the server
    * @param req the request used
    * @return an array of Cookies as parsed from the Set-Cookie header
@@ -170,8 +171,8 @@ public class Cookie implements Serializable {
 
       end = set_cookie.indexOf('=', beg);
       if (end == -1)
-        throw new ProtocolException("Bad Set-Cookie header: " + set_cookie + "\nNo '=' found "
-            + "for token starting at " + "position " + beg);
+        throw new ProtocolException("Bad Set-Cookie header: " + set_cookie + "\nNo '=' found " +
+            "for token starting at " + "position " + beg);
       curr.name = set_cookie.substring(beg, end).trim();
 
       beg = Util.skipSpace(buf, end + 1);
@@ -223,8 +224,8 @@ public class Cookie implements Serializable {
           if (beg < len && buf[beg] == ';') // consume ";"
             beg = Util.skipSpace(buf, beg + 1);
           else if (beg < len && buf[beg] != ',')
-            throw new ProtocolException("Bad Set-Cookie header: " + set_cookie + "\nExpected "
-                + "';' or ',' at position " + beg);
+            throw new ProtocolException("Bad Set-Cookie header: " + set_cookie + "\nExpected " +
+                "';' or ',' at position " + beg);
 
           continue;
         }
@@ -232,8 +233,8 @@ public class Cookie implements Serializable {
         // alright, must now be of the form x=y
         end = set_cookie.indexOf('=', beg);
         if (end == -1)
-          throw new ProtocolException("Bad Set-Cookie header: " + set_cookie + "\nNo '=' found "
-              + "for token starting at " + "position " + beg);
+          throw new ProtocolException("Bad Set-Cookie header: " + set_cookie + "\nNo '=' found " +
+              "for token starting at " + "position " + beg);
 
         String name = set_cookie.substring(beg, end).trim();
         beg = Util.skipSpace(buf, end + 1);
@@ -253,8 +254,8 @@ public class Cookie implements Serializable {
            * letters.
            */
           int pos = beg;
-          while (pos < len
-              && (buf[pos] >= 'a' && buf[pos] <= 'z' || buf[pos] >= 'A' && buf[pos] <= 'Z'))
+          while (pos < len &&
+              (buf[pos] >= 'a' && buf[pos] <= 'z' || buf[pos] >= 'A' && buf[pos] <= 'Z'))
             pos++;
           pos = Util.skipSpace(buf, pos);
           if (pos < len && buf[pos] == ',' && pos > beg)
@@ -283,8 +284,8 @@ public class Cookie implements Serializable {
       if (legal) {
         cookie_arr = Util.resizeArray(cookie_arr, cookie_arr.length + 1);
         cookie_arr[cookie_arr.length - 1] = curr;
-      } else
-        Log.write(Log.COOKI, "Cooki: Ignoring cookie: " + curr);
+      } else if (log.isDebugEnabled())
+        log.debug("Ignoring cookie: " + curr);
     }
 
     return cookie_arr;
@@ -292,7 +293,6 @@ public class Cookie implements Serializable {
 
   /**
    * Set the given attribute, if valid.
-   * 
    * @param cookie the cookie on which to set the value
    * @param name the name of the attribute
    * @param value the value of the attribute
@@ -315,8 +315,7 @@ public class Cookie implements Serializable {
          * throw new ProtocolException("Bad Set-Cookie header: " + set_cookie +
          * "\nInvalid date found at " + "position " + beg);
          */
-        Log.write(Log.COOKI, "Cooki: Bad Set-Cookie header: " + set_cookie
-            + "\n       Invalid date `" + value + "'");
+        log.warn("Bad Set-Cookie header: " + set_cookie + ". Invalid date '" + value + "'");
       }
     } else if (name.equals("max-age")) // from rfc-2109
     {
@@ -328,15 +327,14 @@ public class Cookie implements Serializable {
       try {
         age = Integer.parseInt(value);
       } catch (NumberFormatException nfe) {
-        throw new ProtocolException("Bad Set-Cookie header: " + set_cookie + "\nMax-Age '" + value
-            + "' not a number");
+        throw new ProtocolException("Bad Set-Cookie header: " + set_cookie + "\nMax-Age '" + value +
+            "' not a number");
       }
       cookie.expires = new Date(System.currentTimeMillis() + age * 1000L);
     } else if (name.equalsIgnoreCase("domain")) {
       // you get everything these days...
       if (value.length() == 0) {
-        Log.write(Log.COOKI, "Cooki: Bad Set-Cookie header: " + set_cookie
-            + "\n       domain is empty - ignoring domain");
+        log.warn("Bad Set-Cookie header: " + set_cookie + ". Domain is empty - ignoring domain");
         return true;
       }
 
@@ -349,8 +347,8 @@ public class Cookie implements Serializable {
 
       // must be the same domain as in the url
       if (!cookie.domain.endsWith(value)) {
-        Log.write(Log.COOKI, "Cooki: Bad Set-Cookie header: " + set_cookie
-            + "\n       Current domain " + cookie.domain + " does not match given parsed " + value);
+        log.warn("Bad Set-Cookie header: " + set_cookie + ". Current domain " + cookie.domain +
+            " does not match given parsed " + value);
         return false;
       }
 
@@ -367,9 +365,8 @@ public class Cookie implements Serializable {
       // domain must be either .local or must contain at least
       // two dots
       if (!value.equals(".local") && value.indexOf('.', 1) == -1) {
-        Log.write(Log.COOKI, "Cooki: Bad Set-Cookie header: " + set_cookie
-            + "\n       Domain attribute " + value + "isn't .local and doesn't have at "
-            + "least 2 dots");
+        log.warn("Bad Set-Cookie header: " + set_cookie + ". Domain attribute " + value +
+            "isn't .local and doesn't have at " + "least 2 dots");
         return false;
       }
 
@@ -378,16 +375,15 @@ public class Cookie implements Serializable {
       String top = null;
       if (value.length() > 3)
         top = value.substring(value.length() - 4);
-      if (top == null
-          || !(top.equalsIgnoreCase(".com") || top.equalsIgnoreCase(".edu")
-              || top.equalsIgnoreCase(".net") || top.equalsIgnoreCase(".org")
-              || top.equalsIgnoreCase(".gov") || top.equalsIgnoreCase(".mil") || top
+      if (top == null ||
+          !(top.equalsIgnoreCase(".com") || top.equalsIgnoreCase(".edu") ||
+              top.equalsIgnoreCase(".net") || top.equalsIgnoreCase(".org") ||
+              top.equalsIgnoreCase(".gov") || top.equalsIgnoreCase(".mil") || top
               .equalsIgnoreCase(".int"))) {
         int dl = cookie.domain.length(), vl = value.length();
         if (dl > vl && cookie.domain.substring(0, dl - vl).indexOf('.') != -1) {
-          Log.write(Log.COOKI, "Cooki: Bad Set-Cookie header: " + set_cookie
-              + "\n       Domain attribute " + value + "is more than one level below "
-              + "current domain " + cookie.domain);
+          log.warn("Bad Set-Cookie header: " + set_cookie + ". Domain attribute " + value +
+              "is more than one level below " + "current domain " + cookie.domain);
           return false;
         }
       }
@@ -468,10 +464,10 @@ public class Cookie implements Serializable {
     if (eff_host.indexOf('.') == -1)
       eff_host += ".local";
 
-    return ((domain.charAt(0) == '.' && eff_host.endsWith(domain) || domain.charAt(0) != '.'
-        && eff_host.equals(domain))
-        && Util.getPath(req.getRequestURI()).startsWith(path) && (!secure
-        || con.getProtocol().equals("https") || con.getProtocol().equals("shttp")));
+    return ((domain.charAt(0) == '.' && eff_host.endsWith(domain) || domain.charAt(0) != '.' &&
+        eff_host.equals(domain)) &&
+        Util.getPath(req.getRequestURI()).startsWith(path) && (!secure ||
+        con.getProtocol().equals("https") || con.getProtocol().equals("shttp")));
   }
 
   /**

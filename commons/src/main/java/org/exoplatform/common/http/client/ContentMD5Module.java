@@ -34,6 +34,9 @@ package org.exoplatform.common.http.client;
 
 import java.io.IOException;
 
+import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.ExoLogger;
+
 /**
  * This module handles the Content-MD5 response header. If this header was sent
  * with a response and the entity isn't encoded using an unknown transport
@@ -41,11 +44,13 @@ import java.io.IOException;
  * The MD5InputStream keeps a running digest and checks this against the
  * expected digest from the Content-MD5 header the stream is closed. An
  * IOException is thrown at that point if the digests don't match.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  */
 class ContentMD5Module implements HTTPClientModule {
+
+  private static final Log log = ExoLogger.getLogger("ws.commons.httpclient.ContentMD5Module");
+
   // Constructors
 
   ContentMD5Module() {
@@ -94,11 +99,12 @@ class ContentMD5Module implements HTTPClientModule {
     if ((md5_digest == null && !md5_tok) || resp.getHeader("Transfer-Encoding") != null)
       return;
 
-    if (md5_digest != null)
-      Log.write(Log.MODS, "CMD5M: Received digest: " + md5_digest + " - pushing md5-check-stream");
-    else
-      Log.write(Log.MODS, "CMD5M: Expecting digest in trailer " + " - pushing md5-check-stream");
-
+    if (log.isDebugEnabled()) {
+      if (md5_digest != null)
+        log.debug("Received digest: " + md5_digest + " - pushing md5-check-stream");
+      else
+        log.debug("Expecting digest in trailer " + " - pushing md5-check-stream");
+    }
     resp.inp_stream = new MD5InputStream(resp.inp_stream, new VerifyMD5(resp));
   }
 
@@ -132,11 +138,10 @@ class VerifyMD5 implements HashVerifier {
 
     for (int idx = 0; idx < hash.length; idx++) {
       if (hash[idx] != ContMD5[idx])
-        throw new IOException("MD5-Digest mismatch: expected " + hex(ContMD5) + " but calculated "
-            + hex(hash));
+        throw new IOException("MD5-Digest mismatch: expected " + hex(ContMD5) + " but calculated " +
+            hex(hash));
     }
 
-    Log.write(Log.MODS, "CMD5M: hash successfully verified");
   }
 
   /**

@@ -46,28 +46,27 @@ import java.util.Vector;
 
 /**
  * This class holds various utility methods.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  */
 public class Util {
-  private static final BitSet Separators       = new BitSet(128);
+  private static final BitSet Separators = new BitSet(128);
 
-  private static final BitSet TokenChar        = new BitSet(128);
+  private static final BitSet TokenChar = new BitSet(128);
 
-  private static final BitSet UnsafeChar       = new BitSet(128);
+  private static final BitSet UnsafeChar = new BitSet(128);
 
-  private static DateFormat   http_format;
+  private static DateFormat http_format;
 
-  private static DateFormat   parse_1123;
+  private static DateFormat parse_1123;
 
-  private static DateFormat   parse_850;
+  private static DateFormat parse_850;
 
-  private static DateFormat   parse_asctime;
+  private static DateFormat parse_asctime;
 
   private static final Object http_format_lock = new Object();
 
-  private static final Object http_parse_lock  = new Object();
+  private static final Object http_parse_lock = new Object();
 
   static {
     // rfc-2616 tspecial
@@ -208,7 +207,6 @@ public class Util {
    * Helper method for context lists used by modules. Returns the list
    * associated with the context if it exists; otherwise it creates a new list
    * and adds it to the context list.
-   * 
    * @param cntxt_list the list of lists indexed by context
    * @param cntxt the context
    */
@@ -227,7 +225,6 @@ public class Util {
   /**
    * Creates an array of distances to speed up the search in findStr(). The
    * returned array should be passed as the second argument to findStr().
-   * 
    * @param search the search string (same as the first argument to findStr()).
    * @return an array of distances (to be passed as the second argument to
    *         findStr()).
@@ -270,7 +267,6 @@ public class Util {
   /**
    * Search for a string. Use compile_search() to first generate the second
    * argument. This uses a Knuth-Morris-Pratt like algorithm.
-   * 
    * @param search the string to search for.
    * @param cmp the the array returned by compile_search.
    * @param str the string in which to look for <var>search</var>.
@@ -281,8 +277,8 @@ public class Util {
    *         or -1 if not found.
    */
   final static int findStr(byte[] search, int[] cmp, byte[] str, int beg, int end) {
-    int c1f = cmp[0], c1l = cmp[1], d1 = c1l - c1f, c2f = cmp[2], c2l = cmp[3], d2 = c2l - c2f, c3f = cmp[4], c3l = cmp[5], d3 = c3l
-        - c3f;
+    int c1f = cmp[0], c1l = cmp[1], d1 = c1l - c1f, c2f = cmp[2], c2l = cmp[3], d2 = c2l - c2f, c3f = cmp[4], c3l = cmp[5], d3 = c3l -
+        c3f;
 
     Find: while (beg + search.length <= end) {
       if (search[c1l] == str[beg + c1l]) {
@@ -325,7 +321,6 @@ public class Util {
    * characters preceded by a slash. E.g. "\c" would be replaced by "c". This is
    * used in parsing http headers where quoted-characters are allowed in
    * quoted-strings and often used to quote the quote character &lt;"&gt;.
-   * 
    * @param str the string do dequote
    * @return the string do with all quoted characters replaced by their true
    *         value.
@@ -352,7 +347,6 @@ public class Util {
    * characters preceded by a slash. E.g. "c" would be replaced by "\c". This is
    * used in generating http headers where certain characters need to be quoted,
    * such as the quote character &lt;"&gt;.
-   * 
    * @param str the string do quote
    * @param qlist the list of characters to quote
    * @return the string do with all characters replaced by their quoted version.
@@ -387,7 +381,6 @@ public class Util {
 
   /**
    * This parses the value part of a header. All quoted strings are dequoted.
-   * 
    * @see #parseHeader(java.lang.String, boolean)
    * @param header the value part of the header.
    * @return a Vector containing all the elements; each entry is an instance of
@@ -419,9 +412,8 @@ public class Util {
    * 
    * Any amount of white space is allowed between any part of the header,
    * element or param and is ignored. A missing value in any element or param
-   * will be stored as the empty string; if the "=" is also missing <var>null</var>
-   * will be stored instead.
-   * 
+   * will be stored as the empty string; if the "=" is also missing
+   * <var>null</var> will be stored instead.
    * @param header the value part of the header.
    * @param dequote if true all quoted strings are dequoted.
    * @return a Vector containing all the elements; each entry is an instance of
@@ -445,8 +437,8 @@ public class Util {
         if (beg == len)
           break;
         if (buf[beg] != ',')
-          throw new ParseException("Bad header format: '" + header
-              + "'\nExpected \",\" at position " + beg);
+          throw new ParseException("Bad header format: '" + header +
+              "'\nExpected \",\" at position " + beg);
       }
       first = false;
 
@@ -460,12 +452,12 @@ public class Util {
       }
 
       if (buf[beg] == '=' || buf[beg] == ';' || buf[beg] == '"')
-        throw new ParseException("Bad header format: '" + header
-            + "'\nEmpty element name at position " + beg);
+        throw new ParseException("Bad header format: '" + header +
+            "'\nEmpty element name at position " + beg);
 
       end = beg + 1; // extract element name
-      while (end < len && !Character.isWhitespace(buf[end]) && buf[end] != '=' && buf[end] != ','
-          && buf[end] != ';')
+      while (end < len && !Character.isWhitespace(buf[end]) && buf[end] != '=' && buf[end] != ',' &&
+          buf[end] != ';')
         end++;
       elem_name = new String(buf, beg, end - beg);
 
@@ -500,12 +492,12 @@ public class Util {
         }
 
         if (buf[beg] == '=' || buf[beg] == '"')
-          throw new ParseException("Bad header format: '" + header
-              + "'\nEmpty parameter name at position " + beg);
+          throw new ParseException("Bad header format: '" + header +
+              "'\nEmpty parameter name at position " + beg);
 
         end = beg + 1; // extract param name
-        while (end < len && !Character.isWhitespace(buf[end]) && buf[end] != '=' && buf[end] != ','
-            && buf[end] != ';')
+        while (end < len && !Character.isWhitespace(buf[end]) && buf[end] != '=' &&
+            buf[end] != ',' && buf[end] != ';')
           end++;
         param_name = new String(buf, beg, end - beg);
 
@@ -563,9 +555,9 @@ public class Util {
         end++;
       }
       if (end == len)
-        throw new ParseException("Bad header format: '" + header
-            + "'\nClosing <\"> for quoted-string" + " starting at position " + (beg - 1)
-            + " not found");
+        throw new ParseException("Bad header format: '" + header +
+            "'\nClosing <\"> for quoted-string" + " starting at position " + (beg - 1) +
+            " not found");
       if (deq_buf != null) {
         System.arraycopy(buf, lst_pos, deq_buf, deq_pos, end - lst_pos);
         deq_pos += end - lst_pos;
@@ -589,7 +581,6 @@ public class Util {
   /**
    * Determines if the given header contains a certain token. The header must
    * conform to the rules outlined in parseHeader().
-   * 
    * @see #parseHeader(java.lang.String)
    * @param header the header value.
    * @param token the token to find; the match is case-insensitive.
@@ -605,7 +596,6 @@ public class Util {
 
   /**
    * Get the HttpHeaderElement with the name <var>name</var>.
-   * 
    * @param header a vector of HttpHeaderElement's, such as is returned from
    *          <code>parseHeader()</code>
    * @param name the name of element to retrieve; matching is case-insensitive
@@ -627,7 +617,6 @@ public class Util {
    * especially in headers like 'Content-type' and 'Content-Disposition'.
    * <P>
    * quoted characters ("\x") in a quoted string are dequoted.
-   * 
    * @see #parseHeader(java.lang.String)
    * @param param the parameter name
    * @param hdr the header value
@@ -648,7 +637,6 @@ public class Util {
   /**
    * Assembles a Vector of HttpHeaderElements into a full header string. The
    * individual header elements are seperated by a ", ".
-   * 
    * @param the parsed header
    * @return a string containing the assembled header
    */
@@ -668,7 +656,6 @@ public class Util {
   /**
    * returns the position of the first non-space character in a char array
    * starting a position pos.
-   * 
    * @param str the char array
    * @param pos the position to start looking
    * @return the position of the first non-space character
@@ -683,7 +670,6 @@ public class Util {
   /**
    * returns the position of the first space character in a char array starting
    * a position pos.
-   * 
    * @param str the char array
    * @param pos the position to start looking
    * @return the position of the first space character, or the length of the
@@ -699,7 +685,6 @@ public class Util {
   /**
    * returns the position of the first non-token character in a char array
    * starting a position pos.
-   * 
    * @param str the char array
    * @param pos the position to start looking
    * @return the position of the first non-token character, or the length of the
@@ -715,7 +700,6 @@ public class Util {
   /**
    * Does the string need to be quoted when sent in a header? I.e. does it
    * contain non-token characters?
-   * 
    * @param str the string
    * @return true if it needs quoting (i.e. it contains non-token chars)
    */
@@ -729,14 +713,13 @@ public class Util {
 
   /**
    * Compares two http urls for equality. This exists because the method
-   * <code>java.net.URL.sameFile()</code> is broken (an explicit port 80
-   * doesn't compare equal to an implicit port, and it doesn't take escapes into
+   * <code>java.net.URL.sameFile()</code> is broken (an explicit port 80 doesn't
+   * compare equal to an implicit port, and it doesn't take escapes into
    * account).
    * <P>
    * Two http urls are considered equal if they have the same protocol
    * (case-insensitive match), the same host (case-insensitive), the same port
    * and the same file (after decoding escaped characters).
-   * 
    * @param url1 the first url
    * @param url1 the second url
    * @return true if <var>url1</var> and <var>url2</var> compare equal
@@ -765,7 +748,6 @@ public class Util {
 
   /**
    * Return the default port used by a given protocol.
-   * 
    * @param protocol the protocol
    * @return the port number, or 0 if unknown
    * @deprecated use URI.defaultPort() instead
@@ -778,7 +760,6 @@ public class Util {
   /**
    * Parse the http date string. java.util.Date will do this fine, but is
    * deprecated, so we use SimpleDateFormat instead.
-   * 
    * @param dstr the date string to parse
    * @return the Date object
    */
@@ -827,7 +808,6 @@ public class Util {
    * <P>
    * Some versions of JDK 1.1.x are bugged in that their GMT uses daylight
    * savings time... Therefore we use our own timezone definitions.
-   * 
    * @param date the date and time to be converted
    * @return a string containg the date and time as used in http
    */
@@ -847,7 +827,6 @@ public class Util {
 
   /**
    * Escape unsafe characters in a path.
-   * 
    * @param path the original path
    * @return the path with all unsafe characters escaped
    */
@@ -873,7 +852,7 @@ public class Util {
   }
 
   static final char[] hex_map = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C',
-      'D', 'E', 'F'          };
+      'D', 'E', 'F' };
 
   /**
    * Extract the path from an http resource.
@@ -885,7 +864,6 @@ public class Util {
    * <PRE>
    * resource = [ &quot;/&quot; ] [ path ] [ &quot;;&quot; params ] [ &quot;?&quot; query ] [ &quot;#&quot; fragment ]
    * </PRE>
-   * 
    * @param the resource to split
    * @return the path, including any leading "/"
    * @see #getParams
@@ -905,7 +883,6 @@ public class Util {
 
   /**
    * Extract the params part from an http resource.
-   * 
    * @param the resource to split
    * @return the params, or null if there are none
    * @see #getPath
@@ -928,7 +905,6 @@ public class Util {
 
   /**
    * Extract the query string from an http resource.
-   * 
    * @param the resource to split
    * @return the query, or null if there was none
    * @see #getPath
@@ -947,7 +923,6 @@ public class Util {
 
   /**
    * Extract the fragment part from an http resource.
-   * 
    * @param the resource to split
    * @return the fragment, or null if there was none
    * @see #getPath
@@ -963,7 +938,6 @@ public class Util {
   /**
    * Match <var>pattern</var> against <var>name</var>, where <var>pattern</var>
    * may contain wildcards ('*').
-   * 
    * @param pattern the pattern to match; may contain '*' which match any number
    *          (0 or more) of any character (think file globbing)
    * @param name the name to match against the pattern

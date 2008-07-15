@@ -54,6 +54,9 @@ import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.ExoLogger;
+
 /**
  * This class is the default authorization handler. It currently handles the
  * authentication schemes "Basic", "Digest", and "SOCKS5" (used for the
@@ -64,30 +67,31 @@ import java.util.Vector;
  * {@link #setAuthorizationPrompter(HTTPClient.AuthorizationPrompter) set their
  * own authorization prompter} if desired.
  * <P>
- * <strong>Note:</strong> all methods except for <var>setAuthorizationPrompter</var>
- * are meant to be invoked by the AuthorizationModule only, i.e. should not be
- * invoked by the application (those methods are only public because
- * implementing the <var>AuthorizationHandler</var> interface requires them to
- * be).
- * 
+ * <strong>Note:</strong> all methods except for
+ * <var>setAuthorizationPrompter</var> are meant to be invoked by the
+ * AuthorizationModule only, i.e. should not be invoked by the application
+ * (those methods are only public because implementing the
+ * <var>AuthorizationHandler</var> interface requires them to be).
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  * @since V0.2
  */
 public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants {
-  private static final byte[]          NUL           = new byte[0];
+  private static final byte[] NUL = new byte[0];
 
-  private static final int             DI_A1         = 0;
+  private static final int DI_A1 = 0;
 
-  private static final int             DI_A1S        = 1;
+  private static final int DI_A1S = 1;
 
-  private static final int             DI_QOP        = 2;
+  private static final int DI_QOP = 2;
 
-  private static byte[]                digest_secret = null;
+  private static byte[] digest_secret = null;
 
-  private static AuthorizationPrompter prompter      = null;
+  private static AuthorizationPrompter prompter = null;
 
-  private static boolean               prompterSet   = false;
+  private static boolean prompterSet = false;
+
+  private static final Log log = ExoLogger.getLogger("ws.commons.httpclient.DefaultAuthHandler");
 
   /**
    * For Digest authentication we need to set the uri, response and opaque
@@ -102,16 +106,15 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
     else if (!info.getScheme().equalsIgnoreCase("Digest"))
       throw new AuthSchemeNotImplException(info.getScheme());
 
-    if (Log.isEnabled(Log.AUTH))
-      Log.write(Log.AUTH, "Auth:  fixing up Authorization for host " + info.getHost() + ":"
-          + info.getPort() + "; scheme: " + info.getScheme() + "; realm: " + info.getRealm());
+    if (log.isDebugEnabled())
+      log.debug("Fixing up Authorization for host " + info.getHost() + ":" + info.getPort() +
+          "; scheme: " + info.getScheme() + "; realm: " + info.getRealm());
 
     return digest_fixup(info, req, challenge, resp);
   }
 
   /**
    * returns the requested authorization, or null if none was given.
-   * 
    * @param challenge the parsed challenge from the server.
    * @param req the request which solicited this response
    * @param resp the full response received
@@ -123,16 +126,16 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
       RoResponse resp) throws AuthSchemeNotImplException, IOException {
     AuthorizationInfo cred;
 
-    if (Log.isEnabled(Log.AUTH))
-      Log.write(Log.AUTH, "Auth:  Requesting Authorization for host " + challenge.getHost() + ":"
-          + challenge.getPort() + "; scheme: " + challenge.getScheme() + "; realm: "
-          + challenge.getRealm());
+    if (log.isDebugEnabled())
+      log.debug("Requesting Authorization for host " + challenge.getHost() + ":" +
+          challenge.getPort() + "; scheme: " + challenge.getScheme() + "; realm: " +
+          challenge.getRealm());
 
     // we only handle Basic, Digest and SOCKS5 authentication
 
-    if (!challenge.getScheme().equalsIgnoreCase("Basic")
-        && !challenge.getScheme().equalsIgnoreCase("Digest")
-        && !challenge.getScheme().equalsIgnoreCase("SOCKS5"))
+    if (!challenge.getScheme().equalsIgnoreCase("Basic") &&
+        !challenge.getScheme().equalsIgnoreCase("Digest") &&
+        !challenge.getScheme().equalsIgnoreCase("SOCKS5"))
       throw new AuthSchemeNotImplException(challenge.getScheme());
 
     // For digest authentication, check if stale is set
@@ -182,7 +185,8 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
 
     // Done
 
-    Log.write(Log.AUTH, "Auth:  Got Authorization");
+    if (log.isDebugEnabled())
+      log.debug("Got Authorization");
 
     return cred;
   }
@@ -245,15 +249,15 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
 
       if (pai != null && (qop = Util.getElement(pai, "qop")) != null && qop.getValue() != null) {
         handle_rspauth(prev, resp, req, pai, hdr_name);
-      } else if (prev != null
-          && (Util.hasToken(resp.getHeader("Trailer"), hdr_name)
-              && hasParam(prev.getParams(), "qop", null) || hasParam(prev.getParams(), "qop",
+      } else if (prev != null &&
+          (Util.hasToken(resp.getHeader("Trailer"), hdr_name) &&
+              hasParam(prev.getParams(), "qop", null) || hasParam(prev.getParams(), "qop",
               "auth-int"))) {
         handle_rspauth(prev, resp, req, null, hdr_name);
       }
 
-      else if ((pai != null && qop == null && pai.contains(new HttpHeaderElement("digest")))
-          || (Util.hasToken(resp.getHeader("Trailer"), hdr_name) && prev != null && !hasParam(prev
+      else if ((pai != null && qop == null && pai.contains(new HttpHeaderElement("digest"))) ||
+          (Util.hasToken(resp.getHeader("Trailer"), hdr_name) && prev != null && !hasParam(prev
               .getParams(), "qop", null))) {
         handle_digest(prev, resp, req, hdr_name);
       }
@@ -267,8 +271,8 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
 
   private static final boolean hasParam(NVPair[] params, String name, String val) {
     for (int idx = 0; idx < params.length; idx++)
-      if (params[idx].getName().equalsIgnoreCase(name)
-          && (val == null || params[idx].getValue().equalsIgnoreCase(val)))
+      if (params[idx].getName().equalsIgnoreCase(name) &&
+          (val == null || params[idx].getValue().equalsIgnoreCase(val)))
         return true;
 
     return false;
@@ -376,15 +380,15 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
 
       // currently only MD5 hash (and "MD5-sess") is supported
 
-      if (alg != -1 && !params[alg].getValue().equalsIgnoreCase("MD5")
-          && !params[alg].getValue().equalsIgnoreCase("MD5-sess"))
-        throw new AuthSchemeNotImplException("Digest auth scheme: " + "Algorithm "
-            + params[alg].getValue() + " not implemented");
+      if (alg != -1 && !params[alg].getValue().equalsIgnoreCase("MD5") &&
+          !params[alg].getValue().equalsIgnoreCase("MD5-sess"))
+        throw new AuthSchemeNotImplException("Digest auth scheme: " + "Algorithm " +
+            params[alg].getValue() + " not implemented");
 
-      if (ch_alg != -1 && !ch_params[ch_alg].getValue().equalsIgnoreCase("MD5")
-          && !ch_params[ch_alg].getValue().equalsIgnoreCase("MD5-sess"))
-        throw new AuthSchemeNotImplException("Digest auth scheme: " + "Algorithm "
-            + ch_params[ch_alg].getValue() + " not implemented");
+      if (ch_alg != -1 && !ch_params[ch_alg].getValue().equalsIgnoreCase("MD5") &&
+          !ch_params[ch_alg].getValue().equalsIgnoreCase("MD5-sess"))
+        throw new AuthSchemeNotImplException("Digest auth scheme: " + "Algorithm " +
+            ch_params[ch_alg].getValue() + " not implemented");
 
       // fix up uri and nonce
 
@@ -412,8 +416,8 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
         params[alg] = ch_params[ch_alg];
       }
 
-      if (ch_qop != -1
-          || (ch_alg != -1 && ch_params[ch_alg].getValue().equalsIgnoreCase("MD5-sess"))) {
+      if (ch_qop != -1 ||
+          (ch_alg != -1 && ch_params[ch_alg].getValue().equalsIgnoreCase("MD5-sess"))) {
         if (cnonce == -1) {
           params = Util.resizeArray(params, params.length + 1);
           cnonce = params.length - 1;
@@ -450,9 +454,9 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
         String[] qops = splitList(extra[DI_QOP], ",");
         String p = null;
         for (int idx = 0; idx < qops.length; idx++) {
-          if (qops[idx].equalsIgnoreCase("auth-int")
-              && (req.getStream() == null || req.getConnection().ServProtVersKnown
-                  && req.getConnection().ServerProtocolVersion >= HTTP_1_1)) {
+          if (qops[idx].equalsIgnoreCase("auth-int") &&
+              (req.getStream() == null || req.getConnection().ServProtVersKnown &&
+                  req.getConnection().ServerProtocolVersion >= HTTP_1_1)) {
             p = "auth-int";
             break;
           }
@@ -466,9 +470,9 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
                   + "option 'auth-int' because an HttpOutputStream "
                   + "is being used and the server doesn't speak " + "HTTP/1.1");
 
-          throw new AuthSchemeNotImplException("Digest auth scheme: "
-              + "None of the available qop options '" + ch_params[ch_qop].getValue()
-              + "' implemented");
+          throw new AuthSchemeNotImplException("Digest auth scheme: " +
+              "None of the available qop options '" + ch_params[ch_qop].getValue() +
+              "' implemented");
         }
         params[qop] = new NVPair("qop", p);
       }
@@ -479,9 +483,9 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
         /*
          * Note: we should actually be serializing all requests through here so
          * that the server sees the nonce-count in a strictly increasing order.
-         * However, this would be a *major* hassle to do, so we're just winging
-         * it. Most of the time the requests will go over the wire in the same
-         * order as they pass through here, but in MT apps it's possible for one
+         * However, this would be amajor hassle to do, so we're just winging it.
+         * Most of the time the requests will go over the wire in the same order
+         * as they pass through here, but in MT apps it's possible for one
          * request to "overtake" another between here and the synchronized block
          * in sendRequest().
          */
@@ -498,11 +502,11 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
 
       // calc new session key if necessary
 
-      if (challenge != null
-          && (ch_stale == -1 || !ch_params[ch_stale].getValue().equalsIgnoreCase("true"))
-          && alg != -1 && params[alg].getValue().equalsIgnoreCase("MD5-sess")) {
-        extra[DI_A1S] = MD5.hexDigest(extra[DI_A1] + ":" + params[nonce].getValue() + ":"
-            + params[cnonce].getValue());
+      if (challenge != null &&
+          (ch_stale == -1 || !ch_params[ch_stale].getValue().equalsIgnoreCase("true")) &&
+          alg != -1 && params[alg].getValue().equalsIgnoreCase("MD5-sess")) {
+        extra[DI_A1S] = MD5.hexDigest(extra[DI_A1] + ":" + params[nonce].getValue() + ":" +
+            params[cnonce].getValue());
       }
 
       // update parameters for next auth cycle
@@ -527,9 +531,9 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
     AuthorizationInfo new_info;
 
     boolean ch_dreq_val = false;
-    if (ch_dreq != -1
-        && (ch_params[ch_dreq].getValue() == null || ch_params[ch_dreq].getValue()
-            .equalsIgnoreCase("true")))
+    if (ch_dreq != -1 &&
+        (ch_params[ch_dreq].getValue() == null || ch_params[ch_dreq].getValue().equalsIgnoreCase(
+            "true")))
       ch_dreq_val = true;
 
     if ((ch_dreq_val || digest != -1) && req.getStream() == null) {
@@ -559,8 +563,8 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
 
     // add info for other domains, if listed
 
-    boolean from_server = (challenge != null)
-        && challenge.getHost().equalsIgnoreCase(req.getConnection().getHost());
+    boolean from_server = (challenge != null) &&
+        challenge.getHost().equalsIgnoreCase(req.getConnection().getHost());
     if (ch_domain != -1) {
       URI base = null;
       try {
@@ -663,10 +667,14 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
         "nonce"), req.getMethod(), getValue(params, "uri"), hdr_name, resp);
 
     if (resp.hasEntity()) {
-      Log.write(Log.AUTH, "Auth:  pushing md5-check-stream to verify " + "digest from " + hdr_name);
+      if (log.isDebugEnabled())
+        log.debug("Pushing md5-check-stream to verify digest from " + hdr_name);
+
       resp.inp_stream = new MD5InputStream(resp.inp_stream, verifier);
     } else {
-      Log.write(Log.AUTH, "Auth:  verifying digest from " + hdr_name);
+      if (log.isDebugEnabled())
+        log.debug("Verifying digest from " + hdr_name);
+
       verifier.verifyHash(MD5.digest(NUL), 0);
     }
 
@@ -709,19 +717,21 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
     // if Authentication-Info in header and qop=auth then verify immediately
 
     HttpHeaderElement qop = null;
-    if (auth_info != null
-        && (qop = Util.getElement(auth_info, "qop")) != null
-        && qop.getValue() != null
-        && (qop.getValue().equalsIgnoreCase("auth") || !resp.hasEntity()
-            && qop.getValue().equalsIgnoreCase("auth-int"))) {
-      Log.write(Log.AUTH, "Auth:  verifying rspauth from " + hdr_name);
+    if (auth_info != null &&
+        (qop = Util.getElement(auth_info, "qop")) != null &&
+        qop.getValue() != null &&
+        (qop.getValue().equalsIgnoreCase("auth") || !resp.hasEntity() &&
+            qop.getValue().equalsIgnoreCase("auth-int"))) {
+      if (log.isDebugEnabled())
+        log.debug("Verifying rspauth from " + hdr_name);
+
       verifier.verifyHash(MD5.digest(NUL), 0);
     } else {
       // else push md5 stream and verify after body
 
-      Log
-          .write(Log.AUTH, "Auth:  pushing md5-check-stream to verify " + "rspauth from "
-              + hdr_name);
+      if (log.isDebugEnabled())
+        log.debug("Pushing md5-check-stream to verify rspauth from " + hdr_name);
+
       resp.inp_stream = new MD5InputStream(resp.inp_stream, verifier);
     }
 
@@ -749,8 +759,8 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
     if (qop == -1)
       resp_val = MD5.hexDigest(A1 + ":" + params[nonce].getValue() + ":" + A2);
     else
-      resp_val = MD5.hexDigest(A1 + ":" + params[nonce].getValue() + ":" + params[nc].getValue()
-          + ":" + params[cnonce].getValue() + ":" + params[qop].getValue() + ":" + A2);
+      resp_val = MD5.hexDigest(A1 + ":" + params[nonce].getValue() + ":" + params[nc].getValue() +
+          ":" + params[cnonce].getValue() + ":" + params[qop].getValue() + ":" + A2);
 
     return resp_val;
   }
@@ -783,20 +793,20 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
     byte[] entity_body = (req.getData() == null ? NUL : req.getData());
     String entity_hash = MD5.hexDigest(entity_body);
 
-    String entity_info = MD5.hexDigest(req.getRequestURI() + ":"
-        + (ct == -1 ? "" : hdrs[ct].getValue()) + ":" + entity_body.length + ":"
-        + (ce == -1 ? "" : hdrs[ce].getValue()) + ":" + (lm == -1 ? "" : hdrs[lm].getValue()) + ":"
-        + (ex == -1 ? "" : hdrs[ex].getValue()));
-    String entity_digest = A1_hash + ":" + nonce + ":" + req.getMethod() + ":"
-        + (dt == -1 ? "" : hdrs[dt].getValue()) + ":" + entity_info + ":" + entity_hash;
+    String entity_info = MD5.hexDigest(req.getRequestURI() + ":" +
+        (ct == -1 ? "" : hdrs[ct].getValue()) + ":" + entity_body.length + ":" +
+        (ce == -1 ? "" : hdrs[ce].getValue()) + ":" + (lm == -1 ? "" : hdrs[lm].getValue()) + ":" +
+        (ex == -1 ? "" : hdrs[ex].getValue()));
+    String entity_digest = A1_hash + ":" + nonce + ":" + req.getMethod() + ":" +
+        (dt == -1 ? "" : hdrs[dt].getValue()) + ":" + entity_info + ":" + entity_hash;
 
-    if (Log.isEnabled(Log.AUTH)) {
-      Log.write(Log.AUTH, "Auth:  Entity-Info: '" + req.getRequestURI() + ":"
-          + (ct == -1 ? "" : hdrs[ct].getValue()) + ":" + entity_body.length + ":"
-          + (ce == -1 ? "" : hdrs[ce].getValue()) + ":" + (lm == -1 ? "" : hdrs[lm].getValue())
-          + ":" + (ex == -1 ? "" : hdrs[ex].getValue()) + "'");
-      Log.write(Log.AUTH, "Auth:  Entity-Body: '" + entity_hash + "'");
-      Log.write(Log.AUTH, "Auth:  Entity-Digest: '" + entity_digest + "'");
+    if (log.isDebugEnabled()) {
+      log.debug("Entity-Info: '" + req.getRequestURI() + ":" +
+          (ct == -1 ? "" : hdrs[ct].getValue()) + ":" + entity_body.length + ":" +
+          (ce == -1 ? "" : hdrs[ce].getValue()) + ":" + (lm == -1 ? "" : hdrs[lm].getValue()) +
+          ":" + (ex == -1 ? "" : hdrs[ex].getValue()) + "'");
+      log.debug("Entity-Body: '" + entity_hash + "'");
+      log.debug("Entity-Digest: '" + entity_digest + "'");
     }
 
     return MD5.hexDigest(entity_digest);
@@ -817,7 +827,6 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
 
   /**
    * Generate <var>num</var> bytes of random data.
-   * 
    * @param num the number of bytes to generate
    * @return a byte array of random data
    */
@@ -866,7 +875,6 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
   /**
    * Return the value of the first NVPair whose name matches the key using a
    * case-insensitive search.
-   * 
    * @param list an array of NVPair's
    * @param key the key to search for
    * @return the value of the NVPair with that key, or null if not found.
@@ -884,7 +892,6 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
   /**
    * Return the index of the first NVPair whose name matches the key using a
    * case-insensitive search.
-   * 
    * @param list an array of NVPair's
    * @param key the key to search for
    * @return the index of the NVPair with that key, or -1 if not found.
@@ -902,7 +909,6 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
   /**
    * Sets the value of the NVPair with the name that matches the key
    * (case-insensitive). If no name matches, a new entry is created.
-   * 
    * @param list an array of NVPair's
    * @param key the name of the NVPair
    * @param val the value of the new NVPair
@@ -962,7 +968,6 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
 
   /**
    * Set a new username/password prompter.
-   * 
    * @param prompt the AuthorizationPrompter to use whenever a username and
    *          password are needed; if null, no querying will be done
    * @return the previous prompter
@@ -1015,19 +1020,19 @@ public class DefaultAuthHandler implements AuthorizationHandler, GlobalConstants
  * This verifies the "rspauth" from draft-ietf-http-authentication-03
  */
 class VerifyRspAuth implements HashVerifier, GlobalConstants {
-  private String     uri;
+  private String uri;
 
-  private String     HA1;
+  private String HA1;
 
-  private String     alg;
+  private String alg;
 
-  private String     nonce;
+  private String nonce;
 
-  private String     cnonce;
+  private String cnonce;
 
-  private String     nc;
+  private String nc;
 
-  private String     hdr;
+  private String hdr;
 
   private RoResponse resp;
 
@@ -1059,8 +1064,8 @@ class VerifyRspAuth implements HashVerifier, GlobalConstants {
 
     String qop;
     HttpHeaderElement elem = Util.getElement(pai, "qop");
-    if (elem == null || (qop = elem.getValue()) == null
-        || (!qop.equalsIgnoreCase("auth") && !qop.equalsIgnoreCase("auth-int")))
+    if (elem == null || (qop = elem.getValue()) == null ||
+        (!qop.equalsIgnoreCase("auth") && !qop.equalsIgnoreCase("auth-int")))
       return;
 
     elem = Util.getElement(pai, "rspauth");
@@ -1070,13 +1075,13 @@ class VerifyRspAuth implements HashVerifier, GlobalConstants {
 
     elem = Util.getElement(pai, "cnonce");
     if (elem != null && elem.getValue() != null && !elem.getValue().equals(cnonce))
-      throw new IOException("Digest auth scheme: received wrong " + "client-nonce '"
-          + elem.getValue() + "' - expected '" + cnonce + "'");
+      throw new IOException("Digest auth scheme: received wrong " + "client-nonce '" +
+          elem.getValue() + "' - expected '" + cnonce + "'");
 
     elem = Util.getElement(pai, "nc");
     if (elem != null && elem.getValue() != null && !elem.getValue().equals(nc))
-      throw new IOException("Digest auth scheme: received wrong " + "nonce-count '"
-          + elem.getValue() + "' - expected '" + nc + "'");
+      throw new IOException("Digest auth scheme: received wrong " + "nonce-count '" +
+          elem.getValue() + "' - expected '" + nc + "'");
 
     String A1, A2;
     if (alg != null && alg.equalsIgnoreCase("MD5-sess"))
@@ -1094,11 +1099,9 @@ class VerifyRspAuth implements HashVerifier, GlobalConstants {
 
     for (int idx = 0; idx < hash.length; idx++) {
       if (hash[idx] != digest[idx])
-        throw new IOException("MD5-Digest mismatch: expected " + DefaultAuthHandler.hex(digest)
-            + " but calculated " + DefaultAuthHandler.hex(hash));
+        throw new IOException("MD5-Digest mismatch: expected " + DefaultAuthHandler.hex(digest) +
+            " but calculated " + DefaultAuthHandler.hex(hash));
     }
-
-    Log.write(Log.AUTH, "Auth:  rspauth from " + hdr + " successfully verified");
   }
 }
 
@@ -1106,15 +1109,15 @@ class VerifyRspAuth implements HashVerifier, GlobalConstants {
  * This verifies the "digest" from rfc-2069
  */
 class VerifyDigest implements HashVerifier, GlobalConstants {
-  private String     HA1;
+  private String HA1;
 
-  private String     nonce;
+  private String nonce;
 
-  private String     method;
+  private String method;
 
-  private String     uri;
+  private String uri;
 
-  private String     hdr;
+  private String hdr;
 
   private RoResponse resp;
 
@@ -1147,19 +1150,18 @@ class VerifyDigest implements HashVerifier, GlobalConstants {
 
     byte[] digest = DefaultAuthHandler.unHex(elem.getValue());
 
-    String entity_info = MD5.hexDigest(uri + ":" + header_val("Content-Type", resp) + ":"
-        + header_val("Content-Length", resp) + ":" + header_val("Content-Encoding", resp) + ":"
-        + header_val("Last-Modified", resp) + ":" + header_val("Expires", resp));
-    hash = MD5.digest(HA1 + ":" + nonce + ":" + method + ":" + header_val("Date", resp) + ":"
-        + entity_info + ":" + MD5.toHex(hash));
+    String entity_info = MD5.hexDigest(uri + ":" + header_val("Content-Type", resp) + ":" +
+        header_val("Content-Length", resp) + ":" + header_val("Content-Encoding", resp) + ":" +
+        header_val("Last-Modified", resp) + ":" + header_val("Expires", resp));
+    hash = MD5.digest(HA1 + ":" + nonce + ":" + method + ":" + header_val("Date", resp) + ":" +
+        entity_info + ":" + MD5.toHex(hash));
 
     for (int idx = 0; idx < hash.length; idx++) {
       if (hash[idx] != digest[idx])
-        throw new IOException("MD5-Digest mismatch: expected " + DefaultAuthHandler.hex(digest)
-            + " but calculated " + DefaultAuthHandler.hex(hash));
+        throw new IOException("MD5-Digest mismatch: expected " + DefaultAuthHandler.hex(digest) +
+            " but calculated " + DefaultAuthHandler.hex(hash));
     }
 
-    Log.write(Log.AUTH, "Auth:  digest from " + hdr + " successfully verified");
   }
 
   private static final String header_val(String hdr_name, RoResponse resp) throws IOException {
@@ -1174,7 +1176,6 @@ class SimpleAuthPopup implements AuthorizationPrompter {
 
   /**
    * the method called by DefaultAuthHandler.
-   * 
    * @return the username/password pair
    */
   public NVPair getUsernamePassword(AuthorizationInfo challenge, boolean forProxy) {
@@ -1201,22 +1202,21 @@ class SimpleAuthPopup implements AuthorizationPrompter {
   /**
    * This class implements a simple popup that request username and password
    * used for the "basic" and "digest" authentication schemes.
-   * 
    * @version 0.3-3 06/05/2001
    * @author Ronald Tschal�r
    */
   private static class BasicAuthBox extends Frame {
     private final static String title = "Authorization Request";
 
-    private Dimension           screen;
+    private Dimension screen;
 
-    private Label               line1, line2, line3;
+    private Label line1, line2, line3;
 
-    private TextField           user, pass;
+    private TextField user, pass;
 
-    private int                 done;
+    private int done;
 
-    private final static int    OK    = 1, CANCEL = 0;
+    private final static int OK = 1, CANCEL = 0;
 
     /**
      * Constructs the popup with two lines of text above the input fields
@@ -1311,7 +1311,6 @@ class SimpleAuthPopup implements AuthorizationPrompter {
 
     /**
      * the method called by SimpleAuthPopup.
-     * 
      * @return the username/password pair
      */
     synchronized NVPair getInput(String l1, String l2, String l3, String scheme) {
@@ -1367,26 +1366,24 @@ class SimpleAuthPopup implements AuthorizationPrompter {
 /**
  * This class implements a simple command line prompter that request username
  * and password used for the "basic" and "digest" authentication schemes.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  */
 class SimpleAuthPrompt implements AuthorizationPrompter {
   /**
    * the method called by DefaultAuthHandler.
-   * 
    * @return the username/password pair
    */
   public NVPair getUsernamePassword(AuthorizationInfo challenge, boolean forProxy) {
     String user, pass;
 
     if (challenge.getScheme().equalsIgnoreCase("SOCKS5")) {
-      System.out.println("Enter username and password for SOCKS " + "server on host "
-          + challenge.getHost());
+      System.out.println("Enter username and password for SOCKS " + "server on host " +
+          challenge.getHost());
       System.out.println("Authentication Method: username/password");
     } else {
-      System.out.println("Enter username and password for realm `" + challenge.getRealm()
-          + "' on host " + challenge.getHost() + ":" + challenge.getPort());
+      System.out.println("Enter username and password for realm `" + challenge.getRealm() +
+          "' on host " + challenge.getHost() + ":" + challenge.getPort());
       System.out.println("Authentication Scheme: " + challenge.getScheme());
     }
 
@@ -1433,7 +1430,7 @@ class SimpleAuthPrompt implements AuthorizationPrompter {
 
     if (os.equalsIgnoreCase("Windows 95") || os.equalsIgnoreCase("Windows NT"))
       // I don't think this works on M$ ...
-      cmd = new String[] { "echo", on ? "on" : "off" };
+      cmd = new String[]{ "echo", on ? "on" : "off" };
     else if (os.equalsIgnoreCase("Windows") || os.equalsIgnoreCase("16-bit Windows"))
       ; // ???
     else if (os.equalsIgnoreCase("OS/2"))
@@ -1441,10 +1438,10 @@ class SimpleAuthPrompt implements AuthorizationPrompter {
     else if (os.equalsIgnoreCase("Mac OS") || os.equalsIgnoreCase("MacOS"))
       ; // ???
     else if (os.equalsIgnoreCase("OpenVMS") || os.equalsIgnoreCase("VMS"))
-      cmd = new String[] { "SET TERMINAL " + (on ? "/ECHO" : "/NOECHO") };
+      cmd = new String[]{ "SET TERMINAL " + (on ? "/ECHO" : "/NOECHO") };
     else
       // probably unix
-      cmd = new String[] { "/bin/sh", "-c", "stty " + (on ? "echo" : "-echo") + " < /dev/tty" };
+      cmd = new String[]{ "/bin/sh", "-c", "stty " + (on ? "echo" : "-echo") + " < /dev/tty" };
 
     if (cmd != null)
       try {
@@ -1459,9 +1456,9 @@ class SimpleAuthPrompt implements AuthorizationPrompter {
   static boolean canUseCLPrompt() {
     String os = System.getProperty("os.name");
 
-    return (os.indexOf("Linux") >= 0 || os.indexOf("SunOS") >= 0 || os.indexOf("Solaris") >= 0
-        || os.indexOf("BSD") >= 0 || os.indexOf("AIX") >= 0 || os.indexOf("HP-UX") >= 0
-        || os.indexOf("IRIX") >= 0 || os.indexOf("OSF") >= 0 || os.indexOf("A/UX") >= 0 || os
+    return (os.indexOf("Linux") >= 0 || os.indexOf("SunOS") >= 0 || os.indexOf("Solaris") >= 0 ||
+        os.indexOf("BSD") >= 0 || os.indexOf("AIX") >= 0 || os.indexOf("HP-UX") >= 0 ||
+        os.indexOf("IRIX") >= 0 || os.indexOf("OSF") >= 0 || os.indexOf("A/UX") >= 0 || os
         .indexOf("VMS") >= 0);
   }
 }

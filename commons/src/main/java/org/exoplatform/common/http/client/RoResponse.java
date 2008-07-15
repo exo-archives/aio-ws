@@ -40,7 +40,6 @@ import java.util.Date;
  * This interface represents read-only interface of an intermediate http
  * response. It is the compile-time type passed to various handlers which might
  * the response info but musn't modify the response.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  */
@@ -48,13 +47,12 @@ public interface RoResponse {
   /**
    * give the status code for this request. These are grouped as follows:
    * <UL>
-   * <LI> 1xx - Informational (new in HTTP/1.1)
-   * <LI> 2xx - Success
-   * <LI> 3xx - Redirection
-   * <LI> 4xx - Client Error
-   * <LI> 5xx - Server Error
+   * <LI>1xx - Informational (new in HTTP/1.1)
+   * <LI>2xx - Success
+   * <LI>3xx - Redirection
+   * <LI>4xx - Client Error
+   * <LI>5xx - Server Error
    * </UL>
-   * 
    * @return the status code
    * @exception IOException If any exception occurs on the socket.
    */
@@ -74,7 +72,6 @@ public interface RoResponse {
 
   /**
    * retrieves the field for a given header.
-   * 
    * @param hdr the header name.
    * @return the value for the header, or null if non-existent.
    * @exception IOException If any exception occurs on the socket.
@@ -83,7 +80,6 @@ public interface RoResponse {
 
   /**
    * retrieves the field for a given header. The value is parsed as an int.
-   * 
    * @param hdr the header name.
    * @return the value for the header if the header exists
    * @exception NumberFormatException if the header's value is not a number or
@@ -97,7 +93,6 @@ public interface RoResponse {
    * this fails it is parsed as a long representing the number of seconds since
    * 12:00 AM, Jan 1st, 1970. If this also fails an IllegalArgumentException is
    * thrown.
-   * 
    * @param hdr the header name.
    * @return the value for the header, or null if non-existent.
    * @exception IOException If any exception occurs on the socket.
@@ -110,7 +105,6 @@ public interface RoResponse {
    * Retrieves the field for a given trailer. Note that this should not be
    * invoked until all the response data has been read. If invoked before, it
    * will force the data to be read via <code>getData()</code>.
-   * 
    * @param trailer the trailer name.
    * @return the value for the trailer, or null if non-existent.
    * @exception IOException If any exception occurs on the socket.
@@ -119,7 +113,6 @@ public interface RoResponse {
 
   /**
    * Retrieves the field for a given tailer. The value is parsed as an int.
-   * 
    * @param trailer the tailer name.
    * @return the value for the trailer if the trailer exists
    * @exception NumberFormatException if the trailer's value is not a number or
@@ -134,7 +127,6 @@ public interface RoResponse {
    * 12:00 AM, Jan 1st, 1970. If this also fails an IllegalArgumentException is
    * thrown. <br>
    * Note: When sending dates use Util.httpDate().
-   * 
    * @param trailer the trailer name.
    * @return the value for the trailer, or null if non-existent.
    * @exception IllegalArgumentException if the trailer's value is neither a
@@ -147,11 +139,10 @@ public interface RoResponse {
 
   /**
    * Reads all the response data into a byte array. Note that this method won't
-   * return until <em>all</em> the data has been received (so for instance
-   * don't invoke this method if the server is doing a server push). If
+   * return until <em>all</em> the data has been received (so for instance don't
+   * invoke this method if the server is doing a server push). If
    * getInputStream() had been previously called then this method only returns
    * any unread data remaining on the stream and then closes it.
-   * 
    * @see #getInputStream()
    * @return an array containing the data (body) returned. If no data was
    *         returned then it's set to a zero-length array.
@@ -163,7 +154,6 @@ public interface RoResponse {
    * Gets an input stream from which the returned data can be read. Note that if
    * getData() had been previously called it will actually return a
    * ByteArrayInputStream created from that data.
-   * 
    * @see #getData()
    * @return the InputStream.
    * @exception IOException If any exception occurs on the socket.

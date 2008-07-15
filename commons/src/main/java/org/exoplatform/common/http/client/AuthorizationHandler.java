@@ -40,7 +40,6 @@ import java.io.IOException;
  * the ones handled by the default handler, to use a different UI for soliciting
  * usernames and passwords, or for using an altogether different way of getting
  * the necessary auth info.
- * 
  * @see AuthorizationInfo#setAuthHandler(HTTPClient.AuthorizationHandler)
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
@@ -57,7 +56,6 @@ public interface AuthorizationHandler {
    * <P>
    * This method must check <var>req.allow_ui</var> and only attempt user
    * interaction if it's <var>true</var>.
-   * 
    * @param challenge the parsed challenge from the server; the host, port,
    *          scheme, realm and params are set to the values given by the server
    *          in the challenge.
@@ -83,7 +81,6 @@ public interface AuthorizationHandler {
    * intent of this method is to allow the handler to fix up the info being sent
    * based on the actual request (e.g. in digest authentication the digest-uri,
    * nonce and response-digest usually need to be recalculated).
-   * 
    * @param info the authorization info retrieved from the list of known info.
    * @param req the request this info is targeted for.
    * @param challenge the authorization challenge received from the server if
@@ -107,7 +104,6 @@ public interface AuthorizationHandler {
    * 407 response. In case of a 401 or 407 response the methods
    * <code>fixupAuthInfo()</code> and <code>getAuthorization()</code> are
    * invoked <em>after</em> this method.
-   * 
    * @param resp the full Response
    * @param req the Request which provoked this response
    * @param prev the previous auth info sent, or null if none was sent
@@ -119,11 +115,10 @@ public interface AuthorizationHandler {
       AuthorizationInfo prxy) throws IOException;
 
   /**
-   * This method is similar to <code>handleAuthHeaders</code> except that it
-   * is called if any headers in the trailer were sent. This also implies that
-   * it is invoked after any <code>fixupAuthInfo()</code> or
+   * This method is similar to <code>handleAuthHeaders</code> except that it is
+   * called if any headers in the trailer were sent. This also implies that it
+   * is invoked after any <code>fixupAuthInfo()</code> or
    * <code>getAuthorization()</code> invocation.
-   * 
    * @param resp the full Response
    * @param req the Request which provoked this response
    * @param prev the previous auth info sent, or null if none was sent

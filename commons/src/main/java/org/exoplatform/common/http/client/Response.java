@@ -46,11 +46,13 @@ import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.ExoLogger;
+
 /**
  * This class represents an intermediate response. It's used internally by the
  * modules. When all modules have handled the response then the HTTPResponse
  * fills in its fields with the data from this class.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  */
@@ -59,86 +61,88 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
   private static final Hashtable singleValueHeaders;
 
   /** our http connection */
-  private HTTPConnection         connection;
+  private HTTPConnection connection;
 
   /** our stream demux */
-  private StreamDemultiplexor    stream_handler;
+  private StreamDemultiplexor stream_handler;
 
   /** the HTTPResponse we're coupled with */
-  HTTPResponse                   http_resp;
+  HTTPResponse http_resp;
 
   /** the timeout for read operations */
-  int                            timeout         = 0;
+  int timeout = 0;
 
   /**
    * our input stream (usually from the stream demux). Push input streams onto
    * this if necessary.
    */
-  public InputStream             inp_stream;
+  public InputStream inp_stream;
 
   /** our response input stream from the stream demux */
-  private RespInputStream        resp_inp_stream = null;
+  private RespInputStream resp_inp_stream = null;
 
   /** the method used in the request */
-  private String                 method;
+  private String method;
 
   /** the resource in the request (for debugging purposes) */
-  String                         resource;
+  String resource;
 
   /** was a proxy used for the request? */
-  private boolean                used_proxy;
+  private boolean used_proxy;
 
   /** did the request contain an entity? */
-  private boolean                sent_entity;
+  private boolean sent_entity;
 
   /** the status code returned. */
-  int                            StatusCode      = 0;
+  int StatusCode = 0;
 
   /** the reason line associated with the status code. */
-  String                         ReasonLine;
+  String ReasonLine;
 
   /** the HTTP version of the response. */
-  String                         Version;
+  String Version;
 
   /** the final URI of the document. */
-  URI                            EffectiveURI    = null;
+  URI EffectiveURI = null;
 
   /** any headers which were received and do not fit in the above list. */
-  CIHashtable                    Headers         = new CIHashtable();
+  CIHashtable Headers = new CIHashtable();
 
   /** any trailers which were received and do not fit in the above list. */
-  CIHashtable                    Trailers        = new CIHashtable();
+  CIHashtable Trailers = new CIHashtable();
 
   /**
    * the message length of the response if either there is no data (in which
    * case ContentLength=0) or if the message length is controlled by a
    * Content-Length header. If neither of these, then it's -1
    */
-  int                            ContentLength   = -1;
+  int ContentLength = -1;
 
   /** this indicates how the length of the entity body is determined */
-  int                            cd_type         = CD_HDRS;
+  int cd_type = CD_HDRS;
 
   /** the data (body) returned. */
-  byte[]                         Data            = null;
+  byte[] Data = null;
 
   /** signals if we in the process of reading the headers */
-  boolean                        reading_headers = false;
+  boolean reading_headers = false;
 
   /** signals if we have got and parsed the headers yet */
-  boolean                        got_headers     = false;
+  boolean got_headers = false;
 
   /** signals if we have got and parsed the trailers yet */
-  boolean                        got_trailers    = false;
+  boolean got_trailers = false;
 
   /** remembers any exception received while reading/parsing headers */
-  private IOException            exception       = null;
+  private IOException exception = null;
 
   /** should this response be handled further? */
-  boolean                        final_resp      = false;
+  boolean final_resp = false;
 
   /** should the request be retried by the application? */
-  boolean                        retry           = false;
+  boolean retry = false;
+
+  private static final Log log = ExoLogger.getLogger("ws.commons.httpclient.Response");
 
   static {
     /*
@@ -148,8 +152,8 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
      * into one header, with individual values being separated by commas.
      */
     String[] singleValueHeaderNames = { "age", "location", "content-base", "content-length",
-      "content-location", "content-md5", "content-range", "content-type", "date", "etag",
-      "expires", "proxy-authenticate", "retry-after", };
+        "content-location", "content-md5", "content-range", "content-type", "date", "etag",
+        "expires", "proxy-authenticate", "retry-after", };
 
     singleValueHeaders = new Hashtable(singleValueHeaderNames.length);
     for (int idx = 0; idx < singleValueHeaderNames.length; idx++)
@@ -179,7 +183,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
    * Creates a new Response that reads from the given stream. This is used for
    * the CONNECT subrequest which is used in establishing an SSL tunnel through
    * a proxy.
-   * 
    * @param request the subrequest
    * @param is the input stream from which to read the headers and data.
    */
@@ -201,7 +204,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
    * is not null that is used; else the entity is empty. If the input stream is
    * used then <var>cont_len</var> specifies the length of the data that can be
    * read from it, or -1 if unknown.
-   * 
    * @param version the response version (such as "HTTP/1.1")
    * @param status the status code
    * @param reason the reason line
@@ -236,13 +238,9 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
   /**
    * give the status code for this request. These are grouped as follows:
    * <UL>
-   * <LI> 1xx - Informational (new in HTTP/1.1)
-   * <LI> 2xx - Success
-   * <LI> 3xx - Redirection
-   * <LI> 4xx - Client Error
-   * <LI> 5xx - Server Error
+   * <LI> 1xx - Informational (new in HTTP/1.1) <LI> 2xx - Success <LI> 3xx -
+   * Redirection <LI> 4xx - Client Error <LI> 5xx - Server Error
    * </UL>
-   * 
    * @exception IOException If any exception occurs on the socket.
    */
   public final int getStatusCode() throws IOException {
@@ -253,7 +251,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
 
   /**
    * give the reason line associated with the status code.
-   * 
    * @exception IOException If any exception occurs on the socket.
    */
   public final String getReasonLine() throws IOException {
@@ -264,7 +261,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
 
   /**
    * get the HTTP version used for the response.
-   * 
    * @exception IOException If any exception occurs on the socket.
    */
   public final String getVersion() throws IOException {
@@ -275,7 +271,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
 
   /**
    * Wait for either a '100 Continue' or an error.
-   * 
    * @return the return status.
    */
   int getContinue() throws IOException {
@@ -286,7 +281,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
   /**
    * get the final URI of the document. This is set if the original request was
    * deferred via the "moved" (301, 302, or 303) return status.
-   * 
    * @return the new URI, or null if not redirected
    * @exception IOException If any exception occurs on the socket.
    */
@@ -306,7 +300,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
   /**
    * get the final URL of the document. This is set if the original request was
    * deferred via the "moved" (301, 302, or 303) return status.
-   * 
    * @exception IOException If any exception occurs on the socket.
    * @deprecated use getEffectiveURI() instead
    * @see #getEffectiveURI
@@ -317,7 +310,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
 
   /**
    * set the final URL of the document. This is only for internal use.
-   * 
    * @deprecated use setEffectiveURI() instead
    * @see #setEffectiveURI
    */
@@ -331,7 +323,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
 
   /**
    * retrieves the field for a given header.
-   * 
    * @param hdr the header name.
    * @return the value for the header, or null if non-existent.
    * @exception IOException If any exception occurs on the socket.
@@ -344,7 +335,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
 
   /**
    * retrieves the field for a given header. The value is parsed as an int.
-   * 
    * @param hdr the header name.
    * @return the value for the header if the header exists
    * @exception NumberFormatException if the header's value is not a number or
@@ -365,7 +355,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
    * thrown.
    * <P>
    * Note: When sending dates use Util.httpDate().
-   * 
    * @param hdr the header name.
    * @return the value for the header, or null if non-existent.
    * @exception IOException If any exception occurs on the socket.
@@ -405,7 +394,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
    * will be overwritten; otherwise the header will be added to the list. This
    * is used by some modules when they process the header so that higher level
    * stuff doesn't get confused when the headers and data don't match.
-   * 
    * @param header The name of header field to set.
    * @param value The value to set the field to.
    */
@@ -417,7 +405,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
    * Removes a header field from the list of headers. This is used by some
    * modules when they process the header so that higher level stuff doesn't get
    * confused when the headers and data don't match.
-   * 
    * @param header The name of header field to remove.
    */
   public void deleteHeader(String header) {
@@ -428,7 +415,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
    * Retrieves the field for a given trailer. Note that this should not be
    * invoked until all the response data has been read. If invoked before, it
    * will force the data to be read via <code>getData()</code>.
-   * 
    * @param trailer the trailer name.
    * @return the value for the trailer, or null if non-existent.
    * @exception IOException If any exception occurs on the socket.
@@ -441,7 +427,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
 
   /**
    * Retrieves the field for a given tailer. The value is parsed as an int.
-   * 
    * @param trailer the tailer name.
    * @return the value for the trailer if the trailer exists
    * @exception NumberFormatException if the trailer's value is not a number or
@@ -462,7 +447,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
    * thrown.
    * <P>
    * Note: When sending dates use Util.httpDate().
-   * 
    * @param trailer the trailer name.
    * @return the value for the trailer, or null if non-existent.
    * @exception IllegalArgumentException if the trailer's value is neither a
@@ -505,7 +489,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
    * it will be overwritten; otherwise the trailer will be added to the list.
    * This is used by some modules when they process the trailer so that higher
    * level stuff doesn't get confused when the trailer and data don't match.
-   * 
    * @param trailer The name of trailer field to set.
    * @param value The value to set the field to.
    */
@@ -517,7 +500,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
    * Removes a trailer field from the list of trailers. This is used by some
    * modules when they process the trailer so that higher level stuff doesn't
    * get confused when the trailers and data don't match.
-   * 
    * @param trailer The name of trailer field to remove.
    */
   public void deleteTrailer(String trailer) {
@@ -526,11 +508,10 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
 
   /**
    * Reads all the response data into a byte array. Note that this method won't
-   * return until <em>all</em> the data has been received (so for instance
-   * don't invoke this method if the server is doing a server push). If
+   * return until <em>all</em> the data has been received (so for instance don't
+   * invoke this method if the server is doing a server push). If
    * getInputStream() had been previously called then this method only returns
    * any unread data remaining on the stream and then closes it.
-   * 
    * @see #getInputStream()
    * @return an array containing the data (body) returned. If no data was
    *         returned then it's set to a zero-length array.
@@ -547,7 +528,7 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
       {
         throw ie;
       } catch (IOException ioe) {
-        Log.write(Log.RESP, "Resp:  (" + inp_stream.hashCode() + ")", ioe);
+        log.error("Response:  (" + inp_stream.hashCode() + ")", ioe);
 
         try {
           inp_stream.close();
@@ -566,7 +547,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
    * Gets an input stream from which the returned data can be read. Note that if
    * getData() had been previously called it will actually return a
    * ByteArrayInputStream created from that data.
-   * 
    * @see #getData()
    * @return the InputStream.
    * @exception IOException If any exception occurs on the socket.
@@ -586,7 +566,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
    * have an entity. This is detected by the client and can be queried here.
    * Note that this won't try to do a read() on the input stream (it will
    * however cause the headers to be read and parsed if not already done).
-   * 
    * @return true if the response has an entity, false otherwise
    * @since V0.3-1
    */
@@ -600,15 +579,14 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
   /**
    * Should the request be retried by the application? This can be used by
    * modules to signal to the application that it should retry the request. It's
-   * used when the request used an <var>HttpOutputStream</var> and the module
-   * is therefore not able to retry the request itself. This flag is <var>false</var>
-   * by default.
+   * used when the request used an <var>HttpOutputStream</var> and the module is
+   * therefore not able to retry the request itself. This flag is
+   * <var>false</var> by default.
    * <P>
    * If a module sets this flag then it must also reset() the the
    * <var>HttpOutputStream</var> so it may be reused by the application. It
    * should then also use this <var>HttpOutputStream</var> to recognize the
    * retried request in the requestHandler().
-   * 
    * @param flag indicates whether the application should retry the request.
    */
   public void setRetryRequest(boolean flag) {
@@ -626,7 +604,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
 
   /**
    * Gets and parses the headers. Sets up Data if no data will be received.
-   * 
    * @param skip_cont if true skips over '100 Continue' status codes.
    * @exception IOException If any exception occurs while reading the headers.
    */
@@ -699,8 +676,8 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
       String hdr;
       if ((hdr = (String) Headers.get("Content-Type")) != null) {
         Vector phdr = Util.parseHeader(hdr);
-        ct_mpbr = phdr.contains(new HttpHeaderElement("multipart/byteranges"))
-            || phdr.contains(new HttpHeaderElement("multipart/x-byteranges"));
+        ct_mpbr = phdr.contains(new HttpHeaderElement("multipart/byteranges")) ||
+            phdr.contains(new HttpHeaderElement("multipart/x-byteranges"));
       }
     } catch (ParseException pe) {
     }
@@ -736,7 +713,7 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
       ContentLength = cont_len;
     else
       deleteHeader("Content-Length"); // Content-Length is not valid in this
-                                      // case
+    // case
 
     /*
      * We treat HEAD specially down here because the above code needs to know
@@ -751,10 +728,14 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
       inp_stream.close(); // we will not receive any more data
     }
 
-    Log.write(Log.RESP, "Resp:  Response entity delimiter: "
-        + (cd_type == CD_0 ? "No Entity" : cd_type == CD_CLOSE ? "Close"
-            : cd_type == CD_CONTLEN ? "Content-Length" : cd_type == CD_CHUNKED ? "Chunked"
-                : cd_type == CD_MP_BR ? "Multipart" : "???") + " (" + inp_stream.hashCode() + ")");
+    if (log.isDebugEnabled()) {
+      log
+          .debug("Response entity delimiter: " +
+              (cd_type == CD_0 ? "No Entity" : cd_type == CD_CLOSE ? "Close"
+                  : cd_type == CD_CONTLEN ? "Content-Length" : cd_type == CD_CHUNKED ? "Chunked"
+                      : cd_type == CD_MP_BR ? "Multipart" : "???") + " (" + inp_stream.hashCode() +
+              ")");
+    }
 
     // remove erroneous connection tokens
 
@@ -846,33 +827,34 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
    * these are external to readResponseHeaders() because we need to be able to
    * restart after an InterruptedIOException
    */
-  private byte[]       buf           = new byte[7];
+  private byte[] buf = new byte[7];
 
-  private int          buf_pos       = 0;
+  private int buf_pos = 0;
 
-  private StringBuffer hdrs          = new StringBuffer(400);
+  private StringBuffer hdrs = new StringBuffer(400);
 
-  private boolean      reading_lines = false;
+  private boolean reading_lines = false;
 
-  private boolean      bol           = true;
+  private boolean bol = true;
 
-  private boolean      got_cr        = false;
+  private boolean got_cr = false;
 
   /**
    * Reads the response headers received, folding continued lines.
    * <P>
    * Some of the code is a bit convoluted because we have to be able restart
    * after an InterruptedIOException.
-   * 
    * @inp the input stream from which to read the response
    * @return a (newline separated) list of headers
    * @exception IOException if any read on the input stream fails
    */
   private String readResponseHeaders(InputStream inp) throws IOException {
-    if (buf_pos == 0)
-      Log.write(Log.RESP, "Resp:  Reading Response headers " + inp_stream.hashCode());
-    else
-      Log.write(Log.RESP, "Resp:  Resuming reading Response headers " + inp_stream.hashCode());
+    if (log.isDebugEnabled()) {
+      if (buf_pos == 0)
+        log.debug("Reading Response headers " + inp_stream.hashCode());
+      else
+        log.debug("Resuming reading Response headers " + inp_stream.hashCode());
+    }
 
     // read 7 bytes to see type of response
     if (!reading_lines) {
@@ -896,7 +878,7 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
           buf_pos += got;
         }
       } catch (EOFException eof) {
-        Log.write(Log.RESP, "Resp:  (" + inp_stream.hashCode() + ")", eof);
+        log.error("Response:  (" + inp_stream.hashCode() + ")", eof);
 
         throw eof;
       }
@@ -926,7 +908,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
   /**
    * This is called by the StreamDemultiplexor to read all the trailers of a
    * chunked encoded entity.
-   * 
    * @param inp the raw input stream to read from
    * @exception IOException if any IOException is thrown by the stream
    */
@@ -944,11 +925,9 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
   /**
    * This reads a set of lines up to and including the first empty line. A line
    * is terminated by either a <CR><LF> or <LF>. The lines are stored in the
-   * <var>hdrs</var> buffers. Continued lines are merged and stored as one
-   * line.
+   * <var>hdrs</var> buffers. Continued lines are merged and stored as one line.
    * <P>
    * This method is restartable after an InterruptedIOException.
-   * 
    * @param inp the input stream to read from
    * @exception IOException if any IOException is thrown by the stream
    */
@@ -962,42 +941,41 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
     loop: while (true) {
       int b = inp.read();
       switch (b) {
-      case -1:
-        throw new EOFException("Encountered premature EOF while reading headers:\n" + hdrs);
-      case '\r':
-        got_cr = true;
-        break;
-      case '\n':
-        if (bol)
-          break loop; // all headers read
-        hdrs.append('\n');
-        bol = true;
-        got_cr = false;
-        break;
-      case ' ':
-      case '\t':
-        if (bol) // a continued line
-        {
-          // replace previous \n with SP
-          hdrs.setCharAt(hdrs.length() - 1, ' ');
+        case -1:
+          throw new EOFException("Encountered premature EOF while reading headers:\n" + hdrs);
+        case '\r':
+          got_cr = true;
+          break;
+        case '\n':
+          if (bol)
+            break loop; // all headers read
+          hdrs.append('\n');
+          bol = true;
+          got_cr = false;
+          break;
+        case ' ':
+        case '\t':
+          if (bol) // a continued line
+          {
+            // replace previous \n with SP
+            hdrs.setCharAt(hdrs.length() - 1, ' ');
+            bol = false;
+            break;
+          }
+        default:
+          if (got_cr) {
+            hdrs.append('\r');
+            got_cr = false;
+          }
+          hdrs.append((char) (b & 0xFF));
           bol = false;
           break;
-        }
-      default:
-        if (got_cr) {
-          hdrs.append('\r');
-          got_cr = false;
-        }
-        hdrs.append((char) (b & 0xFF));
-        bol = false;
-        break;
       }
     }
   }
 
   /**
    * Parses the headers received into a new Response structure.
-   * 
    * @param headers a (newline separated) list of headers
    * @exception ProtocolException if any part of the headers do not conform
    */
@@ -1005,14 +983,14 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
     String sts_line = null;
     StringTokenizer lines = new StringTokenizer(headers, "\r\n"), elem;
 
-    if (Log.isEnabled(Log.RESP))
-      Log.write(Log.RESP, "Resp:  Parsing Response headers from Request " + "\"" + method + " "
-          + resource + "\":  (" + inp_stream.hashCode() + ")\n\n" + headers);
+    if (log.isDebugEnabled())
+      log.debug("Parsing Response headers from Request " + "\"" + method + " " + resource +
+          "\":  (" + inp_stream.hashCode() + ")\n\n" + headers);
 
     // Detect and handle HTTP/0.9 responses
 
-    if (!headers.regionMatches(true, 0, "HTTP/", 0, 5)
-        && !headers.regionMatches(true, 0, "HTTP ", 0, 5)) // NCSA bug
+    if (!headers.regionMatches(true, 0, "HTTP/", 0, 5) &&
+        !headers.regionMatches(true, 0, "HTTP ", 0, 5)) // NCSA bug
     {
       Version = "HTTP/0.9";
       StatusCode = 200;
@@ -1082,9 +1060,9 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
           .get("Proxy-Connection");
 
       // parse connection header
-      if ((vers == 1 && con != null && Util.hasToken(con, "close"))
-          || (vers == 0 && !((!used_proxy && con != null && Util.hasToken(con, "keep-alive")) || (used_proxy
-              && pcon != null && Util.hasToken(pcon, "keep-alive")))))
+      if ((vers == 1 && con != null && Util.hasToken(con, "close")) ||
+          (vers == 0 && !((!used_proxy && con != null && Util.hasToken(con, "keep-alive")) || (used_proxy &&
+              pcon != null && Util.hasToken(pcon, "keep-alive")))))
         if (stream_handler != null)
           stream_handler.markForClose(this);
     } catch (ParseException pe) {
@@ -1092,10 +1070,9 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
   }
 
   /**
-   * If the trailers have not been read it calls <code>getData()</code> to
-   * first force all data and trailers to be read. Then the trailers parsed into
-   * the <var>Trailers</var> hashtable.
-   * 
+   * If the trailers have not been read it calls <code>getData()</code> to first
+   * force all data and trailers to be read. Then the trailers parsed into the
+   * <var>Trailers</var> hashtable.
    * @exception IOException if any exception occured during reading of the
    *              response
    */
@@ -1107,7 +1084,8 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
       throw exception;
     }
 
-    Log.write(Log.RESP, "Resp:  Reading Response trailers " + inp_stream.hashCode());
+    if (log.isDebugEnabled())
+      log.debug("Reading Response trailers " + inp_stream.hashCode());
 
     try {
       if (!trailers_read) {
@@ -1116,8 +1094,9 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
       }
 
       if (trailers_read) {
-        Log.write(Log.RESP, "Resp:  Parsing Response trailers from " + "Request \"" + method + " "
-            + resource + "\":  (" + inp_stream.hashCode() + ")\n\n" + hdrs);
+        if (log.isDebugEnabled())
+          log.debug("Parsing Response trailers from " + "Request \"" + method + " " + resource +
+              "\":  (" + inp_stream.hashCode() + ")\n\n" + hdrs);
 
         parseHeaderFields(new StringTokenizer(hdrs.toString(), "\r\n"), Trailers);
       }
@@ -1129,7 +1108,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
   /**
    * Parses the given lines as header fields of the form "<name>: <value>" into
    * the given list.
-   * 
    * @param lines the header or trailer lines, one header field per line
    * @param list the Hashtable to store the parsed fields in
    * @exception ProtocolException if any part of the headers do not conform
@@ -1168,7 +1146,6 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
   /**
    * Reads the response data received. Does not return until either
    * Content-Length bytes have been read or EOF is reached.
-   * 
    * @inp the input stream from which to read the data
    * @exception IOException if any read on the input stream fails
    */
@@ -1197,10 +1174,10 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
         /*
          * Don't do this! If we do, then getData() won't work after a
          * getInputStream() because we'll never get all the expected data.
-         * Instead, let the underlying RespInputStream throw the EOF. if (rcvd ==
-         * -1) // premature EOF { throw new EOFException("Encountered premature
-         * EOF while " + "reading headers: received " + off + " bytes instead of
-         * the expected " + ContentLength + " bytes"); }
+         * Instead, let the underlying RespInputStream throw the EOF. if (rcvd
+         * == -1) // premature EOF { throw new EOFException("Encountered
+         * premature EOF while " + "reading headers: received " + off + " bytes
+         * instead of the expected " + ContentLength + " bytes"); }
          */
       } else {
         int inc = 1000, rcvd = 0;
@@ -1223,16 +1200,15 @@ public final class Response implements RoResponse, GlobalConstants, Cloneable {
     }
   }
 
-  Request req             = null;
+  Request req = null;
 
   boolean isFirstResponse = false;
 
   /**
    * This marks this response as belonging to the first request made over an
-   * HTTPConnection. The <var>con</var> and <var>req</var> parameters are
-   * needed in case we have to do a resend of the request - this is to handle
-   * buggy servers which barf upon receiving a request marked as HTTP/1.1 .
-   * 
+   * HTTPConnection. The <var>con</var> and <var>req</var> parameters are needed
+   * in case we have to do a resend of the request - this is to handle buggy
+   * servers which barf upon receiving a request marked as HTTP/1.1 .
    * @param con The HTTPConnection used
    * @param req The Request sent
    */

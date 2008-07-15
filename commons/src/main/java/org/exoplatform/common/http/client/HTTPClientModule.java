@@ -75,7 +75,6 @@ import java.io.IOException;
  * keep track of the number of redirections made to detect redirect loops; it
  * could do this by defining an instance variable and incrementing it each time
  * the request handler is invoked.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  * @since V0.3
@@ -85,8 +84,8 @@ public interface HTTPClientModule extends HTTPClientModuleConstants {
    * This is invoked before the request is sent. A module will typically use
    * this to make a note of headers, to modify headers and/or data, or even
    * generate and return a response (e.g. for a cache module). If a response is
-   * generated the module must return the appropriate return code (<var>REQ_RESPONSE</var>
-   * or <var>REQ_RETURN</var>).
+   * generated the module must return the appropriate return code
+   * (<var>REQ_RESPONSE</var> or <var>REQ_RETURN</var>).
    * <P>
    * Return codes for phase 1 (defined in HTTPClientModuleConstants.java)
    * <DL>
@@ -98,7 +97,6 @@ public interface HTTPClientModule extends HTTPClientModuleConstants {
    * <DT>REQ_NEWCON_RST <DI>use a new HTTPConnection, restart processing
    * <DT>REQ_NEWCON_SND <DI>use a new HTTPConnection, send immediately
    * </DL>
-   * 
    * @param request the request - may be modified as needed
    * @param response the response if the status is REQ_RESPONSE or REQ_RETURN
    * @return status code REQ_XXX specifying further action
@@ -113,7 +111,6 @@ public interface HTTPClientModule extends HTTPClientModuleConstants {
    * The phase 1 response handler. This will be invoked for every response.
    * Modules will typically make notes of the response and do any header
    * processing which must always be performed.
-   * 
    * @param response the response - may be modified
    * @param request the original request
    * @exception IOException if an IOException occurs on the socket
@@ -126,11 +123,11 @@ public interface HTTPClientModule extends HTTPClientModuleConstants {
   /**
    * The phase 2 response handler. A module may modify the response or generate
    * a new request (e.g. for redirection). This handler will only be invoked for
-   * a given module if all previous modules returned <var>RSP_CONTINUE</var>.
-   * If the request is modified the handler must return an appropriate return
-   * code (<var>RSP_REQUEST</var>, <var>RSP_SEND</var>, <var>RSP_NEWCON_REQ</var>
-   * or <var>RSP_NEWCON_SND</var>). If any other code is return the request
-   * must not be modified.
+   * a given module if all previous modules returned <var>RSP_CONTINUE</var>. If
+   * the request is modified the handler must return an appropriate return code
+   * (<var>RSP_REQUEST</var>, <var>RSP_SEND</var>, <var>RSP_NEWCON_REQ</var> or
+   * <var>RSP_NEWCON_SND</var>). If any other code is return the request must
+   * not be modified.
    * <P>
    * Return codes for phase 2 (defined in HTTPClientModuleConstants.java)
    * <DL>
@@ -142,7 +139,6 @@ public interface HTTPClientModule extends HTTPClientModuleConstants {
    * <DT>RSP_NEWCON_REQ <DI>go to phase 1 using a new HTTPConnection
    * <DT>RSP_NEWCON_SND <DI>send request using a new HTTPConnection
    * </DL>
-   * 
    * @param response the response - may be modified
    * @param request the request; if the status is RSP_REQUEST then this must
    *          contain the new request; however do not modify this if you don't
@@ -160,7 +156,6 @@ public interface HTTPClientModule extends HTTPClientModuleConstants {
    * subrequest was generated in phase 2. Modules should defer any repsonse
    * handling which need only be done if the response is returned to the user to
    * this phase.
-   * 
    * @param response the response - may be modified
    * @param request the original request
    * @exception IOException if an IOException occurs on the socket
@@ -173,14 +168,13 @@ public interface HTTPClientModule extends HTTPClientModuleConstants {
   /**
    * The chunked transfer-encoding (and in future maybe others) can contain
    * trailer fields at the end of the body. Since the
-   * <code>responsePhaseXHandler()</code>'s are invoked before the body is
-   * read and therefore do not have access to the trailers (unless they force
-   * the complete body to be read) this method will be invoked when the trailers
+   * <code>responsePhaseXHandler()</code>'s are invoked before the body is read
+   * and therefore do not have access to the trailers (unless they force the
+   * complete body to be read) this method will be invoked when the trailers
    * have been read and parsed (sort of a post-response handling).
    * <P>
-   * Note: This method <strong>must not</strong> modify any part of the
-   * response other than the trailers.
-   * 
+   * Note: This method <strong>must not</strong> modify any part of the response
+   * other than the trailers.
    * @param response the response
    * @param request the request
    * @exception IOException if an IOException occurs on the socket

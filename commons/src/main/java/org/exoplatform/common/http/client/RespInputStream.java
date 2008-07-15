@@ -36,54 +36,59 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 
+import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.ExoLogger;
+
 /**
  * This is the InputStream that gets returned to the user. The extensions
  * consist of the capability to have the data pushed into a buffer if the stream
  * demux needs to.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  * @since V0.2
  */
 final class RespInputStream extends InputStream implements GlobalConstants {
   /** Use old behaviour: don't set a timeout when reading the response body */
-  private static boolean      dontTimeoutBody = false;
+  private static boolean dontTimeoutBody = false;
 
   /** the stream demultiplexor */
-  private StreamDemultiplexor demux           = null;
+  private StreamDemultiplexor demux = null;
 
   /** our response handler */
-  private ResponseHandler     resph;
+  private ResponseHandler resph;
 
   /**
    * signals that the user has closed the stream and will therefore not read any
    * further data
    */
-  boolean                     closed          = false;
+  boolean closed = false;
 
   /** signals that the connection may not be closed prematurely */
-  private boolean             dont_truncate   = false;
+  private boolean dont_truncate = false;
 
   /** this buffer is used to buffer data that the demux has to get rid of */
-  private byte[]              buffer          = null;
+  private byte[] buffer = null;
 
   /** signals that we were interrupted and that the buffer is not complete */
-  private boolean             interrupted     = false;
+  private boolean interrupted = false;
 
   /** the offset at which the unread data starts in the buffer */
-  private int                 offset          = 0;
+  private int offset = 0;
 
   /** the end of the data in the buffer */
-  private int                 end             = 0;
+  private int end = 0;
 
   /** the total number of bytes of entity data read from the demux so far */
-  int                         count           = 0;
+  int count = 0;
+
+  private static final Log log = ExoLogger.getLogger("ws.commons.httpclient.RespInputStream");
 
   static {
     try {
       dontTimeoutBody = Boolean.getBoolean("HTTPClient.dontTimeoutRespBody");
-      if (dontTimeoutBody)
-        Log.write(Log.DEMUX, "RspIS: disabling timeouts when " + "reading response body");
+      if (log.isDebugEnabled() && dontTimeoutBody)
+        log.debug("Disabling timeouts when " + "reading response body");
+
     } catch (Exception e) {
     }
   }
@@ -101,7 +106,6 @@ final class RespInputStream extends InputStream implements GlobalConstants {
 
   /**
    * Reads a single byte.
-   * 
    * @return the byte read, or -1 if EOF.
    * @exception IOException if any exception occured on the connection.
    */
@@ -114,8 +118,8 @@ final class RespInputStream extends InputStream implements GlobalConstants {
   }
 
   /**
-   * Reads <var>len</var> bytes into <var>b</var>, starting at offset <var>off</var>.
-   * 
+   * Reads <var>len</var> bytes into <var>b</var>, starting at offset
+   * <var>off</var>.
    * @return the number of bytes actually read, or -1 if EOF.
    * @exception IOException if any exception occured on the connection.
    */
@@ -135,7 +139,8 @@ final class RespInputStream extends InputStream implements GlobalConstants {
       return len;
     } else {
       if (resph.resp.cd_type != CD_HDRS)
-        Log.write(Log.DEMUX, "RspIS: Reading stream " + this.hashCode());
+        if (log.isDebugEnabled())
+          log.debug("Reading stream " + this.hashCode());
 
       int rcvd;
       if (dontTimeoutBody && resph.resp.cd_type != CD_HDRS)
@@ -151,7 +156,6 @@ final class RespInputStream extends InputStream implements GlobalConstants {
 
   /**
    * skips <var>num</var> bytes.
-   * 
    * @return the number of bytes actually skipped.
    * @exception IOException if any exception occured on the connection.
    */
@@ -174,7 +178,6 @@ final class RespInputStream extends InputStream implements GlobalConstants {
 
   /**
    * gets the number of bytes available for reading without blocking.
-   * 
    * @return the number of bytes available.
    * @exception IOException if any exception occured on the connection.
    */
@@ -190,9 +193,8 @@ final class RespInputStream extends InputStream implements GlobalConstants {
 
   /**
    * closes the stream.
-   * 
    * @exception if any exception occured on the connection before or during
-   *              close.
+   *            close.
    */
   public synchronized void close() throws IOException {
     if (!closed) {
@@ -201,7 +203,8 @@ final class RespInputStream extends InputStream implements GlobalConstants {
       if (dont_truncate && (buffer == null || interrupted))
         readAll(resph.resp.timeout);
 
-      Log.write(Log.DEMUX, "RspIS: User closed stream " + hashCode());
+      if (log.isDebugEnabled())
+        log.debug("User closed stream " + hashCode());
 
       demux.closeSocketIfAllStreamsClosed();
 
@@ -237,12 +240,12 @@ final class RespInputStream extends InputStream implements GlobalConstants {
    * Response through the ResponseStream to the StreamDemultiplexor. This means
    * we need to be awfully careful about what is synchronized and what
    * parameters are passed to whom.
-   * 
    * @param timeout the timeout to use for reading from the demux
    * @exception IOException If any exception occurs while reading stream.
    */
   void readAll(int timeout) throws IOException {
-    Log.write(Log.DEMUX, "RspIS: Read-all on stream " + this.hashCode());
+    if (log.isDebugEnabled())
+      log.debug("Read-all on stream " + this.hashCode());
 
     synchronized (resph.resp) {
       if (!resph.resp.got_headers) // force headers to be read

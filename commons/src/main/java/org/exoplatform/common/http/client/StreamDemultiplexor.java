@@ -38,46 +38,50 @@ import java.io.InterruptedIOException;
 import java.net.Socket;
 import java.net.SocketException;
 
+import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.ExoLogger;
+
 /**
  * This class handles the demultiplexing of input stream. This is needed for
  * things like keep-alive in HTTP/1.0, persist in HTTP/1.1 and in HTTP-NG.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  */
 class StreamDemultiplexor implements GlobalConstants {
   /** the protocol were handling request for */
-  private int                        Protocol;
+  private int Protocol;
 
   /** the connection we're working for */
-  private HTTPConnection             Connection;
+  private HTTPConnection Connection;
 
   /** the input stream to demultiplex */
-  private BufferedInputStream        Stream;
+  private BufferedInputStream Stream;
 
   /** the socket this hangs off */
-  private Socket                     Sock        = null;
+  private Socket Sock = null;
 
   /** signals after the closing of which stream to close the socket */
-  private ResponseHandler            MarkedForClose;
+  private ResponseHandler MarkedForClose;
 
   /** timer used to close the socket if unused for a given time */
-  private SocketTimeout.TimeoutEntry Timer       = null;
+  private SocketTimeout.TimeoutEntry Timer = null;
 
   /** timer thread which implements the timers */
-  private static SocketTimeout       TimerThread = null;
+  private static SocketTimeout TimerThread = null;
 
   /** cleanup object to stop timer thread when we're gc'd */
-  private static Object              cleanup;
+  private static Object cleanup;
 
   /** a Vector to hold the list of response handlers were serving */
-  private LinkedList                 RespHandlerList;
+  private LinkedList RespHandlerList;
 
   /** number of unread bytes in current chunk (if transf-enc == chunked) */
-  private long                       chunk_len;
+  private long chunk_len;
 
   /** the currently set timeout for the socket */
-  private int                        cur_timeout = 0;
+  private int cur_timeout = 0;
+
+  private static final Log log = ExoLogger.getLogger("ws.commons.httpclient.StreamDemultiplexor");
 
   static {
     TimerThread = new SocketTimeout(60);
@@ -106,7 +110,6 @@ class StreamDemultiplexor implements GlobalConstants {
 
   /**
    * a simple contructor.
-   * 
    * @param protocol the protocol used on this stream.
    * @param sock the socket which we're to demux.
    * @param connection the http-connection this socket belongs to.
@@ -120,11 +123,11 @@ class StreamDemultiplexor implements GlobalConstants {
 
   /**
    * Initializes the demultiplexor with a new socket.
-   * 
    * @param stream the stream to demultiplex
    */
   private void init(Socket sock) throws IOException {
-    Log.write(Log.DEMUX, "Demux: Initializing Stream Demultiplexor (" + this.hashCode() + ")");
+    if (log.isDebugEnabled())
+      log.debug("Initializing Stream Demultiplexor (" + this.hashCode() + ")");
 
     this.Sock = sock;
     this.Stream = new BufferedInputStream(sock.getInputStream());
@@ -153,7 +156,6 @@ class StreamDemultiplexor implements GlobalConstants {
 
   /**
    * creates an input stream for the response.
-   * 
    * @param resp the response structure requesting the stream
    * @return an InputStream
    */
@@ -218,8 +220,8 @@ class StreamDemultiplexor implements GlobalConstants {
         throw resph.exception;
       }
 
-      if (resph.resp.cd_type != CD_HDRS)
-        Log.write(Log.DEMUX, "Demux: Reading for stream " + resph.stream.hashCode());
+      if (resph.resp.cd_type != CD_HDRS && log.isDebugEnabled())
+        log.debug("Reading for stream " + resph.stream.hashCode());
 
       if (Timer != null)
         Timer.hyber();
@@ -228,90 +230,91 @@ class StreamDemultiplexor implements GlobalConstants {
         int rcvd = -1;
 
         if (timeout != cur_timeout) {
-          Log.write(Log.DEMUX, "Demux: Setting timeout to " + timeout + " ms");
+          if (log.isDebugEnabled())
+            log.debug("Setting timeout to " + timeout + " ms");
 
           Sock.setSoTimeout(timeout);
           cur_timeout = timeout;
         }
 
         switch (resph.resp.cd_type) {
-        case CD_HDRS:
-          rcvd = Stream.read(b, off, len);
-          if (rcvd == -1)
-            throw new EOFException("Premature EOF encountered");
-          break;
-
-        case CD_0:
-          rcvd = -1;
-          close(resph);
-          break;
-
-        case CD_CLOSE:
-          rcvd = Stream.read(b, off, len);
-          if (rcvd == -1)
-            close(resph);
-          break;
-
-        case CD_CONTLEN:
-          int cl = resph.resp.ContentLength;
-          if (len > cl - resph.stream.count)
-            len = cl - resph.stream.count;
-
-          rcvd = Stream.read(b, off, len);
-          if (rcvd == -1)
-            throw new EOFException("Premature EOF encountered");
-
-          if (resph.stream.count + rcvd == cl)
-            close(resph);
-
-          break;
-
-        case CD_CHUNKED:
-          if (chunk_len == -1) // it's a new chunk
-            chunk_len = Codecs.getChunkLength(Stream);
-
-          if (chunk_len > 0) // it's data
-          {
-            if (len > chunk_len)
-              len = (int) chunk_len;
+          case CD_HDRS:
             rcvd = Stream.read(b, off, len);
             if (rcvd == -1)
               throw new EOFException("Premature EOF encountered");
-            chunk_len -= rcvd;
-            if (chunk_len == 0) // got the whole chunk
-            {
-              Stream.read(); // CR
-              Stream.read(); // LF
-              chunk_len = -1;
-            }
-          } else // the footers (trailers)
-          {
-            resph.resp.readTrailers(Stream);
+            break;
+
+          case CD_0:
             rcvd = -1;
             close(resph);
-            chunk_len = -1;
-          }
-          break;
+            break;
 
-        case CD_MP_BR:
-          byte[] endbndry = resph.getEndBoundary(Stream);
-          int[] end_cmp = resph.getEndCompiled(Stream);
+          case CD_CLOSE:
+            rcvd = Stream.read(b, off, len);
+            if (rcvd == -1)
+              close(resph);
+            break;
 
-          rcvd = Stream.read(b, off, len);
-          if (rcvd == -1)
-            throw new EOFException("Premature EOF encountered");
+          case CD_CONTLEN:
+            int cl = resph.resp.ContentLength;
+            if (len > cl - resph.stream.count)
+              len = cl - resph.stream.count;
 
-          int ovf = Stream.pastEnd(endbndry, end_cmp);
-          if (ovf != -1) {
-            rcvd -= ovf;
-            close(resph);
-          }
+            rcvd = Stream.read(b, off, len);
+            if (rcvd == -1)
+              throw new EOFException("Premature EOF encountered");
 
-          break;
+            if (resph.stream.count + rcvd == cl)
+              close(resph);
 
-        default:
-          throw new Error("Internal Error in StreamDemultiplexor: " + "Invalid cd_type "
-              + resph.resp.cd_type);
+            break;
+
+          case CD_CHUNKED:
+            if (chunk_len == -1) // it's a new chunk
+              chunk_len = Codecs.getChunkLength(Stream);
+
+            if (chunk_len > 0) // it's data
+            {
+              if (len > chunk_len)
+                len = (int) chunk_len;
+              rcvd = Stream.read(b, off, len);
+              if (rcvd == -1)
+                throw new EOFException("Premature EOF encountered");
+              chunk_len -= rcvd;
+              if (chunk_len == 0) // got the whole chunk
+              {
+                Stream.read(); // CR
+                Stream.read(); // LF
+                chunk_len = -1;
+              }
+            } else // the footers (trailers)
+            {
+              resph.resp.readTrailers(Stream);
+              rcvd = -1;
+              close(resph);
+              chunk_len = -1;
+            }
+            break;
+
+          case CD_MP_BR:
+            byte[] endbndry = resph.getEndBoundary(Stream);
+            int[] end_cmp = resph.getEndCompiled(Stream);
+
+            rcvd = Stream.read(b, off, len);
+            if (rcvd == -1)
+              throw new EOFException("Premature EOF encountered");
+
+            int ovf = Stream.pastEnd(endbndry, end_cmp);
+            if (ovf != -1) {
+              rcvd -= ovf;
+              close(resph);
+            }
+
+            break;
+
+          default:
+            throw new Error("Internal Error in StreamDemultiplexor: " + "Invalid cd_type " +
+                resph.resp.cd_type);
         }
 
         restartTimer();
@@ -322,13 +325,9 @@ class StreamDemultiplexor implements GlobalConstants {
         restartTimer();
         throw ie;
       } catch (IOException ioe) {
-        Log.write(Log.DEMUX, "Demux: ", ioe);
-
         close(ioe, true);
         throw resph.exception; // set by retry_requests
       } catch (ParseException pe) {
-        Log.write(Log.DEMUX, "Demux: ", pe);
-
         close(new IOException(pe.toString()), true);
         throw resph.exception; // set by retry_requests
       }
@@ -375,28 +374,28 @@ class StreamDemultiplexor implements GlobalConstants {
       return avail;
 
     switch (resph.resp.cd_type) {
-    case CD_0:
-      return 0;
-    case CD_HDRS:
-      // this is something of a hack; I could return 0, but then
-      // if you were waiting for something on a response that
-      // wasn't first in line (and you didn't try to read the
-      // other response) you'd wait forever. On the other hand,
-      // we might be making a false promise here...
-      return (avail > 0 ? 1 : 0);
-    case CD_CLOSE:
-      return avail;
-    case CD_CONTLEN:
-      int cl = resph.resp.ContentLength;
-      cl -= resph.stream.count;
-      return (avail < cl ? avail : cl);
-    case CD_CHUNKED:
-      return avail; // not perfect...
-    case CD_MP_BR:
-      return avail; // not perfect...
-    default:
-      throw new Error("Internal Error in StreamDemultiplexor: " + "Invalid cd_type "
-          + resph.resp.cd_type);
+      case CD_0:
+        return 0;
+      case CD_HDRS:
+        // this is something of a hack; I could return 0, but then
+        // if you were waiting for something on a response that
+        // wasn't first in line (and you didn't try to read the
+        // other response) you'd wait forever. On the other hand,
+        // we might be making a false promise here...
+        return (avail > 0 ? 1 : 0);
+      case CD_CLOSE:
+        return avail;
+      case CD_CONTLEN:
+        int cl = resph.resp.ContentLength;
+        cl -= resph.stream.count;
+        return (avail < cl ? avail : cl);
+      case CD_CHUNKED:
+        return avail; // not perfect...
+      case CD_MP_BR:
+        return avail; // not perfect...
+      default:
+        throw new Error("Internal Error in StreamDemultiplexor: " + "Invalid cd_type " +
+            resph.resp.cd_type);
     }
 
   }
@@ -410,7 +409,6 @@ class StreamDemultiplexor implements GlobalConstants {
    * are outstanding (e.g. due to a timeout). 3) when the markedForClose
    * response is closed. 4) if all response streams up until and including the
    * markedForClose response have been closed. 5) if this demux is finalized.
-   * 
    * @param exception the IOException to be sent to the streams.
    * @param was_reset if true then the exception is due to a connection reset;
    *          otherwise it means we generated the exception ourselves and this
@@ -419,8 +417,8 @@ class StreamDemultiplexor implements GlobalConstants {
   synchronized void close(IOException exception, boolean was_reset) {
     if (Sock == null) // already cleaned up
       return;
-
-    Log.write(Log.DEMUX, "Demux: Closing all streams and socket (" + this.hashCode() + ")");
+    if (log.isDebugEnabled())
+      log.debug("Closing all streams and socket (" + this.hashCode() + ")");
 
     try {
       Stream.close();
@@ -451,7 +449,6 @@ class StreamDemultiplexor implements GlobalConstants {
    * Retries outstanding requests. Well, actually the RetryModule does that.
    * Here we just throw a RetryException for each request so that the
    * RetryModule can catch and handle them.
-   * 
    * @param exception the exception that led to this call.
    * @param was_reset this flag is passed to the RetryException and is used by
    *          the RetryModule to distinguish abnormal closes from expected
@@ -498,7 +495,8 @@ class StreamDemultiplexor implements GlobalConstants {
       if (resph != (ResponseHandler) RespHandlerList.getFirst())
         return;
 
-      Log.write(Log.DEMUX, "Demux: Closing stream " + resph.stream.hashCode());
+      if (log.isDebugEnabled())
+        log.debug("Closing stream " + resph.stream.hashCode());
 
       resph.eof = true;
       RespHandlerList.remove(resph);
@@ -569,7 +567,6 @@ class StreamDemultiplexor implements GlobalConstants {
    * Mark this demux to not accept any more request and to close the stream
    * after this <var>resp</var>onse or all requests have been processed, or
    * close immediately if no requests are registered.
-   * 
    * @param response the Response after which the connection should be closed.
    */
   synchronized void markForClose(Response resp) {
@@ -592,7 +589,8 @@ class StreamDemultiplexor implements GlobalConstants {
         {
           MarkedForClose = resph;
 
-          Log.write(Log.DEMUX, "Demux: stream " + resp.inp_stream.hashCode() + " marked for close");
+          if (log.isDebugEnabled())
+            log.debug("Stream " + resp.inp_stream.hashCode() + " marked for close");
 
           closeSocketIfAllStreamsClosed();
           return;
@@ -610,18 +608,19 @@ class StreamDemultiplexor implements GlobalConstants {
       MarkedForClose = lasth; // resp == null, so use last resph
       closeSocketIfAllStreamsClosed();
 
-      Log.write(Log.DEMUX, "Demux: stream " + lasth.stream.hashCode() + " marked for close");
+      if (log.isDebugEnabled())
+        log.debug("Stream " + lasth.stream.hashCode() + " marked for close");
     }
   }
 
   /**
    * Emergency stop. Closes the socket and notifies the responses that the
    * requests are aborted.
-   * 
    * @since V0.3
    */
   void abort() {
-    Log.write(Log.DEMUX, "Demux: Aborting socket (" + this.hashCode() + ")");
+    if (log.isDebugEnabled())
+      log.debug("Aborting socket (" + this.hashCode() + ")");
 
     // notify all responses of abort
 
@@ -636,7 +635,7 @@ class StreamDemultiplexor implements GlobalConstants {
 
       /*
        * Close the socket. Note: this duplicates most of close(IOException,
-       * boolean). We do *not* call close() because that is synchronized, but we
+       * boolean). We donot call close() because that is synchronized, but we
        * want abort() to be asynch.
        */
       if (Sock != null) {
@@ -678,27 +677,26 @@ class StreamDemultiplexor implements GlobalConstants {
 
   /**
    * produces a string.
-   * 
    * @return a string containing the class name and protocol number
    */
   public String toString() {
     String prot;
 
     switch (Protocol) {
-    case HTTP:
-      prot = "HTTP";
-      break;
-    case HTTPS:
-      prot = "HTTPS";
-      break;
-    case SHTTP:
-      prot = "SHTTP";
-      break;
-    case HTTP_NG:
-      prot = "HTTP_NG";
-      break;
-    default:
-      throw new Error("HTTPClient Internal Error: invalid protocol " + Protocol);
+      case HTTP:
+        prot = "HTTP";
+        break;
+      case HTTPS:
+        prot = "HTTPS";
+        break;
+      case SHTTP:
+        prot = "SHTTP";
+        break;
+      case HTTP_NG:
+        prot = "HTTP_NG";
+        break;
+      default:
+        throw new Error("HTTPClient Internal Error: invalid protocol " + Protocol);
     }
 
     return getClass().getName() + "[Protocol=" + prot + "]";
@@ -720,11 +718,11 @@ class SocketTimeout extends Thread {
    * markForClose() on the associated stream demultipexer.
    */
   class TimeoutEntry {
-    boolean             restart = false, hyber = false, alive = true;
+    boolean restart = false, hyber = false, alive = true;
 
     StreamDemultiplexor demux;
 
-    TimeoutEntry        next    = null, prev = null;
+    TimeoutEntry next = null, prev = null;
 
     TimeoutEntry(StreamDemultiplexor demux) {
       this.demux = demux;
@@ -774,7 +772,7 @@ class SocketTimeout extends Thread {
 
   TimeoutEntry[] time_list; // jdk 1.1.x javac bug: these must not
 
-  int            current;  // be private!
+  int current; // be private!
 
   SocketTimeout(int secs) {
     super("SocketTimeout");

@@ -37,7 +37,6 @@ import java.io.IOException;
 /**
  * This holds various information about an active response. Used by the
  * StreamDemultiplexor and RespInputStream.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  * @since V0.2
@@ -47,23 +46,22 @@ final class ResponseHandler {
   RespInputStream stream;
 
   /** the response class */
-  Response        resp;
+  Response resp;
 
   /** the response class */
-  Request         request;
+  Request request;
 
   /**
    * signals that the demux has closed the response stream, and that therefore
    * no more data can be read
    */
-  boolean         eof       = false;
+  boolean eof = false;
 
   /** this is non-null if the stream has an exception pending */
-  IOException     exception = null;
+  IOException exception = null;
 
   /**
    * Creates a new handler. This also allocates the response input stream.
-   * 
    * @param resp the reponse
    * @param request the request
    * @param demux our stream demultiplexor.
@@ -73,8 +71,6 @@ final class ResponseHandler {
     this.request = request;
     this.stream = new RespInputStream(demux, this);
 
-    Log.write(Log.DEMUX, "Demux: Opening stream " + this.stream.hashCode() + " for demux ("
-        + demux.hashCode() + ")");
   }
 
   /**
@@ -84,14 +80,12 @@ final class ResponseHandler {
   private byte[] endbndry = null;
 
   /** holds the compilation of the above string */
-  private int[]  end_cmp  = null;
+  private int[] end_cmp = null;
 
   /**
    * return the boundary string for this response. Set's up the InputStream
    * buffer if neccessary.
-   * 
-   * @param MasterStream the input stream from which the stream demux is
-   *          reading.
+   * @param MasterStream the input stream from which the stream demux is reading.
    * @return the boundary string.
    */
   byte[] getEndBoundary(BufferedInputStream MasterStream) throws IOException, ParseException {
@@ -104,9 +98,7 @@ final class ResponseHandler {
   /**
    * return the compilation of the boundary string for this response. Set's up
    * the InputStream buffer if neccessary.
-   * 
-   * @param MasterStream the input stream from which the stream demux is
-   *          reading.
+   * @param MasterStream the input stream from which the stream demux is reading.
    * @return the compiled boundary string.
    */
   int[] getEndCompiled(BufferedInputStream MasterStream) throws IOException, ParseException {

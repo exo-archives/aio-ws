@@ -38,19 +38,17 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * Some utility methods for digesting info using MD5.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  * @since V0.3-3
  */
 class MD5 {
   private static final char[] hex = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b',
-      'c', 'd', 'e', 'f',        };
+      'c', 'd', 'e', 'f', };
 
   /**
    * Turns array of bytes into string representing each byte as unsigned hex
    * number.
-   * 
    * @param hash array of bytes to convert to hex-string
    * @return generated hex string
    */
@@ -65,7 +63,6 @@ class MD5 {
 
   /**
    * Digest the input.
-   * 
    * @param input the data to be digested.
    * @return the md5-digested input
    */
@@ -80,7 +77,6 @@ class MD5 {
 
   /**
    * Digest the input.
-   * 
    * @param input1 the first part of the data to be digested.
    * @param input2 the second part of the data to be digested.
    * @return the md5-digested input
@@ -97,7 +93,6 @@ class MD5 {
 
   /**
    * Digest the input.
-   * 
    * @param input the data to be digested.
    * @return the md5-digested input as a hex string
    */
@@ -107,7 +102,6 @@ class MD5 {
 
   /**
    * Digest the input.
-   * 
    * @param input1 the first part of the data to be digested.
    * @param input2 the second part of the data to be digested.
    * @return the md5-digested input as a hex string
@@ -118,7 +112,6 @@ class MD5 {
 
   /**
    * Digest the input.
-   * 
    * @param input the data to be digested.
    * @return the md5-digested input as a hex string
    */
@@ -132,7 +125,6 @@ class MD5 {
 
   /**
    * Digest the input.
-   * 
    * @param input the data to be digested.
    * @return the md5-digested input as a hex string
    */

@@ -33,13 +33,12 @@ package org.exoplatform.common.http.client;
 
 /**
  * This is the interface that a username/password prompter must implement. The
- * {@link org.exoplatform.common.http.client.DefaultAuthHandler DefaultAuthHandler}
- * invokes an instance of this each time it needs a username and password to
- * satisfy an authorization challenge (for which it doesn't already have the
- * necessary info). This can be used to implement a different UI from the
- * default popup box for soliciting usernames and passwords, or for using an
- * altogether different way of getting the necessary auth info.
- * 
+ * {@link org.exoplatform.common.http.client.DefaultAuthHandler
+ * DefaultAuthHandler} invokes an instance of this each time it needs a username
+ * and password to satisfy an authorization challenge (for which it doesn't
+ * already have the necessary info). This can be used to implement a different
+ * UI from the default popup box for soliciting usernames and passwords, or for
+ * using an altogether different way of getting the necessary auth info.
  * @see DefaultAuthHandler#setAuthorizationPrompter(HTTPClient.AuthorizationPrompter)
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
@@ -49,7 +48,6 @@ public interface AuthorizationPrompter {
   /**
    * This method is invoked whenever a username and password is required for an
    * authentication challenge to proceed.
-   * 
    * @param challenge the parsed challenge from the server; the host, port,
    *          scheme, realm and params are set to the values given by the server
    *          in the challenge.
@@ -58,8 +56,8 @@ public interface AuthorizationPrompter {
    *          was 401).
    * @return an NVPair containing the username and password in the name and
    *         value fields, respectively, or null if the authorization challenge
-   *         handling is to be aborted (e.g. when the user hits the <var>Cancel</var>
-   *         button).
+   *         handling is to be aborted (e.g. when the user hits the
+   *         <var>Cancel</var> button).
    */
   NVPair getUsernamePassword(AuthorizationInfo challenge, boolean forProxy);
 }

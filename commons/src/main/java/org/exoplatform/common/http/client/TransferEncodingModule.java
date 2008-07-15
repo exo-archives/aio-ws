@@ -37,14 +37,20 @@ import java.util.Vector;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
+import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.ExoLogger;
+
 /**
  * This module handles the TransferEncoding response header. It currently
  * handles the "gzip", "deflate", "compress", "chunked" and "identity" tokens.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  */
 class TransferEncodingModule implements HTTPClientModule {
+
+  private static final Log log = ExoLogger
+      .getLogger("ws.commons.httpclient.TransferEncodingModule");
+
   // Methods
 
   /**
@@ -91,8 +97,8 @@ class TransferEncodingModule implements HTTPClientModule {
         if (Float.valueOf(params[idx].getValue()).floatValue() > 0.)
           return REQ_CONTINUE;
       } catch (NumberFormatException nfe) {
-        throw new ModuleException("Invalid q value for \"*\" in TE " + "header: "
-            + nfe.getMessage());
+        throw new ModuleException("Invalid q value for \"*\" in TE " + "header: " +
+            nfe.getMessage());
       }
     }
 
@@ -142,25 +148,31 @@ class TransferEncodingModule implements HTTPClientModule {
     while (pte.size() > 0) {
       String encoding = ((HttpHeaderElement) pte.lastElement()).getName();
       if (encoding.equalsIgnoreCase("gzip")) {
-        Log.write(Log.MODS, "TEM:   pushing gzip-input-stream");
+        if (log.isDebugEnabled())
+          log.debug("Pushing gzip-input-stream");
 
         resp.inp_stream = new GZIPInputStream(resp.inp_stream);
       } else if (encoding.equalsIgnoreCase("deflate")) {
-        Log.write(Log.MODS, "TEM:   pushing inflater-input-stream");
+        if (log.isDebugEnabled())
+          log.debug("Pushing inflater-input-stream");
 
         resp.inp_stream = new InflaterInputStream(resp.inp_stream);
       } else if (encoding.equalsIgnoreCase("compress")) {
-        Log.write(Log.MODS, "TEM:   pushing uncompress-input-stream");
+        if (log.isDebugEnabled())
+          log.debug("Pushing uncompress-input-stream");
 
         resp.inp_stream = new UncompressInputStream(resp.inp_stream);
       } else if (encoding.equalsIgnoreCase("chunked")) {
-        Log.write(Log.MODS, "TEM:   pushing chunked-input-stream");
+        if (log.isDebugEnabled())
+          log.debug("Pushing chunked-input-stream");
 
         resp.inp_stream = new ChunkedInputStream(resp.inp_stream);
       } else if (encoding.equalsIgnoreCase("identity")) {
-        Log.write(Log.MODS, "TEM:   ignoring 'identity' token");
+        if (log.isDebugEnabled())
+          log.debug("Ignoring 'identity' token");
       } else {
-        Log.write(Log.MODS, "TEM:   Unknown transfer encoding '" + encoding + "'");
+        if (log.isDebugEnabled())
+          log.debug("Unknown transfer encoding '" + encoding + "'");
 
         break;
       }

@@ -59,6 +59,9 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.ExoLogger;
+
 /**
  * This module handles Netscape cookies (also called Version 0 cookies) and
  * Version 1 cookies. Specifically is reads the <var>Set-Cookie</var> and
@@ -71,11 +74,11 @@ import java.util.Vector;
  * it, and a cookie from the cookie list is only sent if the handler allows it.
  * <P>
  * This module expects to be the only one handling cookies. Specifically, it
- * will remove any <var>Cookie</var> and <var>Cookie2</var> header fields
- * found in the request, and it will remove the <var>Set-Cookie</var> and
- * <var>Set-Cookie2</var> header fields in the response (after processing
- * them). In order to add cookies to a request or to prevent cookies from being
- * sent, you can use the {@link #addCookie(HTTPClient.Cookie) addCookie} and
+ * will remove any <var>Cookie</var> and <var>Cookie2</var> header fields found
+ * in the request, and it will remove the <var>Set-Cookie</var> and
+ * <var>Set-Cookie2</var> header fields in the response (after processing them).
+ * In order to add cookies to a request or to prevent cookies from being sent,
+ * you can use the {@link #addCookie(HTTPClient.Cookie) addCookie} and
  * {@link #removeCookie(HTTPClient.Cookie) removeCookie} methods to manipulate
  * the module's list of cookies.
  * <P>
@@ -86,28 +89,30 @@ import java.util.Vector;
  * defaults to a system dependent name. The reading and saving of cookies is
  * enabled by setting the system property <var>HTTPClient.cookies.save</var> to
  * <var>true</var>.
- * 
  * @see <a
  *      href="http://home.netscape.com/newsref/std/cookie_spec.html">Netscape's
  *      cookie spec</a>
- * @see <a href="http://www.ietf.org/rfc/rfc2965.txt">HTTP State Management
- *      Mechanism spec</a>
+ * @see <a href="http://www.ietf.org/rfc/rfc2965.txt">HTTP State Management *
+ *      Mechanism spec< /a>
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  * @since V0.3
  */
+@SuppressWarnings("deprecation")
 public class CookieModule implements HTTPClientModule {
   /** the list of known cookies */
-  private static Hashtable           cookie_cntxt_list = new Hashtable();
+  private static Hashtable cookie_cntxt_list = new Hashtable();
 
   /** the file to use for persistent cookie storage */
-  private static File                cookie_jar        = null;
+  private static File cookie_jar = null;
 
   /** an object, whose finalizer will save the cookies to the jar */
-  private static Object              cookieSaver       = null;
+  private static Object cookieSaver = null;
 
   /** the cookie policy handler */
-  private static CookiePolicyHandler cookie_handler    = new DefaultCookiePolicyHandler();
+  private static CookiePolicyHandler cookie_handler = new DefaultCookiePolicyHandler();
+
+  private static final Log log = ExoLogger.getLogger("ws.commons.httpClient.CookieModule");
 
   // read in cookies from disk at startup
 
@@ -152,8 +157,8 @@ public class CookieModule implements HTTPClientModule {
   }
 
   private static void saveCookies() {
-    if (cookie_jar != null
-        && (!cookie_jar.exists() || cookie_jar.isFile() && cookie_jar.canWrite())) {
+    if (cookie_jar != null &&
+        (!cookie_jar.exists() || cookie_jar.isFile() && cookie_jar.canWrite())) {
       Hashtable cookie_list = new Hashtable();
       Enumeration en = Util.getList(cookie_cntxt_list, HTTPConnection.getDefaultContext())
           .elements();
@@ -190,16 +195,16 @@ public class CookieModule implements HTTPClientModule {
       // default to something reasonable
 
       String os = System.getProperty("os.name");
-      if (os.equalsIgnoreCase("Windows 95") || os.equalsIgnoreCase("16-bit Windows")
-          || os.equalsIgnoreCase("Windows")) {
+      if (os.equalsIgnoreCase("Windows 95") || os.equalsIgnoreCase("16-bit Windows") ||
+          os.equalsIgnoreCase("Windows")) {
         file = System.getProperty("java.home") + File.separator + ".httpclient_cookies";
       } else if (os.equalsIgnoreCase("Windows NT")) {
         file = System.getProperty("user.home") + File.separator + ".httpclient_cookies";
       } else if (os.equalsIgnoreCase("OS/2")) {
         file = System.getProperty("user.home") + File.separator + ".httpclient_cookies";
       } else if (os.equalsIgnoreCase("Mac OS") || os.equalsIgnoreCase("MacOS")) {
-        file = "System Folder" + File.separator + "Preferences" + File.separator
-            + "HTTPClientCookies";
+        file = "System Folder" + File.separator + "Preferences" + File.separator +
+            "HTTPClientCookies";
       } else // it's probably U*IX or VMS
       {
         file = System.getProperty("user.home") + File.separator + ".httpclient_cookies";
@@ -258,15 +263,17 @@ public class CookieModule implements HTTPClientModule {
         Cookie cookie = (Cookie) list.nextElement();
 
         if (cookie.hasExpired()) {
-          Log.write(Log.COOKI, "CookM: cookie has expired and is " + "being removed: " + cookie);
+          if (log.isDebugEnabled())
+            log.debug("Cookie has expired and is being removed: " + cookie);
+
           if (remove_list == null)
             remove_list = new Vector();
           remove_list.addElement(cookie);
           continue;
         }
 
-        if (cookie.sendWith(req)
-            && (cookie_handler == null || cookie_handler.sendCookie(cookie, req))) {
+        if (cookie.sendWith(req) &&
+            (cookie_handler == null || cookie_handler.sendCookie(cookie, req))) {
           int len = cookie.getPath().length();
           int idx;
 
@@ -320,7 +327,9 @@ public class CookieModule implements HTTPClientModule {
 
       req.setHeaders(hdrs);
 
-      Log.write(Log.COOKI, "CookM: Sending cookies '" + value + "'");
+      if (log.isDebugEnabled())
+        log.debug("Sending cookies '" + value + "'");
+
     }
 
     return REQ_CONTINUE;
@@ -383,10 +392,10 @@ public class CookieModule implements HTTPClientModule {
     else
       cookies = Cookie.parse(set_cookie, req);
 
-    if (Log.isEnabled(Log.COOKI)) {
-      Log.write(Log.COOKI, "CookM: Received and parsed " + cookies.length + " cookies:");
+    if (log.isDebugEnabled()) {
+      log.debug("Received and parsed " + cookies.length + " cookies:");
       for (int idx = 0; idx < cookies.length; idx++)
-        Log.write(Log.COOKI, "CookM: Cookie " + idx + ": " + cookies[idx]);
+        log.debug("Cookie " + idx + ": " + cookies[idx]);
     }
 
     Hashtable cookie_list = Util.getList(cookie_cntxt_list, req.getConnection().getContext());
@@ -394,7 +403,9 @@ public class CookieModule implements HTTPClientModule {
       for (int idx = 0; idx < cookies.length; idx++) {
         Cookie cookie = (Cookie) cookie_list.get(cookies[idx]);
         if (cookie != null && cookies[idx].hasExpired()) {
-          Log.write(Log.COOKI, "CookM: cookie has expired and is " + "being removed: " + cookie);
+          if (log.isDebugEnabled())
+            log.debug("Cookie has expired and is " + "being removed: " + cookie);
+
           cookie_list.remove(cookie); // expired, so remove
         } else if (!cookies[idx].hasExpired()) // new or replaced
         {
@@ -416,7 +427,6 @@ public class CookieModule implements HTTPClientModule {
   /**
    * Discard all cookies for the given context. Cookies stored in persistent
    * storage are not affected.
-   * 
    * @param context the context Object
    */
   public static void discardAllCookies(Object context) {
@@ -426,7 +436,6 @@ public class CookieModule implements HTTPClientModule {
 
   /**
    * List all stored cookies for all contexts.
-   * 
    * @return an array of all Cookies
    * @since V0.3-1
    */
@@ -452,7 +461,6 @@ public class CookieModule implements HTTPClientModule {
 
   /**
    * List all stored cookies for a given context.
-   * 
    * @param context the context Object.
    * @return an array of Cookies
    * @since V0.3-1
@@ -476,7 +484,6 @@ public class CookieModule implements HTTPClientModule {
    * Add the specified cookie to the list of cookies in the default context. If
    * a compatible cookie (as defined by <var>Cookie.equals()</var>) already
    * exists in the list then it is replaced with the new cookie.
-   * 
    * @param cookie the Cookie to add
    * @since V0.3-1
    */
@@ -489,7 +496,6 @@ public class CookieModule implements HTTPClientModule {
    * Add the specified cookie to the list of cookies for the specified context.
    * If a compatible cookie (as defined by <var>Cookie.equals()</var>) already
    * exists in the list then it is replaced with the new cookie.
-   * 
    * @param cookie the cookie to add
    * @param context the context Object.
    * @since V0.3-1
@@ -503,7 +509,6 @@ public class CookieModule implements HTTPClientModule {
    * Remove the specified cookie from the list of cookies in the default
    * context. If the cookie is not found in the list then this method does
    * nothing.
-   * 
    * @param cookie the Cookie to remove
    * @since V0.3-1
    */
@@ -516,7 +521,6 @@ public class CookieModule implements HTTPClientModule {
    * Remove the specified cookie from the list of cookies for the specified
    * context. If the cookie is not found in the list then this method does
    * nothing.
-   * 
    * @param cookie the cookie to remove
    * @param context the context Object
    * @since V0.3-1
@@ -561,7 +565,6 @@ public class CookieModule implements HTTPClientModule {
    * determine when a request is verifiable and when not. You are therefore
    * encouraged to provide your own handler which implements section 3.3.6 (use
    * the <code>CookiePolicyHandler.sendCookie</code> method for this).
-   * 
    * @param handler the new policy handler
    * @return the previous policy handler
    */
@@ -577,13 +580,13 @@ public class CookieModule implements HTTPClientModule {
  */
 class DefaultCookiePolicyHandler implements CookiePolicyHandler {
   /** a list of all hosts and domains from which to silently accept cookies */
-  private String[]       accept_domains = new String[0];
+  private String[] accept_domains = new String[0];
 
   /** a list of all hosts and domains from which to silently reject cookies */
-  private String[]       reject_domains = new String[0];
+  private String[] reject_domains = new String[0];
 
   /** the query popup */
-  private BasicCookieBox popup          = null;
+  private BasicCookieBox popup = null;
 
   DefaultCookiePolicyHandler() {
     // have all cookies been accepted or rejected?
@@ -612,7 +615,6 @@ class DefaultCookiePolicyHandler implements CookiePolicyHandler {
    * returns whether this cookie should be accepted. First checks the stored
    * lists of accept and reject domains, and if it is neither accepted nor
    * rejected by these then query the user via a popup.
-   * 
    * @param cookie the cookie in question
    * @param req the request
    * @param resp the response
@@ -626,16 +628,16 @@ class DefaultCookiePolicyHandler implements CookiePolicyHandler {
     // Check lists. Reject takes priority over accept
 
     for (int idx = 0; idx < reject_domains.length; idx++) {
-      if (reject_domains[idx].length() == 0 || reject_domains[idx].charAt(0) == '.'
-          && server.endsWith(reject_domains[idx]) || reject_domains[idx].charAt(0) != '.'
-          && server.equals(reject_domains[idx]))
+      if (reject_domains[idx].length() == 0 || reject_domains[idx].charAt(0) == '.' &&
+          server.endsWith(reject_domains[idx]) || reject_domains[idx].charAt(0) != '.' &&
+          server.equals(reject_domains[idx]))
         return false;
     }
 
     for (int idx = 0; idx < accept_domains.length; idx++) {
-      if (accept_domains[idx].length() == 0 || accept_domains[idx].charAt(0) == '.'
-          && server.endsWith(accept_domains[idx]) || accept_domains[idx].charAt(0) != '.'
-          && server.equals(accept_domains[idx]))
+      if (accept_domains[idx].length() == 0 || accept_domains[idx].charAt(0) == '.' &&
+          server.endsWith(accept_domains[idx]) || accept_domains[idx].charAt(0) != '.' &&
+          server.equals(accept_domains[idx]))
         return true;
     }
 
@@ -653,7 +655,6 @@ class DefaultCookiePolicyHandler implements CookiePolicyHandler {
   /**
    * This handler just allows all cookies to be sent which were accepted (i.e.
    * no further restrictions are placed on the sending of cookies).
-   * 
    * @return true
    */
   public boolean sendCookie(Cookie cookie, RoRequest req) {
@@ -697,50 +698,49 @@ class DefaultCookiePolicyHandler implements CookiePolicyHandler {
 /**
  * A simple popup that asks whether the cookie should be accepted or rejected,
  * or if cookies from whole domains should be silently accepted or rejected.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  */
 class BasicCookieBox extends Frame {
   private final static String title = "Set Cookie Request";
 
-  private Dimension           screen;
+  private Dimension screen;
 
-  private GridBagConstraints  constr;
+  private GridBagConstraints constr;
 
-  private Label               name_value_label;
+  private Label name_value_label;
 
-  private Label               domain_value;
+  private Label domain_value;
 
-  private Label               ports_label;
+  private Label ports_label;
 
-  private Label               ports_value;
+  private Label ports_value;
 
-  private Label               path_value;
+  private Label path_value;
 
-  private Label               expires_value;
+  private Label expires_value;
 
-  private Label               discard_note;
+  private Label discard_note;
 
-  private Label               secure_note;
+  private Label secure_note;
 
-  private Label               c_url_note;
+  private Label c_url_note;
 
-  private Panel               left_panel;
+  private Panel left_panel;
 
-  private Panel               right_panel;
+  private Panel right_panel;
 
-  private Label               comment_label;
+  private Label comment_label;
 
-  private TextArea            comment_value;
+  private TextArea comment_value;
 
-  private TextField           domain;
+  private TextField domain;
 
-  private Button              default_focus;
+  private Button default_focus;
 
-  private boolean             accept;
+  private boolean accept;
 
-  private boolean             accept_domain;
+  private boolean accept_domain;
 
   /**
    * Constructs the popup.
@@ -888,7 +888,6 @@ class BasicCookieBox extends Frame {
 
   /**
    * the method called by the DefaultCookiePolicyHandler.
-   * 
    * @return true if the cookie should be accepted
    */
   public synchronized boolean accept(Cookie cookie, DefaultCookiePolicyHandler h, String server) {

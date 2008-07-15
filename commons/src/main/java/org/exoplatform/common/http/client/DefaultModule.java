@@ -35,16 +35,20 @@ package org.exoplatform.common.http.client;
 import java.io.IOException;
 import java.net.ProtocolException;
 
+import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.ExoLogger;
+
 /**
  * This is the default module which gets called after all other modules have
  * done their stuff.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  */
 class DefaultModule implements HTTPClientModule {
   /** number of times the request will be retried */
   private int req_timeout_retries;
+
+  private static final Log log = ExoLogger.getLogger("ws.commons.httpclient.DefaultModule");
 
   // Constructors
 
@@ -78,43 +82,45 @@ class DefaultModule implements HTTPClientModule {
 
     int sts = resp.getStatusCode();
     switch (sts) {
-    case 408: // Request Timeout
+      case 408: // Request Timeout
 
-      if (req_timeout_retries-- == 0 || req.getStream() != null) {
-        Log.write(Log.MODS, "DefM:  Status " + sts + " " + resp.getReasonLine() + " not handled - "
-            + "maximum number of retries exceeded");
+        if (req_timeout_retries-- == 0 || req.getStream() != null) {
+          if (log.isDebugEnabled())
+            log.debug("Status " + sts + " " + resp.getReasonLine() +
+                " not handled - maximum number of retries exceeded");
 
-        return RSP_CONTINUE;
-      } else {
-        Log.write(Log.MODS, "DefM:  Handling " + sts + " " + resp.getReasonLine() + " - "
-            + "resending request");
+          return RSP_CONTINUE;
+        } else {
+          if (log.isDebugEnabled())
+            log.debug("Handling " + sts + " " + resp.getReasonLine() + " - resending request");
 
+          return RSP_REQUEST;
+        }
+
+      case 411: // Length Required
+        if (req.getStream() != null && req.getStream().getLength() == -1)
+          return RSP_CONTINUE;
+
+        try {
+          resp.getInputStream().close();
+        } catch (IOException ioe) {
+        }
+        if (req.getData() != null)
+          throw new ProtocolException("Received status code 411 even"
+              + " though Content-Length was sent");
+
+        if (log.isDebugEnabled())
+          log.debug("Handling " + sts + " " + resp.getReasonLine() +
+              " - resending request with 'Content-length: 0'");
+
+        req.setData(new byte[0]); // will send Content-Length: 0
         return RSP_REQUEST;
-      }
 
-    case 411: // Length Required
-      if (req.getStream() != null && req.getStream().getLength() == -1)
+      case 505: // HTTP Version not supported
         return RSP_CONTINUE;
 
-      try {
-        resp.getInputStream().close();
-      } catch (IOException ioe) {
-      }
-      if (req.getData() != null)
-        throw new ProtocolException("Received status code 411 even"
-            + " though Content-Length was sent");
-
-      Log.write(Log.MODS, "DefM:  Handling " + sts + " " + resp.getReasonLine() + " - resending "
-          + "request with 'Content-length: 0'");
-
-      req.setData(new byte[0]); // will send Content-Length: 0
-      return RSP_REQUEST;
-
-    case 505: // HTTP Version not supported
-      return RSP_CONTINUE;
-
-    default:
-      return RSP_CONTINUE;
+      default:
+        return RSP_CONTINUE;
     }
   }
 

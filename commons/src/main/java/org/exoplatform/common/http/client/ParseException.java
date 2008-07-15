@@ -35,7 +35,6 @@ package org.exoplatform.common.http.client;
 /**
  * Signals that something went wrong while parsing data. Usually means the input
  * data was invalid.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  */
@@ -52,7 +51,6 @@ public class ParseException extends Exception {
   /**
    * Constructs an ParseException class with the specified detail message. A
    * detail message is a String that describes this particular exception.
-   * 
    * @param s the String containing a detail message
    */
   public ParseException(String s) {

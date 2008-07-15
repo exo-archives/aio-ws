@@ -40,11 +40,13 @@ import java.net.URL;
 import java.util.Date;
 import java.util.Enumeration;
 
+import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.ExoLogger;
+
 /**
  * This defines the http-response class returned by the requests. It's basically
  * a wrapper around the Response class which first lets all the modules handle
  * the response before finally giving the info to the user.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  * @since 0.3
@@ -54,67 +56,68 @@ public class HTTPResponse implements HTTPClientModuleConstants {
   private HTTPClientModule[] modules;
 
   /** the timeout for reads */
-  private int                timeout;
+  private int timeout;
 
   /** the request */
-  private Request            request       = null;
+  private Request request = null;
 
   /** the current response */
-  Response                   response      = null;
+  Response response = null;
 
   /** the HttpOutputStream to synchronize on */
-  private HttpOutputStream   out_stream    = null;
+  private HttpOutputStream out_stream = null;
 
   /** our input stream from the stream demux */
-  private InputStream        inp_stream;
+  private InputStream inp_stream;
 
   /** the status code returned. */
-  private int                StatusCode;
+  private int StatusCode;
 
   /** the reason line associated with the status code. */
-  private String             ReasonLine;
+  private String ReasonLine;
 
   /** the HTTP version of the response. */
-  private String             Version;
+  private String Version;
 
   /** the original URI used. */
-  private URI                OriginalURI   = null;
+  private URI OriginalURI = null;
 
   /** the final URI of the document. */
-  private URI                EffectiveURI  = null;
+  private URI EffectiveURI = null;
 
   /** any headers which were received and do not fit in the above list. */
-  private CIHashtable        Headers       = null;
+  private CIHashtable Headers = null;
 
   /** any trailers which were received and do not fit in the above list. */
-  private CIHashtable        Trailers      = null;
+  private CIHashtable Trailers = null;
 
   /** the ContentLength of the data. */
-  private int                ContentLength = -1;
+  private int ContentLength = -1;
 
   /** the data (body) returned. */
-  private byte[]             Data          = null;
+  private byte[] Data = null;
 
   /** signals if we have got and parsed the headers yet? */
-  private boolean            initialized   = false;
+  private boolean initialized = false;
 
   /** signals if we have got the trailers yet? */
-  private boolean            got_trailers  = false;
+  private boolean got_trailers = false;
 
   /** marks this response as aborted (stop() in HTTPConnection) */
-  private boolean            aborted       = false;
+  private boolean aborted = false;
 
   /** should the request be retried by the application? */
-  private boolean            retry         = false;
+  private boolean retry = false;
 
   /** the method used in the request */
-  private String             method        = null;
+  private String method = null;
+
+  private static final Log log = ExoLogger.getLogger("ws.commons.httpclient.HTTPResponse");
 
   // Constructors
 
   /**
    * Creates a new HTTPResponse.
-   * 
    * @param modules the list of modules handling this response
    * @param timeout the timeout to be used on stream read()'s
    */
@@ -158,13 +161,12 @@ public class HTTPResponse implements HTTPClientModuleConstants {
   /**
    * Give the status code for this request. These are grouped as follows:
    * <UL>
-   * <LI> 1xx - Informational (new in HTTP/1.1)
-   * <LI> 2xx - Success
-   * <LI> 3xx - Redirection
-   * <LI> 4xx - Client Error
-   * <LI> 5xx - Server Error
+   * <LI>1xx - Informational (new in HTTP/1.1)
+   * <LI>2xx - Success
+   * <LI>3xx - Redirection
+   * <LI>4xx - Client Error
+   * <LI>5xx - Server Error
    * </UL>
-   * 
    * @exception IOException if any exception occurs on the socket.
    * @exception ModuleException if any module encounters an exception.
    */
@@ -176,7 +178,6 @@ public class HTTPResponse implements HTTPClientModuleConstants {
 
   /**
    * Give the reason line associated with the status code.
-   * 
    * @exception IOException If any exception occurs on the socket.
    * @exception ModuleException if any module encounters an exception.
    */
@@ -188,7 +189,6 @@ public class HTTPResponse implements HTTPClientModuleConstants {
 
   /**
    * Get the HTTP version used for the response.
-   * 
    * @exception IOException If any exception occurs on the socket.
    * @exception ModuleException if any module encounters an exception.
    */
@@ -200,7 +200,6 @@ public class HTTPResponse implements HTTPClientModuleConstants {
 
   /**
    * Get the name and type of server.
-   * 
    * @deprecated This method is a remnant of V0.1; use
    *             <code>getHeader("Server")</code> instead.
    * @see #getHeader(java.lang.String)
@@ -215,7 +214,6 @@ public class HTTPResponse implements HTTPClientModuleConstants {
 
   /**
    * Get the original URI used in the request.
-   * 
    * @return the URI used in primary request
    */
   public final URI getOriginalURI() {
@@ -225,7 +223,6 @@ public class HTTPResponse implements HTTPClientModuleConstants {
   /**
    * Get the final URL of the document. This is set if the original request was
    * deferred via the "moved" (301, 302, or 303) return status.
-   * 
    * @return the effective URL, or null if no redirection occured
    * @exception IOException If any exception occurs on the socket.
    * @exception ModuleException if any module encounters an exception.
@@ -244,7 +241,6 @@ public class HTTPResponse implements HTTPClientModuleConstants {
    * Get the final URI of the document. If the request was redirected via the
    * "moved" (301, 302, 303, or 307) return status this returns the URI used in
    * the last redirection; otherwise it returns the original URI.
-   * 
    * @return the effective URI
    * @exception IOException If any exception occurs on the socket.
    * @exception ModuleException if any module encounters an exception.
@@ -259,7 +255,6 @@ public class HTTPResponse implements HTTPClientModuleConstants {
 
   /**
    * Retrieves the value for a given header.
-   * 
    * @param hdr the header name.
    * @return the value for the header, or null if non-existent.
    * @exception IOException If any exception occurs on the socket.
@@ -273,7 +268,6 @@ public class HTTPResponse implements HTTPClientModuleConstants {
 
   /**
    * Retrieves the value for a given header. The value is parsed as an int.
-   * 
    * @param hdr the header name.
    * @return the value for the header if the header exists
    * @exception NumberFormatException if the header's value is not a number or
@@ -293,7 +287,6 @@ public class HTTPResponse implements HTTPClientModuleConstants {
    * this fails it is parsed as a long representing the number of seconds since
    * 12:00 AM, Jan 1st, 1970. If this also fails an exception is thrown. <br>
    * Note: When sending dates use Util.httpDate().
-   * 
    * @param hdr the header name.
    * @return the value for the header, or null if non-existent.
    * @exception IllegalArgumentException if the header's value is neither a
@@ -333,7 +326,6 @@ public class HTTPResponse implements HTTPClientModuleConstants {
 
   /**
    * Returns an enumeration of all the headers available via getHeader().
-   * 
    * @exception IOException If any exception occurs on the socket.
    * @exception ModuleException if any module encounters an exception.
    */
@@ -347,7 +339,6 @@ public class HTTPResponse implements HTTPClientModuleConstants {
    * Retrieves the value for a given trailer. This should not be invoked until
    * all response data has been read. If invoked before it will call
    * <code>getData()</code> to force the data to be read.
-   * 
    * @param trailer the trailer name.
    * @return the value for the trailer, or null if non-existent.
    * @exception IOException If any exception occurs on the socket.
@@ -362,7 +353,6 @@ public class HTTPResponse implements HTTPClientModuleConstants {
 
   /**
    * Retrieves the value for a given tailer. The value is parsed as an int.
-   * 
    * @param trailer the tailer name.
    * @return the value for the trailer if the trailer exists
    * @exception NumberFormatException if the trailer's value is not a number or
@@ -384,7 +374,6 @@ public class HTTPResponse implements HTTPClientModuleConstants {
    * 12:00 AM, Jan 1st, 1970. If this also fails an IllegalArgumentException is
    * thrown. <br>
    * Note: When sending dates use Util.httpDate().
-   * 
    * @param trailer the trailer name.
    * @return the value for the trailer, or null if non-existent.
    * @exception IllegalArgumentException if the trailer's value is neither a
@@ -424,7 +413,6 @@ public class HTTPResponse implements HTTPClientModuleConstants {
 
   /**
    * Returns an enumeration of all the trailers available via getTrailer().
-   * 
    * @exception IOException If any exception occurs on the socket.
    * @exception ModuleException if any module encounters an exception.
    */
@@ -436,11 +424,10 @@ public class HTTPResponse implements HTTPClientModuleConstants {
 
   /**
    * Reads all the response data into a byte array. Note that this method won't
-   * return until <em>all</em> the data has been received (so for instance
-   * don't invoke this method if the server is doing a server push). If
-   * <code>getInputStream()</code> had been previously invoked then this
-   * method only returns any unread data remaining on the stream and then closes
-   * it.
+   * return until <em>all</em> the data has been received (so for instance don't
+   * invoke this method if the server is doing a server push). If
+   * <code>getInputStream()</code> had been previously invoked then this method
+   * only returns any unread data remaining on the stream and then closes it.
    * <P>
    * Note to the unwary: code like
    * 
@@ -455,7 +442,6 @@ public class HTTPResponse implements HTTPClientModuleConstants {
    * </PRE>
    * 
    * instead.
-   * 
    * @see #getInputStream()
    * @return an array containing the data (body) returned. If no data was
    *         returned then it's set to a zero-length array.
@@ -473,8 +459,7 @@ public class HTTPResponse implements HTTPClientModuleConstants {
       {
         throw ie;
       } catch (IOException ioe) {
-        Log.write(Log.RESP, "HResp: (\"" + method + " " + OriginalURI.getPathAndQuery() + "\")");
-        Log.write(Log.RESP, "       ", ioe);
+        log.error(method + " " + OriginalURI.getPathAndQuery());
 
         try {
           inp_stream.close();
@@ -493,7 +478,6 @@ public class HTTPResponse implements HTTPClientModuleConstants {
    * Reads all the response data into a buffer and turns it into a string using
    * the appropriate character converter. Since this uses {@link #getData()
    * getData()}, the caveats of that method apply here as well.
-   * 
    * @see #getData()
    * @return the body as a String. If no data was returned then an empty string
    *         is returned.
@@ -517,9 +501,8 @@ public class HTTPResponse implements HTTPClientModuleConstants {
 
   /**
    * Gets an input stream from which the returned data can be read. Note that if
-   * <code>getData()</code> had been previously invoked it will actually
-   * return a ByteArrayInputStream created from that data.
-   * 
+   * <code>getData()</code> had been previously invoked it will actually return
+   * a ByteArrayInputStream created from that data.
    * @see #getData()
    * @return the InputStream.
    * @exception IOException If any exception occurs on the socket.
@@ -539,8 +522,8 @@ public class HTTPResponse implements HTTPClientModuleConstants {
 
   /**
    * Should the request be retried by the application? If the application used
-   * an <var>HttpOutputStream</var> in the request then various modules (such
-   * as the redirection and authorization modules) are not able to resend the
+   * an <var>HttpOutputStream</var> in the request then various modules (such as
+   * the redirection and authorization modules) are not able to resend the
    * request themselves. Instead, it becomes the application's responsibility.
    * The application can check this flag, and if it's set, resend the exact same
    * request. The modules such as the RedirectionModule or AuthorizationModule
@@ -565,16 +548,14 @@ public class HTTPResponse implements HTTPClientModuleConstants {
    *     if (rsp.getStatusCode() &gt;= 300)
    *         ...
    * </PRE>
-   * 
    * <P>
    * Note that for this to ever return true, the java system property
-   * <var>HTTPClient.deferStreamed</var> must be set to true at the beginning
-   * of the application (before the HTTPConnection class is loaded). This
-   * prevents unwary applications from causing inadvertent memory leaks. If an
+   * <var>HTTPClient.deferStreamed</var> must be set to true at the beginning of
+   * the application (before the HTTPConnection class is loaded). This prevents
+   * unwary applications from causing inadvertent memory leaks. If an
    * application does set this, then it <em>must</em> resend any request whose
    * response returns true here in order to prevent memory leaks (a switch to
    * JDK 1.2 will allow us to use weak references and eliminate this problem).
-   * 
    * @return true if the request should be retried.
    * @exception IOException If any exception occurs on the socket.
    * @exception ModuleException if any module encounters an exception.
@@ -592,7 +573,6 @@ public class HTTPResponse implements HTTPClientModuleConstants {
 
   /**
    * produces a full list of headers and their values, one per line.
-   * 
    * @return a string containing the headers
    */
   public String toString() {
@@ -601,9 +581,9 @@ public class HTTPResponse implements HTTPClientModuleConstants {
         handleResponse();
       } catch (Exception e) {
         if (!(e instanceof InterruptedIOException)) {
-          Log.write(Log.RESP, "HResp: (\"" + method + " " + OriginalURI.getPathAndQuery() + "\")");
-          Log.write(Log.RESP, "       ", e);
+          log.error(method + " " + OriginalURI.getPathAndQuery());
         }
+
         return "Failed to read headers: " + e;
       }
     }
@@ -645,7 +625,6 @@ public class HTTPResponse implements HTTPClientModuleConstants {
    * Processes a Response. This is done by calling the response handler in each
    * module. When all is done, the various fields of this instance are
    * intialized from the last Response.
-   * 
    * @exception IOException if any handler throws an IOException.
    * @exception ModuleException if any module encounters an exception.
    * @return true if a new request was generated. This is used for internal
@@ -681,44 +660,44 @@ public class HTTPResponse implements HTTPClientModuleConstants {
       Phase2: for (int idx = 0; idx < modules.length && !aborted; idx++) {
         int sts = modules[idx].responsePhase2Handler(response, request);
         switch (sts) {
-        case RSP_CONTINUE: // continue processing
-          break;
+          case RSP_CONTINUE: // continue processing
+            break;
 
-        case RSP_RESTART: // restart response processing
-          idx = -1;
-          continue doModules;
+          case RSP_RESTART: // restart response processing
+            idx = -1;
+            continue doModules;
 
-        case RSP_SHORTCIRC: // stop processing and return
-          break doModules;
-
-        case RSP_REQUEST: // go to phase 1
-        case RSP_NEWCON_REQ: // process the request using a new con
-          response.getInputStream().close();
-          if (handle_trailers)
-            invokeTrailerHandlers(true);
-          if (request.internal_subrequest)
-            return true;
-          request.getConnection().handleRequest(request, this, response, true);
-          if (initialized)
+          case RSP_SHORTCIRC: // stop processing and return
             break doModules;
 
-          idx = -1;
-          continue doModules;
+          case RSP_REQUEST: // go to phase 1
+          case RSP_NEWCON_REQ: // process the request using a new con
+            response.getInputStream().close();
+            if (handle_trailers)
+              invokeTrailerHandlers(true);
+            if (request.internal_subrequest)
+              return true;
+            request.getConnection().handleRequest(request, this, response, true);
+            if (initialized)
+              break doModules;
 
-        case RSP_SEND: // send the request immediately
-        case RSP_NEWCON_SND: // send the request using a new con
-          response.getInputStream().close();
-          if (handle_trailers)
-            invokeTrailerHandlers(true);
-          if (request.internal_subrequest)
-            return true;
-          request.getConnection().handleRequest(request, this, response, false);
-          idx = -1;
-          continue doModules;
+            idx = -1;
+            continue doModules;
 
-        default: // not valid
-          throw new Error("HTTPClient Internal Error: invalid status" + " " + sts
-              + " returned by module " + modules[idx].getClass().getName());
+          case RSP_SEND: // send the request immediately
+          case RSP_NEWCON_SND: // send the request using a new con
+            response.getInputStream().close();
+            if (handle_trailers)
+              invokeTrailerHandlers(true);
+            if (request.internal_subrequest)
+              return true;
+            request.getConnection().handleRequest(request, this, response, false);
+            idx = -1;
+            continue doModules;
+
+          default: // not valid
+            throw new Error("HTTPClient Internal Error: invalid status" + " " + sts +
+                " returned by module " + modules[idx].getClass().getName());
         }
       }
 
@@ -744,7 +723,6 @@ public class HTTPResponse implements HTTPClientModuleConstants {
 
   /**
    * Copies the relevant fields from Response and marks this as initialized.
-   * 
    * @param resp the Response class to copy from
    */
   void init(Response resp) {
@@ -763,14 +741,13 @@ public class HTTPResponse implements HTTPClientModuleConstants {
     initialized = true;
   }
 
-  private boolean handle_trailers  = false;
+  private boolean handle_trailers = false;
 
   private boolean trailers_handled = false;
 
   /**
    * This is invoked by the RespInputStream when it is close()'d. It just
    * invokes the trailer handler in each module.
-   * 
    * @param force invoke the handlers even if not initialized yet?
    * @exception IOException if thrown by any module
    * @exception ModuleException if thrown by any module
@@ -818,7 +795,6 @@ public class HTTPResponse implements HTTPClientModuleConstants {
   /**
    * Reads the response data received. Does not return until either
    * Content-Length bytes have been read or EOF is reached.
-   * 
    * @inp the input stream from which to read the data
    * @exception IOException if any read on the input stream fails
    */
@@ -847,10 +823,10 @@ public class HTTPResponse implements HTTPClientModuleConstants {
         /*
          * Don't do this! If we do, then getData() won't work after a
          * getInputStream() because we'll never get all the expected data.
-         * Instead, let the underlying RespInputStream throw the EOF. if (rcvd ==
-         * -1) // premature EOF { throw new EOFException("Encountered premature
-         * EOF while " + "reading headers: received " + off + " bytes instead of
-         * the expected " + ContentLength + " bytes"); }
+         * Instead, let the underlying RespInputStream throw the EOF. if (rcvd
+         * == -1) // premature EOF { throw new EOFException("Encountered
+         * premature EOF while " + "reading headers: received " + off + " bytes
+         * instead of the expected " + ContentLength + " bytes"); }
          */
       } else {
         int inc = 1000, rcvd = 0;

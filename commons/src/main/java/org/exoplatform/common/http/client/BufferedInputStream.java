@@ -42,33 +42,31 @@ import java.io.InputStream;
  * <P>
  * Note: none of the methods here are synchronized because we assume the caller
  * is already taking care of that.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  */
 class BufferedInputStream extends FilterInputStream {
   /** our read buffer */
-  private byte[] buffer     = new byte[2000];
+  private byte[] buffer = new byte[2000];
 
   /** the next byte in the buffer at which to read */
-  private int    pos        = 0;
+  private int pos = 0;
 
   /** the end of the valid data in the buffer */
-  private int    end        = 0;
+  private int end = 0;
 
   /** the current mark position, or -1 if none */
-  private int    mark_pos   = -1;
+  private int mark_pos = -1;
 
   /**
    * the large read threashhold: reads larger than this aren't buffered if both
    * the current buffer is empty and no mark has been set. This is just an
    * attempt to balance copying vs. multiple reads.
    */
-  private int    lr_thrshld = 1500;
+  private int lr_thrshld = 1500;
 
   /**
    * Create a new BufferedInputStream around the given input stream.
-   * 
    * @param stream the underlying input stream to use
    */
   BufferedInputStream(InputStream stream) {
@@ -77,7 +75,6 @@ class BufferedInputStream extends FilterInputStream {
 
   /**
    * Read a single byte.
-   * 
    * @return the read byte, or -1 if the end of the stream has been reached
    * @exception IOException if thrown by the underlying stream
    */
@@ -90,7 +87,6 @@ class BufferedInputStream extends FilterInputStream {
 
   /**
    * Read a buffer full.
-   * 
    * @param buf the buffer to read into
    * @param off the offset within <var>buf</var> at which to start writing
    * @param len the number of bytes to read
@@ -122,7 +118,6 @@ class BufferedInputStream extends FilterInputStream {
 
   /**
    * Skip the given number of bytes in the stream.
-   * 
    * @param n the number of bytes to skip
    * @return the actual number of bytes skipped
    * @exception IOException if thrown by the underlying stream
@@ -201,7 +196,6 @@ class BufferedInputStream extends FilterInputStream {
    * boundary and unsets the mark; if not found, is sets the mark_pos back
    * enough from the current position so we can always be sure to find the
    * boundary.
-   * 
    * @param search the search string (end boundary)
    * @param search_cmp the compiled info of the search string
    * @return how many bytes past the end of the boundary we went; -1 if we

@@ -35,7 +35,6 @@ package org.exoplatform.common.http.client;
 /**
  * This interface defines the return codes that the handlers in modules may
  * return.
- * 
  * @see HTTPClientModule
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
@@ -45,19 +44,19 @@ public interface HTTPClientModuleConstants {
   // valid return codes for request handlers
 
   /** continue processing the request */
-  int REQ_CONTINUE   = 0;
+  int REQ_CONTINUE = 0;
 
   /** restart request processing with first module */
-  int REQ_RESTART    = 1;
+  int REQ_RESTART = 1;
 
   /** stop processing and send the request */
-  int REQ_SHORTCIRC  = 2;
+  int REQ_SHORTCIRC = 2;
 
   /** response generated; go to phase 2 */
-  int REQ_RESPONSE   = 3;
+  int REQ_RESPONSE = 3;
 
   /** response generated; return response immediately (no processing) */
-  int REQ_RETURN     = 4;
+  int REQ_RETURN = 4;
 
   /** using a new HTTPConnection, restart request processing */
   int REQ_NEWCON_RST = 5;
@@ -68,19 +67,19 @@ public interface HTTPClientModuleConstants {
   // valid return codes for the phase 2 response handlers
 
   /** continue processing response */
-  int RSP_CONTINUE   = 10;
+  int RSP_CONTINUE = 10;
 
   /** restart response processing with first module */
-  int RSP_RESTART    = 11;
+  int RSP_RESTART = 11;
 
   /** stop processing and return response */
-  int RSP_SHORTCIRC  = 12;
+  int RSP_SHORTCIRC = 12;
 
   /** new request generated; go to phase 1 */
-  int RSP_REQUEST    = 13;
+  int RSP_REQUEST = 13;
 
   /** new request generated; send request immediately (no processing) */
-  int RSP_SEND       = 14;
+  int RSP_SEND = 14;
 
   /** go to phase 1 using a new HTTPConnection */
   int RSP_NEWCON_REQ = 15;

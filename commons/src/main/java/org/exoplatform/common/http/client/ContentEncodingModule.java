@@ -37,14 +37,19 @@ import java.util.Vector;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
+import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.ExoLogger;
+
 /**
  * This module handles the Content-Encoding response header. It currently
  * handles the "gzip", "deflate", "compress" and "identity" tokens.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  */
 class ContentEncodingModule implements HTTPClientModule {
+
+  private static final Log log = ExoLogger.getLogger("ws.commons.httpclient.ContentEncodingModule");
+
   // Methods
 
   /**
@@ -91,8 +96,8 @@ class ContentEncodingModule implements HTTPClientModule {
         if (Float.valueOf(params[idx].getValue()).floatValue() > 0.)
           return REQ_CONTINUE;
       } catch (NumberFormatException nfe) {
-        throw new ModuleException("Invalid q value for \"*\" in " + "Accept-Encoding header: "
-            + nfe.getMessage());
+        throw new ModuleException("Invalid q value for \"*\" in " + "Accept-Encoding header: " +
+            nfe.getMessage());
       }
     }
 
@@ -148,28 +153,35 @@ class ContentEncodingModule implements HTTPClientModule {
 
     String encoding = ((HttpHeaderElement) pce.firstElement()).getName();
     if (encoding.equalsIgnoreCase("gzip") || encoding.equalsIgnoreCase("x-gzip")) {
-      Log.write(Log.MODS, "CEM:   pushing gzip-input-stream");
+      if (log.isDebugEnabled())
+        log.debug("Pushing gzip-input-stream");
 
       resp.inp_stream = new GZIPInputStream(resp.inp_stream);
       pce.removeElementAt(pce.size() - 1);
       resp.deleteHeader("Content-length");
     } else if (encoding.equalsIgnoreCase("deflate")) {
-      Log.write(Log.MODS, "CEM:   pushing inflater-input-stream");
+      if (log.isDebugEnabled())
+        log.debug("Pushing inflater-input-stream");
 
       resp.inp_stream = new InflaterInputStream(resp.inp_stream);
       pce.removeElementAt(pce.size() - 1);
       resp.deleteHeader("Content-length");
     } else if (encoding.equalsIgnoreCase("compress") || encoding.equalsIgnoreCase("x-compress")) {
-      Log.write(Log.MODS, "CEM:   pushing uncompress-input-stream");
+      if (log.isDebugEnabled())
+        log.debug("Pushing uncompress-input-stream");
 
       resp.inp_stream = new UncompressInputStream(resp.inp_stream);
       pce.removeElementAt(pce.size() - 1);
       resp.deleteHeader("Content-length");
     } else if (encoding.equalsIgnoreCase("identity")) {
-      Log.write(Log.MODS, "CEM:   ignoring 'identity' token");
+      if (log.isDebugEnabled())
+        log.debug("Ignoring 'identity' token");
+
       pce.removeElementAt(pce.size() - 1);
     } else {
-      Log.write(Log.MODS, "CEM:   Unknown content encoding '" + encoding + "'");
+      if (log.isDebugEnabled())
+        log.debug("Unknown content encoding '" + encoding + "'");
+
     }
 
     if (pce.size() > 0)

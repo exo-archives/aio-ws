@@ -36,12 +36,14 @@ import java.io.IOException;
 import java.net.ProtocolException;
 import java.util.Hashtable;
 
+import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.ExoLogger;
+
 /**
  * This module handles authentication requests. Authentication info is
  * preemptively sent if any suitable candidate info is available. If a request
  * returns with an appropriate status (401 or 407) then the necessary info is
  * sought from the AuthenticationInfo class.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  */
@@ -49,16 +51,16 @@ class AuthorizationModule implements HTTPClientModule {
   /**
    * This holds the current Proxy-Authorization-Info for each HTTPConnection
    */
-  private static Hashtable  proxy_cntxt_list   = new Hashtable();
+  private static Hashtable proxy_cntxt_list = new Hashtable();
 
   /**
    * a list of deferred authorization retries (used with
    * Response.retryRequest())
    */
-  private static Hashtable  deferred_auth_list = new Hashtable();
+  private static Hashtable deferred_auth_list = new Hashtable();
 
   /** counters for challenge and auth-info lists */
-  private int               auth_lst_idx, prxy_lst_idx, auth_scm_idx, prxy_scm_idx;
+  private int auth_lst_idx, prxy_lst_idx, auth_scm_idx, prxy_scm_idx;
 
   /** the last auth info sent, if any */
   private AuthorizationInfo auth_sent;
@@ -66,17 +68,19 @@ class AuthorizationModule implements HTTPClientModule {
   private AuthorizationInfo prxy_sent;
 
   /** is the info in auth_sent a preemtive guess or the result of a 4xx */
-  private boolean           auth_from_4xx;
+  private boolean auth_from_4xx;
 
-  private boolean           prxy_from_4xx;
+  private boolean prxy_from_4xx;
 
   /** guard against bugs on both our side and the server side */
-  private int               num_tries;
+  private int num_tries;
 
   /** used for deferred authoriation retries */
-  private Request           saved_req;
+  private Request saved_req;
 
-  private Response          saved_resp;
+  private Response saved_resp;
+
+  private static final Log log = ExoLogger.getLogger("ws.commons.httpclient.AuthorizationModule");
 
   // Constructors
 
@@ -120,16 +124,20 @@ class AuthorizationModule implements HTTPClientModule {
       copyFrom((AuthorizationModule) deferred_auth_list.remove(out));
       req.copyFrom(saved_req);
 
-      Log.write(Log.AUTH, "AuthM: Handling deferred auth challenge");
+      if (log.isDebugEnabled())
+        log.debug("Handling deferred auth challenge");
 
       handle_auth_challenge(req, saved_resp);
 
-      if (auth_sent != null)
-        Log.write(Log.AUTH, "AuthM: Sending request with " + "Authorization '" + auth_sent + "'");
-      else
-        Log.write(Log.AUTH, "AuthM: Sending request with " + "Proxy-Authorization '" + prxy_sent
-            + "'");
+      if (auth_sent != null) {
+        if (log.isDebugEnabled())
+          log.debug("Sending request with Authorization '" + auth_sent + "'");
 
+      } else {
+
+        if (log.isDebugEnabled())
+          log.debug("Sending request with Proxy-Authorization '" + prxy_sent + "'");
+      }
       return REQ_RESTART;
     }
 
@@ -173,7 +181,9 @@ class AuthorizationModule implements HTTPClientModule {
       prxy_sent = guess;
       prxy_from_4xx = false;
 
-      Log.write(Log.AUTH, "AuthM: Preemptively sending " + "Proxy-Authorization '" + guess + "'");
+      if (log.isDebugEnabled())
+        log.debug("Preemptively sending Proxy-Authorization '" + guess + "'");
+
     }
     if (rem_idx >= 0) {
       System.arraycopy(hdrs, rem_idx + 1, hdrs, rem_idx, hdrs.length - rem_idx - 1);
@@ -223,7 +233,9 @@ class AuthorizationModule implements HTTPClientModule {
       auth_sent = guess;
       auth_from_4xx = false;
 
-      Log.write(Log.AUTH, "AuthM: Preemptively sending Authorization '" + guess + "'");
+      if (log.isDebugEnabled())
+        log.debug("Preemptively sending Authorization '" + guess + "'");
+
     }
     if (rem_idx >= 0) {
       System.arraycopy(hdrs, rem_idx + 1, hdrs, rem_idx, hdrs.length - rem_idx - 1);
@@ -287,73 +299,77 @@ class AuthorizationModule implements HTTPClientModule {
 
     int sts = resp.getStatusCode();
     switch (sts) {
-    case 401: // Unauthorized
-    case 407: // Proxy Authentication Required
+      case 401: // Unauthorized
+      case 407: // Proxy Authentication Required
 
-      // guard against infinite retries due to bugs
+        // guard against infinite retries due to bugs
 
-      num_tries++;
-      if (num_tries > 10)
-        throw new ProtocolException(
-            "Bug in authorization handling: server refused the given info 10 times");
+        num_tries++;
+        if (num_tries > 10)
+          throw new ProtocolException(
+              "Bug in authorization handling: server refused the given info 10 times");
 
-      // defer handling if a stream was used
+        // defer handling if a stream was used
 
-      if (req.getStream() != null) {
-        if (!HTTPConnection.deferStreamed) {
-          Log.write(Log.AUTH, "AuthM: status " + sts + " not handled - request has "
-              + "an output stream");
+        if (req.getStream() != null) {
+          if (!HTTPConnection.deferStreamed) {
+            if (log.isDebugEnabled())
+              log.debug("Status " + sts + " not handled - request has an output stream");
+
+            return RSP_CONTINUE;
+          }
+
+          saved_req = (Request) req.clone();
+          saved_resp = (Response) resp.clone();
+          deferred_auth_list.put(req.getStream(), this);
+
+          req.getStream().reset();
+          resp.setRetryRequest(true);
+
+          if (log.isDebugEnabled())
+            log.debug("Handling of status " + sts + " deferred because an output stream was used");
+
           return RSP_CONTINUE;
         }
 
-        saved_req = (Request) req.clone();
-        saved_resp = (Response) resp.clone();
-        deferred_auth_list.put(req.getStream(), this);
+        // handle the challenge
 
-        req.getStream().reset();
-        resp.setRetryRequest(true);
+        if (log.isDebugEnabled())
+          log.debug("Handling status: " + sts + " " + resp.getReasonLine());
 
-        Log.write(Log.AUTH, "AuthM: Handling of status " + sts + " deferred because an "
-            + "output stream was used");
+        handle_auth_challenge(req, resp);
 
-        return RSP_CONTINUE;
-      }
+        // check for valid challenge
 
-      // handle the challenge
+        if (auth_sent != null || prxy_sent != null) {
+          try {
+            resp.getInputStream().close();
+          } catch (IOException ioe) {
+          }
 
-      Log.write(Log.AUTH, "AuthM: Handling status: " + sts + " " + resp.getReasonLine());
+          if (auth_sent != null) {
+            if (log.isDebugEnabled())
+              log.debug("Resending request with Authorization '" + auth_sent + "'");
+          } else {
+            if (log.isDebugEnabled())
+              log.debug("Resending request with Proxy-Authorization '" + prxy_sent + "'");
+          }
 
-      handle_auth_challenge(req, resp);
-
-      // check for valid challenge
-
-      if (auth_sent != null || prxy_sent != null) {
-        try {
-          resp.getInputStream().close();
-        } catch (IOException ioe) {
+          return RSP_REQUEST;
         }
 
-        if (auth_sent != null)
-          Log.write(Log.AUTH, "AuthM: Resending request " + "with Authorization '" + auth_sent
-              + "'");
-        else
-          Log.write(Log.AUTH, "AuthM: Resending request " + "with Proxy-Authorization '"
-              + prxy_sent + "'");
+        if (req.getStream() != null) {
+          if (log.isDebugEnabled())
+            log.debug("Status " + sts + " not handled - request has an output stream");
+        } else {
+          if (log.isDebugEnabled())
+            log.debug("No Auth Info found - status " + sts + " not handled");
+        }
+        return RSP_CONTINUE;
 
-        return RSP_REQUEST;
-      }
+      default:
 
-      if (req.getStream() != null)
-        Log.write(Log.AUTH, "AuthM: status " + sts + " not " + "handled - request has an output "
-            + "stream");
-      else
-        Log.write(Log.AUTH, "AuthM: No Auth Info found - " + "status " + sts + " not handled");
-
-      return RSP_CONTINUE;
-
-    default:
-
-      return RSP_CONTINUE;
+        return RSP_CONTINUE;
     }
   }
 
@@ -417,8 +433,8 @@ class AuthorizationModule implements HTTPClientModule {
 
     // check for headers
 
-    if (auth_sent == null && prxy_sent == null && resp.getHeader("WWW-Authenticate") == null
-        && resp.getHeader("Proxy-Authenticate") == null) {
+    if (auth_sent == null && prxy_sent == null && resp.getHeader("WWW-Authenticate") == null &&
+        resp.getHeader("Proxy-Authenticate") == null) {
       if (resp.getStatusCode() == 401)
         throw new ProtocolException("Missing WWW-Authenticate header");
       else
@@ -431,7 +447,6 @@ class AuthorizationModule implements HTTPClientModule {
    * tries to retrieve the neccessary parameters from AuthorizationInfo, and
    * failing that calls the AuthHandler. Handles multiple authentication
    * headers.
-   * 
    * @param auth_str the authentication header field returned by the server.
    * @param req the Request used
    * @param resp the full Response received
@@ -453,10 +468,10 @@ class AuthorizationModule implements HTTPClientModule {
     // get the list of challenges the server sent
     AuthorizationInfo[] challenges = AuthorizationInfo.parseAuthString(auth_str, req, resp);
 
-    if (Log.isEnabled(Log.AUTH)) {
-      Log.write(Log.AUTH, "AuthM: parsed " + challenges.length + " challenges:");
+    if (log.isDebugEnabled()) {
+      log.debug("Parsed " + challenges.length + " challenges:");
       for (int idx = 0; idx < challenges.length; idx++)
-        Log.write(Log.AUTH, "AuthM: Challenge " + challenges[idx]);
+        log.debug("AuthM: Challenge " + challenges[idx]);
     }
 
     if (challenges.length == 0)
@@ -469,8 +484,8 @@ class AuthorizationModule implements HTTPClientModule {
      */
     if (prev != null && prev.getScheme().equalsIgnoreCase("Basic")) {
       for (int idx = 0; idx < challenges.length; idx++)
-        if (prev.getRealm().equals(challenges[idx].getRealm())
-            && prev.getScheme().equalsIgnoreCase(challenges[idx].getScheme()))
+        if (prev.getRealm().equals(challenges[idx].getRealm()) &&
+            prev.getScheme().equalsIgnoreCase(challenges[idx].getScheme()))
           AuthorizationInfo.removeAuthorization(prev, req.getConnection().getContext());
     }
 

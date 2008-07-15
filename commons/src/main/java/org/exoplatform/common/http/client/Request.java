@@ -35,58 +35,56 @@ package org.exoplatform.common.http.client;
 /**
  * This class represents an http request. It's used by classes which implement
  * the HTTPClientModule interface.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  */
 public final class Request implements RoRequest, Cloneable {
   /** null headers */
-  private static final NVPair[] empty               = new NVPair[0];
+  private static final NVPair[] empty = new NVPair[0];
 
   /** the current HTTPConnection */
-  private HTTPConnection        connection;
+  private HTTPConnection connection;
 
   /** the request method to be used (e.g. GET, POST, etc) */
-  private String                method;
+  private String method;
 
   /** the request-uri */
-  private String                req_uri;
+  private String req_uri;
 
   /** the headers to be used */
-  private NVPair[]              headers;
+  private NVPair[] headers;
 
   /** the entity (if any) */
-  private byte[]                data;
+  private byte[] data;
 
   /** or an output stream on which the entity will be written */
-  private HttpOutputStream      stream;
+  private HttpOutputStream stream;
 
   /** are modules allowed to popup windows or otherwise prompt user? */
-  private boolean               allow_ui;
+  private boolean allow_ui;
 
   /**
    * number of millisecs to wait for an error from the server before sending the
    * entity (used when retrying requests)
    */
-  long                          delay_entity        = 0;
+  long delay_entity = 0;
 
   /** number of retries so far */
-  int                           num_retries         = 0;
+  int num_retries = 0;
 
   /** disable pipelining of following request */
-  boolean                       dont_pipeline       = false;
+  boolean dont_pipeline = false;
 
   /** was this request aborted by the user? */
-  boolean                       aborted             = false;
+  boolean aborted = false;
 
   /** is this an internally generated subrequest? */
-  boolean                       internal_subrequest = false;
+  boolean internal_subrequest = false;
 
   // Constructors
 
   /**
    * Creates a new request structure.
-   * 
    * @param con the current HTTPConnection
    * @param method the request method
    * @param req_uri the request-uri
@@ -149,8 +147,8 @@ public final class Request implements RoRequest, Cloneable {
   public void setRequestURI(String req_uri) {
     if (req_uri != null && req_uri.trim().length() > 0) {
       req_uri = req_uri.trim();
-      if (req_uri.charAt(0) != '/' && !req_uri.equals("*") && !method.equals("CONNECT")
-          && !isAbsolute(req_uri))
+      if (req_uri.charAt(0) != '/' && !req_uri.equals("*") && !method.equals("CONNECT") &&
+          !isAbsolute(req_uri))
         req_uri = "/" + req_uri;
       this.req_uri = req_uri;
     } else
@@ -246,7 +244,6 @@ public final class Request implements RoRequest, Cloneable {
 
   /**
    * Copy all the fields from <var>other</var> to this request.
-   * 
    * @param other the Request to copy from
    */
   public void copyFrom(Request other) {

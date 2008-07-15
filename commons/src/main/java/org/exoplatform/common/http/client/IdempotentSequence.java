@@ -56,29 +56,28 @@ import java.util.Hashtable;
  *     if (seq.isIdempotent(r1)) ...
  *     ...
  * </PRE>
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  */
 class IdempotentSequence {
   /** method number definitions */
-  private static final int UNKNOWN       = 0, HEAD = 1, GET = 2, POST = 3, PUT = 4, DELETE = 5,
+  private static final int UNKNOWN = 0, HEAD = 1, GET = 2, POST = 3, PUT = 4, DELETE = 5,
       OPTIONS = 6, TRACE = 7,
 
       // DAV methods
       PROPFIND = 8, PROPPATCH = 9, MKCOL = 10, COPY = 11, MOVE = 12, LOCK = 13, UNLOCK = 14;
 
   /** these are the history of previous requests */
-  private int[]            m_history;
+  private int[] m_history;
 
-  private String[]         r_history;
+  private String[] r_history;
 
-  private int              m_len, r_len;
+  private int m_len, r_len;
 
   /** trigger analysis of threads */
-  private boolean          analysis_done = false;
+  private boolean analysis_done = false;
 
-  private Hashtable        threads       = new Hashtable();
+  private Hashtable threads = new Hashtable();
 
   // Constructors
 
@@ -98,7 +97,6 @@ class IdempotentSequence {
    * Add the request to the end of the list of requests. This is used to build
    * the complete sequence of requests before determining whether the sequence
    * is idempotent.
-   * 
    * @param req the next request
    */
   public void add(Request req) {
@@ -113,10 +111,9 @@ class IdempotentSequence {
 
   /**
    * Is this request part of an idempotent sequence? This method <em>must
-   * not</em>
-   * be called before all requests have been added to this sequence; similarly,
-   * <var>add()</var> <em>must not</em> be called after this method was
-   * invoked.
+   * not</em> be called before all requests have been added to this sequence;
+   * similarly, <var>add()</var> <em>must not</em> be called after this method
+   * was invoked.
    * <P>
    * We split up the sequence of requests into individual sub-sequences, or
    * threads, with all requests in a thread having the same request-URI and no
@@ -133,11 +130,10 @@ class IdempotentSequence {
    * </OL>
    * <P>
    * The major assumption here is that the side effects of any method only apply
-   * to resource specified. E.g. a <tt>"PUT /barbara.html"</tt> will only
-   * affect the resource "/barbara.html" and nothing else. This assumption is
-   * violated by POST of course; however, POSTs are not pipelined and will
-   * therefore never show up here.
-   * 
+   * to resource specified. E.g. a <tt>"PUT /barbara.html"</tt> will only affect
+   * the resource "/barbara.html" and nothing else. This assumption is violated
+   * by POST of course; however, POSTs are not pipelined and will therefore
+   * never show up here.
    * @param req the request
    */
   public boolean isIdempotent(Request req) {
@@ -184,7 +180,6 @@ class IdempotentSequence {
   /**
    * A method is idempotent if the side effects of N identical requests is the
    * same as for a single request (Section 9.1.2 of RFC-????).
-   * 
    * @return true if method is idempotent
    */
   public static boolean methodIsIdempotent(String method) {
@@ -193,24 +188,24 @@ class IdempotentSequence {
 
   private static boolean methodIsIdempotent(int method) {
     switch (method) {
-    case HEAD:
-    case GET:
-    case PUT:
-    case DELETE:
-    case OPTIONS:
-    case TRACE:
-    case PROPFIND:
-    case PROPPATCH:
-    case COPY:
-    case MOVE:
-      return true;
-    case UNKNOWN:
-    case POST:
-    case MKCOL:
-    case LOCK:
-    case UNLOCK:
-    default:
-      return false;
+      case HEAD:
+      case GET:
+      case PUT:
+      case DELETE:
+      case OPTIONS:
+      case TRACE:
+      case PROPFIND:
+      case PROPPATCH:
+      case COPY:
+      case MOVE:
+        return true;
+      case UNKNOWN:
+      case POST:
+      case MKCOL:
+      case LOCK:
+      case UNLOCK:
+      default:
+        return false;
     }
   }
 
@@ -220,7 +215,6 @@ class IdempotentSequence {
    * wouldn't be. In essence, if a request uses a method which has side effects
    * and is complete then the state of the resource after the request is
    * independent of the state of the resource before the request.
-   * 
    * @return true if method is complete
    */
   public static boolean methodIsComplete(String method) {
@@ -229,24 +223,24 @@ class IdempotentSequence {
 
   private static boolean methodIsComplete(int method) {
     switch (method) {
-    case HEAD:
-    case GET:
-    case PUT:
-    case DELETE:
-    case OPTIONS:
-    case TRACE:
-    case PROPFIND:
-    case COPY:
-    case MOVE:
-    case LOCK:
-    case UNLOCK:
-      return true;
-    case UNKNOWN:
-    case POST:
-    case PROPPATCH:
-    case MKCOL:
-    default:
-      return false;
+      case HEAD:
+      case GET:
+      case PUT:
+      case DELETE:
+      case OPTIONS:
+      case TRACE:
+      case PROPFIND:
+      case COPY:
+      case MOVE:
+      case LOCK:
+      case UNLOCK:
+        return true;
+      case UNKNOWN:
+      case POST:
+      case PROPPATCH:
+      case MKCOL:
+      default:
+        return false;
     }
   }
 
@@ -256,24 +250,24 @@ class IdempotentSequence {
 
   private static boolean methodHasSideEffects(int method) {
     switch (method) {
-    case HEAD:
-    case GET:
-    case OPTIONS:
-    case TRACE:
-    case PROPFIND:
-    case LOCK:
-    case UNLOCK:
-      return false;
-    case UNKNOWN:
-    case POST:
-    case PUT:
-    case DELETE:
-    case PROPPATCH:
-    case MKCOL:
-    case COPY:
-    case MOVE:
-    default:
-      return true;
+      case HEAD:
+      case GET:
+      case OPTIONS:
+      case TRACE:
+      case PROPFIND:
+      case LOCK:
+      case UNLOCK:
+        return false;
+      case UNKNOWN:
+      case POST:
+      case PUT:
+      case DELETE:
+      case PROPPATCH:
+      case MKCOL:
+      case COPY:
+      case MOVE:
+      default:
+        return true;
     }
   }
 

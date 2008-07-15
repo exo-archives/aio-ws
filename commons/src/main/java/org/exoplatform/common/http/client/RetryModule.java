@@ -34,6 +34,9 @@ package org.exoplatform.common.http.client;
 
 import java.io.IOException;
 
+import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.ExoLogger;
+
 /**
  * This module handles request retries when a connection closes prematurely. It
  * is triggered by the RetryException thrown by the StreamDemultiplexor.
@@ -44,12 +47,14 @@ import java.io.IOException;
  * necessary because this module will not only resend its request but it also
  * resend all other requests in the chain. Also, it rethrows the RetryException
  * in Phase1 to restart the processing of the modules.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  * @since V0.3
  */
 class RetryModule implements HTTPClientModule, GlobalConstants {
+
+  private static final Log log = ExoLogger.getLogger("ws.commons.httpclient.RetryModule");
+
   // Constructors
 
   /**
@@ -74,7 +79,7 @@ class RetryModule implements HTTPClientModule, GlobalConstants {
     try {
       resp.getStatusCode();
     } catch (RetryException re) {
-      Log.write(Log.MODS, "RtryM: Caught RetryException");
+      log.error("Caught RetryException");
 
       boolean got_lock = false;
 
@@ -88,7 +93,7 @@ class RetryModule implements HTTPClientModule, GlobalConstants {
             seq.add(e.request);
 
           for (RetryException e = re.first; e != null; e = e.next) {
-            Log.write(Log.MODS, "RtryM: handling exception ", e);
+            log.error("Handling exception ", e);
 
             Request req = e.request;
             HTTPConnection con = req.getConnection();
@@ -98,10 +103,10 @@ class RetryModule implements HTTPClientModule, GlobalConstants {
              * and 9.1.2), or we've already retried enough times, or the headers
              * have been read and parsed already
              */
-            if (!seq.isIdempotent(req)
-                || (con.ServProtVersKnown && con.ServerProtocolVersion >= HTTP_1_1 && req.num_retries > 0)
-                || ((!con.ServProtVersKnown || con.ServerProtocolVersion <= HTTP_1_0) && req.num_retries > 4)
-                || e.response.got_headers) {
+            if (!seq.isIdempotent(req) ||
+                (con.ServProtVersKnown && con.ServerProtocolVersion >= HTTP_1_1 && req.num_retries > 0) ||
+                ((!con.ServProtVersKnown || con.ServerProtocolVersion <= HTTP_1_0) && req.num_retries > 4) ||
+                e.response.got_headers) {
               e.first = null;
               continue;
             }
@@ -137,8 +142,8 @@ class RetryModule implements HTTPClientModule, GlobalConstants {
              * so that the available() call (to watch for an error response from
              * the server) will work correctly.
              */
-            if (e.next != null && e.next.request.getData() != null
-                && (!con.ServProtVersKnown || con.ServerProtocolVersion < HTTP_1_1) && e.conn_reset) {
+            if (e.next != null && e.next.request.getData() != null &&
+                (!con.ServProtVersKnown || con.ServerProtocolVersion < HTTP_1_1) && e.conn_reset) {
               addToken(req, "Connection", "close");
             }
 
@@ -161,8 +166,7 @@ class RetryModule implements HTTPClientModule, GlobalConstants {
 
             // now resend the request
 
-            Log.write(Log.MODS, "RtryM: Retrying request '" + req.getMethod() + " "
-                + req.getRequestURI() + "'");
+            log.info("Retrying request '" + req.getMethod() + " " + req.getRequestURI() + "'");
 
             if (e.conn_reset)
               req.num_retries++;
@@ -213,7 +217,6 @@ class RetryModule implements HTTPClientModule, GlobalConstants {
   /**
    * Add a token to the given header. If the header does not exist then create
    * it with the given token.
-   * 
    * @param req the request who's headers are to be modified
    * @param hdr the name of the header to add the token to (or to create)
    * @param tok the token to add

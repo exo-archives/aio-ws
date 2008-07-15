@@ -36,6 +36,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.ExoLogger;
+
 /**
  * This class provides an output stream for requests. The stream must first be
  * associated with a request before it may be used; this is done by passing it
@@ -49,7 +52,6 @@ import java.io.OutputStream;
  *    if (rsp.getStatusCode() &gt;= 300)
  *        ...
  * </PRE>
- * 
  * <P>
  * There are two constructors for this class, one taking a length parameter, and
  * one without any parameters. If the stream is created with a length then the
@@ -63,18 +65,18 @@ import java.io.OutputStream;
  * HTTP/1.0 then all data will be written to a buffer first, and only when the
  * stream is closed will the request be sent.
  * <P>
- * Another reason that using the <var>HttpOutputStream(length)</var>
- * constructor is recommended over the <var>HttpOutputStream()</var> one is
- * that some HTTP/1.1 servers do not allow the chunked transfer encoding to be
- * used when POSTing to a cgi script. This is because the way the cgi API is
- * defined the cgi script expects a Content-length environment variable. If the
- * data is sent using the chunked transfer encoding however, then the server
- * would have to buffer all the data before invoking the cgi so that this
- * variable could be set correctly. Not all servers are willing to do this.
+ * Another reason that using the <var>HttpOutputStream(length)</var> constructor
+ * is recommended over the <var>HttpOutputStream()</var> one is that some
+ * HTTP/1.1 servers do not allow the chunked transfer encoding to be used when
+ * POSTing to a cgi script. This is because the way the cgi API is defined the
+ * cgi script expects a Content-length environment variable. If the data is sent
+ * using the chunked transfer encoding however, then the server would have to
+ * buffer all the data before invoking the cgi so that this variable could be
+ * set correctly. Not all servers are willing to do this.
  * <P>
- * If you cannot use the <var>HttpOutputStream(length)</var> constructor and
- * are having problems sending requests (usually a 411 response) then you can
- * try setting the system property <var>HTTPClient.dontChunkRequests</var> to
+ * If you cannot use the <var>HttpOutputStream(length)</var> constructor and are
+ * having problems sending requests (usually a 411 response) then you can try
+ * setting the system property <var>HTTPClient.dontChunkRequests</var> to
  * <var>true</var> (this needs to be done either on the command line or
  * somewhere in the code before the HTTPConnection is first accessed). This will
  * prevent the client from using the chunked encoding in this case and will
@@ -87,41 +89,42 @@ import java.io.OutputStream;
  * things as authorization and retrying of requests won't be done by the
  * HTTPClient for such requests. But see {@link HTTPResponse#retryRequest()
  * HTTPResponse.retryRequest} for a partial solution.
- * 
  * @version 0.3-3 06/05/2001
  * @author Ronald Tschal�r
  * @since V0.3
  */
 public class HttpOutputStream extends OutputStream {
   /** null trailers */
-  private static final NVPair[] empty    = new NVPair[0];
+  private static final NVPair[] empty = new NVPair[0];
 
   /** the length of the data to be sent */
-  private int                   length;
+  private int length;
 
   /** the length of the data received so far */
-  private int                   rcvd     = 0;
+  private int rcvd = 0;
 
   /** the request this stream is associated with */
-  private Request               req      = null;
+  private Request req = null;
 
   /** the response from sendRequest if we stalled the request */
-  private Response              resp     = null;
+  private Response resp = null;
 
   /** the socket output stream */
-  private OutputStream          os       = null;
+  private OutputStream os = null;
 
   /** the buffer to be used if needed */
-  private ByteArrayOutputStream bos      = null;
+  private ByteArrayOutputStream bos = null;
 
   /** the trailers to send if using chunked encoding. */
-  private NVPair[]              trailers = empty;
+  private NVPair[] trailers = empty;
 
   /** the timeout to pass to SendRequest() */
-  private int                   con_to   = 0;
+  private int con_to = 0;
 
   /** just ignore all the data if told to do so */
-  private boolean               ignore   = false;
+  private boolean ignore = false;
+
+  private static final Log log = ExoLogger.getLogger("ws.commons.httpclient.HttpOutputStream");
 
   // Constructors
 
@@ -129,7 +132,6 @@ public class HttpOutputStream extends OutputStream {
    * Creates an output stream of unspecified length. Note that it is
    * <strong>highly</strong> recommended that this constructor be avoided where
    * possible and <code>HttpOutputStream(int)</code> used instead.
-   * 
    * @see HttpOutputStream#HttpOutputStream(int)
    */
   public HttpOutputStream() {
@@ -139,7 +141,6 @@ public class HttpOutputStream extends OutputStream {
   /**
    * This creates an output stream which will take <var>length</var> bytes of
    * data.
-   * 
    * @param length the number of bytes which will be sent over this stream
    */
   public HttpOutputStream(int length) {
@@ -154,7 +155,6 @@ public class HttpOutputStream extends OutputStream {
    * Associates this stream with a request and the actual output stream. No
    * other methods in this class may be invoked until this method has been
    * invoked by the HTTPConnection.
-   * 
    * @param req the request this stream is to be associated with
    * @param os the underlying output stream to write our data to, or null if we
    *          should write to a ByteArrayOutputStream instead.
@@ -168,15 +168,16 @@ public class HttpOutputStream extends OutputStream {
     if (os == null)
       bos = new ByteArrayOutputStream();
 
-    Log.write(Log.CONN, "OutS:  Stream ready for writing");
-    if (bos != null)
-      Log.write(Log.CONN, "OutS:  Buffering all data before sending " + "request");
+    if (log.isDebugEnabled()) {
+      log.debug("Stream ready for writing");
+      if (bos != null)
+        log.debug("Buffering all data before sending request");
+    }
   }
 
   /**
    * Setup this stream to dump the data to the great bit-bucket in the sky. This
    * is needed for when a module handles the request directly.
-   * 
    * @param req the request this stream is to be associated with
    */
   void ignoreData(Request req) {
@@ -187,7 +188,6 @@ public class HttpOutputStream extends OutputStream {
   /**
    * Return the response we got from sendRequest(). This waits until the request
    * has actually been sent.
-   * 
    * @return the response returned by sendRequest()
    */
   synchronized Response getResponse() {
@@ -203,7 +203,6 @@ public class HttpOutputStream extends OutputStream {
   /**
    * Returns the number of bytes this stream is willing to accept, or -1 if it
    * is unbounded.
-   * 
    * @return the number of bytes
    */
   public int getLength() {
@@ -212,7 +211,6 @@ public class HttpOutputStream extends OutputStream {
 
   /**
    * Gets the trailers which were set with <code>setTrailers()</code>.
-   * 
    * @return an array of header fields
    * @see #setTrailers(HTTPClient.NVPair[])
    */
@@ -229,10 +227,9 @@ public class HttpOutputStream extends OutputStream {
    * <var>Trailer</var> header in the request (see section 14.40 of
    * draft-ietf-http-v11-spec-rev-06.txt).
    * <P>
-   * This method (and its related <code>getTrailers()</code>)) are in this
-   * class and not in <var>Request</var> because setting trailers is something
-   * an application may want to do, not only modules.
-   * 
+   * This method (and its related <code>getTrailers()</code>)) are in this class
+   * and not in <var>Request</var> because setting trailers is something an
+   * application may want to do, not only modules.
    * @param trailers an array of header fields
    */
   public void setTrailers(NVPair[] trailers) {
@@ -260,7 +257,6 @@ public class HttpOutputStream extends OutputStream {
   /**
    * Writes a single byte on the stream. It is subject to the same rules as
    * <code>write(byte[], int, int)</code>.
-   * 
    * @param b the byte to write
    * @exception IOException if any exception is thrown by the socket
    * @see #write(byte[], int, int)
@@ -274,7 +270,6 @@ public class HttpOutputStream extends OutputStream {
    * Writes an array of bytes on the stream. This method may not be used until
    * this stream has been passed to one of the methods in HTTPConnection (i.e.
    * until it has been associated with a request).
-   * 
    * @param buf an array containing the data to write
    * @param off the offset of the data whithin the buffer
    * @param len the number bytes (starting at <var>off</var>) to write
@@ -293,8 +288,8 @@ public class HttpOutputStream extends OutputStream {
       return;
 
     if (length != -1 && rcvd + len > length) {
-      IOException ioe = new IOException("Tried to write too many bytes (" + (rcvd + len) + " > "
-          + length + ")");
+      IOException ioe = new IOException("Tried to write too many bytes (" + (rcvd + len) + " > " +
+          length + ")");
       req.getConnection().closeDemux(ioe, false);
       req.getConnection().outputFinished();
       throw ioe;
@@ -320,7 +315,6 @@ public class HttpOutputStream extends OutputStream {
    * Closes the stream and causes the data to be sent if it has not already been
    * done so. This method <strong>must</strong> be invoked when all data has
    * been written.
-   * 
    * @exception IOException if any exception is thrown by the underlying socket,
    *              or if too few bytes were written.
    * @exception IllegalAccessError if this stream has not been associated with a
@@ -358,7 +352,8 @@ public class HttpOutputStream extends OutputStream {
         req.setHeaders(hdrs);
       }
 
-      Log.write(Log.CONN, "OutS:  Sending request");
+      if (log.isDebugEnabled())
+        log.debug("Sending request");
 
       try {
         resp = req.getConnection().sendRequest(req, con_to);
@@ -368,8 +363,8 @@ public class HttpOutputStream extends OutputStream {
       notify();
     } else {
       if (rcvd < length) {
-        IOException ioe = new IOException("Premature close: only " + rcvd
-            + " bytes written instead of the " + "expected " + length);
+        IOException ioe = new IOException("Premature close: only " + rcvd +
+            " bytes written instead of the " + "expected " + length);
         req.getConnection().closeDemux(ioe, false);
         req.getConnection().outputFinished();
         throw ioe;
@@ -377,11 +372,11 @@ public class HttpOutputStream extends OutputStream {
 
       try {
         if (length == -1) {
-          if (Log.isEnabled(Log.CONN) && trailers.length > 0) {
-            Log.write(Log.CONN, "OutS:  Sending trailers:");
+
+          if (log.isDebugEnabled() && trailers.length > 0) {
+            log.debug("Sending trailers:");
             for (int idx = 0; idx < trailers.length; idx++)
-              Log.write(Log.CONN, "       " + trailers[idx].getName() + ": "
-                  + trailers[idx].getValue());
+              log.debug("\t" + trailers[idx].getName() + ": " + trailers[idx].getValue());
           }
 
           os.write(Codecs.chunkedEncode(null, 0, 0, trailers, true));
@@ -389,7 +384,9 @@ public class HttpOutputStream extends OutputStream {
 
         os.flush();
 
-        Log.write(Log.CONN, "OutS:  All data sent");
+        if (log.isDebugEnabled())
+          log.debug("All data sent");
+
       } catch (IOException ioe) {
         req.getConnection().closeDemux(ioe, true);
         throw ioe;
@@ -401,7 +398,6 @@ public class HttpOutputStream extends OutputStream {
 
   /**
    * produces a string describing this stream.
-   * 
    * @return a string containing the name and the length
    */
   public String toString() {
