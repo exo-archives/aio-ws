@@ -68,9 +68,13 @@ public class BeanBuilder {
         // first letter to lower case
         key = (key.length() > 1) ? Character.toLowerCase(key.charAt(0)) +
             key.substring(1) : key.toLowerCase();
-            
+        
+        // Bug : WS-53    
+        if (jsonValue.isNull())
+          return null;
+        
         if (!jsonValue.isObject())
-          throw new JsonException("Unsupported type of jsonValue here!");
+          throw new JsonException("Unsupported type of jsonValue.");
 
         JsonValue childJsonValue = jsonValue.getElement(key);
         
