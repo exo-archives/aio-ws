@@ -29,8 +29,8 @@ import org.exoplatform.services.security.cas.client.AbstractIdentityInitializerF
  */
 public class BaseIdentityInitializerFilterImpl extends AbstractIdentityInitializerFilter {
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.security.cas.client.AbstractIdentityInitializerFilter#createIdentity(java.lang.String)
+  /**
+   * {@inheritDoc} 
    */
   @Override
   protected Identity createIdentity(String userId) throws Exception {
@@ -43,8 +43,8 @@ public class BaseIdentityInitializerFilterImpl extends AbstractIdentityInitializ
     return authenticator.createIdentity(userId);
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.security.cas.client.AbstractIdentityInitializerFilter#getContainer()
+  /**
+   * {@inheritDoc} 
    */
   @Override
   protected ExoContainer getContainer() {

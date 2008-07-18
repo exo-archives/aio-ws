@@ -29,21 +29,33 @@ import org.jasig.cas.authentication.principal.UsernamePasswordCredentials;
 
 
 /**
+ * CAS uses spring framework.
+ * It is specified component of spring container.
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class HTTPAuthenticationHandler extends
-    AbstractUsernamePasswordAuthenticationHandler {
+public class HTTPAuthenticationHandler extends AbstractUsernamePasswordAuthenticationHandler {
 
+  /**
+   * URL for authentication. It must be set in configuration.
+   * See cas/WEB-INF/deployerConfigContext.xml .
+   */
   private String authenticationURL;
   
-  /* (non-Javadoc)
-   * @see org.jasig.cas.authentication.handler.support.AbstractUsernamePasswordAuthenticationHandler
-   * #authenticateUsernamePasswordInternal(org.jasig.cas.authentication.principal.UsernamePasswordCredentials)
+  /**
+   * Is in required use HTTPS protocol only. 
    */
-  protected boolean authenticateUsernamePasswordInternal(
-      UsernamePasswordCredentials credentials) {
+  private boolean security = false;
+  
+  /**
+   * Do authentication via HTTP or HTTPS at remote or local host.
+   * {@inheritDoc}
+   */
+  protected boolean authenticateUsernamePasswordInternal(UsernamePasswordCredentials credentials) {
 
+    if (security && !authenticationURL.startsWith("https://"))
+      throw new IllegalArgumentException("Security parameter is set 'true', https must be used.");
+    
     HttpURLConnection conn = null;
     boolean auth = false;
     try {
@@ -117,15 +129,24 @@ public class HTTPAuthenticationHandler extends
     return auth;
   }
   
-  /*
+  /**
    * This method is called by spring framework, authenticationURL is passed from configuration.
+   * @param authenticationURL the URL for authentication.
    */
   public void setAuthenticationURL(String authenticationURL) {
+    if (log.isDebugEnabled())
+      log.debug("URL for uathentication " + authenticationURL);
     this.authenticationURL = authenticationURL;
   }
   
+  /**
+   * This method is called by spring framework, security is passed from configuration.
+   * @param security must be used https or not.
+   */
   public void setSecurity(boolean security) {
-    log.info("................. "+security);
+    if (log.isDebugEnabled())
+      log.debug("security is set " + security + ". Only HTTPS protocol must be used.");
+    this.security = security;
   }
 
 }

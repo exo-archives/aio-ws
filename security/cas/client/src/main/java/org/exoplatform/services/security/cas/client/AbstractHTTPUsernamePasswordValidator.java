@@ -39,14 +39,17 @@ import org.exoplatform.services.security.UsernameCredential;
  */
 public abstract class AbstractHTTPUsernamePasswordValidator extends HttpServlet {
 
+  /**
+   * Logger. 
+   */
   protected Log log = ExoLogger.getLogger("ws.security.AbstractHTTPUsernamePasswordValidator");
   
-  /* (non-Javadoc)
-   * @see javax.servlet.http.HttpServlet#service(javax.servlet.http.HttpServletRequest,
-   * javax.servlet.http.HttpServletResponse)
+  /**
+   *  Validate username/password.
+   *  {@inheritDoc}
    */
   @Override
-  public final void service (HttpServletRequest request, HttpServletResponse response)
+  public final void service(HttpServletRequest request, HttpServletResponse response)
       throws ServletException,  IOException {
     
     String username = request.getParameter("username");
@@ -84,7 +87,7 @@ public abstract class AbstractHTTPUsernamePasswordValidator extends HttpServlet 
    * For customize authentication success message.
    * @param response the HTTPServletResponse.
    * @param principal the principal's name.
-   * @throws IOException
+   * @throws IOException if i/o error occurs.
    */
   protected abstract void sendSuccessMessage(HttpServletResponse response, String principal) throws IOException;
 
@@ -92,7 +95,7 @@ public abstract class AbstractHTTPUsernamePasswordValidator extends HttpServlet 
    * For customize authentication fail message.
    * @param response the HTTPServletResponse.
    * @param principal the principal's name.
-   * @throws IOException
+   * @throws IOException if i/o error occurs.
    */
   protected abstract void sendFailMessage(HttpServletResponse response, String principal) throws IOException;
   

@@ -39,20 +39,21 @@ import org.exoplatform.services.security.IdentityRegistry;
  */
 public abstract class AbstractIdentityInitializerFilter implements Filter {
 
+  /**
+   * Logger.
+   */
   protected Log log = ExoLogger.getLogger("ws.security.AbstractIdentityInitializerFilter");
 
-  /*
-   * (non-Javadoc)
-   * @see javax.servlet.Filter#destroy()
+  /**
+   * {@inheritDoc}
    */
   public void destroy() {
     // nothing to do
   }
 
-  /*
-   * (non-Javadoc)
-   * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
-   *      javax.servlet.ServletResponse, javax.servlet.FilterChain)
+  /**
+   * Initialize and register Identity for current user.
+   * {@inheritDoc}
    */
   public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain)
       throws IOException, ServletException {
@@ -80,9 +81,8 @@ public abstract class AbstractIdentityInitializerFilter implements Filter {
 
   }
 
-  /*
-   * (non-Javadoc)
-   * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
+  /**
+   * {@inheritDoc}
    */
   public void init(FilterConfig config) throws ServletException {
     // nothing to do currently
@@ -93,7 +93,7 @@ public abstract class AbstractIdentityInitializerFilter implements Filter {
    * requested from authentication server, etc.
    * @param userId the userId.
    * @return identity for specified user.
-   * @throws Exception
+   * @throws Exception if any error occurs.
    */
   protected abstract Identity createIdentity(String userId) throws Exception;
 
