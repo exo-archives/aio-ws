@@ -36,25 +36,28 @@ import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.IdentityRegistry;
 
 /**
+ * NOTE this filter must be configured after OAuthConsumerFilter and after
+ * OAuthRequestWrapperFilter.
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 public class OAuthIdentityInitializerFilter implements Filter {
 
-  private final static Log log = ExoLogger.getLogger("ws.security.OAuthIdentityInitializerFilter");
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger("ws.security.OAuthIdentityInitializerFilter");
 
-  /*
-   * (non-Javadoc)
-   * @see javax.servlet.Filter#destroy()
+  /**
+   * {@inheritDoc}
    */
   public void destroy() {
     // nothing to do
   }
 
-  /*
-   * (non-Javadoc)
-   * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
-   *      javax.servlet.ServletResponse, javax.servlet.FilterChain)
+  /**
+   * Create {@link Identity} for user.
+   * {@inheritDoc}
    */
   public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain)
       throws IOException, ServletException {
@@ -66,8 +69,8 @@ public class OAuthIdentityInitializerFilter implements Filter {
     Identity identity = identityRegistry.getIdentity(userId);
 
     if (identity == null) {
-      if (log.isDebugEnabled()) {
-        log.debug("Identity is null for " + userId);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Identity is null for " + userId);
       }
 
       try {
@@ -82,22 +85,30 @@ public class OAuthIdentityInitializerFilter implements Filter {
 
   }
 
+  /**
+   * Create Identity for given userId.
+   * @param userId the user ID.
+   * @return identity.
+   * @throws Exception if any error occurs.
+   */
   protected Identity createIdentity(String userId) throws Exception {
     Authenticator authenticator = (Authenticator) getContainer().getComponentInstanceOfType(Authenticator.class);
-    if (log.isDebugEnabled()) {
-      log.debug("Try create identity for user " + userId);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Try create identity for user " + userId);
     }
 
     return authenticator.createIdentity(userId);
   }
 
+  /**
+   * @return actual ExoContainer.
+   */
   protected ExoContainer getContainer() {
     return ExoContainerContext.getCurrentContainer();
   }
 
-  /*
-   * (non-Javadoc)
-   * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
+  /**
+   * {@inheritDoc}
    */
   public void init(FilterConfig arg0) throws ServletException {
     // nothing to do

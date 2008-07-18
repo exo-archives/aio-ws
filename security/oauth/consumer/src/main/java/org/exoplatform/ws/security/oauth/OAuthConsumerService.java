@@ -33,7 +33,7 @@ public interface OAuthConsumerService {
    * @see net.oauth.OAuth.OAUTH_TOKEN,
    * @see net.oauth.OAuth.OAUTH_TOKEN_SECRET.  
    * @return satisfied accessor. 
-   * @throws OAuthProblemException
+   * @throws OAuthProblemException if can't get accessor and can't create new one.
    */
   OAuthAccessor getAccessor(OAuthMessage oauthMessage) throws OAuthProblemException;
   
@@ -42,7 +42,7 @@ public interface OAuthConsumerService {
    * @param oauthMessage the OAuthMessage. Must have at least two parameters
    * @see net.oauth.OAuth.OAUTH_TOKEN,
    * @see net.oauth.OAuth.OAUTH_TOKEN_SECRET.
-   * @throws OAuthProblemException
+   * @throws OAuthProblemException if accessor can't be removed.
    */
   void removeAccessor(OAuthMessage oauthMessage) throws OAuthProblemException;
   

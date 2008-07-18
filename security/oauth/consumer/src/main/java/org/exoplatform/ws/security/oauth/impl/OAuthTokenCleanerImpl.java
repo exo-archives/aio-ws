@@ -35,26 +35,36 @@ import net.oauth.OAuthAccessor;
  */
 public final class OAuthTokenCleanerImpl extends Thread implements OAuthTokenCleaner {
   
-  private final long timeout;
-  
-  private Set<OAuthAccessor> tokens;
-  
-  private final static Log log = ExoLogger.getLogger("ws.security.OAuthTokenCleanerImpl");
-  
   /**
    * Default cleaner timeout. By default 5 minutes.
    */
   public static final long DEFAULT_TIMEOUT = 5 * 60 * 1000;
 
+  /**
+   * Actual timeout. Cleaner will be run every x ms.
+   */
+  private final long timeout;
+  
+  private Set<OAuthAccessor> tokens;
+  
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger("ws.security.OAuthTokenCleanerImpl");
+
+  /**
+   * Constructs OauthTokenCleaner.
+   * @param params initialized parameters.
+   */
   public OAuthTokenCleanerImpl(InitParams params) {
     ValueParam t = params.getValueParam("tokenCleanerTimeout");
     timeout = t != null ? Long.parseLong(t.getValue()) * 60 * 1000 : DEFAULT_TIMEOUT;
-    log.info("Token Cleaner timeout is " + timeout + " ms.");
+    LOG.info("Token Cleaner timeout is " + timeout + " ms.");
     this.start();
   }
 
-  /* (non-Javadoc)
-   * @see java.lang.Thread#run()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public void run() {
@@ -68,8 +78,8 @@ public final class OAuthTokenCleanerImpl extends Thread implements OAuthTokenCle
     }
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.ws.security.oauth.TokenCleaner#clean()
+  /**
+   * {@inheritDoc}
    */
   public void clean() {
     long currentTime = System.currentTimeMillis();
@@ -81,11 +91,11 @@ public final class OAuthTokenCleanerImpl extends Thread implements OAuthTokenCle
     Iterator<OAuthAccessor> iter = tokens.iterator();
     while (iter.hasNext()) {
       OAuthAccessor a = iter.next();
-      Object o = null;
-      if ((o = a.getProperty("expired")) != null) {
+      Object o = a.getProperty("expired");
+      if (o != null) {
         if ((Long) o < currentTime) {
-          if (log.isDebugEnabled()) {
-            log.debug("Remove expired accessor: " + a);
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("Remove expired accessor: " + a);
           }
           iter.remove();
         }
@@ -93,8 +103,9 @@ public final class OAuthTokenCleanerImpl extends Thread implements OAuthTokenCle
     }
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.ws.security.oauth.OAuthTokenCleaner#setTokens(java.util.Set)
+  /**
+   * By this method must be passed collections of accessor which must be under control.
+   * {@inheritDoc}
    */
   public void setTokens(Set<OAuthAccessor> tokens) {
     this.tokens = tokens;

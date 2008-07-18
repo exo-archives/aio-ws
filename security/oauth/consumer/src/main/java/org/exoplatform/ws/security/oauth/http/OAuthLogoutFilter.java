@@ -44,26 +44,32 @@ import org.exoplatform.ws.security.oauth.OAuthConsumerService;
  * Can be used in logout process, client MUST pass parameter query
  * parameter logout=yes. In filter init parameters must present consumer name as it done
  * for OAuthConsumerFilter, otherwise exception will be thrown.
+ * Usually can be configured last in web.xml, for sure after OAuthConsumerFilter.
  * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 public class OAuthLogoutFilter implements Filter {
   
+  /**
+   * Consumer name.
+   */
   private String consumerName;
   
-  private final static Log log = ExoLogger.getLogger("ws.security.OAuthLogoutFilter");  
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger("ws.security.OAuthLogoutFilter");  
 
-  /* (non-Javadoc)
-   * @see javax.servlet.Filter#destroy()
+  /**
+   * {@inheritDoc}
    */
   public void destroy() {
     // nothing to do
   }
 
-  /* (non-Javadoc)
-   * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
-   * javax.servlet.ServletResponse, javax.servlet.FilterChain)
+  /**
+   * {@inheritDoc}
    */
   public void doFilter(ServletRequest request, ServletResponse response,
       FilterChain chain) throws IOException, ServletException {
@@ -107,8 +113,8 @@ public class OAuthLogoutFilter implements Filter {
       try {
         // remove accessor if token and secret token passes with parameters or in cookies
         consumerService.removeAccessor(oauthMessage);
-      } catch(OAuthProblemException e) {
-        log.error("Can't remove accessor.");
+      } catch (OAuthProblemException e) {
+        LOG.error("Can't remove accessor.");
       }
       
       // remove token cookie
@@ -121,8 +127,8 @@ public class OAuthLogoutFilter implements Filter {
     chain.doFilter(httpRequest, httpResponse);
   }
 
-  /* (non-Javadoc)
-   * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
+  /**
+   * {@inheritDoc}
    */
   public void init(FilterConfig config) throws ServletException {
     consumerName = config.getInitParameter("consumer");

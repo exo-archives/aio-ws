@@ -34,23 +34,29 @@ import org.apache.commons.logging.Log;
 import org.exoplatform.services.log.ExoLogger;
 
 /**
+ * NOTE mast be configured in web.xml after OAuthConsumerFilter but before 
+ * OAuthIdentityInitializerFilter.
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 public class OAuthRequestWrapperFilter implements Filter {
 
-  private final static Log log = ExoLogger.getLogger("ws.security.OAuthRequestWrapperFilter");  
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger("ws.security.OAuthRequestWrapperFilter");  
 
-  /* (non-Javadoc)
-   * @see javax.servlet.Filter#destroy()
+  /**
+   * {@inheritDoc}
    */
   public void destroy() {
     // nothing to do
   }
 
-  /* (non-Javadoc)
-   * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
-   * javax.servlet.ServletResponse, javax.servlet.FilterChain)
+  /**
+   * Create {@link HttpServletRequestWrapper} and overrides
+   * methods getRemoteUser() and getUserPrincipal().
+   * {@inheritDoc}
    */
   public void doFilter(ServletRequest request, ServletResponse response,
       FilterChain chain) throws IOException, ServletException {
@@ -63,8 +69,8 @@ public class OAuthRequestWrapperFilter implements Filter {
     else 
       principal = (Principal) httpRequest.getAttribute("oauth_principal");
     
-    if (log.isDebugEnabled()) {
-      log.debug("user principal: " + principal);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("user principal: " + principal);
     }
     
     OAuthHttpServletRequestWrapper requestWrapper = new OAuthHttpServletRequestWrapper(
@@ -72,33 +78,44 @@ public class OAuthRequestWrapperFilter implements Filter {
     chain.doFilter(requestWrapper, response);
   }
 
-  /* (non-Javadoc)
-   * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
+  /**
+   * {@inheritDoc}
    */
   public void init(FilterConfig arg0) throws ServletException {
     // nothing to do
   }
   
   
+  /**
+   * @see javax.servlet.http.HttpServletResponseWrapper
+   */
   final class OAuthHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
+    /**
+     * User principal.
+     */
     private final Principal principal;
 
+    /**
+     * Constructs HttpServletResponseWrapper.
+     * @param request original request.
+     * @param principal the user principal.
+     */
     OAuthHttpServletRequestWrapper(final HttpServletRequest request, final Principal principal) {
         super(request);
         this.principal = principal;
     }
 
-    /* (non-Javadoc)
-     * @see javax.servlet.http.HttpServletRequestWrapper#getUserPrincipal()
+    /**
+     * {@inheritDoc}
      */
     @Override
     public Principal getUserPrincipal() {
         return this.principal;
     }
 
-    /* (non-Javadoc)
-     * @see javax.servlet.http.HttpServletRequestWrapper#getRemoteUser()
+    /**
+     * {@inheritDoc}
      */
     @Override
     public String getRemoteUser() {

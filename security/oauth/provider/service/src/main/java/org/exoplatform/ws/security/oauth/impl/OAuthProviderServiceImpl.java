@@ -40,13 +40,26 @@ import org.exoplatform.ws.security.oauth.OAuthProviderService;
  */
 public abstract class OAuthProviderServiceImpl implements OAuthProviderService {
 
+  /**
+   * Known consumers.
+   */
   protected final HashMap<String, OAuthConsumer> consumers =
         new HashMap<String, OAuthConsumer>();
   
+  /**
+   * User tokens. Tokens keeps in this Set only before user get access token.
+   */
   protected final HashSet<OAuthAccessor> tokens = new HashSet<OAuthAccessor>();
 
-  protected static final Log log = ExoLogger.getLogger("ws.security.OAuthProviderServiceImpl");
+  /**
+   * Logger.
+   */
+  protected static final Log LOG = ExoLogger.getLogger("ws.security.OAuthProviderServiceImpl");
   
+  /**
+   * Constructs instance of OAuthProviderService.
+   * @param params the initialized parameters.
+   */
   public OAuthProviderServiceImpl(InitParams params) {
     Iterator<PropertiesParam> iterator = params.getPropertiesParamIterator();
     while (iterator.hasNext()) {
@@ -62,9 +75,8 @@ public abstract class OAuthProviderServiceImpl implements OAuthProviderService {
     }
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.ws.security.oauth.OAuthProviderService#getConsumer(
-   * java.lang.String)
+  /**
+   * {@inheritDoc}
    */
   public OAuthConsumer getConsumer(String name) throws OAuthProblemException {
     OAuthConsumer consumer = consumers.get(name);
@@ -74,9 +86,8 @@ public abstract class OAuthProviderServiceImpl implements OAuthProviderService {
         + name + "'.");
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.ws.security.oauth.OAuthProviderService#getAccessor(
-   * net.oauth.OAuthMessage)
+  /**
+   * {@inheritDoc}
    */
   public OAuthAccessor getAccessor(OAuthMessage oauthMessage)
       throws OAuthProblemException {
@@ -84,10 +95,10 @@ public abstract class OAuthProviderServiceImpl implements OAuthProviderService {
       String token = oauthMessage.getParameter(OAuth.OAUTH_TOKEN);
       String secret = oauthMessage.getParameter(OAuth.OAUTH_TOKEN_SECRET);
       for (OAuthAccessor a : tokens) {
-        if (a.requestToken != null && a.requestToken.equals(token) &&
-            a.tokenSecret != null && a.tokenSecret.equals(secret)) {
-          if (log.isDebugEnabled()) {
-            log.debug("Request token found: " + token);
+        if (a.requestToken != null && a.requestToken.equals(token)
+            && a.tokenSecret != null && a.tokenSecret.equals(secret)) {
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("Request token found: " + token);
           }
           return a;
         }
@@ -100,9 +111,8 @@ public abstract class OAuthProviderServiceImpl implements OAuthProviderService {
     }
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.ws.security.oauth.OAuthProviderService#getConsumer(
-   * net.oauth.OAuthMessage)
+  /**
+   * {@inheritDoc}
    */
   public OAuthConsumer getConsumer(OAuthMessage oauthMessage)
       throws OAuthProblemException {
@@ -117,9 +127,8 @@ public abstract class OAuthProviderServiceImpl implements OAuthProviderService {
     }
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.ws.security.oauth.OAuthProviderService#authorize(
-   * net.oauth.OAuthAccessor, java.lang.String)
+  /**
+   * {@inheritDoc}
    */
   public void authorize(OAuthAccessor accessor, String userId)
       throws OAuthProblemException {
@@ -131,8 +140,8 @@ public abstract class OAuthProviderServiceImpl implements OAuthProviderService {
     tokens.add(accessor);
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.ws.security.oauth.OAuthProviderService#generateRequestToken(net.oauth.OAuthAccessor)
+  /**
+   * {@inheritDoc}
    */
   public void generateRequestToken(OAuthAccessor accessor) {
     accessor.requestToken = generateToken();
@@ -141,8 +150,8 @@ public abstract class OAuthProviderServiceImpl implements OAuthProviderService {
     tokens.add(accessor);    
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.ws.security.oauth.OAuthProviderService#generateAccessToken(net.oauth.OAuthAccessor)
+  /**
+   * {@inheritDoc}
    */
   public void generateAccessToken(OAuthAccessor accessor) throws OAuthProblemException {
     String requestToken = accessor.requestToken;
@@ -151,11 +160,11 @@ public abstract class OAuthProviderServiceImpl implements OAuthProviderService {
     boolean valid = false;
     while (iter.hasNext()) {
       OAuthAccessor a = iter.next();
-      if(a.requestToken != null && a.requestToken.equals(requestToken)
+      if (a.requestToken != null && a.requestToken.equals(requestToken)
           && a.tokenSecret != null && a.tokenSecret.equals(secretToken)) {
         
-        if (log.isDebugEnabled()) {
-          log.debug("Validation ok, for user '" + a.getProperty("userId")
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Validation ok, for user '" + a.getProperty("userId")
               + "' access token will be generated.");
         }
         
@@ -183,12 +192,12 @@ public abstract class OAuthProviderServiceImpl implements OAuthProviderService {
    * Generate token.
    * @return the token.
    */
-  abstract protected String generateToken();
+  protected abstract String generateToken();
   
   /**
    * Generate secret token.
    * @return the created secret token.
    */
-  abstract protected String generateSecret();
+  protected abstract String generateSecret();
 
 }

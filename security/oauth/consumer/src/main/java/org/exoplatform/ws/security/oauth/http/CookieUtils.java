@@ -28,8 +28,8 @@ class CookieUtils {
   
   /**
    * For removing old cookie, set max age for it 0.
-   * @param name the cookie name.
-   * @return cookie.
+   * @param c cookie which must be deleted.
+   * @return cookie cookie with 'maxAge = 0'.
    */
   static final Cookie deleteCookie(Cookie c) {
     c.setMaxAge(0);

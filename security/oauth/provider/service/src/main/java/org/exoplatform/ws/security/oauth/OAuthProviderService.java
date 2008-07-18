@@ -53,7 +53,7 @@ public interface OAuthProviderService {
   /**
    * @param accessor the accessor.
    * @param userId the user name or other identifier.
-   * @throws OAuthProblemException
+   * @throws OAuthProblemException if any error occurs.
    */
   void authorize(OAuthAccessor accessor, String userId) throws OAuthProblemException;
   
@@ -68,9 +68,9 @@ public interface OAuthProviderService {
    * Generate access token for given accessor and remove it from collection.
    * This accessor must be kept by Consumer.
    * @param accessor the accessor.
-   * @throws OAuthProblemException
+   * @throws OAuthProblemException if access token can't be created.
    */
-  void generateAccessToken(OAuthAccessor acessor) throws OAuthProblemException;
+  void generateAccessToken(OAuthAccessor accessor) throws OAuthProblemException;
   
 }
 

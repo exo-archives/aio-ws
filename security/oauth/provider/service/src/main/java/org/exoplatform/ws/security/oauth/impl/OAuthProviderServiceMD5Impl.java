@@ -33,16 +33,16 @@ public final class OAuthProviderServiceMD5Impl extends OAuthProviderServiceImpl 
     super(params);
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.ws.security.oauth.impl.OAuthProviderServiceImpl#generateSecret()
+  /**
+   * {@inheritDoc}
    */
   @Override
   protected String generateSecret() {
     return DigestUtils.md5Hex(UUID.randomUUID().toString());
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.ws.security.oauth.impl.OAuthProviderServiceImpl#generateToken()
+  /**
+   * {@inheritDoc}
    */
   @Override
   protected String generateToken() {

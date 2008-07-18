@@ -44,23 +44,41 @@ import net.oauth.OAuthServiceProvider;
  */
 public final class OAuthConsumerServiceImpl implements OAuthConsumerService {
   
+  /**
+   * Default token alive time is 5 hours.
+   */
+  public static final long DEFAULT_TOKEN_ALIVE_TIME = 60000 * 60 * 5;
+
+  /**
+   * Tokens.
+   */
   private final HashSet<OAuthAccessor> tokens = new HashSet<OAuthAccessor>();
+  
+  /**
+   * Known consumers.
+   */
   private final HashMap<String, OAuthConsumer> consumers =
       new HashMap<String, OAuthConsumer>();
   
-  private final static Log log = ExoLogger.getLogger("ws.security.OAuthConsumerServiceImpl");
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger("ws.security.OAuthConsumerServiceImpl");
   
+  /**
+   * Actual ExoOAuthClient.
+   */
   private final ExoOAuthClient oauthClient;
   
-  // By default token alive time is 5 hours.
-  private static final long DEFAULT_TOKEN_ALIVE_TIME = 60000 * 60 * 5;
-  
+  /**
+   * Actual token alive time.
+   */
   private final long tokenAliveTime;
   
   /**
    * Without token cleaner. Tokens never expired.
    * @param oauthClient the ExoOAuthClient instance.
-   * @param params 
+   * @param params initialized parameters.
    */
   public OAuthConsumerServiceImpl(ExoOAuthClient oauthClient, InitParams params) {
     this(oauthClient, null, params);
@@ -69,8 +87,8 @@ public final class OAuthConsumerServiceImpl implements OAuthConsumerService {
   /**
    * With token cleaner. Token will be removed after timeout.
    * @param oauthClient the ExoOAuthClient instance.
-   * @param tokenCleanerProducer the TokenCleanerHolder.  
-   * @param params
+   * @param tokenCleaner the TokenCleaner.  
+   * @param params initialized parameters.
    */
   public OAuthConsumerServiceImpl(ExoOAuthClient oauthClient,
       OAuthTokenCleaner tokenCleaner, InitParams params) {
@@ -80,7 +98,7 @@ public final class OAuthConsumerServiceImpl implements OAuthConsumerService {
     ValueParam t = params.getValueParam("tokenAliveTime");
     tokenAliveTime = t != null ? Long.parseLong(t.getValue()) * 60 * 1000
         : DEFAULT_TOKEN_ALIVE_TIME;
-    log.info("Token alive time is : " + tokenAliveTime + " ms.");
+    LOG.info("Token alive time is : " + tokenAliveTime + " ms.");
 
     // Create consumers
     while (iterator.hasNext()) {
@@ -107,12 +125,12 @@ public final class OAuthConsumerServiceImpl implements OAuthConsumerService {
     if (tokenCleaner != null) {
       tokenCleaner.setTokens(tokens);
     } else {
-      log.warn("Running without token cleaner. All tokens will be never expired!");
+      LOG.warn("Running without token cleaner. All tokens will be never expired!");
     }
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.ws.security.oauth.OAuthConsumerService#getAccessor(net.oauth.OAuthMessage)
+  /**
+   * {@inheritDoc}
    */
   public OAuthAccessor getAccessor(OAuthMessage oauthMessage) throws OAuthProblemException {
     try {
@@ -128,20 +146,20 @@ public final class OAuthConsumerServiceImpl implements OAuthConsumerService {
         while (iter.hasNext()) {
           OAuthAccessor a = iter.next();
   
-          if(a.accessToken != null && a.accessToken.equals(token)
+          if (a.accessToken != null && a.accessToken.equals(token)
               && a.tokenSecret != null && a.tokenSecret.equals(secret)) {
-            if (log.isDebugEnabled()) {
-              log.debug("Access token found: " + token);
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("Access token found: " + token);
             }
             // Nothing to do here, token is valid.
             return a;
           }
           
-          if(a.requestToken != null && a.requestToken.equals(token)
+          if (a.requestToken != null && a.requestToken.equals(token)
               && a.tokenSecret != null && a.tokenSecret.equals(secret)) {
             
-            if (log.isDebugEnabled()) {
-              log.debug("Request token found: " + token);
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("Request token found: " + token);
             }
             // Remove old one.
             iter.remove();
@@ -164,9 +182,9 @@ public final class OAuthConsumerServiceImpl implements OAuthConsumerService {
         // Get request token for it.
         oauthClient.getRequestToken(accessor);
         
-        if (log.isDebugEnabled()) {
-          log.debug("Request and access token not found or not valid, " +
-              "generate a new request token " + accessor.requestToken);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Request and access token not found or not valid, "
+              + "generate a new request token " + accessor.requestToken);
         }
       }
       
@@ -179,8 +197,8 @@ public final class OAuthConsumerServiceImpl implements OAuthConsumerService {
     }
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.ws.security.oauth.OAuthConsumerService#removeAccessor(net.oauth.OAuthMessage)
+  /**
+   * {@inheritDoc}
    */
   public void removeAccessor(OAuthMessage oauthMessage) throws OAuthProblemException {
     try {
@@ -193,10 +211,10 @@ public final class OAuthConsumerServiceImpl implements OAuthConsumerService {
         while (iter.hasNext()) {
           OAuthAccessor a = iter.next();
 
-          if (a.accessToken != null && a.accessToken.equals(token) &&
-              a.tokenSecret != null && a.tokenSecret.equals(secret)) {
-            if (log.isDebugEnabled()) {
-              log.debug("Remove access token found: " + token);
+          if (a.accessToken != null && a.accessToken.equals(token)
+              && a.tokenSecret != null && a.tokenSecret.equals(secret)) {
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("Remove access token found: " + token);
             }
 
             iter.remove();
@@ -205,10 +223,16 @@ public final class OAuthConsumerServiceImpl implements OAuthConsumerService {
         }
       }
     } catch (IOException e) {
-      log.error("Can't remove access token.");
+      LOG.error("Can't remove access token.");
     }
   }
  
+  /**
+   * Get consumer with specified name.
+   * @param name the consumer's name.
+   * @return consumer.
+   * @throws OAuthProblemException if consumer with specified name not found.
+   */
   private OAuthConsumer getConsumer(String name) throws OAuthProblemException {
     OAuthConsumer consumer = consumers.get(name);
     if (consumer != null)

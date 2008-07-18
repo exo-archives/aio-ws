@@ -47,19 +47,32 @@ import net.oauth.server.OAuthServlet;
  */
 public class OAuthConsumerFilter implements Filter {
   
+  /**
+   * Consumer name.
+   */
   private String consumerName;
   
-  private final static Log log = ExoLogger.getLogger("ws.security.OAuthConsumerFilter");  
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger("ws.security.OAuthConsumerFilter");  
 
-  /* (non-Javadoc)
-   * @see javax.servlet.Filter#destroy()
+  /**
+   * {@inheritDoc}
    */
   public void destroy() {
+    // nothing to do.
   }
 
-  /* (non-Javadoc)
-   * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse,
-   * javax.servlet.FilterChain)
+  /**
+   * Check cookies (or request parameters) in client request, if client has
+   * required cookies (or request parameters) then filter will check is
+   * accessor corresponding to this cookie valid.
+   * If it is user will get access to requested resource.
+   * Addition filter adds request attribute with username.
+   * If there is not required cookies or parameters in request user
+   * will be redirect to provider and authentication process started.
+   * {@inheritDoc}  
    */
   public void doFilter(ServletRequest request, ServletResponse response,
       FilterChain chain) throws IOException, ServletException {
@@ -91,13 +104,13 @@ public class OAuthConsumerFilter implements Filter {
       
       OAuthAccessor accessor = consumerService.getAccessor(oauthMessage);
       if (accessor.accessToken != null) {
-        if (log.isDebugEnabled()) {
-          log.debug("Access grant, oauth_token " + accessor.accessToken
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Access grant, oauth_token " + accessor.accessToken
               + ", oauth_secret_token " + accessor.tokenSecret);
         }
         if (accessor.getProperty("userId") != null) {
-          if (log.isDebugEnabled()) {
-            log.debug("userId " + accessor.getProperty("userId"));
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("userId " + accessor.getProperty("userId"));
           }
           
           UserPrincipal principal = new UserPrincipal((String) accessor.getProperty("userId"));
@@ -108,9 +121,9 @@ public class OAuthConsumerFilter implements Filter {
       }
       if (accessor.requestToken != null) {
         String authorizationURL = accessor.consumer.serviceProvider.userAuthorizationURL;
-        if (log.isDebugEnabled()) { 
-          log.debug("Request token generated, request will be redirected to URL '"
-              + authorizationURL + "' for authorization." );
+        if (LOG.isDebugEnabled()) { 
+          LOG.debug("Request token generated, request will be redirected to URL '"
+              + authorizationURL + "' for authorization.");
         }
         
         httpResponse.setStatus(HttpServletResponse.SC_TEMPORARY_REDIRECT);
@@ -119,6 +132,7 @@ public class OAuthConsumerFilter implements Filter {
         String query = httpRequest.getQueryString();
         if (query != null)
           url += '?' + query;
+        
         httpResponse.setHeader("Location", 
             OAuth.addParameters(authorizationURL,
                 OAuth.OAUTH_TOKEN, accessor.requestToken,
@@ -133,8 +147,9 @@ public class OAuthConsumerFilter implements Filter {
   }
   
 
-  /* (non-Javadoc)
-   * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
+  /**
+   * Get consumer name from filter init parameters.
+   * {@inheritDoc} 
    */
   public void init(FilterConfig config) throws ServletException {
     consumerName = config.getInitParameter("consumer");

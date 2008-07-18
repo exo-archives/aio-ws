@@ -40,8 +40,8 @@ import org.exoplatform.ws.security.oauth.ExoOAuthClient;
  */
 public class OAuthClientHttpImpl implements ExoOAuthClient {
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.ws.security.oauth.ExoOAuthClient#getAccessToken(net.oauth.OAuthAccessor)
+  /**
+   * {@inheritDoc} 
    */
   public void getAccessToken(OAuthAccessor accessor) throws Exception {
     List<OAuth.Parameter> p1 = new ArrayList<OAuth.Parameter>();
@@ -85,8 +85,8 @@ public class OAuthClientHttpImpl implements ExoOAuthClient {
     accessor.requestToken = null;
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.ws.security.oauth.ExoOAuthClient#getRequestToken(net.oauth.OAuthAccessor)
+  /**
+   * {@inheritDoc} 
    */
   public void getRequestToken(OAuthAccessor accessor) throws Exception {
     OAuthMessage request = accessor.newRequestMessage(HTTPMethods.POST,
