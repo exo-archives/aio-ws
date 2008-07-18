@@ -33,11 +33,26 @@ import org.exoplatform.common.transport.SerialResponse;
  */
 public class Main {
 
+  /**
+   * URL of simple service.
+   */
   private static final String URL = "/simple-service/";
+  
+  /**
+   * Bean JNDI name. 
+   */
   private static final String BEAN_NAME = "RestEJBConnector";
 
-  private static final String data = "Hello world";
+  /**
+   * Sample data. 
+   */
+  private static final String DATA = "Hello world";
 
+  /**
+   * Looking for bean.
+   * @return home interface of bean.
+   * @throws Exception if bean can't be found in JNDI context.
+   */
   private RestEJBConnector getBean() throws Exception {
       InitialContext ctx = new InitialContext();
       System.out.println("Looking for " + BEAN_NAME + "...");
@@ -65,7 +80,7 @@ public class Main {
     System.out.println("PUT method (new data)...");
     request.setMethod("PUT");
     request.setUrl(URL);
-    request.setData(new SerialInputData(data.getBytes()));
+    request.setData(new SerialInputData(DATA.getBytes()));
     response = bean.service(request);
     System.out.println(response.getStatus());
     if (response.getData() != null)
@@ -82,7 +97,7 @@ public class Main {
     System.out.println("POS method (change data)...");
     request.setMethod("POST");
     request.setUrl(URL);
-    request.setData(new SerialInputData(new StringBuffer(data).reverse().toString().getBytes()));
+    request.setData(new SerialInputData(new StringBuffer(DATA).reverse().toString().getBytes()));
     response = bean.service(request);
     System.out.println(response.getStatus());
     if (response.getData() != null)
@@ -106,6 +121,11 @@ public class Main {
 
   }
 
+  /**
+   * Print stream data at standard output.
+   * @param in stream.
+   * @throws IOException if i/o error occurs.
+   */
   private static void printStream(InputStream in) throws IOException {
     int rd = -1;
     while ((rd = in.read()) != -1)

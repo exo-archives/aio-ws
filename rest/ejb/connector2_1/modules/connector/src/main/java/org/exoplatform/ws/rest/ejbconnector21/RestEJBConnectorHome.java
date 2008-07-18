@@ -28,6 +28,12 @@ import javax.ejb.EJBHome;
  */
 public interface RestEJBConnectorHome extends EJBHome {
   
+  /**
+   * Home interface.
+   * @return RestEJBConnector. 
+   * @throws RemoteException if remote interface error occurs. 
+   * @throws CreateException if home interface of bean can't be created.
+   */
   RestEJBConnector create() throws RemoteException, CreateException;
   
 }

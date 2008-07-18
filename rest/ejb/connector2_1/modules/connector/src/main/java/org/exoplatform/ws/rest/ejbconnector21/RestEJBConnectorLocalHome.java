@@ -26,6 +26,11 @@ import javax.ejb.EJBLocalHome;
  */
 public interface RestEJBConnectorLocalHome extends EJBLocalHome {
   
+  /**
+   * Local Home interface.
+   * @return RestEJBConnector. 
+   * @throws CreateException if home interface of bean can't be created.
+   */
   RestEJBConnectorLocal create() throws CreateException;
 
 }

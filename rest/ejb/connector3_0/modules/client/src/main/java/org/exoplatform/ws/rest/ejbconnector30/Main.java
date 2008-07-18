@@ -34,26 +34,34 @@ import org.exoplatform.common.transport.SerialResponse;
  */
 public class Main {
 
+  /**
+   * URL of simple service.
+   */
   private static final String URL = "/simple-service/";
 
-  private static final String data = "Hello world";
+  /**
+   * Sample data.
+   */
+  private static final String DATA = "Hello world";
 
-  // ----------------------------
-  // default rules for name easybeans container on Jonas
-  private static final String JNDI_NAME = "org.exoplatform.ws.rest.ejbconnector30.RestEJBConnector" +
-      "_" + RestEJBConnectorRemote.class.getName() + "@Remote";
+  /**
+   * Default name of bean in easybeans container on Jonas.
+   */
+  private static final String JNDI_NAME = "org.exoplatform.ws.rest.ejbconnector30.RestEJBConnector" 
+    + "_" + RestEJBConnectorRemote.class.getName() + "@Remote";
 
-  // for JBoss
-// private static final String JNDI_NAME = "RestEJBConnector/remote";
-  // ----------------------------
-
+  /**
+   * Looking for bean.
+   * @return the home interface of bean.
+   * @throws Exception if bean can't be founf.
+   */
   private RestEJBConnectorRemote getBean() throws Exception {
     Properties env = new Properties();
-// env.put(Context.INITIAL_CONTEXT_FACTORY, "org.objectweb.carol.jndi.spi.MultiOrbInitialContextFactory");
+//    env.put(Context.INITIAL_CONTEXT_FACTORY, "org.objectweb.carol.jndi.spi.MultiOrbInitialContextFactory");
+//    env.put("java.naming.provider.url", "rmi://localhost:1099");
+//    env.put("java.naming.factory.url.pkgs", "org.objectweb.carol.jndi.spi");
     env.put(Context.INITIAL_CONTEXT_FACTORY, "org.ow2.easybeans.component.smartclient.spi.SmartContextFactory");
-// env.put("java.naming.provider.url", "rmi://localhost:1099");
     env.put("java.naming.provider.url", "rmi://localhost:2503");
-// env.put("java.naming.factory.url.pkgs", "org.objectweb.carol.jndi.spi");
 
     InitialContext ctx = new InitialContext(env);
     
@@ -63,10 +71,6 @@ public class Main {
   }
 
   public static void main(String[] args) throws Exception {
-    test();
-  }
-
-  private static void test() throws Exception {
     Main m = new Main();
     SerialRequest request = new SerialRequest();
 
@@ -83,7 +87,7 @@ public class Main {
     System.out.println("PUT method (new data)...");
     request.setMethod("PUT");
     request.setUrl(URL);
-    request.setData(new SerialInputData(data.getBytes()));
+    request.setData(new SerialInputData(DATA.getBytes()));
     response = bean.service(request);
     System.out.println(response.getStatus());
     if (response.getData() != null)
@@ -100,7 +104,7 @@ public class Main {
     System.out.println("POS method (change data)...");
     request.setMethod("POST");
     request.setUrl(URL);
-    request.setData(new SerialInputData(new StringBuffer(data).reverse().toString().getBytes()));
+    request.setData(new SerialInputData(new StringBuffer(DATA).reverse().toString().getBytes()));
     response = bean.service(request);
     System.out.println(response.getStatus());
     if (response.getData() != null)
@@ -121,9 +125,13 @@ public class Main {
     System.out.println(response.getStatus());
     if (response.getData() != null)
       printStream(response.getData().getStream());
-
   }
 
+  /**
+   * Print content of stream to standard output.
+   * @param in the source stream.
+   * @throws IOException if i/o error occurs.
+   */
   private static void printStream(InputStream in) throws IOException {
     int rd = -1;
     while ((rd = in.read()) != -1)

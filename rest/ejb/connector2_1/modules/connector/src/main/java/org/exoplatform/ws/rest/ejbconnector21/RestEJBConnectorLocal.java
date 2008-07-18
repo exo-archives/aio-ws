@@ -31,6 +31,12 @@ import org.exoplatform.common.transport.SerialResponse;
  */
 public interface RestEJBConnectorLocal extends EJBLocalObject {
 
+  /**
+   * Local interface.
+   * @param request SerialRequest. This is special wrapper around REST request, which can be transfer via RMI.
+   * @return SerialResponse. This is special wrapper for REST response, which can be transfer via RMI.
+   * @throws IOException if i/o error occurs.
+   */
   SerialResponse service(SerialRequest request) throws IOException;
   
 }

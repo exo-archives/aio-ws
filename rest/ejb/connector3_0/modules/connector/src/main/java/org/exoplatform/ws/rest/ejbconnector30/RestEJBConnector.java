@@ -62,16 +62,19 @@ import org.exoplatform.services.rest.Response;
 @DeclareRoles({ "admin", "users" })
 public class RestEJBConnector implements RestEJBConnectorRemote, RestEJBConnectorLocal {
 
-  private static final Log log = ExoLogger.getLogger("ws.rest.RestEJBConnector");
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger("ws.rest.RestEJBConnector");
 
+  /**
+   * SessionContext must be injected by EJB container.
+   */
   @Resource
   private SessionContext context;
 
-  /*
-   * (non-Javadoc)
-   * @see
-   * org.exoplatform.ws.rest.ejbconnector3.RestEJBConnector#service(org.exoplatform
-   * .common.transport.SerialRequest)
+  /**
+   * {@inheritDoc}
    */
 //  @PermitAll
   @RolesAllowed({ "admin", "users" })
@@ -79,15 +82,15 @@ public class RestEJBConnector implements RestEJBConnectorRemote, RestEJBConnecto
     ResourceDispatcher dispatcher = (ResourceDispatcher) getContainer().getComponentInstanceOfType(
         ResourceDispatcher.class);
 
-    if (log.isDebugEnabled()) {
+    if (LOG.isDebugEnabled()) {
       if (context != null)
-        log.debug("Caller principal " + context.getCallerPrincipal());
+        LOG.debug("Caller principal " + context.getCallerPrincipal());
       else
-        log.debug("Session context is null");
+        LOG.debug("Session context is null");
     }
 
     if (dispatcher == null) {
-      log.error("ResourceDispatcher not found in container!");
+      LOG.error("ResourceDispatcher not found in container!");
       throw new EJBException("ResourceDispatcher not found in container!");
     }
 
@@ -118,10 +121,6 @@ public class RestEJBConnector implements RestEJBConnectorRemote, RestEJBConnecto
         InputStream in = new FileInputStream(file) {
           private boolean removed = false;
 
-          /*
-           * (non-Javadoc)
-           * @see java.io.FileInputStream#close()
-           */
           @Override
           public void close() throws IOException {
             try {
@@ -132,10 +131,6 @@ public class RestEJBConnector implements RestEJBConnectorRemote, RestEJBConnecto
             }
           }
 
-          /*
-           * (non-Javadoc)
-           * @see java.io.FileInputStream#finalize()
-           */
           @Override
           protected void finalize() throws IOException {
             try {
@@ -155,11 +150,14 @@ public class RestEJBConnector implements RestEJBConnectorRemote, RestEJBConnecto
       return response;
 
     } catch (Exception e) {
-      log.error("This request can't be serve by service. Check request parameters and try again.");
+      LOG.error("This request can't be serve by service. Check request parameters and try again.");
       throw new EJBException("This request can't be serve!", e);
     }
   }
 
+  /**
+   * @return actual ExoContainer.
+   */
   protected ExoContainer getContainer() {
     ExoContainer container = ExoContainerContext.getCurrentContainer();
     if (container instanceof RootContainer)
@@ -168,6 +166,11 @@ public class RestEJBConnector implements RestEJBConnectorRemote, RestEJBConnecto
     return container;
   }
 
+  /**
+   * Create MultivaluedMetadata.
+   * @param map the source map.
+   * @return the MultivaluedMetadata.
+   */
   protected MultivaluedMetadata createMultivaluedMetadata(HashMap<String, String> map) {
     MultivaluedMetadata multivaluedMetadata = new MultivaluedMetadata();
     if (map != null) {
