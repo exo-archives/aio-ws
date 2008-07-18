@@ -27,5 +27,11 @@ import java.io.InputStream;
  * @version $Id: $
  */
 public interface DeserializableEntity {
-  public void readObject(InputStream in) throws IOException;
+  
+  /**
+   * Read object from giveb stream.
+   * @param in InputStream. 
+   * @throws IOException if an I/O error occurs.
+   */
+  void readObject(InputStream in) throws IOException;
 }

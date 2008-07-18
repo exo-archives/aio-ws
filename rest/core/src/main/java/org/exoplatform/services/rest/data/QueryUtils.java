@@ -19,17 +19,23 @@ package org.exoplatform.services.rest.data;
 import org.exoplatform.services.rest.MultivaluedMetadata;
 
 /**
+ * Utils for process query parameters.
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 public final class QueryUtils {
   
-  /*
-   * Class has only static methods.
+  /**
+   * Must not be created.
    */
   private QueryUtils() {
   }
 
+  /**
+   * Transform query string to {@link MultivaluedMetadata} .
+   * @param queryString source string.
+   * @return MultivaluedMetadata.
+   */
   public static MultivaluedMetadata parseQueryString(String queryString) {
     String[] p = queryString.split("&");
     MultivaluedMetadata queryParams = new MultivaluedMetadata();

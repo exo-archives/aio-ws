@@ -35,30 +35,59 @@ import org.exoplatform.services.rest.transformer.StringOutputTransformer;
  * @version $Id: $
  */
 public class Response {
-  private int status_;
-  private Object entity_;
-  private EntityMetadata metadata_;
-  private MultivaluedMetadata responseHeaders_;
-  private List<Cookie> cookies_;
-  private OutputEntityTransformer transformer_;
-  private Map<String, String> transformerParameters_;
+  /**
+   * Response status.
+   */
+  private int status;
+  
+  /**
+   * Response entity. 
+   */
+  private Object entity;
+  
+  /**
+   * Entity metadata.
+   */
+  private EntityMetadata metadata;
+  
+  /**
+   * Response headers.
+   */
+  private MultivaluedMetadata responseHeaders;
+  
+  /**
+   * Cookies.
+   */
+  private List<Cookie> cookies;
+  
+  /**
+   * Output transformer, can be null if response has not entity.
+   */
+  private OutputEntityTransformer transformer;
+  
+  /**
+   * Extra parameters for transformer. 
+   */
+  private Map<String, String> transformerParameters;
 
   /**
    * @param status the HTTP status.
    * @param responseHeaders the HTTP headers.
    * @param entity the representation requested object.
+   * @param cookies the cookies.
    * @param transformer the entity serializator.
+   * @param transformerParameters the additional parameters for transformer. 
    */
   protected Response(int status, MultivaluedMetadata responseHeaders,
       Object entity, List<Cookie> cookies, OutputEntityTransformer transformer,
       Map<String, String> transformerParameters) {
-    status_ = status;
-    responseHeaders_ = responseHeaders;
-    entity_ = entity;
-    cookies_ = cookies;
-    transformer_ = transformer;
-    transformerParameters_ = transformerParameters;
-    metadata_ = new EntityMetadata(responseHeaders);
+    this.status = status;
+    this.responseHeaders = responseHeaders;
+    this.entity = entity;
+    this.cookies = cookies;
+    this.transformer = transformer;
+    this.transformerParameters = transformerParameters;
+    this.metadata = new EntityMetadata(responseHeaders);
   }
 
   /**
@@ -66,7 +95,7 @@ public class Response {
    * @return the HTTP status.
    */
   public int getStatus() {
-    return status_;
+    return status;
   }
 
   /**
@@ -74,7 +103,7 @@ public class Response {
    * @return the HTTP headers for response
    */
   public MultivaluedMetadata getResponseHeaders() {
-    return responseHeaders_;
+    return responseHeaders;
   }
 
   /**
@@ -82,28 +111,27 @@ public class Response {
    * @return the entity
    */
   public Object getEntity() {
-    return entity_;
+    return entity;
   }
   
   /**
    * @return the cookies that will be added to response. 
    */
   public List<Cookie> getCookies() {
-    return cookies_;
+    return cookies;
   }
 
   /**
    * EntityMetadata gives possibility to view some response headers by use
    * method get.<br/> For example:<br/>
-   * 
    * <pre>
    * metadata.getMediaType()
    * </pre> - Content-Type header.
-   * @return
+   * @return the entity meta data.
    * @see org.exoplatform.services.rest.EntityMetadata.
    */
   public EntityMetadata getEntityMetadata() {
-    return metadata_;
+    return metadata;
   }
 
   /**
@@ -111,11 +139,7 @@ public class Response {
    * @return the state of OutputEntityTransformer.
    */
   public boolean isTransformerInitialized() {
-    return transformer_ != null;
-//    if (transformer_ != null) {
-//      return true;
-//    }
-//    return false;
+    return transformer != null;
   }
 
   /**
@@ -123,11 +147,7 @@ public class Response {
    * @return the entity state.
    */
   public boolean isEntityInitialized() {
-    return entity_ != null;
-//    if (entity_ != null) {
-//      return true;
-//    }
-//    return false;
+    return entity != null;
   }
   
   /**
@@ -136,7 +156,7 @@ public class Response {
    * @return OutputEntityTransformer parameters;
    */
   public Map<String, String> getTransformerParameters() {
-    return transformerParameters_;
+    return transformerParameters;
   }
 
   /**
@@ -144,7 +164,7 @@ public class Response {
    * @param transformer the transformer which can serialize entity.
    */
   public void setTransformer(OutputEntityTransformer transformer) {
-    this.transformer_ = transformer;
+    this.transformer = transformer;
   }
 
   /**
@@ -153,9 +173,8 @@ public class Response {
    * @throws IOException Input/Output Exception.
    */
   public void writeEntity(OutputStream outputEntityStream) throws IOException {
-//    if (transformer_ != null) {
     if (isTransformerInitialized() && isEntityInitialized()) {
-      transformer_.writeTo(entity_, outputEntityStream);
+      transformer.writeTo(entity, outputEntityStream);
     }
   }
 
@@ -164,7 +183,7 @@ public class Response {
    * @return transformer the transformer which can serialize entity
    */
   public OutputEntityTransformer getTransformer() {
-    return transformer_;
+    return transformer;
   }
 
   /**
@@ -172,13 +191,39 @@ public class Response {
    */
   public static class Builder {
 
-    int status;
-    Object entity;
-    MultivaluedMetadata responseHeaders = new MultivaluedMetadata();
-    List<Cookie> cookies;
-    OutputEntityTransformer transformer;
-    Map<String, String> transformerParameters;
+    /**
+     * HTTP status.
+     */
+    private int status;
+    
+    /**
+     * Entity data. 
+     */
+    private Object entity;
+    
+    /**
+     * HTTP headers.
+     */
+    private MultivaluedMetadata responseHeaders = new MultivaluedMetadata();
+    
+    /**
+     * Cookies.
+     */
+    private List<Cookie> cookies;
+    
+    /**
+     * Entity output transformer.
+     */
+    private OutputEntityTransformer transformer;
+    
+    /**
+     * Additional parameters for transformer. 
+     */
+    private Map<String, String> transformerParameters;
 
+    /**
+     * Must not be visible for external class.
+     */
     protected Builder() {
     }
 
@@ -474,7 +519,7 @@ public class Response {
 
     /**
      * set Content-Length header.
-     * @param Content-Length size of data in bytes.
+     * @param length the size of data in bytes.
      * @return the Builder with added "Content-Length" header.
      */
     public Builder contentLenght(long length) {
@@ -535,7 +580,7 @@ public class Response {
     }
 
     /**
-     * @param c
+     * @param c the CacheControl.
      * @see org.exoplatform.services.rest.CacheControl.
      * @return the Builder with added Cache-Control header.
      */
@@ -546,13 +591,13 @@ public class Response {
     
     /**
      * Add new cookies.
-     * @param cookies the new cookies that will be added to response.
+     * @param cc the new cookies that will be added to response.
      * @return the Builder instance.
      */
-    public Builder cookies(Cookie... cookies) {
+    public Builder cookies(Cookie... cc) {
       if (this.cookies == null)
-        this.cookies = new ArrayList<Cookie>(cookies.length);
-      for (Cookie c : cookies)
+        this.cookies = new ArrayList<Cookie>(cc.length);
+      for (Cookie c : cc)
         this.cookies.add(c);
       return this;
     }

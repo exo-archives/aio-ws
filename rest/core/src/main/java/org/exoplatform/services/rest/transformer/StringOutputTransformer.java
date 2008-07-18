@@ -27,10 +27,8 @@ import java.io.OutputStream;
  */
 public class StringOutputTransformer extends OutputEntityTransformer {
 
-  /*
-   * (non-Javadoc)
-   * @see org.exoplatform.services.rest.transformer.OutputEntityTransformer#writeTo(
-   *      java.lang.Object, java.io.OutputStream)
+  /**
+   * {@inheritDoc}}
    */
   @Override
   public final void writeTo(final Object entity, final OutputStream entityDataStream)

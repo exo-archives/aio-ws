@@ -24,50 +24,119 @@ import java.util.Map;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-class AnnotationUtils {
+final class AnnotationUtils {
   
+  /**
+   * Utility class. Must not be created.
+   */
+  private AnnotationUtils() {
+  }
+  
+  /**
+   * Known annotation types.
+   */
   public enum Anno {
     // method's annotations
+    
+    /**
+     * HTTP method, @see {@link HTTPMethod} .
+     */
     HTTP_METHOD,
+    
+    /**
+     * URI template, see {@link URITemplate} .
+     */
     URI_TEMPLATE,
+
+    /**
+     * Query template, see {@link QueryTemplate} .
+     */
     QUERY_TEMPLATE,
+
+    /**
+     * see {@link ConsumedMimeTypes} .
+     */
     CONSUMED_MIMETYPES,
+    
+    /**
+     * see {@link ProducedMimeTypes} .
+     */
     PRODUCED_MIMETYPES, 
+    
+    /**
+     * see {@link InputTransformer} .
+     */
     INPUT_TRANSFORMER,
+    
+    /**
+     * see {@link OutputTransformer} .
+     */
     OUTPUT_TRANSFORMER,
     
     // method's parameters annotations
+    
+    /**
+     * @see {@link URIParam} .
+     */
     URI_PARAM,
+    
+    /**
+     * see {@link QueryParam} .
+     */
     QUERY_PARAM,
+    
+    /**
+     * see {@link HeaderParam} .
+     */
     HEADER_PARAM,
+    
+    /**
+     * @see {@link CookieParam} .
+     */
     COOKIE_PARAM,
+    
+    /**
+     * @see {@link ContextParam} .
+     */
     CONTEXT_PARAM
   }
   
-  private static final Map<String, Anno> knownAnno =
-    new HashMap<String, Anno>(); 
+  /**
+   * Mapping annotations class name to enum.
+   */
+  private static final Map<String, Anno> KNOWN_ANNO = new HashMap<String, Anno>(); 
   
   static {
-    knownAnno.put(ConsumedMimeTypes.class.getName(), Anno.CONSUMED_MIMETYPES);
-    knownAnno.put(ContextParam.class.getName(), Anno.CONTEXT_PARAM);
-    knownAnno.put(CookieParam.class.getName(), Anno.COOKIE_PARAM);
-    knownAnno.put(HeaderParam.class.getName(), Anno.HEADER_PARAM);
-    knownAnno.put(HTTPMethod.class.getName(), Anno.HTTP_METHOD);
-    knownAnno.put(InputTransformer.class.getName(), Anno.INPUT_TRANSFORMER);
-    knownAnno.put(OutputTransformer.class.getName(), Anno.OUTPUT_TRANSFORMER);
-    knownAnno.put(ProducedMimeTypes.class.getName(), Anno.PRODUCED_MIMETYPES);
-    knownAnno.put(QueryParam.class.getName(), Anno.QUERY_PARAM);
-    knownAnno.put(QueryTemplate.class.getName(), Anno.QUERY_TEMPLATE);
-    knownAnno.put(URIParam.class.getName(), Anno.URI_PARAM);
-    knownAnno.put(URITemplate.class.getName(), Anno.URI_TEMPLATE);
+    KNOWN_ANNO.put(ConsumedMimeTypes.class.getName(), Anno.CONSUMED_MIMETYPES);
+    KNOWN_ANNO.put(ContextParam.class.getName(), Anno.CONTEXT_PARAM);
+    KNOWN_ANNO.put(CookieParam.class.getName(), Anno.COOKIE_PARAM);
+    KNOWN_ANNO.put(HeaderParam.class.getName(), Anno.HEADER_PARAM);
+    KNOWN_ANNO.put(HTTPMethod.class.getName(), Anno.HTTP_METHOD);
+    KNOWN_ANNO.put(InputTransformer.class.getName(), Anno.INPUT_TRANSFORMER);
+    KNOWN_ANNO.put(OutputTransformer.class.getName(), Anno.OUTPUT_TRANSFORMER);
+    KNOWN_ANNO.put(ProducedMimeTypes.class.getName(), Anno.PRODUCED_MIMETYPES);
+    KNOWN_ANNO.put(QueryParam.class.getName(), Anno.QUERY_PARAM);
+    KNOWN_ANNO.put(QueryTemplate.class.getName(), Anno.QUERY_TEMPLATE);
+    KNOWN_ANNO.put(URIParam.class.getName(), Anno.URI_PARAM);
+    KNOWN_ANNO.put(URITemplate.class.getName(), Anno.URI_TEMPLATE);
   }
   
+  /**
+   * Check is annotation known.
+   * @param clazz the annotation class.
+   * @return true if annotation is known, false otherwise.
+   */
   public static boolean isKnownType(Class<?> clazz) {
-    return knownAnno.get(clazz.getName()) != null;
+    return KNOWN_ANNO.get(clazz.getName()) != null;
   }
   
+  /**
+   * Get enum type which is corresponded to aonnotation class.
+   * @param clazz the annotation class.
+   * @return enum type.
+   */
   public static Anno getType(Class<?> clazz) {
-    return knownAnno.get(clazz.getName());
+    return KNOWN_ANNO.get(clazz.getName());
   }
 
 }

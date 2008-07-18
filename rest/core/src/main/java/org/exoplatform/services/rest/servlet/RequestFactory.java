@@ -36,15 +36,18 @@ import org.exoplatform.services.rest.ResourceIdentifier;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class RequestFactory {
+public final class RequestFactory {
 
-  /*
-   * Class has only static methods.
+  /**
+   * Must not be created.
    */
   private RequestFactory() {
   }
   
-  private static final Log log = ExoLogger.getLogger("ws.rest.core.RequestFactory");
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger("ws.rest.core.RequestFactory");
 
   /**
    * Create REST request.
@@ -63,19 +66,19 @@ public class RequestFactory {
     InputStream in = httpRequest.getInputStream();
     String port = (httpRequest.getServerPort() == 80) ? "" : ":" + httpRequest.getServerPort();
 
-    String baseURI = httpRequest.getScheme() + "://" +
-        httpRequest.getServerName() + port + httpRequest.getContextPath() +
-        httpRequest.getServletPath();
+    String baseURI = httpRequest.getScheme() + "://"
+        + httpRequest.getServerName() + port + httpRequest.getContextPath()
+        + httpRequest.getServletPath();
 
     ResourceIdentifier identifier = new ResourceIdentifier(httpRequest
         .getServerName(), baseURI, pathInfo);
     return new Request(in, identifier, method, headerParams, queryParams, cookies);
   }
 
-  /* Parse headers from HTTP request.
+  /**
+   * Parse headers from HTTP request.
    * @param httpRequest HttpServletRequest.
-   * @return Map provide HTTP header in structure Map &lt; String, Enumeration
-   *         &lt; String &gt; &gt;.
+   * @return MultivaluedMetadata.
    */
   private static MultivaluedMetadata parseHttpHeaders(
       HttpServletRequest httpRequest) {
@@ -86,18 +89,18 @@ public class RequestFactory {
       Enumeration<?> e = httpRequest.getHeaders(k);
       while (e.hasMoreElements()) {
         headerParams.putSingle(k, (String) e.nextElement());
-        if (log.isDebugEnabled()) {
-          log.debug(k + " = " + headerParams.get(k));
+        if (LOG.isDebugEnabled()) {
+          LOG.debug(k + " = " + headerParams.get(k));
         }
       }
     }
     return headerParams;
   }
 
-  /* Parse query parameters from HTTP request.
+  /**
+   * Parse query parameters from HTTP request.
    * @param httpRequest HttpServletRequest.
-   * @return Map provide HTTP query parameters in structure Map &gt; String,
-   *         String[] &gt;.
+   * @return MultivaluedMetadata.
    */
   private static MultivaluedMetadata parseQueryParams(
       HttpServletRequest httpRequest) {
@@ -108,14 +111,19 @@ public class RequestFactory {
       String[] params = httpRequest.getParameterValues(k);
       for (int i = 0; i < params.length; i++) {
         queryParams.putSingle(k, params[i]);
-        if (log.isDebugEnabled()) {
-          log.debug(k + " = " + params[i]);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug(k + " = " + params[i]);
         }
       }
     }
     return queryParams;
   }
   
+  /**
+   * Get cookies from request.
+   * @param httpRequest HttpServletRequest.
+   * @return MultivaluedMetadata.
+   */
   private static Map<String, org.exoplatform.services.rest.Cookie> getCookies(
       HttpServletRequest httpRequest) {
     javax.servlet.http.Cookie[] sc = httpRequest.getCookies();
@@ -129,8 +137,8 @@ public class RequestFactory {
             c.getPath(), c.getDomain(), c.getVersion());
       if (c.getComment() != null)
         cookie.setComment(c.getComment());
-      if (log.isDebugEnabled()) {
-        log.debug("Cookie found in request: " + c);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Cookie found in request: " + c);
       }
       /* Cookie name to lower case, it must be case insensitive.
        */

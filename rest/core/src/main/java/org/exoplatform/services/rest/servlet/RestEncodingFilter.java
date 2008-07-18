@@ -27,35 +27,38 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 /**
- * Created by The eXo Platform SARL Author : Volodymyr Krasnikov
- * volodymyr.krasnikov@exoplatform.com.ua
+ * @author <a href="mailto:volodymyr.krasnikov@exoplatform.com.ua">Volodymyr Krasnikov</a>
  */
 public class RestEncodingFilter implements Filter {
 
-  private String requestEncodings_;
+  /**
+   * Request encoding.
+   */
+  private String requestEncodings;
 
-  /* (non-Javadoc)
-   * @see javax.servlet.Filter#destroy()
+  /**
+   * {@inheritDoc}
    */
   public void destroy() {
+    // nothing to do.
   }
 
-  /* (non-Javadoc)
-   * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
-   * javax.servlet.ServletResponse, javax.servlet.FilterChain)
+  /**
+   * Set character encoding.
+   * {@inheritDoc}
    */
   public void doFilter(ServletRequest req, ServletResponse resp, FilterChain filterChain)
       throws IOException, ServletException {
-    if (req.getCharacterEncoding() == null && requestEncodings_ != null)
-      req.setCharacterEncoding(requestEncodings_);
+    if (req.getCharacterEncoding() == null && requestEncodings != null)
+      req.setCharacterEncoding(requestEncodings);
     filterChain.doFilter(req, resp);
   }
 
-  /* (non-Javadoc)
-   * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
+  /**
+   * {@inheritDoc}
    */
   public void init(FilterConfig config) throws ServletException {
-    requestEncodings_ = config.getInitParameter("REQUEST_ENCODING");
+    requestEncodings = config.getInitParameter("REQUEST_ENCODING");
   }
 
 }

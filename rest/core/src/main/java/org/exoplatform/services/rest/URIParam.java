@@ -44,5 +44,8 @@ import java.lang.annotation.Target;
 @Target(value = { PARAMETER })
 @Retention(RUNTIME)
 public @interface URIParam {
+  /**
+   * Get name of URI parameter. 
+   */
   String value();
 }

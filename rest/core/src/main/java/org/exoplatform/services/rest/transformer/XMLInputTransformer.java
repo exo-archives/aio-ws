@@ -31,6 +31,9 @@ import org.xml.sax.SAXException;
  */
 public class XMLInputTransformer extends InputEntityTransformer {
 
+  /**
+   * {@inheritDoc}}
+   */
   @Override
   public final Document readFrom(final InputStream entityDataStream)
       throws IOException {

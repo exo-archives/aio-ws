@@ -29,14 +29,13 @@ import java.io.IOException;
  */
 public class DeserializableTransformer extends InputEntityTransformer {
 
-  /*
-   * (non-Javadoc)
-   * @see org.exoplatform.services.rest.transformer.InputEntityTransformer#readFrom(java.io.InputStream)
+  /**
+   * {@inheritDoc}
    */
   public final DeserializableEntity readFrom(final InputStream entityDataStream)
       throws IOException {
     try {
-      DeserializableEntity e = (DeserializableEntity) entityType_.newInstance();
+      DeserializableEntity e = (DeserializableEntity) entityType.newInstance();
       e.readObject(entityDataStream);
       return e;
     } catch (IllegalAccessException iae) {

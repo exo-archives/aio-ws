@@ -34,10 +34,8 @@ import org.w3c.dom.Document;
  */
 public class XMLOutputTransformer extends OutputEntityTransformer {
 
-  /*
-   * (non-Javadoc)
-   * @see org.exoplatform.services.rest.transformer.OutputEntityTransformer#writeTo
-   *      (java.lang.Object, java.io.OutputStream)
+  /**
+   * {@inheritDoc}}
    */
   @Override
   public final void writeTo(final Object entity, final OutputStream entityDataStream)

@@ -29,9 +29,8 @@ import java.io.InputStream;
  */
 public class PassthroughInputTransformer extends InputEntityTransformer {
 
-  /*
-   * (non-Javadoc)
-   * @see org.exoplatform.services.rest.transformer.InputEntityTransformer#readFrom(java.io.InputStream)
+  /**
+   * {@inheritDoc}} .
    */
   @Override
   public final Object readFrom(final InputStream entityDataStream)

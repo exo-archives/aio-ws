@@ -34,5 +34,8 @@ import org.exoplatform.services.rest.transformer.InputEntityTransformer;
 @Retention(RUNTIME)
 @Target({ TYPE, METHOD })
 public @interface InputTransformer {
+  /**
+   * Get class of input transformer.
+   */
   Class<? extends InputEntityTransformer> value();
 }

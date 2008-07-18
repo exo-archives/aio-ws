@@ -49,127 +49,211 @@ import org.mortbay.jetty.servlet.ServletHolder;
  */
 public class StandaloneRestServer implements Startable {
 
-  private static final Log log = ExoLogger.getLogger("StandaloneRestServer");
-  private static final String[] DUMMY_ROLES = new String[] { "user" };
-  private static final String REALM = "exo-realm";
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger("StandaloneRestServer");
+  
+  /**
+   * User roles list. 
+   */
+  private static final String[] DUMMY_ROLES = new String[] {"users"};
+  
+  /**
+   * Security domain.
+   */
+  private static final String REALM = "exo-domain";
+  
+  /**
+   * Prefix for filter declaration in configuration.
+   */
   private static final String CONFIG_FILTER_NAME_PREFIX = "filter-class";
+  
+  /**
+   * Prefix for filter mapping declaration in configuration.
+   */
   private static final String CONFIG_FILTER_MAPPING_PREFIX = "filter-mapping";
+  
+  /**
+   * Server port description in configuration. 
+   */
   private static final String CONFIG_SERVER_PORT = "server-port";
+  
+  /**
+   * Context path for rest servlet. 
+   */
   private static final String CONFIG_CONTEXT_PATH = "context-path";
+  
+  /**
+   * Servlet mapping for rest servlet.
+   */
   private static final String CONFIG_SERVLET_MAPPING = "servlet-mapping";
+  
+  /**
+   * Authentication type declaration in configuration. 
+   */
   private static final String CONFIG_AUTHENTICATION = "authentication";
-  private static final String CONFIG_LOGIN_MODULE_NAME = "login-module-name";
+  
+  /**
+   * Login module configuration.
+   */
+  private static final String LOGIN_MODULE = "login-module";
+  
+  /**
+   * Security constraint mapping. 
+   */
   private static final String CONFIG_SECURITY_CONSTRAINT_MAPPING = "security-constraint-mapping";
+  
+  /**
+   * Actual server port.
+   */
   private final int port;
+  
+  /**
+   * Authentication type. 
+   */
   private final String authentication;
-  private final String loginModuleName;
+  
+  /**
+   * Login module.
+   */
+  private final String loginModule;
+  
+  /**
+   * Servlet context.
+   */
   private final String servletContextPath;
+  
+  /**
+   * Servlet URL pattern.
+   */
   private final String servletURIPattern;
+  
+  /**
+   * Security constraint URL pattern.
+   */
   private final String securityConstraintURIPattern;
+  
+  /**
+   * Filters URI paterns.
+   */
   private final List<String> filterURIPatterns;
+  
+  /**
+   * Filters.
+   */
   private final List<String> filters;
+  
+  /**
+   * Server.
+   */
   private Server server;
 
+  /**
+   * @param initParams initialize parameters. 
+   */
   public StandaloneRestServer(InitParams initParams) {
-    PropertiesParam params = initParams
-        .getPropertiesParam("standalone-rest-server.properties");
+    PropertiesParam params = initParams.getPropertiesParam("standalone-rest-server.properties");
 
     Iterator<Property> iterator = params.getPropertyIterator();
     filters = new ArrayList<String>();
     filterURIPatterns = new ArrayList<String>();
+    
     for (int i = 0; iterator.hasNext(); i++) {
       Property f = iterator.next();
       String pname = f.getName();
       if (pname.startsWith(CONFIG_FILTER_NAME_PREFIX)) {
         filters.add(f.getValue());
-        log.info("Filter: " + f.getValue());
-        String fmap = params.getProperty(CONFIG_FILTER_MAPPING_PREFIX +
-            pname.substring(CONFIG_FILTER_NAME_PREFIX.length()));
-        filterURIPatterns.add((fmap != null) ? fmap : "/*");
-        log.info("Filter mapping: " + fmap);
+        LOG.info("Filter: " + f.getValue());
+        String fmap = params.getProperty(CONFIG_FILTER_MAPPING_PREFIX
+            +  pname.substring(CONFIG_FILTER_NAME_PREFIX.length()));
+        filterURIPatterns.add(fmap != null ? fmap : "/*");
+        LOG.info("Filter mapping: " + fmap);
       }
     }
 
-    port = (params.getProperty(CONFIG_SERVER_PORT) != null) ? Integer
-        .valueOf(params.getProperty(CONFIG_SERVER_PORT)) : 8080;
-    if (log.isDebugEnabled()) {
-      log.debug("port: " + port);
+    port = params.getProperty(CONFIG_SERVER_PORT) != null
+        ? Integer.valueOf(params.getProperty(CONFIG_SERVER_PORT)) : 8080;
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("port: " + port);
     }
 
     servletContextPath = params.getProperty(CONFIG_CONTEXT_PATH);
     if (servletContextPath == null) {
       throw new NullPointerException("ContextPath is null");
     }
-    if (log.isDebugEnabled()) {
-      log.debug("RestServlet ContextPath: " + servletContextPath);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("RestServlet ContextPath: "
+          + servletContextPath);
     }
 
-    servletURIPattern = (params.getProperty(CONFIG_SERVLET_MAPPING) != null) ? params
-        .getProperty(CONFIG_SERVLET_MAPPING)
-        : "/*";
-    if (log.isDebugEnabled()) {
-      log.debug("RestServlet URI pattern: " + servletURIPattern);
+    servletURIPattern = params.getProperty(CONFIG_SERVLET_MAPPING) != null
+        ? params.getProperty(CONFIG_SERVLET_MAPPING) : "/*";
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("RestServlet URI pattern: " + servletURIPattern);
     }
 
-    authentication = (params.getProperty(CONFIG_AUTHENTICATION) != null) ? params
-        .getProperty(CONFIG_AUTHENTICATION)
-        : "BASIC";
-    if (log.isDebugEnabled()) {
-      log.debug("Authentication: " + authentication);
+    authentication = params.getProperty(CONFIG_AUTHENTICATION) != null
+        ? params.getProperty(CONFIG_AUTHENTICATION) : "BASIC";
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Authentication: " + authentication);
     }
 
-    loginModuleName = (params.getProperty(CONFIG_LOGIN_MODULE_NAME) != null) ? params
-        .getProperty(CONFIG_LOGIN_MODULE_NAME)
-        : "exo-domain";
-    if (log.isDebugEnabled()) {
-      log.debug("Login module: " + loginModuleName);
+    loginModule = params.getProperty(LOGIN_MODULE) != null
+        ? params.getProperty(LOGIN_MODULE) : "exo-domain";
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Login module: " + loginModule);
     }
 
-    securityConstraintURIPattern = (params
-        .getProperty(CONFIG_SECURITY_CONSTRAINT_MAPPING) != null) ? params
-        .getProperty(CONFIG_SECURITY_CONSTRAINT_MAPPING) : "/*";
-    if (log.isDebugEnabled()) {
-      log.debug("Security constraint URI pattern: " +
-          securityConstraintURIPattern);
+    securityConstraintURIPattern = params.getProperty(CONFIG_SECURITY_CONSTRAINT_MAPPING) != null
+        ? params.getProperty(CONFIG_SECURITY_CONSTRAINT_MAPPING) : "/*";
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Security constraint URI pattern: "
+          + securityConstraintURIPattern);
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * @see org.picocontainer.Startable#start()
+  /**
+   * Server starter.
+   * {@inheritDoc}
    */
   public void start() {
     server = createServer();
     try {
       server.start();
-      log.info("StandaloneRestServer started.");
+      LOG.info("StandaloneRestServer started.");
     } catch (Exception e) {
-      log.error("Start StandaloneRestServer failed!");
+      LOG.error("Start StandaloneRestServer failed!");
       e.printStackTrace();
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * @see org.picocontainer.Startable#stop()
+  /**
+   * Server destroy.
+   * {@inheritDoc}
    */
   public void stop() {
     try {
       server.stop();
-      log.info("StandaloneRestServer stoped.");
+      LOG.info("StandaloneRestServer stoped.");
     } catch (Exception e) {
-      log.error("Stop StandaloneRestServer failed!");
+      LOG.error("Stop StandaloneRestServer failed!");
     }
   }
 
+  /**
+   * @return instance of server.
+   */
   public Server getServer() {
     return server;
   }
 
-  private Server createServer() {// throws Exception {
-    // create context
-    Server server_ = new Server(port);
-    Context context = new Context(server_, servletContextPath, Context.SESSIONS);
+  /**
+   * @return create server instance.
+   */
+  private Server createServer() {
+    Server ser = new Server(port);
+    Context context = new Context(ser, servletContextPath, Context.SESSIONS);
     context.setSecurityHandler(createSecurityHandler());
     ServletHolder holder = new ServletHolder(new RestServlet());
     context.addServlet(holder, servletURIPattern);
@@ -177,10 +261,13 @@ public class StandaloneRestServer implements Startable {
     for (String filter : filters) {
       context.addFilter(filter, filterURIPatterns.get(i++), Context.SESSIONS);
     }
-    return server_;
+    return ser;
 
   }
 
+  /**
+   * @return security handler for server.
+   */
   private SecurityHandler createSecurityHandler() {
     // create security constraint for RestServlet
     Constraint constraint = new Constraint();
@@ -192,13 +279,13 @@ public class StandaloneRestServer implements Startable {
     mapping.setConstraint(constraint);
     // create realm and security handler for RestServlet
     JAASUserRealm jaasUserRealm = new JAASUserRealm(REALM);
-    jaasUserRealm.setLoginModuleName(loginModuleName);
+    jaasUserRealm.setLoginModuleName(loginModule);
     jaasUserRealm.setCallbackHandlerClass(DefaultCallbackHandler.class
         .getName());
     jaasUserRealm.setRoleCheckPolicy(new DummyRoleCheckPolicy());
     SecurityHandler securityHandler = new SecurityHandler();
     securityHandler.setUserRealm(jaasUserRealm);
-    securityHandler.setConstraintMappings(new ConstraintMapping[] { mapping });
+    securityHandler.setConstraintMappings(new ConstraintMapping[] {mapping});
     return securityHandler;
   }
 
@@ -207,10 +294,9 @@ public class StandaloneRestServer implements Startable {
    */
   static class DummyRoleCheckPolicy implements RoleCheckPolicy {
 
-    /*
-     * (non-Javadoc)
-     * @see org.mortbay.jetty.plus.jaas.RoleCheckPolicy#checkRole(
-     *      java.lang.String, java.security.Principal, java.security.acl.Group)
+    /**
+     * Check user roles.
+     * {@inheritDoc}
      */
     public boolean checkRole(String role, Principal userPrincipal, Group group) {
       // always true

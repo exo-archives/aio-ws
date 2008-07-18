@@ -46,12 +46,29 @@ import org.exoplatform.services.rest.container.ResourceContainerResolvingStrateg
  */
 public class ResourceBinder implements Startable {
 
-  private List<ResourceDescriptor> resourceDescriptors_;
-  private List<ResourceContainerResolvingStrategy> bindStrategies_;
-  private ExoContainerContext containerContext_;
-  private ExoContainer container_;
-  private static final Log log = ExoLogger.getLogger("ws.rest.core.ResourceBinder");
+  /**
+   * Collections of resource descriptors.
+   */
+  private List<ResourceDescriptor> resourceDescriptors;
+  
+  /**
+   * Resolving strategies.
+   */
+  private List<ResourceContainerResolvingStrategy> bindStrategies;
+  
+  /**
+   * Container context.
+   */
+  private ExoContainerContext containerContext;
+  
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger("ws.rest.core.ResourceBinder");
 
+  /**
+   * Comparator for ResourceDescriptors.
+   */
   private static final ResourceDescriptorComparator COMPARATOR = new ResourceDescriptorComparator();
   
   /** 
@@ -59,8 +76,10 @@ public class ResourceBinder implements Startable {
    */
   private static class ResourceDescriptorComparator implements Comparator<ResourceDescriptor> {
 
-    /* (non-Javadoc)
-     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+    /**
+     * Compare two ResourceDescriptors by number of URI parameters.
+     * If number of URI parameters are the same then compare by Query parameters.
+     * {@inheritDoc}
      */
     public int compare(ResourceDescriptor resourceDescriptor1,
         ResourceDescriptor resourceDescriptor2) {
@@ -108,16 +127,16 @@ public class ResourceBinder implements Startable {
   public ResourceBinder(InitParams params, ExoContainerContext containerContext)
       throws Exception {
 
-    this.containerContext_ = containerContext;
-    this.resourceDescriptors_ = new ArrayList<ResourceDescriptor>();
-    this.bindStrategies_ = new ArrayList<ResourceContainerResolvingStrategy>();
+    this.containerContext = containerContext;
+    this.resourceDescriptors = new ArrayList<ResourceDescriptor>();
+    this.bindStrategies = new ArrayList<ResourceContainerResolvingStrategy>();
 
     Iterator<ValueParam> i = params.getValueParamIterator();
     while (i.hasNext()) {
       ValueParam v = i.next();
       ResourceContainerResolvingStrategy rs = (ResourceContainerResolvingStrategy) Class
           .forName(v.getValue()).newInstance();
-      bindStrategies_.add(rs);
+      bindStrategies.add(rs);
     }
   }
 
@@ -146,12 +165,12 @@ public class ResourceBinder implements Startable {
    */
   final public synchronized void bind(final ResourceContainer resourceCont)
       throws InvalidResourceDescriptorException {
-    for (ResourceContainerResolvingStrategy strategy : bindStrategies_) {
+    for (ResourceContainerResolvingStrategy strategy : bindStrategies) {
       List<ResourceDescriptor> resList = strategy.resolve(resourceCont);
       validate(resList);
-      resourceDescriptors_.addAll(resList);
-      log.info("Bind new ResourceContainer: " + resourceCont);
-      Collections.sort(resourceDescriptors_, COMPARATOR);
+      resourceDescriptors.addAll(resList);
+      LOG.info("Bind new ResourceContainer: " + resourceCont);
+      Collections.sort(resourceDescriptors, COMPARATOR);
     }
 //    int i = 1;
 //    for (ResourceDescriptor r : resourceDescriptors_) {
@@ -165,12 +184,12 @@ public class ResourceBinder implements Startable {
    * @param resourceCont the ResourceContainer which should be unbinded.
    */
   final public synchronized void unbind(final ResourceContainer resourceCont) {
-    Iterator<ResourceDescriptor> iter = resourceDescriptors_.iterator();
+    Iterator<ResourceDescriptor> iter = resourceDescriptors.iterator();
     while (iter.hasNext()) {
       ResourceDescriptor resource = iter.next();
       if (resource.getResourceContainer().equals(resourceCont)) {
         iter.remove();
-        log.info("Remove ResourceContainer " + resourceCont);
+        LOG.info("Remove ResourceContainer " + resourceCont);
       }
     }
   }
@@ -180,12 +199,12 @@ public class ResourceBinder implements Startable {
    * @param className the class name.
    */
   final public synchronized void unbind(final String className) {
-    Iterator<ResourceDescriptor> iter = resourceDescriptors_.iterator();
+    Iterator<ResourceDescriptor> iter = resourceDescriptors.iterator();
     while (iter.hasNext()) {
       ResourceDescriptor resource = iter.next();
       if (className.equals(resource.getResourceContainer().getClass().getName())) {
         iter.remove();
-        log.info("Remove ResourceContainer " + resource.getResourceContainer());
+        LOG.info("Remove ResourceContainer " + resource.getResourceContainer());
       }
     }
   }
@@ -194,14 +213,14 @@ public class ResourceBinder implements Startable {
    * Clear the list of ResourceContainer description.
    */
   final public void clear() {
-    this.resourceDescriptors_.clear();
+    this.resourceDescriptors.clear();
   }
 
   /**
    * @return all resources descriptors.
    */
   final public List<ResourceDescriptor> getAllDescriptors() {
-    return this.resourceDescriptors_;
+    return this.resourceDescriptors;
   }
 
   /**
@@ -219,7 +238,7 @@ public class ResourceBinder implements Startable {
       String newHTTPMethod = newDescriptor.getAcceptableMethod();
       MultivaluedMetadata newQueryPattern = newDescriptor.getQueryPattern();
 
-      for (ResourceDescriptor storedDescriptor : resourceDescriptors_) {
+      for (ResourceDescriptor storedDescriptor : resourceDescriptors) {
         URIPattern srotedPattern = storedDescriptor.getURIPattern();
         String storedHTTPMethod = storedDescriptor.getAcceptableMethod();
         MultivaluedMetadata storedQueryPattern = storedDescriptor
@@ -369,14 +388,14 @@ public class ResourceBinder implements Startable {
    * @see org.picocontainer.Startable#start()
    */
   public void start() {
-    container_ = containerContext_.getContainer();
-    List<ResourceContainer> list = container_
+    ExoContainer container = containerContext.getContainer();
+    List<ResourceContainer> list = container
         .getComponentInstancesOfType(ResourceContainer.class);
     for (ResourceContainer c : list) {
       try {
         bind(c);
       } catch (InvalidResourceDescriptorException irde) {
-        log.error("Can't add ResourceContainer Component: " +
+        LOG.error("Can't add ResourceContainer Component: " +
             c.getClass().getName() + ".\nException : " + irde);
       }
     }

@@ -34,5 +34,8 @@ import org.exoplatform.services.rest.transformer.OutputEntityTransformer;
 @Retention(RUNTIME)
 @Target({ TYPE, METHOD })
 public @interface OutputTransformer {
+  /**
+   * Get class of output transformer.
+   */
   Class<? extends OutputEntityTransformer> value();
 }

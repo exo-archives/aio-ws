@@ -31,20 +31,30 @@ import java.util.List;
  */
 public class MultivaluedMetadata {
 
+  /**
+   * Map there single key has few values.
+   */
   private HashMap<String, List<String>> data;
 
+  /**
+   * Constructs an empty MultivaluedMetadata.
+   */
   public MultivaluedMetadata() {
     data = new HashMap<String, List<String>>();
   }
 
+  /**
+  * Constructs a new MultivaluedMetadata with the same mappings as the specified <code>data</code>.
+  * @param data the map whose mappings are to be placed in this data.
+  */
   public MultivaluedMetadata(HashMap<String, List<String>> data) {
     this.data = data;
   }
 
   /**
    * Set key's value to one item list of values.
-   * @param key the key
-   * @param vals the value
+   * @param key the key.
+   * @param vals the value.
    */
   public void put(String key, List<String> vals) {
     data.put(key.toLowerCase(), vals);
@@ -52,8 +62,8 @@ public class MultivaluedMetadata {
 
   /**
    * Add one more value to the current list of values.
-   * @param key the key
-   * @param value the value to be add
+   * @param key the key.
+   * @param value the value to be add.
    */
   public void putSingle(String key, String value) {
     List<String> vals = data.get(key.toLowerCase());
@@ -66,8 +76,8 @@ public class MultivaluedMetadata {
 
   /**
    * Return the first value of the key.
-   * @param key the key
-   * @return the value
+   * @param key the key.
+   * @return the value.
    */
   public String getFirst(String key) {
     List<String> vals = data.get(key.toLowerCase());
@@ -80,7 +90,7 @@ public class MultivaluedMetadata {
   /**
    * Return the all pair key-values and values convert from List &lt;String&gt;
    * to the String. This may be used to set HTTP headers.
-   * @return key-valies pair represet by HashMap
+   * @return key-valies pair represet by HashMap.
    */
   public HashMap<String, String> getAll() {
     HashMap<String, String> h = new HashMap<String, String>();
@@ -99,8 +109,8 @@ public class MultivaluedMetadata {
   /**
    * Return values and values convert from List&lt;String&gt; to the String.
    * This may be used to set HTTP headers.
-   * @param key the key
-   * @return the value
+   * @param key the key.
+   * @return the value.
    */
   public String get(String key) {
     List<String> vals = getList(key.toLowerCase());
@@ -112,8 +122,8 @@ public class MultivaluedMetadata {
 
   /**
    * Return values represented by List&lt;String&gt;.
-   * @param key the key
-   * @return the value
+   * @param key the key.
+   * @return the value.
    */
   public List<String> getList(String key) {
     return data.get(key.toLowerCase());
@@ -127,12 +137,22 @@ public class MultivaluedMetadata {
     return data.keySet();
   }
   
+  /**
+   * Check is there descriptor with specified key.
+   * @param key the descriptor key.
+   * @return true if value with specified key exist false otherwise.
+   */
   public boolean has(String key) {
     if (data.get(key) != null)
       return true;
     return false;
   }
 
+  /**
+   * Convert List&lt;String&gt; to single String, where values separated by ','.
+   * @param list the source list.
+   * @return String result.
+   */
   private String convertToString(List<String> list) {
     if (list.size() == 0) {
       return null;

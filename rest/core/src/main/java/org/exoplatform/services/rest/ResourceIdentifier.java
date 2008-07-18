@@ -26,52 +26,69 @@ import java.util.Map;
  */
 public class ResourceIdentifier {
 
+  /**
+   * URI parameters.
+   */
   private Map<String, String> parameters = null;
 
+  /**
+   * Host name.
+   */
   private String host = "localhost";
 
+  /**
+   * URI.
+   */
   private String uri;
 
+  /**
+   * Base URI of resource.
+   */
   private String baseURI;
 
+  /**
+   * @param host the host name.
+   * @param baseURI the base URI.
+   * @param relURI the relative URI.
+   */
   public ResourceIdentifier(String host, String baseURI, String relURI) {
     this(baseURI, relURI);
     this.host = host;
   }
 
   /**
-   * @param baseURI the base URI
-   * @param relURI the relative URI
+   * @param baseURI the base URI.
+   * @param relURI the relative URI.
    */
   public ResourceIdentifier(String baseURI, String relURI) {
-    this.uri = (relURI.endsWith("/")) ? relURI : (relURI + '/');
+    this.uri = relURI.endsWith("/") ? relURI : (relURI + '/');
     this.baseURI = baseURI;
   }
 
   /**
    * @param relURI the relative URI Relative URI used for identification
-   *            ResourceContainer with can serve the request
+   *            ResourceContainer with can serve the request.
    */
   public ResourceIdentifier(String relURI) {
     this("", relURI);
   }
 
   /**
-   * @return the host
+   * @return the host.
    */
   public String getHost() {
     return host;
   }
 
   /**
-   * @return the relative URI
+   * @return the relative URI.
    */
   public String getURI() {
     return uri;
   }
 
   /**
-   * @return the base URI
+   * @return the base URI.
    */
   public String getBaseURI() {
     return baseURI;
@@ -79,21 +96,19 @@ public class ResourceIdentifier {
 
   /**
    * Initialize the URI parameters.
-   * @param pattern the URIPattern
-   * @see org.exoplatform.services.rest.URIPattern
+   * @param pattern the URIPattern.
+   * @see org.exoplatform.services.rest.URIPattern .
    */
   public void initParameters(URIPattern pattern) {
     this.parameters = pattern.parse(uri);
   }
 
   /**
-   * @return the key-value pairs of URi parameters.
-   * @throws IllegalStateException URI parameters not initialized yet.
+   * @return the key-value pairs of URI parameters.
    */
-  public Map<String, String> getParameters() throws IllegalStateException {
+  public Map<String, String> getParameters() {
     if (parameters == null) {
-      throw new IllegalStateException(
-          "Parameters are not initialized. Call initParameters(pattern) first");
+      throw new IllegalStateException("Parameters are not initialized. Call initParameters(pattern) first");
     }
     return parameters;
   }

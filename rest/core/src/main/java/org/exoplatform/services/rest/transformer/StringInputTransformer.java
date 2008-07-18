@@ -27,10 +27,8 @@ import java.io.InputStream;
  */
 public class StringInputTransformer extends InputEntityTransformer {
 
-  /*
-   * (non-Javadoc)
-   * @see org.exoplatform.services.rest.transformer.InputEntityTransformer#readFrom(
-   *      java.io.InputStream)
+  /**
+   * {@inheritDoc}}
    */
   @Override
   public final String readFrom(final InputStream entityDataStream) throws IOException {

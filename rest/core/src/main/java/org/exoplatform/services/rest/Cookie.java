@@ -22,67 +22,99 @@ package org.exoplatform.services.rest;
  * @version $Id: $
  */
 public final class Cookie {
-  private String name_;                                                       
-  private String value_;
-  
-  /* Optional. Describes cookie and how it use. 
+  /**
+   * Cookie name. 
    */
-  private String comment_;                                                        
+  private String name;
   
-  /* Optional. Domain that sees cookie. 
+  /**
+   * Cookie value.
    */
-  private String domain_;
+  private String value;
   
-  /* Cookie auto-expire after specified time. 
+  /**
+   * Describes cookie and how it use. This optional.  
    */
-  private int maxAge_ = -1;
+  private String comment;                                                        
   
-  /* Optional. URLs that see the cookie. 
+  /**
+   * Domain that sees cookie. This optional.
    */
-  private String path_;
+  private String domain;
   
-  /* Optional. Secure (use SSL, https://)
+  /**
+   *  Cookie auto-expire after specified time. 
    */
-  private boolean secure_ = false;
+  private int maxAge = -1;
   
-  /* Set the default version to 0 (Netscape's Implementation).
+  /**
+   *  URLs that see the cookie. This is optional. 
+   */
+  private String path;
+  
+  /**
+   * Secure (use SSL, https://). This is optional, by default false.
+   */
+  private boolean secure = false;
+  
+  /**
+   * Set the default version to 0 (Netscape's Implementation).
    * Can be set to 1 (RFC 2109).
    */
-  private int version_ = 0;
+  private int version = 0;
   
+  /**
+   * @param name the coolie name.
+   * @param value the cookie value.
+   * @param path the URLs that see the cookie.
+   * @param domain the domain that sees cookie.
+   * @param version the cookie version, can be 0 or 1.
+   */
   public Cookie(String name, String value, String path, String domain,
       int version) {
-    name_ = name;
-    value_ = value;
+    this.name = name;
+    this.value = value;
+    this.path = path;
+    this.domain = domain;
     setVersion(version);
-    domain_ = domain;
-    path_ = path;
   }
   
+  /**
+   * Cookie with default version, default version is 0.
+   * @param name the coolie name.
+   * @param value the cookie value.
+   * @param path the URLs that see the cookie.
+   * @param domain the domain that sees cookie.
+   */
   public Cookie(String name, String value, String path, String domain) {                                                   
-    name_ = name;                                                                                                    
-    value_ = value;                                                                                                  
-    domain_ = domain;                                                                                                
-    path_ = path;                                                                                                    
+    this.name = name;                                                                                                    
+    this.value = value;                                                                                                  
+    this.path = path;                                                                                                    
+    this.domain = domain;                                                                                                
   }   
   
+  /**
+   * Cookie with default version, and without specified path and domain.
+   * @param name the coolie name.
+   * @param value the cookie value.
+   */
   public Cookie(String name, String value) {
-    name_ = name;
-    value_ = value;
+    this.name = name;
+    this.value = value;
   }
   
   /**
    * @return the cookie name.
    */
   public String getName() {
-    return name_;
+    return name;
   }
   
   /**
    * @return the cookie value.
    */
   public String getValue() {
-    return value_;
+    return value;
   }
   
   /**
@@ -94,7 +126,7 @@ public final class Cookie {
    * @return the cookie max age.
    */
   public int getMaxAge() {
-    return maxAge_;
+    return maxAge;
   }
   
   /**
@@ -102,7 +134,7 @@ public final class Cookie {
    * @param maxAge the new cookie max age.
    */
   public void setMaxAge(int maxAge) {
-    maxAge_ = maxAge;
+    this.maxAge = maxAge;
   }
   
   /**
@@ -112,7 +144,7 @@ public final class Cookie {
    * @return the cookie version.
    */
   public int getVersion() {
-    return version_;
+    return version;
   }
   
   /**
@@ -122,21 +154,21 @@ public final class Cookie {
   public void setVersion(int version) {
     if (version != 1 && version != 0)
       throw new IllegalArgumentException("Unknow cookie version, must be 0 or 1.");
-    version_ = version;
+    this.version = version;
   }
   
   /**
    * @return the domain name for this cookie.
    */
   public String getDomain() {
-    return domain_;
+    return domain;
   }
   
   /**
    * @return path for the cookie to which the client should return the cookie.
    */
   public String getPath() {
-    return path_;
+    return path;
   }
   
   /**
@@ -145,7 +177,7 @@ public final class Cookie {
    * @return the cookie secure state.
    */
   public boolean isSecure() {
-    return secure_;
+    return secure;
   }
   
   /**
@@ -153,36 +185,37 @@ public final class Cookie {
    * @param secure the new cookie secure state.
    */
   public void setSecure(boolean secure) {
-    secure_ = secure;
+    this.secure = secure;
   }
 
   /**
    * @return the cookie comment.
    */
   public String getComment() {
-    return comment_;
+    return comment;
   }
 
   /**
    * @param comment the comment for this cookie.
    */
   public void setComment(String comment) {
-    comment_ = comment;
+    this.comment = comment;
   }
   
-  /* (non-Javadoc)
+  /** String representation of cookie. 
    * @see java.lang.Object#toString()
+   * {@inheritDoc}
    */
   @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
-    sb.append("name = ").append(name_)
-      .append("; value = ").append(value_)
-      .append("; maxAge = ").append(maxAge_)
-      .append("; version = ").append(version_)
-      .append("; domain = ").append(domain_)
-      .append("; path = ").append(path_)
-      .append("; comment = ").append(comment_);
+    sb.append("name = ").append(name)
+      .append("; value = ").append(value)
+      .append("; maxAge = ").append(maxAge)
+      .append("; version = ").append(version)
+      .append("; domain = ").append(domain)
+      .append("; path = ").append(path)
+      .append("; comment = ").append(comment);
     return sb.toString();
   }
 

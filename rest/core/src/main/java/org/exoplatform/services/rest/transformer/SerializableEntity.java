@@ -21,11 +21,16 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Object implement this interface should be able to write entity data by own
- * methods.<br/>
+ * Object implement this interface should be able to write entity data by own methods.
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 public interface SerializableEntity {
+  
+  /**
+   * Write object in given output stream.
+   * @param out output stream.
+   * @throws IOException i/o error occurs.
+   */
   void writeObject(OutputStream out) throws IOException;
 }

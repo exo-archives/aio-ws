@@ -21,7 +21,17 @@ package org.exoplatform.services.rest.transformer;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class XSLTConstants {
-  public static String XSLT_TEMPLATE = "xslt.template";
+public final class XSLTConstants {
+  
+  /**
+   * Must not be created.
+   */
+  private XSLTConstants() {
+  }
+  
+  /**
+   * Under this name must be set transformer parameter which set schemas name in TRAXTemplatesService.  
+   */
+  public static final String XSLT_TEMPLATE = "xslt.template";
 }
 

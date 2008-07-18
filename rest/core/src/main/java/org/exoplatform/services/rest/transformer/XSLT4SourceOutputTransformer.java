@@ -35,25 +35,31 @@ import org.exoplatform.services.xml.transform.trax.TRAXTransformer;
  */
 public class XSLT4SourceOutputTransformer extends OutputEntityTransformer {
   
-  private TRAXTemplatesService templatesService_;
+  /**
+   * TRAXTemplates service. Contains compiled schemas. 
+   */
+  private TRAXTemplatesService templatesService;
   
+  /**
+   * Construct transformer.
+   * @param templatesService TRAXTemplates service.
+   */
   public XSLT4SourceOutputTransformer(TRAXTemplatesService templatesService) {
-    templatesService_ = templatesService;
+    this.templatesService = templatesService;
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.transformer.OutputEntityTransformer#writeTo(
-   * java.lang.Object, java.io.OutputStream)
+  /**
+   * {@inheritDoc} .
    */
   @Override
   public void writeTo(Object entity, OutputStream entityDataStream)
       throws IOException {
     Source e = (Source) entity;
-    String xsltTemplate = transformerParameters_.get(XSLTConstants.XSLT_TEMPLATE);
+    String xsltTemplate = transformerParameters.get(XSLTConstants.XSLT_TEMPLATE);
     try {
       TRAXTransformer transformer = null;
       if (xsltTemplate != null) {
-        transformer = templatesService_.getTemplates(xsltTemplate).newTransformer();
+        transformer = templatesService.getTemplates(xsltTemplate).newTransformer();
       } else {
         throw new TransformerConfigurationException("Can't get parameter '"
             + XSLTConstants.XSLT_TEMPLATE + "' from OutputTransformer parameters.\n"

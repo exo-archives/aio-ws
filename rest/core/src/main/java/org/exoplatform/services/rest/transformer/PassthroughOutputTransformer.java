@@ -30,12 +30,13 @@ import java.io.OutputStream;
  */
 public class PassthroughOutputTransformer extends OutputEntityTransformer {
 
+  /**
+   * Buffer.
+   */
   private static final int BUFF_SIZE = 4096;
   
-  /*
-   * (non-Javadoc)
-   * @see org.exoplatform.services.rest.transformer.OutputEntityTransformer#writeTo(java.lang.Object,
-   *      java.io.OutputStream)
+  /**
+   * {@inheritDoc}} .
    */
   @Override
   public final void writeTo(final Object entity, final OutputStream entityDataStream)
@@ -43,9 +44,9 @@ public class PassthroughOutputTransformer extends OutputEntityTransformer {
     InputStream e = (InputStream) entity;
     byte[] buf = new byte[BUFF_SIZE];
     int rd = -1;
-    while ((rd = e.read(buf)) != -1) {
+    
+    while ((rd = e.read(buf)) != -1)
       entityDataStream.write(buf, 0, rd);
-    }
   }
 
 }

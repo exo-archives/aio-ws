@@ -27,13 +27,24 @@ import org.w3c.dom.Element;
  */
 public class XlinkHref {
 
+  /**
+   * xlinks:href attribute.
+   */
   private static final String XLINK_HREF = "xlinks:href";
+  
+  
+  /**
+   * Default namespace for xlinks:href. 
+   */
   private static final String XLINK_NAMESPACE_URL = "http://www.w3c.org/1999/xlink";
 
+  /**
+   * URI.
+   */
   private String uri;
 
   /**
-   * @param u new uri
+   * @param u new uri.
    */
   public XlinkHref(String u) {
     this.uri = u;
@@ -41,7 +52,7 @@ public class XlinkHref {
 
   /**
    * Get uri.
-   * @return uri current uri
+   * @return uri current uri.
    */
   public final String getURI() {
     return uri;
@@ -49,7 +60,7 @@ public class XlinkHref {
 
   /**
    * Add xlink to given element of DOM structure.
-   * @param parent element
+   * @param parent element.
    */
   public void putToElement(Element parent) {
     parent.setAttributeNS(XLINK_NAMESPACE_URL, XLINK_HREF, uri);
@@ -57,8 +68,8 @@ public class XlinkHref {
 
   /**
    * Add external suffix to uri an d then insert xlink into element of DOM.
-   * @param parent element
-   * @param extURI external suffix for uri
+   * @param parent element.
+   * @param extURI external suffix for uri.
    */
   public void putToElement(Element parent, String extURI) {
     parent.setAttributeNS(XLINK_NAMESPACE_URL, XLINK_HREF, uri + extURI);

@@ -17,12 +17,16 @@
 package org.exoplatform.services.rest;
 
 /**
+ * Wrapper around {@link MultivaluedMetadata}. For easer access to most used entity descriptor. 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 public class EntityMetadata {
 
-  protected MultivaluedMetadata metadata;
+  /**
+   * Description of resource.
+   */
+  private MultivaluedMetadata metadata;
 
   /**
    * Constructor for EntityMetadata.
@@ -99,6 +103,10 @@ public class EntityMetadata {
     return metadata.getFirst("Content-Type");
   }
 
+  /**
+   * The HTTP Cache-Control response header.
+   * @return Cache-Control header.
+   */
   public String getCacheControl() {
     return metadata.getFirst("Cache-Control");
   }

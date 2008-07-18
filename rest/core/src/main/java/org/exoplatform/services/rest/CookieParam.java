@@ -30,5 +30,8 @@ import java.lang.annotation.Target;
 @Target(value = { PARAMETER })
 @Retention(RUNTIME)
 public @interface CookieParam {
+  /**
+   * Get cookie name.
+   */
   String value();
 }

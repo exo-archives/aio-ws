@@ -32,5 +32,8 @@ import org.exoplatform.services.rest.data.MimeTypes;
 @Target({ METHOD })
 @Retention(RUNTIME)
 public @interface ProducedMimeTypes {
+  /**
+   * Get the specified mimetype. 
+   */
   String value() default MimeTypes.ALL;
 }

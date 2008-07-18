@@ -23,11 +23,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
+ * QueryTemplate defines Query pattern for ResourceContainer.
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 @Target(value = { METHOD })
 @Retention(RUNTIME)
 public @interface QueryTemplate {
+  /**
+   * Get specified query pattern.
+   */
   String value();
 }

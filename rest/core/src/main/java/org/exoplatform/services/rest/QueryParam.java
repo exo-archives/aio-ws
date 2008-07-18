@@ -42,5 +42,8 @@ import java.lang.annotation.Target;
 @Target(value = { PARAMETER })
 @Retention(RUNTIME)
 public @interface QueryParam {
+  /**
+   * Get the name of specified query parameter. 
+   */
   String value();
 }

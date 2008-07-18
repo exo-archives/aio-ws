@@ -1,13 +1,5 @@
 package org.exoplatform.services.rest;
 
-/**
- * An utility class for manipulating "parametrized" strings. 
- * A parametrized is a string constructed by substituting placeholders
- * in the pattern string where pattern string is any string containing 
- * placeholders in the form of "{placeholderName}". 
- * @author Alexander Tereshkin
- */
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,119 +9,154 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * An utility class for manipulating "parametrized" strings. 
+ * A parametrized is a string constructed by substituting placeholders
+ * in the pattern string where pattern string is any string containing 
+ * placeholders in the form of "{placeholderName}". 
+ * @author Alexander Tereshkin
+ */
 public class URIPattern {
 
-  private static Pattern paramPattern_ = Pattern.compile("\\{[^\\}^\\{]*\\}");
-  private String[] tokens_;
-  private String[] paramNames_;
-  private String pattern_;
-  private Set<String> params_;
+  /**
+   * Pattern for URI. URI must have form /test/{param1}/.
+   * At the place param1 can be any value. 
+   */
+  private static Pattern paramPattern = Pattern.compile("\\{[^\\}^\\{]*\\}");
+  
+  /**
+   * Array of tokens. 
+   */
+  private String[] tokens;
+  
+  /**
+   * Array of parameter names.
+   */
+  private String[] paramNames;
+  
+  /**
+   * Pattern.
+   */
+  private String pattern;
+  
+  /**
+   * Result set of URI parameters.
+   */
+  private Set<String> params;
+  
   /**
    * Total length of all tokens. Used for searching priority
    * Resources for some URI. The higher total length of tokens 
    * the more precision URIPattern for one URI.
    */
-  private int totalTokensLength_ = 0;
+  private int totalTokensLength = 0;
 
   /**
    * Creates a new instance of ParametrizedStringParser.
    * @param patternString pattern.
    */
   public URIPattern(String patternString) {
-    tokens_ = paramPattern_.split(patternString, -1);
-    for (String t : tokens_) {
+    tokens = paramPattern.split(patternString, -1);
+    for (String t : tokens) {
       if (t.length() == 0) {
-        throw new IllegalArgumentException("Invalid pattern:" + patternString);
+        throw new IllegalArgumentException("Invalid pattern:"
+            + patternString);
       }
-      totalTokensLength_ += t.length(); 
+      totalTokensLength += t.length(); 
     }
-    int numParams = tokens_.length - 1;
-    paramNames_ = new String[numParams];
-    Matcher matcher = paramPattern_.matcher(patternString);
+    
+    int numParams = tokens.length - 1;
+    paramNames = new String[numParams];
+    Matcher matcher = paramPattern.matcher(patternString);
     for (int i = 0; matcher.find(); i++) {
-      paramNames_[i] = patternString.substring(matcher.start() + 1, matcher
-          .end() - 1);
+      paramNames[i] = patternString.substring(matcher.start() + 1, matcher.end() - 1);
     }
+    
     if (numParams > 0) {
-      assert paramNames_[numParams - 1] != null;
+      assert paramNames[numParams - 1] != null;
     }
-    this.pattern_ = patternString;
-    params_ = Collections.unmodifiableSet(new HashSet<String>(Arrays
-        .asList(paramNames_)));
+    pattern = patternString;
+    params = Collections.unmodifiableSet(new HashSet<String>(Arrays
+        .asList(paramNames)));
   }
 
   /**
    * Returns a <code>Set</code> of names of parameters (placeholders)
    * participating in the underlying pattern string.
-   * @return <code>Set</code> of string parameters
+   * @return <code>Set</code> of string parameters.
    */
   public Set<String> getParamNames() {
-    return params_;
+    return params;
   }
 
   /**
    * Parses the given string against the underlying pattern and returns a
    * <code>Map</code> of parameter names to values.
-   * @param string string to parse
-   * @return <code>Map</code> of parameter names to values
-   * @throws IllegalArgumentException if the string doesn't match the pattern
+   * @param string string to parse.
+   * @return <code>Map</code> of parameter names to values.
    */
   public Map<String, String> parse(String string) {
     if (string == null) {
       throw new NullPointerException();
     }
     Map<String, String> ret = new HashMap<String, String>();
-    if (paramNames_.length == 0) {
-      if (string.equals(pattern_)) {
+    if (paramNames.length == 0) {
+      if (string.equals(pattern)) {
         return ret;
       }
-      throw new IllegalArgumentException("Pattern not matched: " + pattern_ +
-          ", " + string);
+      throw new IllegalArgumentException("Pattern not matched: "
+          + pattern
+          + ", "
+          + string);
     }
     if (!matches(string)) {
-      throw new IllegalArgumentException("Pattern not matched: " + pattern_ +
-          ", " + string);
+      throw new IllegalArgumentException("Pattern not matched: "
+          + pattern
+          + ", "
+          + string);
     }
-    int pos = tokens_[0].length();
-    for (int i = 0; i < paramNames_.length; i++) {
-      int nextPos = tokens_[i + 1].length() > 0 ? string.indexOf(tokens_[i + 1],
+    int pos = tokens[0].length();
+    for (int i = 0; i < paramNames.length; i++) {
+      int nextPos = tokens[i + 1].length() > 0 ? string.indexOf(tokens[i + 1],
           pos) : string.length();
       if (nextPos < 0) {
-        throw new IllegalArgumentException("Pattern not matched: " + pattern_ +
-            ", " + string);
+        throw new IllegalArgumentException("Pattern not matched: "
+            + pattern
+            + ", "
+            + string);
       }
-      if (i == paramNames_.length - 1 && tokens_[i + 1].equals("/")) {
-        ret.put(paramNames_[i], string.substring(pos, string.length() - 1));
+      if (i == paramNames.length - 1 && tokens[i + 1].equals("/")) {
+        ret.put(paramNames[i], string.substring(pos, string.length() - 1));
       } else {
-        ret.put(paramNames_[i], string.substring(pos, nextPos));
+        ret.put(paramNames[i], string.substring(pos, nextPos));
       }
-      pos = nextPos + tokens_[i + 1].length();
+      pos = nextPos + tokens[i + 1].length();
     }
     return ret;
   }
 
   /**
    * Checks if the given string matches the underlying pattern.
-   * @param string string to test
-   * @return true if the string matches the pattern false otherwise
+   * @param string string to test.
+   * @return true if the string matches the pattern false otherwise.
    */
   public boolean matches(String string) {
-    if (paramNames_.length == 0 && !pattern_.equals(string)) {
+    if (paramNames.length == 0 && !pattern.equals(string)) {
       return false;
     }
-    if (string.indexOf(tokens_[0], 0) != 0) {
+    if (string.indexOf(tokens[0], 0) != 0) {
       return false;
     }
-    int pos = tokens_[0].length();
-    for (int i = 0; i < paramNames_.length; i++) {
-      int nextPos = (tokens_[i + 1].length() > 0) ? string.indexOf(
-          tokens_[i + 1], pos) : string.length();
+    int pos = tokens[0].length();
+    for (int i = 0; i < paramNames.length; i++) {
+      int nextPos = (tokens[i + 1].length() > 0) ? string.indexOf(
+          tokens[i + 1], pos) : string.length();
       if (nextPos < 0) {
         return false;
       }
-      pos = nextPos + tokens_[i + 1].length();
+      pos = nextPos + tokens[i + 1].length();
     }
-    if (string.lastIndexOf(tokens_[tokens_.length - 1], string.length()) < 0) {
+    if (string.lastIndexOf(tokens[tokens.length - 1], string.length()) < 0) {
       return false;
     }
     return true;
@@ -137,8 +164,8 @@ public class URIPattern {
 
   /**
    * check is two URIPattern matches.
-   * @param another the another URIPattern
-   * @return the result of comparison
+   * @param another the another URIPattern.
+   * @return the result of comparison.
    */
   public boolean matches(URIPattern another) {
 //    Pattern p = Pattern.compile("\\{.*\\}");
@@ -151,15 +178,15 @@ public class URIPattern {
    * @return the underlying pattern string.
    */
   public String getString() {
-    return pattern_;
+    return pattern;
   }
   
-//  public String[] getTokens() {
-//    return tokens_;
-//  }
-  
+  /**
+   * Get total tokens length.
+   * @return the total tokens length. 
+   */
   public int getTotalTokensLength() {
-    return totalTokensLength_;
+    return totalTokensLength;
   }
 
 }

@@ -36,7 +36,7 @@ public abstract class OutputEntityTransformer implements
    * @see org.exoplatform.services.rest.Response#setTransformerParameters().
    * @see org.exoplatform.services.rest.Response#getTransformerParameters().
    */
-  protected Map<String, String> transformerParameters_ = new HashMap<String, String>();
+  protected Map<String, String> transformerParameters = new HashMap<String, String>();
   
   /**
    * With this constructor from ExoContainer can be got any Objects. 
@@ -52,7 +52,7 @@ public abstract class OutputEntityTransformer implements
    */
   public void addTransformerParameters(Map<String, String> trfParams) {
     if (trfParams != null) 
-      transformerParameters_.putAll(trfParams);
+      transformerParameters.putAll(trfParams);
   }
 
   /**
@@ -61,7 +61,7 @@ public abstract class OutputEntityTransformer implements
    * @param entityDataStream the OutputStream
    * @throws IOException Input/Output Exception
    */
-  abstract public void writeTo(Object entity, OutputStream entityDataStream)
+  public abstract void writeTo(Object entity, OutputStream entityDataStream)
       throws IOException;
 }
 

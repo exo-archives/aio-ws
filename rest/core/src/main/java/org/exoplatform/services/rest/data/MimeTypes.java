@@ -27,18 +27,33 @@ import java.util.regex.Pattern;
  */
 public class MimeTypes {
 
+  /**
+   * All mimetypes.
+   */
   public static final String ALL = "*/*";
 
-  private String[] mimeTypes_;
+  /**
+   * Array of consumed or produced mimetype for resource.
+   */
+  private String[] mimeTypes;
   
+  /**
+   * Whitespaces pattern.
+   */
   private static final Pattern SPACE_PATTERN = Pattern.compile("(\\s+)");
   
+  /**
+   * Comparator for mimetype. Compare mimetypes by quality, q=... .
+   */
   private static final QualityComparator COMPARATOR = new QualityComparator();
   
+  /**
+   * QualityComparator.
+   */
   private static class QualityComparator implements Comparator<String> {
 
-    /* (non-Javadoc)
-     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+    /**
+     * {@inheritDoc}
      */
     public int compare(String mimeType1, String mimeType2) {
       float q1 = getQvalue(mimeType1);
@@ -50,6 +65,11 @@ public class MimeTypes {
       return 0;
     }
     
+    /**
+     * Get q value from mimetype string.
+     * @param s source string.
+     * @return mimetype quality (from 0 to 1).
+     */
     private Float getQvalue(String s) {
       float q = 1.0F;
       int t = s.indexOf(';');
@@ -80,11 +100,11 @@ public class MimeTypes {
   public MimeTypes(String mimeTypeHeader) {
     Matcher m = SPACE_PATTERN.matcher(mimeTypeHeader);
     mimeTypeHeader = m.replaceAll("");
-    mimeTypes_ = mimeTypeHeader.split(",");
-    Arrays.sort(mimeTypes_, COMPARATOR);
-    for (int i = 0; i < mimeTypes_.length; i++) {
-      String t = mimeTypes_[i];
-      mimeTypes_[i] = removeQvalue(t);
+    mimeTypes = mimeTypeHeader.split(",");
+    Arrays.sort(mimeTypes, COMPARATOR);
+    for (int i = 0; i < mimeTypes.length; i++) {
+      String t = mimeTypes[i];
+      mimeTypes[i] = removeQvalue(t);
     }
   }
   
@@ -93,7 +113,7 @@ public class MimeTypes {
    * @see org.exoplatform.services.rest.data.HeaderUtils.
    */
   public String[] getAsArray() {
-    return mimeTypes_;
+    return mimeTypes;
   }
 
   /**
@@ -102,7 +122,7 @@ public class MimeTypes {
    * @return result.
    */
   public boolean hasMimeType(String s) {
-    for (String m : mimeTypes_) {
+    for (String m : mimeTypes) {
       m = removeQvalue(m);
       if (m.equalsIgnoreCase(s)) {
         return true;
@@ -111,7 +131,7 @@ public class MimeTypes {
     return false;
   }
   
-  /*
+  /**
    * Remove q value from given string.
    * Example text/xml;q=0.9 will be change to text/xml.
    * @param m the source string.
@@ -124,13 +144,14 @@ public class MimeTypes {
     return m;
   }
   
-  /* (non-Javadoc)
-   * @see java.lang.Object#toString()
+  /**
+   * String representation of mimetypes.
+   * {@inheritDoc}
    */
   @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
-    for (String m : mimeTypes_) {
+    for (String m : mimeTypes) {
       if (sb.length() > 0)
         sb.append(',').append(' ');
       sb.append(m);

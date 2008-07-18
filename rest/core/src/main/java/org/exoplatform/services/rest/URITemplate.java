@@ -33,5 +33,8 @@ import java.lang.annotation.Target;
 @Target(value = { TYPE, METHOD })
 @Retention(RUNTIME)
 public @interface URITemplate {
+  /**
+   * Get specified URI pattern.
+   */
   String value() default "/";
 }

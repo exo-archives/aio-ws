@@ -33,14 +33,13 @@ import javax.xml.bind.JAXBException;
  */
 public class JAXBInputTransformer extends InputEntityTransformer {
 
-  /*
-   * (non-Javadoc)
-   * @see org.exoplatform.services.rest.transformer.InputEntityTransformer#readFrom(java.io.InputStream)
+  /**
+   * {@inheritDoc}
    */
   @Override
   public final Object readFrom(final InputStream entityDataStream) throws IOException {
     try {
-      JAXBContext jaxbContext = JAXBContext.newInstance(entityType_);
+      JAXBContext jaxbContext = JAXBContext.newInstance(entityType);
       return jaxbContext.createUnmarshaller().unmarshal(entityDataStream);
     } catch (JAXBException jaxbe) {
       throw new IOException("Can't transform InputStream to Object: " + jaxbe);

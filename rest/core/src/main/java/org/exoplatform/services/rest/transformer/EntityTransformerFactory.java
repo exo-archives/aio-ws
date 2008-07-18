@@ -33,15 +33,24 @@ import org.exoplatform.container.ExoContainerContext;
  */
 public class EntityTransformerFactory {
 
-  private ExoContainer container_;
+  /**
+   * ExoContainer instance.
+   */
+  private ExoContainer container;
   
+  /**
+   * Constructor comparators.
+   */
   private static final ConstructorsComparator COMPARATOR = new ConstructorsComparator(); 
   
+  /**
+   * Compare constructors by parameter number.
+   */
   private static class ConstructorsComparator
       implements Comparator<Constructor<? extends GenericEntityTransformer>> {
 
-    /* (non-Javadoc)
-     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+    /** 
+     * {@inheritDoc}
      */
     public int compare(Constructor<? extends GenericEntityTransformer> constructor1,
         Constructor<? extends GenericEntityTransformer> constructor2) {
@@ -57,15 +66,15 @@ public class EntityTransformerFactory {
   }
   
   /**
-   * Create a new instance of GenericEntityTransformer.<br/>
-   * @param transformerType the type of transformer with should be created.
+   * Create a new instance of GenericEntityTransformer.
+   * @param containerContext the ExoContainerContext.
    */
   public EntityTransformerFactory(ExoContainerContext containerContext) {
-    container_ = containerContext.getContainer();
+    container = containerContext.getContainer();
   }
   
   /**
-   * Create a new GenericEntityTransformer.<br/>
+   * Create a new GenericEntityTransformer.
    * @param transformerType the type of transformer with should be created.
    * @return new instance GenericEntityTransformer
    * @see org.exoplatform.services.rest.transformer.GenericEntityTransformer.
@@ -75,22 +84,21 @@ public class EntityTransformerFactory {
       Class<? extends GenericEntityTransformer> transformerType) throws Exception {
 
     Constructor<? extends GenericEntityTransformer>[] constructors =
-      (Constructor<? extends GenericEntityTransformer>[])transformerType.getConstructors();
+      (Constructor<? extends GenericEntityTransformer>[]) transformerType.getConstructors();
 
     /* Sort constructors by number of parameters.
      * With more parameters must be first.
      */
     Arrays.sort(constructors, COMPARATOR);
-//    sortConstructorsByParamsLength(constructors, 0, constructors.length - 1);
       
-    l:for (Constructor<? extends GenericEntityTransformer> c : constructors) {
+    l: for (Constructor<? extends GenericEntityTransformer> c : constructors) {
       Class<?>[] parameterTypes = c.getParameterTypes();
       if (parameterTypes.length == 0) 
         return c.newInstance();
       
       List<Object> parameters = new ArrayList<Object>(parameterTypes.length);
       for (Class<?> clazz : c.getParameterTypes()) {
-        Object p = container_.getComponentInstanceOfType(clazz);
+        Object p = container.getComponentInstanceOfType(clazz);
         if (p == null)
           continue l;
         parameters.add(p);
@@ -99,46 +107,5 @@ public class EntityTransformerFactory {
     }
     return null;
   }
-
-//  /**
-//   * @param i0 - index of start element.
-//   * @param k0 - index of end element.
-//   */
-//  private void sortConstructorsByParamsLength(
-//      Constructor<? extends GenericEntityTransformer>[] constructors, int i0, int k0) {
-//    int i = i0;
-//    int k = k0;
-//    if (k0 > i0) {
-//      int middleElementParameterArrayLength = constructors[(i0 + k0) / 2].getParameterTypes().length;
-//      while (i <= k) {
-//        while ((i < k0) &&
-//            (constructors[i].getParameterTypes().length > middleElementParameterArrayLength)) {
-//          i++;
-//        }
-//        while ((k > i0) &&
-//            (constructors[k].getParameterTypes().length < middleElementParameterArrayLength)) {
-//          k--;
-//        }
-//        if (i <= k) {
-//          swapResources(constructors, i, k);
-//          i++;
-//          k--;
-//        }
-//      }
-//      if (i0 < k) {
-//        sortConstructorsByParamsLength(constructors, i0, k);
-//      }
-//      if (i < k0) {
-//        sortConstructorsByParamsLength(constructors, i, k0);
-//      }
-//    }
-//  }
-//
-//  private void swapResources(Constructor<? extends GenericEntityTransformer>[] constructors,
-//      int i, int k) {
-//    Constructor<? extends GenericEntityTransformer> temp = constructors[i];
-//    constructors[i] = constructors[k];
-//    constructors[k] = temp;
-//  }
 
 }

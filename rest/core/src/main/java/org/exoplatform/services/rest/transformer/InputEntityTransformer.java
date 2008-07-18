@@ -31,7 +31,7 @@ public abstract class InputEntityTransformer implements
   /**
    * type of Objects which InputEntityTransformer can serve.
    */
-  protected Class<?> entityType_;
+  protected Class<?> entityType;
 
   /**
    * With this constructor from ExoContainer can be got any Objects. 
@@ -43,27 +43,27 @@ public abstract class InputEntityTransformer implements
 
   /**
    * Set the type of Objects which should be serve by InputEntityTransformer.
-   * @param entityType the type of entity
+   * @param entityType the type of entity.
    */
   public final void setType(Class<?> entityType) {
-    this.entityType_ = entityType;
+    this.entityType = entityType;
   }
 
   /**
    * Get the type of served Objects.
-   * @return type of served object
+   * @return type of served object.
    */
   public final Class<?> getType() {
-    return entityType_;
+    return entityType;
   }
 
   /**
    * Build Objects from given InputStream.
-   * @param entityDataStream from this InputStream Object should be readed
-   * @return Object builded Object
-   * @throws IOException Input/Output Exception
+   * @param entityDataStream from this InputStream Object should be red.
+   * @return Object builded Object.
+   * @throws IOException Input/Output Exception.
    */
-  abstract public Object readFrom(InputStream entityDataStream)
+  public abstract Object readFrom(InputStream entityDataStream)
       throws IOException;
 
 }

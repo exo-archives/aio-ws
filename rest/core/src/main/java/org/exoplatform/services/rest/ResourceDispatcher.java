@@ -43,21 +43,52 @@ import org.exoplatform.services.rest.transformer.OutputEntityTransformer;
  */
 public class ResourceDispatcher implements Connector {
 
+  /**
+   * Context parameter 'host'. 
+   */
   public static final String CONTEXT_PARAM_HOST = "host";
+  
+  /**
+   * Context parameter 'baseURI'.
+   */
   public static final String CONTEXT_PARAM_BASE_URI = "baseURI";
+  
+  /**
+   * Context parameter 'relURI'.
+   */
   public static final String CONTEXT_PARAM_REL_URI = "relURI";
+  
+  /**
+   * Context parameter 'absLocation'.
+   */
   public static final String CONTEXT_PARAM_ABSLOCATION = "absLocation";
 
-  private List<ResourceDescriptor> resourceDescriptors_;
-  private ThreadLocal<Context> contextHolder_ = new ThreadLocal<Context>();
-  private final Map<String, String> contextParams_ = new HashMap<String, String>();
+  /**
+   * Collection of Resource descriptors. 
+   */
+  private List<ResourceDescriptor> resourceDescriptors;
+  
+  /**
+   * Hold context parameters actual for current request.
+   */
+  private ThreadLocal<Context> contextHolder = new ThreadLocal<Context>();
+  
+  /**
+   * Hold static context parameters.
+   */
+  private final Map<String, String> contextParams = new HashMap<String, String>();
           
-  private EntityTransformerFactory factory_;
+  /**
+   * Factory for Transformers.
+   */
+  private EntityTransformerFactory factory;
 
   /**
    * Constructor gets all binded ResourceContainers from ResourceBinder.
-   * @param containerContext ExoContainerContext
-   * @throws Exception any Exception
+   * @param params the initialized parameters for ResourceDispatcher. 
+   * @param binder the ResourceBinder component.
+   * @param factory the EntityTransformerFactory component.
+   * @throws Exception any Exception.
    */
   public ResourceDispatcher(InitParams params, ResourceBinder binder,
       EntityTransformerFactory factory) throws Exception {
@@ -68,12 +99,12 @@ public class ResourceDispatcher implements Connector {
         Iterator<Property> iterator = contextParam.getPropertyIterator();
         while (iterator.hasNext()) {
           Property property = iterator.next();
-          contextParams_.put(property.getName(), property.getValue());
+          contextParams.put(property.getName(), property.getValue());
         }
       }
     }
-    this.resourceDescriptors_ = binder.getAllDescriptors();
-    this.factory_ = factory;
+    this.resourceDescriptors = binder.getAllDescriptors();
+    this.factory = factory;
   }
 
   /**
@@ -93,7 +124,7 @@ public class ResourceDispatcher implements Connector {
       requestedMimeTypes = new MimeTypes(MimeTypes.ALL);
     
     ResourceDescriptor resource = null;
-    for (ResourceDescriptor r : resourceDescriptors_) {
+    for (ResourceDescriptor r : resourceDescriptors) {
 
       MimeTypes producedMimeTypes = new MimeTypes(r.getProducedMimeTypes());
       MultivaluedMetadata annotatedQueryParams = r.getQueryPattern();
@@ -136,7 +167,7 @@ public class ResourceDispatcher implements Connector {
       identifier.initParameters(resource.getURIPattern());
     
       // Set initialized context to thread local
-      contextHolder_.set(new Context(contextParams_, identifier));
+      contextHolder.set(new Context(contextParams, identifier));
 
       Annotation[] methodParametersAnnotations = resource.getMethodParameterAnnotations();
       Class<?>[] methodParameters = resource.getMethodParameters();
@@ -144,7 +175,7 @@ public class ResourceDispatcher implements Connector {
       // building array of parameters
       for (int i = 0; i < methodParametersAnnotations.length; i++) {
         if (methodParametersAnnotations[i] == null) {
-          InputEntityTransformer transformer = (InputEntityTransformer) factory_
+          InputEntityTransformer transformer = (InputEntityTransformer) factory
               .newTransformer(resource.getInputTransformerType());
           transformer.setType(methodParameters[i]);
           params[i] = transformer.readFrom(request.getEntityStream());
@@ -167,7 +198,7 @@ public class ResourceDispatcher implements Connector {
               break;
             case CONTEXT_PARAM:
               ContextParam c = (ContextParam) a;
-              constructorParam = contextHolder_.get().get(c.value());
+              constructorParam = contextHolder.get().get(c.value());
               break;
             case COOKIE_PARAM:
               CookieParam k = (CookieParam) a;
@@ -200,14 +231,16 @@ public class ResourceDispatcher implements Connector {
         response.setTransformer(getTransformer(resource, response.getTransformerParameters()));
       } else {
         OutputEntityTransformer transformer = response.getTransformer();
-        if(transformer != null)
+        if (transformer != null)
           transformer.addTransformerParameters(response.getTransformerParameters());
       }
       return response;
     }
     // if no one ResourceContainer found
-    throw new NoSuchMethodException("No method found for " + methodName + " " +
-        requestedURI);
+    throw new NoSuchMethodException("No method found for "
+        + methodName
+        + " "
+        + requestedURI);
   }
 
   /**
@@ -218,7 +251,7 @@ public class ResourceDispatcher implements Connector {
    */
   @Deprecated
   public Context getRuntimeContext() {
-    return contextHolder_.get();
+    return contextHolder.get();
   }
   
   /**
@@ -230,23 +263,28 @@ public class ResourceDispatcher implements Connector {
    * @param value the value.
    */
   public void addContextParameter(String key, String value) {
-    contextHolder_.get().set(key, value);
+    contextHolder.get().set(key, value);
   }
 
   /**
    * Get OutputEntitytransformer if it was not set before.
+   * @param resource the Resource.
+   * @param transformerParameters the parameters for transformer.
+   * @return instance of transformer.
+   * @throws InvalidResourceDescriptorException if no one transformer found.
    */
   private OutputEntityTransformer getTransformer(ResourceDescriptor resource,
       Map<String, String> transformerParameters) throws InvalidResourceDescriptorException {
     try {
-      OutputEntityTransformer transformer = (OutputEntityTransformer) factory_.newTransformer(
+      OutputEntityTransformer transformer = (OutputEntityTransformer) factory.newTransformer(
           resource.getOutputTransformerType());
       transformer.addTransformerParameters(transformerParameters);
       return transformer;
     } catch (Exception e) {
       throw new InvalidResourceDescriptorException(
           "Could not get EntityTransformer from Response"
-          + " or annotation to ResourceDescriptor. Exception: " + e);
+          + " or annotation to ResourceDescriptor. Exception: "
+          + e);
     }
   }
 
