@@ -45,17 +45,37 @@ import org.exoplatform.services.ws.AbstractWebService;
  */
 public class WebServiceLoader implements Startable {
 
+  /**
+   * ExoContainer.
+   */
   private ExoContainer container;
-  private ExoContainerContext containerContext;
-  private XFire xfire;
-  private AnnotationServiceFactory serviceFactory;
-  private List < AbstractWebService > services;
   
-  private final static Log logger = ExoLogger.getLogger(WebServiceLoader.class);
+  /**
+   * XFire engine.
+   */
+  private XFire xfire;
+  
+  /**
+   * @see {@link AnnotationServiceFactory}
+   */
+  private AnnotationServiceFactory serviceFactory;
+  
+  /**
+   * Contains list of container component which implements {@link AbstractWebService} .
+   */
+  private List <AbstractWebService> services;
+  
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger(WebServiceLoader.class);
 
   
-  public WebServiceLoader(ExoContainerContext context) {
-    containerContext = context;
+  /**
+   * Constructs instance of WebServiceLoader.
+   * @param containerContext the ExoContainer context.
+   */
+  public WebServiceLoader(ExoContainerContext containerContext) {
     container = containerContext.getContainer();
     createXFire();
     createFactory();
@@ -70,18 +90,25 @@ public class WebServiceLoader implements Startable {
     }
   }
   
+  /**
+   * Create service factory.
+   */
   private void createFactory() {
     if (serviceFactory == null) {
       this.serviceFactory = new AnnotationServiceFactory();
     }
   }
   
-  private ServiceRegistry getRegisrty() {
+  /**
+   * @return the service registry.
+   */
+  private ServiceRegistry getRegistry() {
     return xfire.getServiceRegistry();
   }
   
-  /* (non-Javadoc)
-   * @see org.picocontainer.Startable#start()
+  /**
+   * Register all available container components as services in XFire engine.
+   * {@inheritDoc} 
    */
   public void start() {
     services = container.getComponentInstancesOfType(AbstractWebService.class);
@@ -95,11 +122,14 @@ public class WebServiceLoader implements Startable {
             new PicoFactory(simpleReference, ws.getServiceInfo().getServiceClass()),
             RequestScopePolicy.instance())
       );
-      getRegisrty().register(ws);
-      logger.info("New WebService " + ws.getName() + " registered.");
+      getRegistry().register(ws);
+      LOG.info("New WebService " + ws.getName() + " registered.");
     }
   }
   
+  /**
+   * {@inheritDoc} 
+   */
   public void stop() {
   }
 
