@@ -37,33 +37,60 @@ import org.exoplatform.services.security.sso.config.Config;
  */
 public class NTLMAuthenticator implements SSOAuthenticator {
 
-  private static final Log log = ExoLogger.getLogger("ws.security.NTLMAuthenticator");
+  private static final Log LOG = ExoLogger.getLogger("ws.security.NTLMAuthenticator");
 
+  /**
+   * Response to the client. Can be null if server has nothing to say.
+   */
   private byte[] sendBackToken;
+  
+  /**
+   * Domain name.
+   */
   private String domain;
+  
+  /**
+   * Workstation name.
+   */
   private String workstation;
+  
+  /**
+   * User name.
+   */
   private String user;
+  
+  /**
+   * User principal. 
+   */
   private Principal principal;
+  
+  /**
+   * Indicate is authentication completed.
+   */
   private boolean complete = false;
+
+  /**
+   * Indicate is authentication successful.
+   */
   private boolean success = false;
   
-  
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.organization.auth.sso.SSOAuthenticator#isComplete()
+
+  /**
+   * {@inheritDoc}
    */
   public boolean isComplete() {
     return complete;
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.organization.auth.sso.SSOAuthenticator#isSuccess()
+  /**
+   * {@inheritDoc}
    */
   public boolean isSuccess() {
     return success;
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.organization.auth.sso.SSOAuthenticator#authenticate(byte[])
+  /**
+   * {@inheritDoc}
    */
   public void doAuthenticate(byte[] token) throws Exception {
 
@@ -86,8 +113,8 @@ public class NTLMAuthenticator implements SSOAuthenticator {
         
 //      NOTE that the supplied domain are in OEM format. (Message type 1)
         domain = new String(token, domainOffset, domainLength);
-        if (log.isDebugEnabled()) {
-          log.debug("NTLM message Type 1. Domain name specified: " + domain);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("NTLM message Type 1. Domain name specified: " + domain);
         }
         
         // Check is workstation member of domain.
@@ -109,8 +136,8 @@ public class NTLMAuthenticator implements SSOAuthenticator {
         int workstationOffset = readLong(token, 24 + 4);
 //      NOTE that the supplied domain are in OEM format. (Message type 1)
         workstation = new String(token, workstationOffset, workstationLength);
-        if (log.isDebugEnabled()) {
-          log.debug("NTLM message Type 1. Workstation name specified: " + workstation);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("NTLM message Type 1. Workstation name specified: " + workstation);
         }
         
       }
@@ -127,9 +154,8 @@ public class NTLMAuthenticator implements SSOAuthenticator {
       
       System.arraycopy(challenge, 0, sendBackToken, 24, 8);
       
-      if (log.isDebugEnabled()) {
-        log.debug("NTLM message type 1. Send back token : " +
-            new String(Base64.encodeBase64(sendBackToken)));
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("NTLM message type 1. Send back token : " + new String(Base64.encodeBase64(sendBackToken)));
       }
       
       // Indicate we get success on this step but process is not finished yet.
@@ -150,8 +176,8 @@ public class NTLMAuthenticator implements SSOAuthenticator {
       int domainLength = readInt(token, 28);
       int domainOffset = readLong(token, 28 + 4);
       domain = new String(token, domainOffset, domainLength, charset);
-      if (log.isDebugEnabled()) {
-        log.debug("NTLM message Type 3. Domain name specified: " + domain);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("NTLM message Type 3. Domain name specified: " + domain);
       }
       
       // Check is workstation member of domain.
@@ -167,15 +193,15 @@ public class NTLMAuthenticator implements SSOAuthenticator {
       int workstationOffset = readLong(token, 44 + 4);
       workstation = new String(token, workstationOffset, workstationLength,
           charset);
-      if (log.isDebugEnabled()) {
-        log.debug("NTLM message Type 3. Workstation name specified: " + workstation);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("NTLM message Type 3. Workstation name specified: " + workstation);
       }
       
       int userLength = readInt(token, 36);
       int userOffset = readLong(token, 36 + 4);
       user = new String(token, userOffset, userLength, charset);
-      if (log.isDebugEnabled()) {
-        log.debug("NTLM message Type 3. User name specified: " + user);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("NTLM message Type 3. User name specified: " + user);
       }
 
       int lmLength = readInt(token, 12);
@@ -196,8 +222,8 @@ public class NTLMAuthenticator implements SSOAuthenticator {
       
       principal = new UserPrincipal(getUser());
       
-      if (log.isDebugEnabled()) {
-        log.debug("Login successful for principal: " + ntlmPassAuth);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Login successful for principal: " + ntlmPassAuth);
       }
       
       // Authentication successful, level 3 passed.
@@ -215,22 +241,22 @@ public class NTLMAuthenticator implements SSOAuthenticator {
         + "Client must send NTLM message type 1 or message type 3.");
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.organization.auth.sso.SSOAuthenticator#getSendBackToken()
+  /**
+   * {@inheritDoc}
    */
   public byte[] getSendBackToken() {
     return sendBackToken;
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.organization.auth.sso.SSOAuthenticator#getUser()
+  /**
+   * {@inheritDoc}
    */
   public String getUser() {
     return user;
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.organization.auth.sso.SSOAuthenticator#getPrincipal()
+  /**
+   * {@inheritDoc}
    */
   public Principal getPrincipal() {
     return principal;
@@ -250,23 +276,35 @@ public class NTLMAuthenticator implements SSOAuthenticator {
     return true;
   }
 
-  /* Read integer value from given byte array. 
+  /**
+   * Read integer value from given byte array. 
    * Not Java integer, two bytes. 
+   * @param bb source bytes.
+   * @param p the position in byte array.
+   * @return integer.
    */
   private static int readInt(byte[] bb, int p) {
     return (bb[p] & 0xFF) | ((bb[p + 1] & 0xFF) << 8);
   }
 
-  /* Read long value from given byte array.
+  /**
+   * Read long value from given byte array.
    * Not Java long, four bytes.
+   * @param bb source bytes.
+   * @param p the position in byte array.
+   * @return long.
    */
   private static int readLong(byte[] bb, int p) {
     return (bb[p] & 0xFF) | ((bb[p + 1] & 0xFF) << 8)
          | ((bb[p + 2] & 0xFF) << 16) | ((bb[p + 2] & 0xFF) << 24);
   }
 
-  /* Write long value to given byte array.
+  /**
+   * Write long value to given byte array.
    * This is not Java long, four bytes.
+   * @param bb the bytes.
+   * @param p the start position.
+   * @param l the long value.
    */
   private static void writeLong(byte[] bb, int p, int l) {
     bb[p] = (byte) (l & 0xFF);

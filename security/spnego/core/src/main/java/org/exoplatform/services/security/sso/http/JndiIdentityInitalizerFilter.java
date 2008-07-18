@@ -41,26 +41,27 @@ import org.exoplatform.services.security.MembershipEntry;
 import org.exoplatform.services.security.sso.jndi.JndiAction;
 
 /**
+ * NOTE must be configured after SSOAuthenticationFilter.
  * Get groups for user and create and register Identity for him.
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 public class JndiIdentityInitalizerFilter implements Filter {
 
-  private static final Log log = ExoLogger.getLogger("ws.security.JndiIdentityInitalizerFilter");
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger("ws.security.JndiIdentityInitalizerFilter");
 
-  /*
-   * (non-Javadoc)
-   * @see javax.servlet.Filter#destroy()
+  /**
+   * {@inheritDoc}
    */
   public void destroy() {
     // nothing to do
   }
 
-  /*
-   * (non-Javadoc)
-   * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
-   *      javax.servlet.ServletResponse, javax.servlet.FilterChain)
+  /**
+   * {@inheritDoc}
    */
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
       ServletException {
@@ -79,8 +80,8 @@ public class JndiIdentityInitalizerFilter implements Filter {
         Identity identity = null;
         try {
           List<String> groups = JndiAction.getGroups(userId);
-          if (log.isDebugEnabled()) {
-            log.debug("..... " + groups);
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("..... " + groups);
           }
 
           Set<MembershipEntry> entries = new HashSet<MembershipEntry>(groups.size());
@@ -89,22 +90,21 @@ public class JndiIdentityInitalizerFilter implements Filter {
           }
           identity = new Identity(userId, entries);
         } catch (LoginException e) {
-          log.error("Can't get groups for " + userId + " from AD!");
+          LOG.error("Can't get groups for " + userId + " from AD!");
           // create identity without memberships
           identity = new Identity(userId);
         }
 
         identityRegistry.register(identity);
 
-      }
-      else {
-        if (log.isDebugEnabled()) {
-          log.debug("Identity for " + userId + " already registered.");
+      } else {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Identity for " + userId + " already registered.");
         }
         
       }
     } else {
-      log.error("Username is null, can't create identity.");
+      LOG.error("Username is null, can't create identity.");
     }
     
     chain.doFilter(request, response);
@@ -118,9 +118,8 @@ public class JndiIdentityInitalizerFilter implements Filter {
     return ExoContainerContext.getCurrentContainer();
   }
 
-  /*
-   * (non-Javadoc)
-   * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
+  /**
+   * {@inheritDoc}
    */
   public void init(FilterConfig arg0) throws ServletException {
     // nothing to do

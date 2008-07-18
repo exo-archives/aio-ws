@@ -32,28 +32,52 @@ import org.ietf.jgss.GSSName;
  */
 public class SpnegoAuthenticator implements SSOAuthenticator {
 
+  /**
+   * SpnegoHandler.
+   */
   private SpnegoHandler handler;
   
+  /**
+   * Response to the client. Can be null if server has nothing to say.
+   */
   private byte[] sendBackToken;
+
+  /**
+   * @see org.ietf.jgss.GSSName .
+   */
   private GSSName name;
+  
+  /**
+   * User name.
+   */
   private String username;
+  
+  /**
+   * User principal. 
+   */
   private Principal principal;
 
-  private static final Log log = ExoLogger.getLogger("ws.security.SpnegoAuthenticator");
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger("ws.security.SpnegoAuthenticator");
   
+  /**
+   * Constructs instance of SpnegoAuthenticator.
+   */
   public SpnegoAuthenticator() {
     handler = new SpnegoHandler();
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.organization.auth.sso.SSOAuthenticator#authenticate(byte[])
+  /**
+   * {@inheritDoc}
    */
   public void doAuthenticate(byte[] token) throws Exception {
     sendBackToken = handler.authenticate(token);
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.organization.auth.sso.SSOAuthenticator#getPrincipal()
+  /**
+   * {@inheritDoc}
    */
   public Principal getPrincipal() {
     if (principal != null)
@@ -66,15 +90,15 @@ public class SpnegoAuthenticator implements SSOAuthenticator {
     return null;
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.organization.auth.sso.SSOAuthenticator#getSendBackTokens()
+  /**
+   * {@inheritDoc}
    */
   public byte[] getSendBackToken() {
     return sendBackToken;
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.organization.auth.sso.SSOAuthenticator#getUser()
+  /**
+   * {@inheritDoc}
    */
   public String getUser() {
     if (username != null)
@@ -84,7 +108,7 @@ public class SpnegoAuthenticator implements SSOAuthenticator {
       try {
         name = handler.getGSSContext().getSrcName();
       } catch (GSSException e) {
-        log.error("GSSContext is not established!", e);
+        LOG.error("GSSContext is not established!", e);
       }
     }
     
@@ -98,15 +122,15 @@ public class SpnegoAuthenticator implements SSOAuthenticator {
     return null;
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.organization.auth.sso.SSOAuthenticator#isComplete()
+  /**
+   * {@inheritDoc}
    */
   public boolean isComplete() {
     return handler.isComplete();
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.organization.auth.sso.SSOAuthenticator#isSuccess()
+  /**
+   * {@inheritDoc}
    */
   public boolean isSuccess() {
     return handler.isEstablished();

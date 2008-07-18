@@ -27,6 +27,9 @@ import org.picocontainer.Startable;
  */
 public class SSOConfigurator implements Startable {
   
+  /**
+   * @param params initialized parameters.
+   */
   public SSOConfigurator(InitParams params) {
     PropertiesParam pparams = params.getPropertiesParam("sso-properties");
     if (pparams == null)
@@ -43,14 +46,14 @@ public class SSOConfigurator implements Startable {
       config.setCrossDomain(true);
   }
 
-  /* (non-Javadoc)
-   * @see org.picocontainer.Startable#start()
+  /**
+   * {@inheritDoc}
    */
   public void start() {
   }
 
-  /* (non-Javadoc)
-   * @see org.picocontainer.Startable#stop()
+  /**
+   * {@inheritDoc}
    */
   public void stop() {
   }

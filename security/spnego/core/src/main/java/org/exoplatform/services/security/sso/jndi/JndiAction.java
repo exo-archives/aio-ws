@@ -47,26 +47,38 @@ import org.exoplatform.services.security.sso.config.Config;
  */
 public class JndiAction {
 
-  private final static Log log = ExoLogger.getLogger("ws.security.JndiAction");
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger("ws.security.JndiAction");
 
+  /**
+   * Must not be created directly.
+   */
   private JndiAction() {
   }
 
+  /**
+   * Get user's groups.
+   * @param user the user name.
+   * @return List of user's groups.
+   * @throws LoginException if can't login to LDAP server. 
+   */
   public static List<String> getGroups(String user) throws LoginException {
     Config config = Config.getInstance();
     /* Login context for JNDI action.
      */
     LoginContext lc = new LoginContext(config.getJaasContext());
     lc.login();
-    if (log.isDebugEnabled()) {
-      log.debug("Login for privileged user success, try go get LDAP.");
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Login for privileged user success, try go get LDAP.");
     }
     Subject subject = lc.getSubject();
     Object o = Subject.doAs(subject, new JndiAction().new Action(user));
     if (o != null) {
       List<String> groups = (List<String>) o;
-      if (log.isDebugEnabled()) {
-        log.debug("Groups for user \"" + user + "\": " + groups);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Groups for user \"" + user + "\": " + groups);
       }
       return groups;
     }
@@ -94,17 +106,26 @@ public class JndiAction {
     return sb.toString();
   }
 
+  /**
+   * Privileged action.
+   */
   private class Action implements PrivilegedAction<List<String>> {
 
+    /**
+     * Name of user.
+     */
     private final String user;
 
+    /**
+     * Constructs new Action instance.
+     * @param user the user name.
+     */
     Action(String user) {
       this.user = user;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see java.security.PrivilegedAction#run()
+    /**
+     * {@inheritDoc}
      */
     public List<String> run() {
       try {
@@ -121,7 +142,7 @@ public class JndiAction {
         searchCtrls.setSearchScope(SearchControls.SUBTREE_SCOPE);
         String searchFilter = "(&(objectClass=user)(CN=" + user + "))";
         String searchBase = "CN=Users," + JndiAction.domainName2LdapAddress(config.getDomain());
-        String[] returnAttributes = { "memberOf" };
+        String[] returnAttributes = {"memberOf"};
         searchCtrls.setReturningAttributes(returnAttributes);
 
         List<String> list = new ArrayList<String>();
@@ -131,21 +152,22 @@ public class JndiAction {
         
         while (answer.hasMoreElements()) {
           SearchResult sr = answer.next();
-          if (log.isDebugEnabled()) {
-            log.debug("Search result: " + sr.getName());
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("Search result: " + sr.getName());
           }
           Attributes attrs = sr.getAttributes();
           if (attrs != null) {
             for (NamingEnumeration<? extends Attribute> ne = attrs.getAll(); ne.hasMore();) {
               Attribute attr = ne.next();
-              if (log.isDebugEnabled()) {
-                log.debug("Attribute: getID() " + attr.getID());
-                log.debug("Attribute: size()  " + attr.size());
+              if (LOG.isDebugEnabled()) {
+                LOG.debug("Attribute: getID() " + attr.getID());
+                LOG.debug("Attribute: size()  " + attr.size());
               }
               int results = attr.size();
               for (int i = 0; i < results; i++) {
                 String s = (String) attr.get(i);
                 int comma = s.indexOf(',');
+                // skip 'CN='
                 list.add(s.substring(3, comma));
               }
             }

@@ -23,36 +23,86 @@ package org.exoplatform.services.security.sso.config;
  */
 public class Config {
 
+  /**
+   * Authenticator key. With this key authenticator should be stored in HTTPSession. 
+   */
   public static final String SSOAUTHENTICATOR_KEY = "_sso.authenticator";
 
-  // NTLMSSP signature : NTLMSSP
-  public static final byte[] NTLMSSP_SIGNATURE = new byte[]{ 0x4E, 0x54, 0x4C, 0x4D, 0x53, 0x53, 0x50, 0x00 };
+  /**
+   * NTLMSSP signature : NTLMSSP.
+   */
+  public static final byte[] NTLMSSP_SIGNATURE = new byte[] {0x4E, 0x54, 0x4C, 0x4D, 0x53, 0x53, 0x50, 0x00};
 
-  // Default character set for NTLM messages
+  /**
+   * Default character set for NTLM messages.
+   */
   public static final String DEFAULT_CHARSET = "UnicodeLittleUnmarked";
 
-  // Possible names of authentication mechanism
+  /**
+   * Negotiate authentication.
+   */
   public static final String HTTP_NEGOTIATE = "Negotiate";
+  
+  /**
+   * NTLM authentication. 
+   */
   public static final String HTTP_NTLM = "NTLM";
 
-  private static String[] supportedMechanisms = new String[]{ HTTP_NEGOTIATE, HTTP_NTLM };
+  /**
+   * Supported authentication type.
+   */
+  private static final String[] SUPPORTED_MECHANISM = new String[] {HTTP_NEGOTIATE, HTTP_NTLM};
 
+  /**
+   * Instance of Config.
+   */
   private static Config config;
 
+  /**
+   * Domain controller.
+   */
   private String domainCtrl;
+  
+  /**
+   * Character encoding.
+   */
   private String charset;
+  
+  /**
+   * LDAP server address. This address will be used for getting user's groups.
+   * @see {@link JndiAction}
+   */
   private String ldapServer;
+  
+  /**
+   * Name of JAAS context.
+   */
   private String jaasContext;
+  
+  /**
+   * Address for alternative authentication, should be used if client does
+   * not support 'Negotiate' or 'NTLMSSP'.
+   */
   private String redirectOnError;
+  
+  /**
+   * Is cross domain authentication allowed.
+   * Usual actual only for NTLM, Kerberos authentication 
+   * is allowed only in one domain by default. 
+   */
   private boolean crossDomain = false;
 
-  /*
-   * Only one instance of this class can be created. First time must be created
-   * and configured by SSOConfigurator.
+  /**
+   * Singleton instance. Constructor must not be used directly. 
+   * Only one instance of this class can be created.
+   * First time must be created and configured by SSOConfigurator.
    */
   private Config() {
   }
 
+  /**
+   * @return existing instance of Config or create new one.
+   */
   public static Config getInstance() {
     return config == null ? config = new Config() : config;
   }
@@ -61,7 +111,7 @@ public class Config {
    * @return the array of supported authentication mechanisms.
    */
   public static String[] getSupportedAuthenticationMechanisms() {
-    return supportedMechanisms;
+    return SUPPORTED_MECHANISM;
   }
 
   /**
@@ -73,7 +123,7 @@ public class Config {
 
   /**
    * Set Domain Controller name.
-   * @param the domainCtrl the Domain Controller name.
+   * @param domainCtrl the Domain Controller name.
    */
   void setDomain(String domainCtrl) {
     this.domainCtrl = domainCtrl;
@@ -145,7 +195,7 @@ public class Config {
   }
 
   /**
-   * @param jassContext the JAAS context name.
+   * @param jaasContext the JAAS context name.
    */
   void setJaasContext(String jaasContext) {
     this.jaasContext = jaasContext;

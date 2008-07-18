@@ -27,7 +27,7 @@ public interface SSOAuthenticator {
   
   /**
    * @param token the token from client.
-   * @throws Exception
+   * @throws Exception if any error occurs.
    */
   void doAuthenticate(byte[] token) throws Exception;
   

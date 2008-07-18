@@ -81,7 +81,10 @@ import org.exoplatform.services.security.sso.spnego.message.OctetString;
  */
 public class SpnegoHandler {
 
-  final static Log logger = ExoLogger.getLogger("core.sso.SpnegoHandler");
+  /**
+   * Logger.
+   */
+  static final Log LOG = ExoLogger.getLogger("ws.security.SpnegoHandler");
 
   /**
    * The parser to use.
@@ -93,14 +96,45 @@ public class SpnegoHandler {
    */
   private boolean rfc4178 = true;
 
-  // flag to only warn once.
+  /**
+   * Flag to only warn once.
+   */
   private static boolean doWarnings = true;
 
   /**
    * State of the SpnegoHandler.
    */
   public enum State {
-    UNINITIALIZED, INITIALIZED, NEGOTIATING, ESTABLISHED, FAILED, UNAUTHORIZED
+    
+    /**
+     * Process not started yet. 
+     */
+    UNINITIALIZED,
+    
+    /**
+     * Context initialized. 
+     */
+    INITIALIZED,
+    
+    /**
+     * Authentication in process. 
+     */
+    NEGOTIATING,
+    
+    /**
+     * Successful.
+     */
+    ESTABLISHED,
+    
+    /**
+     * Failed. 
+     */
+    FAILED,
+    
+    /**
+     * @see setUnauthorized() .
+     */
+    UNAUTHORIZED
   }
 
   /**
@@ -114,26 +148,29 @@ public class SpnegoHandler {
   private State state = State.UNINITIALIZED;
 
   /**
-   * Creates a new SpnegoHandler
+   * Creates a new SpnegoHandler .
    * @throws GSSSpnegoException If we failed to establish the GSS-API context.
    */
   public SpnegoHandler() throws GSSSpnegoException {
     testSetup();
   }
 
+  /**
+   * Check is configuration of environment is correct.  
+   */
   private void testSetup() {
 
     String tmp = System.getProperty("javax.security.auth.useSubjectCredsOnly");
     if (tmp == null) {
       if (doWarnings)
-        logger.warn("javax.security.auth.useSubjectCredsOnly is not set "
+        LOG.warn("javax.security.auth.useSubjectCredsOnly is not set "
             + "which makes it default to true. SpnegoHandler will not work.");
       state = State.FAILED;
     }
 
     if ("true".equalsIgnoreCase(tmp)) {
       if (doWarnings)
-        logger.warn("javax.security.auth.useSubjectCredsOnly is set to true. "
+        LOG.warn("javax.security.auth.useSubjectCredsOnly is set to true. "
             + "SpnegoHandler will not work.");
       state = State.FAILED;
     }
@@ -142,7 +179,7 @@ public class SpnegoHandler {
 
     if (tmp == null) {
       if (doWarnings)
-        logger.warn("java.security.auth.login.config is not set. "
+        LOG.warn("java.security.auth.login.config is not set. "
             + "This property needs to point to a JAAS config file. "
             + "SpnegoHandler will not work.");
       state = State.FAILED;
@@ -152,6 +189,11 @@ public class SpnegoHandler {
 
   }
 
+  /**
+   * Initialize GSSContext.
+   * @param flags ContextFlags.
+   * @throws GSSException if GSS error occurs.
+   */
   private void init(ContextFlags flags) throws GSSException {
 
     // Oid spnegoOid = new Oid("1.3.6.1.5.5.2"); // java 6 has this.
@@ -224,7 +266,7 @@ public class SpnegoHandler {
       if (negTokenInit.getMechTypes() != null) {
         MechTypeList list = negTokenInit.getMechTypes();
         if (list.getMechs().size() == 0) {
-          logger.info("No mech in mech list");
+          LOG.info("No mech in mech list");
           state = State.FAILED;
           return null;
         } else {
@@ -238,7 +280,7 @@ public class SpnegoHandler {
             }
           }
           if (!hasKerberos) {
-            logger.info("Mech list does not contain kerberos!");
+            LOG.info("Mech list does not contain kerberos!");
             state = State.FAILED;
             return null;
           }
@@ -254,8 +296,8 @@ public class SpnegoHandler {
       token = context.acceptSecContext(token, mechToken.getSourceStart(),
           mechToken.getSourceLength());
       if (context.isEstablished()) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Accepted Spnego negotiation. Authenticated user: "
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Accepted Spnego negotiation. Authenticated user: "
               + context.getSrcName());
         }
         // in theory SPNEGO allows for several roundtrips between client

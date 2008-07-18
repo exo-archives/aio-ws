@@ -46,30 +46,28 @@ import org.exoplatform.services.security.sso.ntlm.NTLMAuthenticator;
  */
 public class SSOAuthenticationFilter implements Filter {
 
-  /*
-   * NOTE: Some logs about error will be shown only in debug mode. Just one
+  /**
+   * Logger.
+   * NOTE Some logs about error will be shown only in debug mode. Just one
    * reason for this, if client is out of domain it can be authenticate in some
    * other way (not NTLM or SPNEGO).
    */
-  private static final Log log = ExoLogger.getLogger("ws.security.SSOAuthenticationFilter");
+  private static final Log LOG = ExoLogger.getLogger("ws.security.SSOAuthenticationFilter");
 
-  /*
-   * URL for alternative authentication. If user can't authenticate by this
-   * filter.
+  /**
+   * URL for alternative authentication. If user can't authenticate by this filter.
    */
   private static String redirectOnError;
 
-  /*
-   * (non-Javadoc)
-   * @see javax.servlet.Filter#destroy()
+  /**
+   * {@inheritDoc}
    */
   public void destroy() {
+    // nothing to do.
   }
 
-  /*
-   * (non-Javadoc)
-   * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
-   *      javax.servlet.ServletResponse, javax.servlet.FilterChain)
+  /**
+   * {@inheritDoc}
    */
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
       ServletException {
@@ -87,9 +85,8 @@ public class SSOAuthenticationFilter implements Filter {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
+  /**
+   * {@inheritDoc}
    */
   public void init(FilterConfig filterConfig) throws ServletException {
     redirectOnError = Config.getInstance().getRedirectOnError();
@@ -97,22 +94,20 @@ public class SSOAuthenticationFilter implements Filter {
 
   /**
    * Do all work about authentication.
-   * @param request the request object to check for headers.
-   * @param response the response object to set headers and
-   *            <code>sendError(401)</code>.
-   * @return Principal id authentication complete and success and null
-   *         otherwise.
-   * @throws IOException from the servlet API.
+   * @param httpRequest the request object to check for headers.
+   * @param httpResponse the response object to set headers and <code>sendError(401)</code>.
+   * @return Principal id authentication complete and success and null  otherwise.
+   * @throws IOException if i/o error occurs.
    */
-  public final static Principal authenticate(HttpServletRequest httpRequest, HttpServletResponse httpResponse)
+  public static final Principal authenticate(HttpServletRequest httpRequest, HttpServletResponse httpResponse)
       throws IOException {
     /*
      * Request is authenticated in some other way. Usually must not be happen.
      */
     Principal principal = httpRequest.getUserPrincipal();
     if (principal != null) {
-      if (log.isDebugEnabled()) {
-        log.debug("User " + principal + " already authenticated.");
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("User " + principal + " already authenticated.");
       }
 
       return principal;
@@ -126,9 +121,10 @@ public class SSOAuthenticationFilter implements Filter {
 
     // Authenticator found in session
     if (auth != null) {
-      if (log.isDebugEnabled()) {
-        log.debug("Get authenticator from HTTP session." + " principal : " + auth.getPrincipal() +
-            " authentication complete: " + auth.isComplete() + " authentication success: " + auth.isSuccess());
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Get authenticator from HTTP session." + " principal : " + auth.getPrincipal()
+            + " authentication complete: " + auth.isComplete()
+            + " authentication success: " + auth.isSuccess());
       }
 
       // Authentication complete with success.
@@ -147,8 +143,8 @@ public class SSOAuthenticationFilter implements Filter {
 
     if (authHeader == null) {
       // Authentication process is not started yet.
-      if (log.isDebugEnabled()) {
-        log.debug("No authorization headers, send WWW-Authenticate header.");
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("No authorization headers, send WWW-Authenticate header.");
       }
 
       /*
@@ -224,9 +220,12 @@ public class SSOAuthenticationFilter implements Filter {
 
   }
   
-  /*
+  /**
    * Check if it possible to use some alternative mechanism of authentication.
    * If it is disable send FORBIDDEN (403) status.
+   * @param httpResponse the response object to set headers and <code>sendError(403)</code>.
+   * @param e thrown Exception.
+   * @throws IOException if i/o error occurs.
    */
   private static void doFailed(HttpServletResponse httpResponse, Exception e) throws IOException {
     if (redirectOnError == null) {
@@ -235,8 +234,8 @@ public class SSOAuthenticationFilter implements Filter {
       httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
     } else {
       // If have alternative mechanism then hide errors.
-      if (log.isDebugEnabled()) {
-        log.debug("Thrown exception " + e.getMessage());
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Thrown exception " + e.getMessage());
         e.printStackTrace();
       }
       httpResponse.sendRedirect(redirectOnError);
@@ -244,24 +243,35 @@ public class SSOAuthenticationFilter implements Filter {
   }
   
 
+  /**
+   * @see javax.servlet.http.HttpServletResponseWrapper .
+   */
   final class SSOHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
+    /**
+     * User principal.
+     */
     private Principal principal;
     
+    /**
+     * @param request the original request.
+     * @param principal the user principal.
+     */
     public SSOHttpServletRequestWrapper(final HttpServletRequest request, final Principal principal) {
       super(request);
       this.principal = principal;
     }
-    /* (non-Javadoc)
-     * @see javax.servlet.http.HttpServletRequestWrapper#getRemoteUser()
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public String getRemoteUser() {
       return getUserPrincipal().getName();
     }
 
-    /* (non-Javadoc)
-     * @see javax.servlet.http.HttpServletRequestWrapper#getUserPrincipal()
+    /**
+     * {@inheritDoc}
      */
     @Override
     public Principal getUserPrincipal() {

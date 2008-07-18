@@ -53,16 +53,21 @@ import org.exoplatform.services.log.ExoLogger;
  * <code>redirectOnFailed</code>. The path is webapp relative.
  * {@link #setRedirectOnFailed(String)}.
  * @author Martin Algesten
+ * 
+ * @deprecated In eXo implementation SSOAuthenticationFilter must be used instead this.
  */
 public class SpnegoFilter implements Filter {
 
-  final static Log logger = ExoLogger.getLogger("core.sso.SpnegoFilter");
+  /**
+   * Logger.
+   */
+  static final Log LOG = ExoLogger.getLogger("core.sso.SpnegoFilter");
 
   /**
    * The name of the session attribute we bind the handler to.
    * "spnego.ServletSpnegoHandler".
    */
-  public final static String HANDLER_ATTRIBUTE_KEY = "spnego.ServletSpnegoHandler";
+  public static final String HANDLER_ATTRIBUTE_KEY = "spnego.ServletSpnegoHandler";
 
   /**
    * A webapp relative resource to redirect to on successful authentication.
@@ -84,9 +89,16 @@ public class SpnegoFilter implements Filter {
    */
   private boolean catchExceptions = true;
 
+  /**
+   * {@inheritDoc}
+   */
   public void destroy() {
+    // nothing to do.
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public void doFilter(ServletRequest inrequest, ServletResponse inresponse,
       FilterChain chain) throws IOException, ServletException {
 
@@ -97,8 +109,8 @@ public class SpnegoFilter implements Filter {
 
     try {
       if (handler == null) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Binding new ServletSpnegoHandler to session");
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Binding new ServletSpnegoHandler to session");
         }
         handler = bindNewServletSpnegoHandlerInSession(request);
       }
@@ -106,7 +118,7 @@ public class SpnegoFilter implements Filter {
     } catch (SpnegoException spne) {
       if (!catchExceptions)
         throw spne;
-      logger.error("Caught exception", spne);
+      LOG.error("Caught exception", spne);
       if (!response.isCommitted())
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
@@ -127,8 +139,9 @@ public class SpnegoFilter implements Filter {
   }
 
   /**
-   * Utility method for obtaining the {@link ServletSpnegoHandler} bound to the
-   * session.
+   * Utility method for obtaining the {@link ServletSpnegoHandler} bound to the session.
+   * @param request HttpServletRequest.
+   * @return ServletSpnegoHandler.
    */
   public static ServletSpnegoHandler extractServletSpnegoHandlerFromSession(
       HttpServletRequest request) {
@@ -139,8 +152,9 @@ public class SpnegoFilter implements Filter {
   }
 
   /**
-   * Utility method for setting a new {@link ServletSpnegoHandler} in the
-   * session.
+   * Utility method for setting a new {@link ServletSpnegoHandler} in the session.
+   * @param request HttpServletRequest.
+   * @return ServletSpnegoHandler.
    */
   public static ServletSpnegoHandler bindNewServletSpnegoHandlerInSession(
       HttpServletRequest request) {
@@ -150,6 +164,9 @@ public class SpnegoFilter implements Filter {
     return handler;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public void init(FilterConfig config) throws ServletException {
     catchExceptions = !"false".equals(config
         .getInitParameter("catchExceptions"));

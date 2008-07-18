@@ -27,14 +27,21 @@ import org.exoplatform.services.security.sso.spnego.SpnegoAuthenticator;
  */
 public class SSOAuthenticatorFactory {
   
+  /**
+   * Authenticator factory.
+   */
   private static SSOAuthenticatorFactory authFactory;
   
-  /*
-   * Only one instance of factory. 
+  /**
+   * Singleton instance.
+   * Must not be used directly.
    */
   private SSOAuthenticatorFactory() {
   }
   
+  /**
+   * @return existing instance of factory or create new one.
+   */
   public static SSOAuthenticatorFactory getInstance() {
     return authFactory == null ? authFactory = new SSOAuthenticatorFactory() : authFactory;
   }

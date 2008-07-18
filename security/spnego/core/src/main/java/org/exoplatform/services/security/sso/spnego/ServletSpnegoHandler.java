@@ -31,23 +31,26 @@ import org.exoplatform.services.log.ExoLogger;
  */
 public class ServletSpnegoHandler extends SpnegoHandler {
 
-  final static Log logger = ExoLogger.getLogger("core.sso.ServletSpnegoHandler");
+  /**
+   * Logger.
+   */
+  static final Log LOG = ExoLogger.getLogger("core.sso.ServletSpnegoHandler");
 
   /**
    * The server header (WWW-Authenticate).
    */
-  private final static String HEADER_WWW_AUTHENTICATE = "WWW-Authenticate";
+  private static final String HEADER_WWW_AUTHENTICATE = "WWW-Authenticate";
 
   /**
    * The client header (Authoriation).
    */
-  private final static String HEADER_AUTHORIZATION = "Authorization";
+  private static final String HEADER_AUTHORIZATION = "Authorization";
 
   /**
    * The prefix used by SPNEGO before the Base64 encoded GSS-API token
    * (Negotiate).
    */
-  private final static String NEG_TOKEN = "Negotiate";
+  private static final String NEG_TOKEN = "Negotiate";
 
   /**
    * Expects "Negotiate &lt;base64 token>" input and returns the same kind of
@@ -57,7 +60,6 @@ public class ServletSpnegoHandler extends SpnegoHandler {
    *            <code>"Negotiate ab3qfd32..."</code>
    * @return Null if {@link #authenticate(byte[])} return null or the encoded
    *         result as <code>"Negotiate 8sdf832hdf..."</code>
-   * @throws SpnegoException if the authentication fails.
    */
   public String authenticate(String challenge) {
     if (challenge != null && challenge.startsWith(NEG_TOKEN)) {
@@ -106,8 +108,8 @@ public class ServletSpnegoHandler extends SpnegoHandler {
 
     if (isComplete())
       return;
-    if (logger.isDebugEnabled()) {
-      logger.debug("Entering Spnego authentication remote address: " 
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Entering Spnego authentication remote address: " 
           + request.getRemoteAddr());
     }
     String authorization = request.getHeader(HEADER_AUTHORIZATION);
@@ -116,8 +118,8 @@ public class ServletSpnegoHandler extends SpnegoHandler {
       authorization = null;
 
     if (authorization != null) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Recevied client token: "
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Recevied client token: "
             + authorization);
       }
     }
@@ -126,14 +128,14 @@ public class ServletSpnegoHandler extends SpnegoHandler {
 
     if (responseToken != null) {
       response.setHeader(HEADER_WWW_AUTHENTICATE, responseToken);
-      if (logger.isDebugEnabled()) {
-        logger.debug("Sending response token: " + responseToken);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Sending response token: " + responseToken);
       }
     }
 
     if (!isEstablished()) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Sending 401 response code.");
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Sending 401 response code.");
       }
       response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
     }
