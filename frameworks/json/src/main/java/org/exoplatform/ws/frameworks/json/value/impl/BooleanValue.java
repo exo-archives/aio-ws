@@ -27,43 +27,49 @@ import org.exoplatform.ws.frameworks.json.value.JsonValue;
  */
 public class BooleanValue extends JsonValue {
 
-  private final boolean value_;
+  /**
+   * Value.
+   */
+  private final boolean value;
   
+  /**
+   * Constructs new BooleanValue.
+   * @param value value.
+   */
   public BooleanValue(boolean value) {
-    value_ = value;
+    this.value = value;
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#isBoolean()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public boolean isBoolean() {
     return true;
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#toString()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public String toString() {
-    return (value_) ? "true" : "false";
+    return value ? "true" : "false";
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#getBooleanValue()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public boolean getBooleanValue() {
-    return value_;
+    return value;
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#writeTo(
-   * org.exoplatform.services.rest.frameworks.json.JsonWriter)
+  /**
+   * {@inheritDoc}
    */
   @Override
   public void writeTo(JsonWriter writer) throws JsonException {
-    writer.writeValue(value_);
+    writer.writeValue(value);
   }
 
 }

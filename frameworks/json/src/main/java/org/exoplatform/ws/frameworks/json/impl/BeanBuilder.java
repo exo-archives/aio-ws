@@ -47,7 +47,7 @@ public class BeanBuilder {
    * @param clazz the Class of target Object.
    * @param jsonValue the Json representation.
    * @return Object.
-   * @throws Exception
+   * @throws Exception if any errors occurs.
    */
   public Object createObject(Class<?> clazz, JsonValue jsonValue) throws Exception {
     Object object = clazz.newInstance();
@@ -66,8 +66,8 @@ public class BeanBuilder {
         Class<?> methodParameterClazz = parameterTypes[0];
         String key = methodName.substring("set".length());
         // first letter to lower case
-        key = (key.length() > 1) ? Character.toLowerCase(key.charAt(0)) +
-            key.substring(1) : key.toLowerCase();
+        key = (key.length() > 1)
+            ? Character.toLowerCase(key.charAt(0)) + key.substring(1) : key.toLowerCase();
         
         // Bug : WS-53    
         if (jsonValue.isNull())
@@ -84,7 +84,7 @@ public class BeanBuilder {
         // if one of known primitive type or array of primitive type
         if (JsonUtils.isKnownType(methodParameterClazz)) {
           method.invoke(object,
-              new Object[]{ createObjectKnownTypes(methodParameterClazz, childJsonValue) });
+              new Object[] {createObjectKnownTypes(methodParameterClazz, childJsonValue)});
         } else {
           Types type = JsonUtils.getType(methodParameterClazz);
           // other type Collection, Map or Object[].  
@@ -93,7 +93,7 @@ public class BeanBuilder {
               case ARRAY_OBJECT:
               {
                 Object array = createArray(methodParameterClazz, childJsonValue);
-                method.invoke(object, new Object[]{ array });
+                method.invoke(object, new Object[] {array});
               }
                 break;
               case COLLECTION:
@@ -109,9 +109,8 @@ public class BeanBuilder {
                       parameterizedTypeClass = (Class<?>) parameterizedType.getActualTypeArguments()[0];
                     } catch (ClassCastException e) {
                       throw new JsonException(
-                          "This type of Collection can't be restored from JSON source.\n" +
-                              "Collection is parameterized by wrong Type: " +
-                              parameterizedType + ".");
+                          "This type of Collection can't be restored from JSON source.\n"
+                              + "Collection is parameterized by wrong Type: " + parameterizedType + ".");
                     }
                   } else {
                     throw new JsonException(
@@ -121,22 +120,22 @@ public class BeanBuilder {
                   }
                 }
                 Constructor<?> constructor = null;
-                if (methodParameterClazz.isInterface() ||
-                    Modifier.isAbstract(methodParameterClazz.getModifiers())) {
+                if (methodParameterClazz.isInterface()
+                    || Modifier.isAbstract(methodParameterClazz.getModifiers())) {
                   try {
                     constructor = ArrayList.class.asSubclass(
                         methodParameterClazz).getConstructor(
-                        new Class[]{ Collection.class });
+                        new Class[] {Collection.class});
                   } catch (Exception e) {
                     try {
                       constructor = HashSet.class.asSubclass(
                           methodParameterClazz).getConstructor(
-                          new Class[]{ Collection.class });
+                          new Class[] {Collection.class});
                     } catch (Exception e1) {
                       try {
                         constructor = LinkedList.class.asSubclass(
                             methodParameterClazz).getConstructor(
-                            new Class[]{ Collection.class });
+                            new Class[] {Collection.class});
                       } catch (Exception e2) {
                         // ignore exception here
                       }
@@ -144,7 +143,7 @@ public class BeanBuilder {
                   }
                 } else {
                   constructor = methodParameterClazz
-                      .getConstructor(new Class[]{ Collection.class });
+                      .getConstructor(new Class[] {Collection.class});
                 }
                 if (constructor == null)
                   throw new JsonException(
@@ -179,11 +178,10 @@ public class BeanBuilder {
                           "Key of Map must be String.");
                     try {  
                       parameterizedTypeClass = (Class<?>) parameterizedType.getActualTypeArguments()[1];
-                    } catch(Exception e) {
+                    } catch (Exception e) {
                       throw new JsonException(
-                          "This type of Map can't be restored from JSON source.\n" +
-                              "Map is parameterized by wrong Type: " +
-                              parameterizedType + ".");
+                          "This type of Map can't be restored from JSON source.\n"
+                          + "Map is parameterized by wrong Type: " + parameterizedType + ".");
                     }
                   } else {
                     throw new JsonException(
@@ -193,30 +191,29 @@ public class BeanBuilder {
                   }
                 }
                 Constructor<?> constructor = null;
-                if (methodParameterClazz.isInterface() ||
-                    Modifier.isAbstract(methodParameterClazz.getModifiers())) {
+                if (methodParameterClazz.isInterface()
+                    || Modifier.isAbstract(methodParameterClazz.getModifiers())) {
                   try {
                     constructor = HashMap.class.asSubclass(
                         methodParameterClazz).getConstructor(
-                        new Class[]{ Map.class });
+                        new Class[] {Map.class});
                   } catch (Exception e) {
                     try {
                       constructor = Hashtable.class.asSubclass(
                           methodParameterClazz).getConstructor(
-                          new Class[]{ Map.class });
+                          new Class[] {Map.class});
                     } catch (Exception e1) {
                       try {
                         constructor = LinkedHashMap.class.asSubclass(
                             methodParameterClazz).getConstructor(
-                            new Class[]{ Map.class });
+                            new Class[] {Map.class});
                       } catch (Exception e2) {
                         // ignore exception here
                       }
                     }
                   }
                 } else {
-                  constructor = methodParameterClazz
-                      .getConstructor(new Class[]{ Map.class });
+                  constructor = methodParameterClazz.getConstructor(new Class[] {Map.class});
                 }
                 
                 if (constructor == null)
@@ -241,10 +238,10 @@ public class BeanBuilder {
                 
               }
                 break;
-                default:
+              default:
                 // it must never happen!
-                throw new JsonException("Can't restore parameter of method : " + method +
-                		" from JSON source.");
+                throw new JsonException("Can't restore parameter of method : " + method
+                    + " from JSON source.");
             }
 
           } else {
@@ -262,7 +259,7 @@ public class BeanBuilder {
    * @param clazz the Class of target Object.
    * @param jsonValue the Json representation.
    * @return Object.
-   * @throws Exception
+   * @throws Exception if any errors occurs.
    */
   private Object createArray(Class<?> clazz, JsonValue jsonValue) throws Exception {
     
@@ -292,6 +289,13 @@ public class BeanBuilder {
     return array;
   }
 
+  /**
+   * Create Objects of known types.
+   * @param clazz class.
+   * @param jsonValue JsonValue , @see {@link JsonValue}
+   * @return Object.
+   * @throws JsonException if type is unknown.
+   */
   private Object createObjectKnownTypes(Class<?> clazz, JsonValue jsonValue)
       throws JsonException {
     Types t = JsonUtils.getType(clazz);
@@ -399,6 +403,9 @@ public class BeanBuilder {
           params[i++] = values.next().getStringValue();
         return params;
       }
+      default:
+        // Nothing to do for other type. Exception will be thrown.
+        break;
     }
     throw new JsonException("Unknown type");
   }

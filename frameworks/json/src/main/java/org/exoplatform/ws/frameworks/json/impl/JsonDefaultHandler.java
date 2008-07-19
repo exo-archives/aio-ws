@@ -35,89 +35,101 @@ import org.exoplatform.ws.frameworks.json.value.impl.StringValue;
  */
 public class JsonDefaultHandler implements JsonHandler {
 
-  private String key_;
+  /**
+   * The key.
+   */
+  private String key;
 
-  private JsonValue current_;
+  /**
+   * JsonValue which is currently in process.
+   */
+  private JsonValue current;
   
-  private Stack<JsonValue> values_;
+  /**
+   * Stack of JsonValues.
+   */
+  private Stack<JsonValue> values;
 
+  /**
+   * Constructs new JsonHandler.
+   */
   public JsonDefaultHandler() {
-    values_ = new Stack<JsonValue>();
+    this.values = new Stack<JsonValue>();
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.JsonHandler#characters(char[])
+  /**
+   * {@inheritDoc}
    */
   public void characters(char[] characters) {
-    if (current_.isObject())
-      current_.addElement(key_, parseCharacters(characters));
-    else if (current_.isArray())
-      current_.addElement(parseCharacters(characters));
+    if (current.isObject())
+      current.addElement(key, parseCharacters(characters));
+    else if (current.isArray())
+      current.addElement(parseCharacters(characters));
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.JsonHandler#endArray()
+  /**
+   * {@inheritDoc}
    */
   public void endArray() {
-    current_ = values_.pop();
+    current = values.pop();
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.JsonHandler#endObject()
+  /**
+   * {@inheritDoc}
    */
   public void endObject() {
-    current_ = values_.pop();
+    current = values.pop();
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.JsonHandler#key(java.lang.String)
+  /**
+   * {@inheritDoc}
    */
   public void key(String key) {
-    key_ = key;
+    this.key = key;
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.JsonHandler#startArray()
+  /**
+   * {@inheritDoc}
    */
   public void startArray() {
     ArrayValue o = new ArrayValue();
-    if (current_.isObject())
-      current_.addElement(key_, o);
-    else if (current_.isArray())
-      current_.addElement(o);
-    values_.push(current_);
-    current_ = o;
+    if (current.isObject())
+      current.addElement(key, o);
+    else if (current.isArray())
+      current.addElement(o);
+    values.push(current);
+    current = o;
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.JsonHandler#startObject()
+  /**
+   * {@inheritDoc}
    */
   public void startObject() {
-    if (current_ == null) {
-      current_ = new ObjectValue();
-      values_.push(current_);
+    if (current == null) {
+      current = new ObjectValue();
+      values.push(current);
       return;
     }
     ObjectValue o = new ObjectValue();
-    if (current_.isObject())
-      current_.addElement(key_, o);
-    else if (current_.isArray())
-      current_.addElement(o);
-    values_.push(current_);
-    current_ = o;
+    if (current.isObject())
+      current.addElement(key, o);
+    else if (current.isArray())
+      current.addElement(o);
+    values.push(current);
+    current = o;
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.JsonHandler#getJsonObject()
+  /**
+   * {@inheritDoc}
    */
   public JsonValue getJsonObject() {
-    return current_;
+    return current;
   }
 
   /**
    * Parse characters array dependent of context.
    * @param characters the characters array.
-   * @return
+   * @return JsonValue.
    */
   private JsonValue parseCharacters(char[] characters) {
     String s = new String(characters);

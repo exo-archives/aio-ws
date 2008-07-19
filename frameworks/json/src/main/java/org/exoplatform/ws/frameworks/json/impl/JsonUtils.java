@@ -25,64 +25,209 @@ import java.util.Map;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class JsonUtils {
+public final class JsonUtils {
 
+  /**
+   * Must not be created.
+   */
+  private JsonUtils() {
+  }
+  
+  /**
+   * Known types.
+   */
   public enum Types {
-    BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, BOOLEAN, CHAR, STRING, NULL,
+    
+    /**
+     * Byte. 
+     */
+    BYTE,
+    
+    /**
+     * Short. 
+     */
+    SHORT,
+    
+    /**
+     * Integer. 
+     */
+    INT,
+    
+    /**
+     * Long. 
+     */
+    LONG,
+    
+    /**
+     * Float. 
+     */
+    FLOAT,
+    
+    /**
+     * Double.
+     */
+    DOUBLE,
+    
+    /**
+     * Boolean.
+     */
+    BOOLEAN,
+    
+    /**
+     * Char.
+     */
+    CHAR,
+    
+    /**
+     * String.
+     */
+    STRING,
+    
+    /**
+     * Corresponding to null value.
+     */
+    NULL,
 
-    ARRAY_BYTE, ARRAY_SHORT, ARRAY_INT, ARRAY_LONG, ARRAY_FLOAT, ARRAY_DOUBLE,
-    ARRAY_BOOLEAN, ARRAY_CHAR, ARRAY_STRING, ARRAY_OBJECT, COLLECTION, MAP
+    
+    /**
+     * Array of Bytes. 
+     */
+    ARRAY_BYTE,
+    
+    /**
+     * Array of Shorts. 
+     */
+    ARRAY_SHORT,
+
+    /**
+     * Array of Integers. 
+     */
+    ARRAY_INT,
+    
+    /**
+     * Array of Longs. 
+     */
+    ARRAY_LONG,
+    
+    /**
+     * Array of Floats. 
+     */
+    ARRAY_FLOAT,
+    
+    /**
+     * Array of Doubles. 
+     */
+    ARRAY_DOUBLE,
+    
+    /**
+     * Array of Booleans. 
+     */
+    ARRAY_BOOLEAN,
+    
+    /**
+     * Array of Chars. 
+     */
+    ARRAY_CHAR,
+    
+    /**
+     * Array of Strings. 
+     */
+    ARRAY_STRING,
+    
+    /**
+     * Array of Java Objects (beans). 
+     */
+    ARRAY_OBJECT,
+    
+    /**
+     * Collection. 
+     */
+    COLLECTION,
+    
+    /**
+     * Map. 
+     */
+    MAP
   }
 
+  /**
+   * Types of Json tokens.
+   */
   public enum JsonToken {
-    object, array, key, value
+    /**
+     * JSON object, "key":{value1, ... } . 
+     */
+    object,
+    
+    /**
+     * JSON array "key":[value1, ... ] .
+     */
+    array,
+    
+    /**
+     * Key.
+     */
+    key,
+    
+    /**
+     * Value.
+     */
+    value
   }
 
-  private static final Map<String, Types> knownTypes = new HashMap<String, Types>();
+  /**
+   * Map of known types.
+   */
+  private static final Map<String, Types> KNOWN_TYPES = new HashMap<String, Types>();
 
   static {
     // wrappers for primitive types
-    knownTypes.put(Boolean.class.getName(), Types.BOOLEAN);
+    KNOWN_TYPES.put(Boolean.class.getName(), Types.BOOLEAN);
 
-    knownTypes.put(Byte.class.getName(), Types.BYTE);
-    knownTypes.put(Short.class.getName(), Types.SHORT);
-    knownTypes.put(Integer.class.getName(), Types.INT);
-    knownTypes.put(Long.class.getName(), Types.LONG);
-    knownTypes.put(Float.class.getName(), Types.FLOAT);
-    knownTypes.put(Double.class.getName(), Types.DOUBLE);
+    KNOWN_TYPES.put(Byte.class.getName(), Types.BYTE);
+    KNOWN_TYPES.put(Short.class.getName(), Types.SHORT);
+    KNOWN_TYPES.put(Integer.class.getName(), Types.INT);
+    KNOWN_TYPES.put(Long.class.getName(), Types.LONG);
+    KNOWN_TYPES.put(Float.class.getName(), Types.FLOAT);
+    KNOWN_TYPES.put(Double.class.getName(), Types.DOUBLE);
 
-    knownTypes.put(Character.class.getName(), Types.CHAR);
-    knownTypes.put(String.class.getName(), Types.STRING);
+    KNOWN_TYPES.put(Character.class.getName(), Types.CHAR);
+    KNOWN_TYPES.put(String.class.getName(), Types.STRING);
 
     // primitive types
-    knownTypes.put("boolean", Types.BOOLEAN);
+    KNOWN_TYPES.put("boolean", Types.BOOLEAN);
 
-    knownTypes.put("byte", Types.BYTE);
-    knownTypes.put("short", Types.SHORT);
-    knownTypes.put("int", Types.INT);
-    knownTypes.put("long", Types.LONG);
-    knownTypes.put("float", Types.FLOAT);
-    knownTypes.put("double", Types.DOUBLE);
+    KNOWN_TYPES.put("byte", Types.BYTE);
+    KNOWN_TYPES.put("short", Types.SHORT);
+    KNOWN_TYPES.put("int", Types.INT);
+    KNOWN_TYPES.put("long", Types.LONG);
+    KNOWN_TYPES.put("float", Types.FLOAT);
+    KNOWN_TYPES.put("double", Types.DOUBLE);
 
-    knownTypes.put("char", Types.CHAR);
+    KNOWN_TYPES.put("char", Types.CHAR);
 
-    knownTypes.put("null", Types.NULL);
+    KNOWN_TYPES.put("null", Types.NULL);
 
     // arrays
-    knownTypes.put(new boolean[0].getClass().getName(), Types.ARRAY_BOOLEAN);
+    KNOWN_TYPES.put(new boolean[0].getClass().getName(), Types.ARRAY_BOOLEAN);
 
-    knownTypes.put(new byte[0].getClass().getName(), Types.ARRAY_BYTE);
-    knownTypes.put(new short[0].getClass().getName(), Types.ARRAY_SHORT);
-    knownTypes.put(new int[0].getClass().getName(), Types.ARRAY_INT);
-    knownTypes.put(new long[0].getClass().getName(), Types.ARRAY_LONG);
-    knownTypes.put(new double[0].getClass().getName(), Types.ARRAY_DOUBLE);
-    knownTypes.put(new float[0].getClass().getName(), Types.ARRAY_FLOAT);
+    KNOWN_TYPES.put(new byte[0].getClass().getName(), Types.ARRAY_BYTE);
+    KNOWN_TYPES.put(new short[0].getClass().getName(), Types.ARRAY_SHORT);
+    KNOWN_TYPES.put(new int[0].getClass().getName(), Types.ARRAY_INT);
+    KNOWN_TYPES.put(new long[0].getClass().getName(), Types.ARRAY_LONG);
+    KNOWN_TYPES.put(new double[0].getClass().getName(), Types.ARRAY_DOUBLE);
+    KNOWN_TYPES.put(new float[0].getClass().getName(), Types.ARRAY_FLOAT);
 
-    knownTypes.put(new char[0].getClass().getName(), Types.ARRAY_CHAR);
-    knownTypes.put(new String[0].getClass().getName(), Types.ARRAY_STRING);
+    KNOWN_TYPES.put(new char[0].getClass().getName(), Types.ARRAY_CHAR);
+    KNOWN_TYPES.put(new String[0].getClass().getName(), Types.ARRAY_STRING);
 
   }
 
+  /**
+   * Transform Java String to JSON string.
+   * @param string source String.
+   * @return result.
+   */
   public static String getJsonString(String string) {
     if (string == null || string.length() == 0)
       return "\"\"";
@@ -115,8 +260,7 @@ public class JsonUtils {
         default:
           if (c < '\u0010')
             sb.append("\\u000" + Integer.toHexString(c));
-          else if ((c < '\u0020' && c > '\u0009') ||
-              (c >= '\u0080' && c < '\u00a0'))
+          else if ((c < '\u0020' && c > '\u0009') || (c >= '\u0080' && c < '\u00a0'))
             sb.append("\\u00" + Integer.toHexString(c));
           else if (c >= '\u2000' && c < '\u2100')
             sb.append("\\u" + Integer.toHexString(c));
@@ -129,23 +273,38 @@ public class JsonUtils {
     return sb.toString();
   }
 
+  /**
+   * Check is given Object is known.
+   * @param o Object.
+   * @return true if Object is known, false otherwise.
+   */
   public static boolean isKnownType(Object o) {
     if (o == null)
       return true;
     return isKnownType(o.getClass());
   }
 
+  /**
+   * Check is given Class is known.
+   * @param clazz Class.
+   * @return true if Class is known, false otherwise.
+   */
   public static boolean isKnownType(Class<?> clazz) {
-    if (knownTypes.get(clazz.getName()) != null)
+    if (KNOWN_TYPES.get(clazz.getName()) != null)
       return true;
     return false;
   }
 
+  /**
+   * Get 'type' of Object. @see {@link KNOWN_TYPES} .
+   * @param o Object.
+   * @return 'type'.
+   */
   public static Types getType(Object o) {
     if (o == null)
       return Types.NULL;
-    if (knownTypes.get(o.getClass().getName()) != null)
-      return knownTypes.get(o.getClass().getName());
+    if (KNOWN_TYPES.get(o.getClass().getName()) != null)
+      return KNOWN_TYPES.get(o.getClass().getName());
     if (o instanceof Object[])
       return Types.ARRAY_OBJECT;
     if (o instanceof Collection)
@@ -155,9 +314,14 @@ public class JsonUtils {
     return null;
   }
 
+  /**
+   * Get 'type' of Class. @see {@link KNOWN_TYPES} .
+   * @param clazz Class.
+   * @return 'type'.
+   */
   public static Types getType(Class<?> clazz) {
-    if (knownTypes.get(clazz.getName()) != null)
-      return knownTypes.get(clazz.getName());
+    if (KNOWN_TYPES.get(clazz.getName()) != null)
+      return KNOWN_TYPES.get(clazz.getName());
     if (clazz.isArray())
       return Types.ARRAY_OBJECT;
     if (Collection.class.isAssignableFrom(clazz))

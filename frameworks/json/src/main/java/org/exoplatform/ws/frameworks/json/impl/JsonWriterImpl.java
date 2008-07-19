@@ -35,192 +35,202 @@ public class JsonWriterImpl implements JsonWriter {
   /**
    * Stack for control position in document.
    */
-  private final Stack<JsonToken> jsonTokens_ = new Stack<JsonToken>();
+  private final Stack<JsonToken> jsonTokens = new Stack<JsonToken>();
   
-  private final Writer writer_;
+  /**
+   * Writer.
+   */
+  private final Writer writer;
 
-  private boolean commaFirst_ = false;
+  /**
+   * Indicate is current value is the first, if not before value must be written comma.  
+   */
+  private boolean commaFirst = false;
 
+  /**
+   * Constructs JsonWriter.
+   * @param writer Writer.
+   */
   public JsonWriterImpl(Writer writer) {
-    writer_ = writer;
+    this.writer = writer;
   }
 
+  /**
+   * Constructs JsonWriter.
+   * @param out OutputStream.
+   */
   public JsonWriterImpl(OutputStream out) {
     this(new OutputStreamWriter(out));
   }
 
-  /*
-   * (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.JSONEncoder#writeStartObject()
+  /**
+   * {@inheritDoc}
    */
   public void writeStartObject() throws JsonException {
-    if (!jsonTokens_.isEmpty()) {
+    if (!jsonTokens.isEmpty()) {
       // Object can be stated after key with followed ':' or as array item.  
-      if (jsonTokens_.peek() != JsonToken.key && jsonTokens_.peek() != JsonToken.array)
+      if (jsonTokens.peek() != JsonToken.key && jsonTokens.peek() != JsonToken.array)
         throw new JsonException("Syntax error. Unexpected element '{'.");
     }
     try {
-      if (commaFirst_) // needed ',' before 
-        writer_.write(',');
-      writer_.write('{');
+      if (commaFirst) // needed ',' before 
+        writer.write(',');
+      writer.write('{');
      // if at the top of stack is 'key' then remove it.
-      if (!jsonTokens_.isEmpty() && jsonTokens_.peek() == JsonToken.key)
-        jsonTokens_.pop(); 
-      jsonTokens_.push(JsonToken.object); // remember new object opened
-      commaFirst_ = false;
+      if (!jsonTokens.isEmpty() && jsonTokens.peek() == JsonToken.key)
+        jsonTokens.pop(); 
+      jsonTokens.push(JsonToken.object); // remember new object opened
+      commaFirst = false;
     } catch (IOException e) {
       throw new JsonException(e);
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.JSONEncoder#writeEndObject()
+  /**
+   * {@inheritDoc}
    */
   public void writeEndObject() throws JsonException {
     try {
-      if (jsonTokens_.pop() != JsonToken.object) // wrong JSON structure.
+      if (jsonTokens.pop() != JsonToken.object) // wrong JSON structure.
         throw new JsonException("Sysntax error. Unexpected element '}'.");
-      writer_.write('}');
-      commaFirst_ = true;
+      writer.write('}');
+      commaFirst = true;
     } catch (IOException e) {
       throw new JsonException(e);
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.JSONEncoder#writeStartArray()
+  /**
+   * {@inheritDoc}
    */
   public void writeStartArray() throws JsonException {
-    if (jsonTokens_.isEmpty()
-        || (jsonTokens_.peek() != JsonToken.key && jsonTokens_.peek() != JsonToken.array))
+    if (jsonTokens.isEmpty()
+        || (jsonTokens.peek() != JsonToken.key && jsonTokens.peek() != JsonToken.array))
       throw new JsonException("Sysntax error. Unexpected element '['..");
     try {
-      if (commaFirst_) // needed ',' before 
-        writer_.write(',');
-      writer_.write('[');
-      if (jsonTokens_.peek() == JsonToken.key)
+      if (commaFirst) // needed ',' before 
+        writer.write(',');
+      writer.write('[');
+      if (jsonTokens.peek() == JsonToken.key)
         // if at the top of stack is 'key' then remove it.
-        jsonTokens_.pop();
-      jsonTokens_.push(JsonToken.array); // remember new array opened
-      commaFirst_ = false;
+        jsonTokens.pop();
+      jsonTokens.push(JsonToken.array); // remember new array opened
+      commaFirst = false;
     } catch (IOException e) {
       throw new JsonException(e);
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.JSONEncoder#writeEndArray()
+  /**
+   * {@inheritDoc}
    */
   public void writeEndArray() throws JsonException {
     try {
-      if (jsonTokens_.pop() != JsonToken.array) // wrong JSON structure 
+      if (jsonTokens.pop() != JsonToken.array) // wrong JSON structure 
         throw new JsonException("Sysntax error. Unexpected element ']'.");
-      writer_.write(']');
-      commaFirst_ = true;
+      writer.write(']');
+      commaFirst = true;
     } catch (IOException e) {
       throw new JsonException(e);
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.JSONEncoder#writeKey(java.lang.String)
+  /**
+   * {@inheritDoc}
    */
   public void writeKey(String key) throws JsonException {
     if (key == null)
       throw new JsonException("Key is null.");
-    if (jsonTokens_.isEmpty() || jsonTokens_.peek() != JsonToken.object)
+    if (jsonTokens.isEmpty() || jsonTokens.peek() != JsonToken.object)
       throw new JsonException("Sysntax error. Unexpected characters '"
-          + key + "'." + jsonTokens_);
+          + key + "'." + jsonTokens);
     try {
-      if (commaFirst_)
-        writer_.write(',');
+      if (commaFirst)
+        writer.write(',');
       // create JSON representation for given string.
-      writer_.write(JsonUtils.getJsonString(key));
-      writer_.write(':');
-      commaFirst_ = false;
-      jsonTokens_.push(JsonToken.key);
+      writer.write(JsonUtils.getJsonString(key));
+      writer.write(':');
+      commaFirst = false;
+      jsonTokens.push(JsonToken.key);
     } catch (IOException e) {
       throw new JsonException(e);
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.JSONEncoder#writeString(java.lang.String)
+  /**
+   * {@inheritDoc}
    */
   public void writeString(String value) throws JsonException {
     write(JsonUtils.getJsonString(value));
   }
 
-  /*
-   * (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.JSONEncoder#writeValue(long)
+  /**
+   * {@inheritDoc}
    */
   public void writeValue(long value) throws JsonException {
     write(Long.toString(value));
   }
 
-  /*
-   * (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.JSONEncoder#writeValue(double)
+  /**
+   * {@inheritDoc}
    */
   public void writeValue(double value) throws JsonException {
     write(Double.toString(value));
   }
 
-  /*
-   * (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.JSONEncoder#writeValue(boolean)
+  /**
+   * {@inheritDoc}
    */
   public void writeValue(boolean value) throws JsonException {
     write(Boolean.toString(value));
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.JSONWriter#writeNull()
+  /**
+   * {@inheritDoc}
    */
   public void writeNull() throws JsonException {
     write("null");
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.JSONWriter#flush()
+  /**
+   * {@inheritDoc}
    */
   public void flush() throws JsonException {
     try {
-      writer_.flush();
+      writer.flush();
     } catch (IOException e) {
       new JsonException(e);
     }
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.JSONWriter#close()
+  /**
+   * {@inheritDoc}
    */
   public void close() throws JsonException {
     try {
-      writer_.close();
+      writer.close();
     } catch (IOException e) {
       new JsonException(e);
     }
   }
 
+  /**
+   * Write single String.
+   * @param value String.
+   * @throws JsonException if any errors occurs.
+   */
   private void write(String value) throws JsonException {
     try {
-      if (jsonTokens_.isEmpty()
-          || (jsonTokens_.peek() != JsonToken.key
-              && jsonTokens_.peek() != JsonToken.array))
+      if (jsonTokens.isEmpty()
+          || (jsonTokens.peek() != JsonToken.key
+              && jsonTokens.peek() != JsonToken.array))
         throw new JsonException("Sysntax error. Unexpected characters '" + value + "'.");
-      if (commaFirst_) 
-        writer_.write(',');
-      writer_.write(value);
-      commaFirst_ = true;
-      if (jsonTokens_.peek() == JsonToken.key)
-        jsonTokens_.pop();
+      if (commaFirst) 
+        writer.write(',');
+      writer.write(value);
+      commaFirst = true;
+      if (jsonTokens.peek() == JsonToken.key)
+        jsonTokens.pop();
     } catch (IOException e) {
       throw new JsonException(e);
     }

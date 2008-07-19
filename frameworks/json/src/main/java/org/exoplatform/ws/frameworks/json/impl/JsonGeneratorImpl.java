@@ -46,8 +46,8 @@ import org.exoplatform.ws.frameworks.json.value.impl.StringValue;
  */
 public class JsonGeneratorImpl implements JsonGenerator {
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.ws.frameworks.json.JsonGenerator#createJsonObject(java.lang.Object)
+  /**
+   * {@inheritDoc}
    */
   public JsonValue createJsonObject(Object object) throws JsonException {
     Method[] methods = object.getClass().getMethods();
@@ -64,8 +64,8 @@ public class JsonGeneratorImpl implements JsonGenerator {
        * 2. Must be without parameters.
        * 3. Not "getClass" method. 
        */
-      if (methodName.startsWith("get") && methodName.length() > "get".length() &&
-          method.getParameterTypes().length == 0 && !"getClass".equals(methodName)) {
+      if (methodName.startsWith("get") && methodName.length() > "get".length()
+          && method.getParameterTypes().length == 0 && !"getClass".equals(methodName)) {
 
         String key = methodName.substring("get".length());
 
@@ -96,6 +96,12 @@ public class JsonGeneratorImpl implements JsonGenerator {
     return jsonRootValue;
   }
   
+  /**
+   * Create JsonValue corresponding to Java object.
+   * @param object source object.
+   * @return JsonValue.
+   * @throws JsonException if any errors occurs.
+   */
   protected JsonValue createJsonValue(Object object) throws JsonException {
     Types t = JsonUtils.getType(object);
     switch (t) {
@@ -240,6 +246,12 @@ public class JsonGeneratorImpl implements JsonGenerator {
     
   }
   
+  /**
+   * Check fields in class which marked as 'transient'. Transient fields will
+   * be not serialized in JSON representation. 
+   * @param clazz the class.
+   * @return list of fields which must be skiped.
+   */
   private static List<String> getTransientFields(Class<?> clazz) {
     List<String> l = new ArrayList<String>();
     Field[] fields = clazz.getDeclaredFields();

@@ -27,19 +27,22 @@ import org.exoplatform.ws.frameworks.json.value.JsonValue;
  */
 public abstract class NumericValue extends JsonValue {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean isNumeric() {
     return true;
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#toString()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public abstract String toString();
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.ws.frameworks.json.value.JsonValue#writeTo(org.exoplatform.ws.frameworks.json.JsonWriter)
+  /**
+   * {@inheritDoc}
    */
   @Override
   public abstract void writeTo(JsonWriter writer) throws JsonException; 

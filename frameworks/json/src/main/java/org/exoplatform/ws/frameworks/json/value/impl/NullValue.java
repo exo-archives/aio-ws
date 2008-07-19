@@ -27,22 +27,24 @@ import org.exoplatform.ws.frameworks.json.value.JsonValue;
  */
 public class NullValue extends JsonValue {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean isNull() {
     return true;
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#toString()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public String toString() {
     return "null";
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#writeTo(
-   * org.exoplatform.services.rest.frameworks.json.JsonWriter)
+  /**
+   * {@inheritDoc}
    */
   @Override
   public void writeTo(JsonWriter writer) throws JsonException {

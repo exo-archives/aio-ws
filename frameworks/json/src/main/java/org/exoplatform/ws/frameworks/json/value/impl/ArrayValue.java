@@ -31,50 +31,52 @@ import org.exoplatform.ws.frameworks.json.value.JsonValue;
  */
 public class ArrayValue extends JsonValue {
   
-  private final List<JsonValue> children_ = new ArrayList<JsonValue>(); 
+  /**
+   * List of children.
+   */
+  private final List<JsonValue> children = new ArrayList<JsonValue>(); 
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#addElement(
-   * org.exoplatform.services.rest.frameworks.json.value.JsonValue)
+  /**
+   * {@inheritDoc}
    */
   @Override
   public void addElement(JsonValue child) {
-    children_.add(child);
+    children.add(child);
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#isArray()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public boolean isArray() {
     return true;
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#getElements()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public Iterator<JsonValue> getElements() {
-    return children_.iterator();
+    return children.iterator();
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#size()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public int size() {
-    return children_.size();
+    return children.size();
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#toString()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
     sb.append('[');
     int i = 0;
-    for (JsonValue v : children_) {
+    for (JsonValue v : children) {
       if (i > 0)
         sb.append(',');
       i++;
@@ -84,14 +86,13 @@ public class ArrayValue extends JsonValue {
     return sb.toString();
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#writeTo(
-   * org.exoplatform.services.rest.frameworks.json.JsonWriter)
+  /**
+   * {@inheritDoc}
    */
   @Override
   public void writeTo(JsonWriter writer) throws JsonException {
     writer.writeStartArray();
-    for (JsonValue v : children_)
+    for (JsonValue v : children)
       v.writeTo(writer);
     writer.writeEndArray();
   }

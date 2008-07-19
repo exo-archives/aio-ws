@@ -27,90 +27,97 @@ import org.exoplatform.ws.frameworks.json.impl.JsonException;
  */
 public class LongValue extends NumericValue {
 
-  private final long value_;
+  /**
+   * Value.
+   */
+  private final long value;
   
+  /**
+   * Constructs new LongValue.
+   * @param value the value.
+   */
   public LongValue(long value) {
-    value_ = value;
+    this.value = value;
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#isLong()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public boolean isLong() {
     return true;
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#getStringValue()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public String getStringValue() {
-    return Long.toString(value_);
+    return Long.toString(value);
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#getByteValue()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public byte getByteValue() {
-    return (byte)value_;
+    return (byte) value;
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#getShortValue()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public short getShortValue() {
-    return (short)value_;
+    return (short) value;
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#getIntValue()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public int getIntValue() {
-    return (int)value_;
+    return (int) value;
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#getLongValue()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public long getLongValue() {
-    return value_;
+    return value;
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#getDoubleValue()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public double getDoubleValue() {
-    return value_;
+    return value;
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#getFloatValue()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public float getFloatValue() {
-    return value_;
+    return value;
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.impl.NumericValue#toString()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public String toString() {
     return getStringValue();
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.ws.framework.json.value.JsonValue#writeTo(org.exoplatform.ws.framework.json.JsonWriter)
+  /**
+   * {@inheritDoc}
    */
   @Override
   public void writeTo(JsonWriter writer) throws JsonException {
-    writer.writeValue(value_);
+    writer.writeValue(value);
   }
 
 }

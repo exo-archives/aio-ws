@@ -28,12 +28,15 @@ import org.exoplatform.ws.frameworks.json.impl.JsonWriterImpl;
 import org.exoplatform.ws.frameworks.json.value.JsonValue;
 
 /**
- * Created by The eXo Platform SARL Author : Volodymyr Krasnikov
+ * Created by The eXo Platform SARL.
+ * Author : Volodymyr Krasnikov
  * volodymyr.krasnikov@exoplatform.com.ua
  */
-
 public class Bean2JsonOutputTransformer extends OutputEntityTransformer {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void writeTo(Object entity, OutputStream entityDataStream) throws IOException {
     try {

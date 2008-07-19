@@ -30,15 +30,14 @@ import org.exoplatform.ws.frameworks.json.impl.JsonParserImpl;
 import org.exoplatform.ws.frameworks.json.value.JsonValue;
 
 /**
- * Created by The eXo Platform SARL
+ * Created by The eXo Platform SARL.
  * Author : Volodymyr Krasnikov
  *          volodymyr.krasnikov@exoplatform.com.ua
  */
-
 public class Json2BeanInputTransformer extends InputEntityTransformer {
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.transformer.InputEntityTransformer#readFrom(java.io.InputStream)
+  /**
+   * {@inheritDoc}
    */
   @Override
   public Object readFrom(InputStream entityDataStream) throws IOException {
@@ -50,7 +49,7 @@ public class Json2BeanInputTransformer extends InputEntityTransformer {
       JsonHandler jsonHandler = new JsonDefaultHandler();
       jsonParser.parse(entityDataStream, jsonHandler);
       JsonValue jsonValue = jsonHandler.getJsonObject();
-      targetObject = new BeanBuilder().createObject(this.getType(),jsonValue);
+      targetObject = new BeanBuilder().createObject(this.getType(), jsonValue);
     } catch (JsonException e) {
       e.printStackTrace();
       throw new IOException("JSON parsing exception");

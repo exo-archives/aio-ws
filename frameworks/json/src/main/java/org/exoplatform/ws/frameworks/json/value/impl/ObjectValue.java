@@ -32,71 +32,72 @@ import org.exoplatform.ws.frameworks.json.value.JsonValue;
  */
 public class ObjectValue extends JsonValue {
 
-  private final Map<String, JsonValue> children_ = new HashMap<String, JsonValue>();
+  /**
+   * Children.
+   */
+  private final Map<String, JsonValue> children = new HashMap<String, JsonValue>();
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#addElement(
-   * java.lang.String, org.exoplatform.services.rest.frameworks.json.value.JsonValue)
+  /**
+   * {@inheritDoc}
    */
   @Override
   public void addElement(String key, JsonValue child) {
-    children_.put(key, child);
+    children.put(key, child);
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#isObject()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public boolean isObject() {
     return true;
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#getKeys()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public Iterator<String> getKeys() {
-    return children_.keySet().iterator();
+    return children.keySet().iterator();
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#getElement(java.lang.String)
+  /**
+   * {@inheritDoc}
    */
   @Override
   public JsonValue getElement(String key) {
-    return children_.get(key);
+    return children.get(key);
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#toString()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
     sb.append('{');
     int i = 0;
-    for (String key : children_.keySet()) {
+    for (String key : children.keySet()) {
       if (i > 0)
         sb.append(',');
       i++;
       sb.append(JsonUtils.getJsonString(key));
       sb.append(':');
-      sb.append(children_.get(key).toString());
+      sb.append(children.get(key).toString());
     }
     sb.append('}');
     return sb.toString();
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#writeTo(
-   * org.exoplatform.services.rest.frameworks.json.JsonWriter)
+  /**
+   * {@inheritDoc}
    */
   @Override
   public void writeTo(JsonWriter writer) throws JsonException {
     writer.writeStartObject();
-    for (String key : children_.keySet()) {
+    for (String key : children.keySet()) {
       writer.writeKey(key);
-      JsonValue v = children_.get(key);
+      JsonValue v = children.get(key);
       v.writeTo(writer);
     }
     writer.writeEndObject();

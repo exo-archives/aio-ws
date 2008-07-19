@@ -28,43 +28,49 @@ import org.exoplatform.ws.frameworks.json.value.JsonValue;
  */
 public class StringValue extends JsonValue {
   
-  private final String value_;
+  /**
+   * Value.
+   */
+  private final String value;
   
+  /**
+   * Constructs new StringValue.
+   * @param value the value.
+   */
   public StringValue(String value) {
-    value_ = value;
+    this.value = value;
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#isString()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public boolean isString() {
     return true;
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#getStringValue()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public String getStringValue() {
-    return value_;
+    return value;
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#toString()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public String toString() {
-    return JsonUtils.getJsonString(value_);
+    return JsonUtils.getJsonString(value);
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.rest.frameworks.json.value.JsonValue#writeTo(
-   * org.exoplatform.services.rest.frameworks.json.JsonWriter)
+  /**
+   * {@inheritDoc}
    */
   @Override
   public void writeTo(JsonWriter writer) throws JsonException {
-    writer.writeString(value_);
+    writer.writeString(value);
   }
   
 }
