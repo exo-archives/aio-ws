@@ -21,25 +21,31 @@ import java.util.Arrays;
  */
 public class Oid extends AbstractMessagePart {
 
-  public final static int[] OID_SPNEGO = new int[]{ 0x2b, 0x06, 0x01, 0x05,
-      0x05, 0x02 };
+  public static final int[] OID_SPNEGO = new int[] {0x2b, 0x06, 0x01, 0x05, 0x05, 0x02};
 
-  public final static int[] OID_KERBEROS_MICROSOFT = new int[]{ 0x2a, 0x86,
-      0x48, 0x82, 0xf7, 0x12, 0x01, 0x02, 0x02 };
+  public static final int[] OID_KERBEROS_MICROSOFT = new int[] {0x2a, 0x86, 0x48, 0x82, 0xf7, 0x12, 0x01, 0x02, 0x02};
 
-  public final static int[] OID_KERBEROS = new int[]{ 0x2a, 0x86, 0x48, 0x86,
-      0xf7, 0x12, 0x01, 0x02, 0x02 };
+  public static final int[] OID_KERBEROS = new int[] {0x2a, 0x86, 0x48, 0x86, 0xf7, 0x12, 0x01, 0x02, 0x02};
 
   private int[] oid = null;
 
+  /**
+   * {@inheritDoc} 
+   */
   public int getDerType() {
     return TYPE_OID;
   }
 
+  /**
+   * {@inheritDoc} 
+   */
   public int[] toDer() {
     return wrap(TYPE_OID, oid);
   }
 
+  /**
+   * {@inheritDoc} 
+   */
   public void parse(ParseState state) {
     state.setPhase("OID");
     state.expect(TYPE_OID, true, "Expected oid identifier");

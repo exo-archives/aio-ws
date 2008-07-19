@@ -23,35 +23,32 @@ public class MechTypeList extends AbstractSequence<Oid> {
 
   private LinkedList<Oid> mechs = new LinkedList<Oid>();
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.organization.auth.sso.spnego.message.AbstractSequence#getParts()
+  /**
+   * {@inheritDoc}
    */
   @Override
   protected LinkedList<Oid> getParts() {
     return mechs;
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.organization.auth.sso.spnego.message.AbstractSequence
-   * #createInstance(org.exoplatform.services.organization.auth.sso.spnego.message.ParseState)
+  /**
+   * {@inheritDoc}
    */
   @Override
-  protected Oid createInstance( ParseState state ) {
+  protected Oid createInstance(ParseState state) {
     return new Oid();
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.organization.auth.sso.spnego.message
-   * .AbstractSequence#setParts(java.util.LinkedList)
+  /**
+   * {@inheritDoc}
    */
   @Override
   protected void setParts(LinkedList<Oid> parts) {
     this.mechs = parts;
   }
   
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.organization.auth.sso.spnego.message
-   * .AbstractSequence#parse(org.exoplatform.services.organization.auth.sso.spnego.message.ParseState)
+  /**
+   * {@inheritDoc}
    */
   @Override
   public void parse(ParseState state) {
@@ -60,14 +57,14 @@ public class MechTypeList extends AbstractSequence<Oid> {
   }
   
   /**
-   * @return the mechs
+   * @return the mechs .
    */
   public LinkedList<Oid> getMechs() {
     return mechs;
   }
   
   /**
-   * @param mechs the mechs to set
+   * @param mechs the mechs to set .
    */
   public void setMechs(LinkedList<Oid> mechs) {
     this.mechs = mechs;

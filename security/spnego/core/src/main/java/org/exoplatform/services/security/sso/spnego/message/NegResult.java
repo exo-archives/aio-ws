@@ -19,23 +19,36 @@ package org.exoplatform.services.security.sso.spnego.message;
  */
 public class NegResult extends AbstractMessagePart {
 
-  public final static int ACCEPT_COMPLETED = 1;
-  public final static int ACCEPT_INCOMPLETE = 2;
-  public final static int REJECTED = 3;
+  public static final int ACCEPT_COMPLETED = 1;
+  public static final int ACCEPT_INCOMPLETE = 2;
+  public static final int REJECTED = 3;
 
   private int result = 0;
 
+  /**
+   * {@inheritDoc}
+   */
   public int getDerType() {
     return TYPE_ENUMERATED;
   }
 
+  /**
+   * Constructs new instance of NegResult.
+   */
   public NegResult() {
   }
 
+  /**
+   * Constructs new instance of NegResult with specified result.
+   * @param result the result.
+   */
   public NegResult(int result) {
     this.result = result;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public int[] toDer() {
     int[] tmp = new int[3];
     tmp[0] = TYPE_ENUMERATED;
@@ -44,6 +57,9 @@ public class NegResult extends AbstractMessagePart {
     return tmp;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public void parse(ParseState state) {
     state.setPhase("NEG_RESULT");
     state.expect(TYPE_ENUMERATED, true, "Expected enumerated identifier");
@@ -53,10 +69,16 @@ public class NegResult extends AbstractMessagePart {
     this.result = state.getToken()[state.getIndex()];
   }
 
+  /**
+   * @return result.
+   */
   public int getResult() {
     return result;
   }
 
+  /**
+   * @param result the result.
+   */
   public void setResult(int result) {
     this.result = result;
   }

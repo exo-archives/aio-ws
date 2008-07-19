@@ -51,8 +51,7 @@ public class ParseState {
   }
 
   /**
-   * Expects the current position to hold the given array of values
-   * <code>b</code>
+   * Expects the current position to hold the given array of values <code>b</code>.
    * @param b the array of values expected.
    * @param moveIndex Tells if we are to move the index counter.
    * @param message Message to add to messages if the position does not hold the
@@ -126,8 +125,7 @@ public class ParseState {
     byte[] b = new byte[1];
     b[0] = token[index];
     char[] c = Hex.encodeHex(b);
-    messages.add("[" + index + "," + phase + ",0x" + c[0] + c[1] + "] " +
-        message);
+    messages.add("[" + index + "," + phase + ",0x" + c[0] + c[1] + "] " + message);
   }
 
   public byte[] getToken() {

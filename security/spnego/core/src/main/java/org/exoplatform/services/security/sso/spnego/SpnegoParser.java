@@ -28,7 +28,10 @@ import org.exoplatform.services.security.sso.spnego.message.ParseState;
  */
 public class SpnegoParser {
 
-  final static Log logger = ExoLogger.getLogger("core.sso.SpnegoParser");
+  /**
+   * Logger.
+   */
+  static final Log LOG = ExoLogger.getLogger("ws.security.SpnegoParser");
 
   /**
    * Parses an incoming NegTokenInit.
@@ -40,21 +43,21 @@ public class SpnegoParser {
     ParseState state = new ParseState(token);
     ApplicationConstructedObject result = new ApplicationConstructedObject();
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("Token dump: " + dump(token));
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Token dump: " + dump(token));
     }
 
     try {
       result.parse(state);
     } catch (Exception e) {
-      logger.error("Failed to parse: " + e.getMessage());
-      if (logger.isDebugEnabled()) {
-        logger.debug("Failed to parse", e);
+      LOG.error("Failed to parse: " + e.getMessage());
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Failed to parse", e);
       }
     }
 
     for (String message : state.getMessages()) {
-      logger.info(message);
+      LOG.info(message);
     }
 
     if (state.getMessages().size() == 0) {
@@ -77,21 +80,21 @@ public class SpnegoParser {
 
     NegTokenTarg result = new NegTokenTarg();
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("Token dump: " + dump(token));
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Token dump: " + dump(token));
     }
 
     try {
       result.parse(state);
     } catch (Exception e) {
-      logger.error("Failed to parse: " + e.getMessage());
-      if (logger.isDebugEnabled()) {
-        logger.debug("Failed to parse", e);
+      LOG.error("Failed to parse: " + e.getMessage());
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Failed to parse", e);
       }
     }
 
     for (String message : state.getMessages()) {
-      logger.info(message);
+      LOG.info(message);
     }
 
     if (state.getMessages().size() == 0) {
@@ -104,6 +107,8 @@ public class SpnegoParser {
 
   /**
    * Dumps the given token in a nice string.
+   * @param token the source bytes.
+   * @return the result String.
    */
   protected String dump(byte[] token) {
 

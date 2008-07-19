@@ -19,19 +19,19 @@ package org.exoplatform.services.security.sso.spnego.message;
  */
 public interface MessagePart {
   
-  public final static int TYPE_APPLICATION_CONSTRUCTED_OBJECT = 0x60;
-  public final static int TYPE_NEG_TOKEN_INIT = 0xa0;
-  public final static int TYPE_NEG_TOKEN_TARG = 0xa1;
-  public final static int TYPE_SEQUENCE = 0x30;
-  public final static int TYPE_OID = 0x06;
-  public final static int TYPE_OCTET_STRING = 0x04;
-  public final static int TYPE_ENUMERATED = 0x0a;
-  public final static int TYPE_BIT_STRING = 0x03;
+  public static final int TYPE_APPLICATION_CONSTRUCTED_OBJECT = 0x60;
+  public static final int TYPE_NEG_TOKEN_INIT = 0xa0;
+  public static final int TYPE_NEG_TOKEN_TARG = 0xa1;
+  public static final int TYPE_SEQUENCE = 0x30;
+  public static final int TYPE_OID = 0x06;
+  public static final int TYPE_OCTET_STRING = 0x04;
+  public static final int TYPE_ENUMERATED = 0x0a;
+  public static final int TYPE_BIT_STRING = 0x03;
 
-  public int getDerType();
+  int getDerType();
   
-  public int[] toDer();
+  int[] toDer();
   
-  public void parse( ParseState state );
+  void parse(ParseState state);
   
 }

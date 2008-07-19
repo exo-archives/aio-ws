@@ -32,15 +32,24 @@ public class NegTokenSequencePart extends AbstractMessagePart {
     this.messagePart = messagePart;
   }
 
-  // 0xa0, 0xa1, 0xa2, 0xa3...
+  /**
+   * 0xa0, 0xa1, 0xa2, 0xa3...
+   * {@inheritDoc}
+   */
   public int getDerType() {
     return 0xa0 + seqNo;
   }
 
+  /**
+   * {@inheritDoc} 
+   */
   public int[] toDer() {
     return wrap(getDerType(), messagePart.toDer());
   }
 
+  /**
+   * {@inheritDoc} 
+   */
   public void parse(ParseState state) {
     seqNo = 0xff & state.getToken()[state.getIndex()];
     state.setIndex(state.getIndex() + 1);

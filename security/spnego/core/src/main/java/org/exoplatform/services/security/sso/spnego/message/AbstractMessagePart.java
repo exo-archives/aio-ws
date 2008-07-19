@@ -21,6 +21,7 @@ public abstract class AbstractMessagePart implements MessagePart {
 
   /**
    * Calculates the ASN.1 DER represenation of the length given.
+   * @param length the length.
    * @return if length &lt; 0x80, the length straight off. If more than 0x80,
    *         the first byte is 0x80 | [number of bytes required to represent
    *         length] and then bytes high byte first.
@@ -61,15 +62,27 @@ public abstract class AbstractMessagePart implements MessagePart {
     return tmp;
   }
 
-  public static void arraycopy(byte[] src, int srcPos, int[] dest, int destPos,
-      int length) {
+  /**
+   * @param src the source bytes.
+   * @param srcPos the start position in source.
+   * @param dest the destination.
+   * @param destPos the start position in destination.
+   * @param length how many bytes must be copy.
+   */
+  public static void arraycopy(byte[] src, int srcPos, int[] dest, int destPos, int length) {
     for (int i = 0; i < length; i++) {
       dest[destPos + i] = 0xff & src[srcPos + i];
     }
   }
 
-  public static void arraycopy(int[] src, int srcPos, byte[] dest, int destPos,
-      int length) {
+  /**
+   * @param src the source bytes.
+   * @param srcPos the start position in source.
+   * @param dest the destination.
+   * @param destPos the start position in destination.
+   * @param length how many bytes must be copy.
+   */
+  public static void arraycopy(int[] src, int srcPos, byte[] dest, int destPos, int length) {
     for (int i = 0; i < length; i++) {
       dest[destPos + i] = (byte) src[srcPos + i];
     }

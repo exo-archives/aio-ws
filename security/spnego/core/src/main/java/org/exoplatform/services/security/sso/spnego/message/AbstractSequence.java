@@ -22,6 +22,9 @@ import java.util.LinkedList;
 public abstract class AbstractSequence<T extends MessagePart> extends
     AbstractMessagePart {
 
+  /**
+   * {@inheritDoc}
+   */
   public int getDerType() {
     return TYPE_SEQUENCE;
   }
@@ -32,6 +35,9 @@ public abstract class AbstractSequence<T extends MessagePart> extends
 
   protected abstract void setParts(LinkedList<T> parts);
 
+  /**
+   * {@inheritDoc}
+   */
   public int[] toDer() {
     LinkedList<int[]> derParts = new LinkedList<int[]>();
     int totalLength = 0;
@@ -51,6 +57,9 @@ public abstract class AbstractSequence<T extends MessagePart> extends
     return wrap(TYPE_SEQUENCE, tmp);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public void parse(ParseState state) {
 
     state.expect(TYPE_SEQUENCE, true, "Expected type identifier");

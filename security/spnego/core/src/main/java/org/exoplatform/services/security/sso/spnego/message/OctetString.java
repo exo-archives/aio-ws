@@ -24,14 +24,23 @@ public class OctetString extends AbstractMessagePart {
   private int sourceStart;
   private int sourceLength;
 
+  /**
+   * {@inheritDoc} 
+   */
   public int getDerType() {
     return TYPE_OCTET_STRING;
   }
 
+  /**
+   * {@inheritDoc} 
+   */
   public int[] toDer() {
     return wrap(TYPE_OCTET_STRING, data);
   }
 
+  /**
+   * {@inheritDoc} 
+   */
   public void parse(ParseState state) {
     state.setPhase("OCTET_STRING");
     state.expect(TYPE_OCTET_STRING, true, "Expected octet string identifier");

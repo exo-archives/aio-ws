@@ -19,13 +19,26 @@ package org.exoplatform.services.security.sso.spnego.message;
  */
 public class ApplicationConstructedObject extends AbstractMessagePart {
 
+  /**
+   * @see {@link Oid}
+   */
   private Oid oid;
+  
+  /**
+   * @see {@link NegTokenInit}
+   */
   private NegTokenInit negTokenInit;
 
+  /**
+   * {@inheritDoc}
+   */
   public int getDerType() {
     return TYPE_APPLICATION_CONSTRUCTED_OBJECT;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public int[] toDer() {
 
     int[] oidDer = oid.toDer();
@@ -39,6 +52,9 @@ public class ApplicationConstructedObject extends AbstractMessagePart {
     return wrap(TYPE_APPLICATION_CONSTRUCTED_OBJECT, tmp);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public void parse(ParseState state) {
     state.setPhase("APPLICATION_CONSTRUCTED_OBJECT");
     state.expect(TYPE_APPLICATION_CONSTRUCTED_OBJECT, true,
@@ -55,18 +71,30 @@ public class ApplicationConstructedObject extends AbstractMessagePart {
     negTokenInit.parse(state);
   }
 
+  /**
+   * @return NegTokenInit.
+   */
   public NegTokenInit getNegTokenInit() {
     return negTokenInit;
   }
 
+  /**
+   * @param negTokenInit NegTokenInit.
+   */
   public void setNegTokenInit(NegTokenInit negTokenInit) {
     this.negTokenInit = negTokenInit;
   }
 
+  /**
+   * @return Oid.
+   */
   public Oid getOid() {
     return oid;
   }
 
+  /**
+   * @param oid Oid.
+   */
   public void setOid(Oid oid) {
     this.oid = oid;
   }

@@ -21,24 +21,27 @@ import java.util.LinkedList;
  */
 public class NegTokenInit extends AbstractSequence<NegTokenSequencePart> {
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.organization.auth.sso.spnego.message.AbstractSequence#getDerType()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public int getDerType() {
     return TYPE_NEG_TOKEN_INIT;
   }
 
-  public final static int INDEX_MECH_TYPES = 0;
-  public final static int INDEX_REQ_FLAGS = 1;
-  public final static int INDEX_MECH_TOKEN = 2;
-  public final static int INDEX_MECH_LIST_MIC = 3;
+  public static final int INDEX_MECH_TYPES = 0;
+  public static final int INDEX_REQ_FLAGS = 1;
+  public static final int INDEX_MECH_TOKEN = 2;
+  public static final int INDEX_MECH_LIST_MIC = 3;
 
   private MechTypeList mechTypes;
   private ContextFlags contextFlags;
   private OctetString mechToken;
   private OctetString mechListMIC;
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   protected LinkedList<NegTokenSequencePart> getParts() {
 
@@ -60,18 +63,17 @@ public class NegTokenInit extends AbstractSequence<NegTokenSequencePart> {
 
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.organization.auth.sso.spnego.message.AbstractSequence#toDer()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public int[] toDer() {
-    int tmp[] = super.toDer();
+    int[] tmp = super.toDer();
     return wrap(TYPE_NEG_TOKEN_INIT, tmp);
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.organization.auth.sso.spnego.message.AbstractSequence
-   * #parse(org.exoplatform.services.organization.auth.sso.spnego.message.ParseState)
+  /**
+   * {@inheritDoc}
    */
   @Override
   public void parse(ParseState state) {
@@ -81,9 +83,8 @@ public class NegTokenInit extends AbstractSequence<NegTokenSequencePart> {
     super.parse(state);
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.organization.auth.sso.spnego.message.AbstractSequence
-   * #createInstance(org.exoplatform.services.organization.auth.sso.spnego.message.ParseState)
+  /**
+   * {@inheritDoc}
    */
   @Override
   protected NegTokenSequencePart createInstance(ParseState state) {
@@ -101,12 +102,15 @@ public class NegTokenInit extends AbstractSequence<NegTokenSequencePart> {
       mechListMIC = new OctetString();
       part.setMessagePart(mechListMIC);
     } else {
-      state.addMessage("Unexpected message part sequence no: " +
-          state.getToken()[state.getIndex()]);
+      state.addMessage("Unexpected message part sequence no: "
+          + state.getToken()[state.getIndex()]);
     }
     return part;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   protected void setParts(LinkedList<NegTokenSequencePart> parts) {
     for (NegTokenSequencePart part : parts) {
@@ -124,32 +128,50 @@ public class NegTokenInit extends AbstractSequence<NegTokenSequencePart> {
           mechListMIC = (OctetString) part.getMessagePart();
           break;
         default:
-          throw new RuntimeException("Unexpected sequence number: " +
-              part.getSeqNo());
+          throw new RuntimeException("Unexpected sequence number: "
+              + part.getSeqNo());
       }
     }
   }
 
+  /**
+   * @return context flags.
+   */
   public ContextFlags getContextFlags() {
     return contextFlags;
   }
 
+  /**
+   * @param contextFlags the context flags.
+   */
   public void setContextFlags(ContextFlags contextFlags) {
     this.contextFlags = contextFlags;
   }
 
+  /**
+   * @return mechanism list.
+   */
   public OctetString getMechListMIC() {
     return mechListMIC;
   }
 
+  /**
+   * @param mechListMIC the mechanism list.
+   */
   public void setMechListMIC(OctetString mechListMIC) {
     this.mechListMIC = mechListMIC;
   }
 
+  /**
+   * @return mechanism token.
+   */
   public OctetString getMechToken() {
     return mechToken;
   }
 
+  /**
+   * @param mechToken the mechanism token.
+   */
   public void setMechToken(OctetString mechToken) {
     this.mechToken = mechToken;
   }

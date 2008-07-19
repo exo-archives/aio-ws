@@ -241,6 +241,7 @@ public class SpnegoHandler {
    * passes that into the {@link GSSContext} that was established in the
    * constructor.
    * @param token the spnego message.
+   * @return sendback tokens.
    * @throws SpnegoException if an exception is encountered whilst doing the
    *             authentication.
    */
@@ -321,6 +322,9 @@ public class SpnegoHandler {
 
   /**
    * Constructs the response byte array from the give input.
+   * @param isKerberosMicrosoft is Kerberos Microsoft.
+   * @param gssApiToken input tokens.
+   * @return response byte array.
    */
   protected byte[] constructResponse(boolean isKerberosMicrosoft,
       byte[] gssApiToken) {
@@ -358,14 +362,14 @@ public class SpnegoHandler {
   /**
    * Tells if negotiation is complete or if more roundtrips to authenticate() is
    * expected.
+   * @return true if authentication is complete, false otherwise.
    */
   public boolean isComplete() {
-    return state == State.ESTABLISHED || state == State.FAILED ||
-        state == State.UNAUTHORIZED;
+    return state == State.ESTABLISHED || state == State.FAILED || state == State.UNAUTHORIZED;
   }
 
   /**
-   * Returns the current state.
+   * @return the current state.
    */
   public State getState() {
     return state;
@@ -380,21 +384,21 @@ public class SpnegoHandler {
   }
 
   /**
-   * Returns the GSSContext.
+   * @return the GSSContext.
    */
   public GSSContext getGSSContext() {
     return context;
   }
 
   /**
-   * Tells if the credentials have been established.
+   * @return true if the credentials have been established, false otherwise..
    */
   public boolean isEstablished() {
     return state == State.ESTABLISHED;
   }
 
   /**
-   * Tells if the negotiation has failed.
+   * @return true if the negotiation has failed, false otherwise .
    */
   public boolean isFailed() {
     return state == State.FAILED;
