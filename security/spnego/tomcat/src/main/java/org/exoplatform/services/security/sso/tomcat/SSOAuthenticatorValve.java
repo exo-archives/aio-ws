@@ -39,16 +39,8 @@ import org.exoplatform.services.security.sso.jndi.JndiAction;
  */
 public class SSOAuthenticatorValve extends AuthenticatorBase {
 
-  public SSOAuthenticatorValve() {
-    super();
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see org.apache.catalina.authenticator.AuthenticatorBase#authenticate(
-   *      org.apache.catalina.connector.Request,
-   *      org.apache.catalina.connector.Response,
-   *      org.apache.catalina.deploy.LoginConfig)
+  /**
+   * {@inheritDoc} 
    */
   @Override
   protected boolean authenticate(Request request, Response response, LoginConfig loginConfig) throws IOException,
