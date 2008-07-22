@@ -48,37 +48,45 @@ import org.exoplatform.services.log.ExoLogger;
  */
 public class AnonymousUserContextRedirectionFilter implements Filter {
   
+  /**
+   * context-name.
+   */
   private final static String CONTEXT_NAME_PARAMETER = "context-name";
   
-  private final static Log LOGGER = ExoLogger.getLogger("ws.AnonymousUserContextRedirectionFilter");
+  /**
+   * Logger.
+   */
+  private final static Log LOG = ExoLogger.getLogger("ws.AnonymousUserContextRedirectionFilter");
   
+  /**
+   * The name of context.
+   */
   private String contextName;
   
-  /* (non-Javadoc)
-   * @see javax.servlet.Filter#destroy()
+  /**
+   * {@inheritDoc}
    */
   public void destroy() {
+    // nothing to do.
   }
 
-  /* (non-Javadoc)
-   * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
-   * javax.servlet.ServletResponse, javax.servlet.FilterChain)
+  /**
+   * {@inheritDoc}
    */
   public void doFilter(ServletRequest request, ServletResponse response,
       FilterChain filterChain) throws IOException, ServletException {
     HttpServletRequest httpRequest = (HttpServletRequest) request;
     String user = httpRequest.getRemoteUser();
     
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Current user '" + user + "'.");
-    }
+    if (LOG.isDebugEnabled())
+      LOG.debug("Current user '" + user + "'.");
     
     if (user != null) {
       filterChain.doFilter(request, response);
     } else {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Redirect user to context '" + contextName + "'.");
-      }
+      
+      if (LOG.isDebugEnabled())
+        LOG.debug("Redirect user to context '" + contextName + "'.");
       
       String pathInfo = httpRequest.getPathInfo();
       String query = httpRequest.getQueryString();
@@ -87,7 +95,7 @@ public class AnonymousUserContextRedirectionFilter implements Filter {
        * It is necessary to encode URI before redirect, otherwise
        * we get invalid URL (if it contains not ASCII characters).
        * When client (MS Word, for example) we get unparsed 'plus'
-       * in URL in webdav server.  Currently it works and best
+       * in URL in WebDAV server.  Currently it works and best
        * solution for now.
        *
        * ******************************************************
@@ -98,13 +106,16 @@ public class AnonymousUserContextRedirectionFilter implements Filter {
        * This string must be encoded by client, for LinkGenerator.
        */
       ((HttpServletResponse) response).sendRedirect(
-          encodeURL(contextName + pathInfo) + ((query != null) ? "?" + query : ""));
+          encodeURL(contextName + pathInfo) + (query != null ? "?" + query : ""));
       
     }
   }
   
-  /*
-   * Encode URL by URLEncoder#encode(url), then replace all '+' by '%20'
+  /**
+   * Encode URL by URLEncoder#encode(url), then replace all '+' by '%20' .
+   * @param url source String.
+   * @return encoded String.
+   * @throws UnsupportedEncodingException if encoding is unsupported.
    */
   private static String encodeURL(String url)
       throws UnsupportedEncodingException {
@@ -124,13 +135,14 @@ public class AnonymousUserContextRedirectionFilter implements Filter {
     return sb.toString();
   }
   
-  /* (non-Javadoc)
-   * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
+  /**
+   * Get context name. It must be specified as init parameter.
+   * {@inheritDoc}
    */
   public void init(FilterConfig filterConfig) throws ServletException {
     contextName = filterConfig.getInitParameter(CONTEXT_NAME_PARAMETER);
     if (contextName == null) {
-      LOGGER.error("AnonymousUserContextRedirectionFilter is not deployed. Set Init-param '"
+      LOG.error("AnonymousUserContextRedirectionFilter is not deployed. Set Init-param '"
           + CONTEXT_NAME_PARAMETER
           + " pointed to the target context name in the web.xml");
       throw new ServletException("Filter error. Init-param '" + CONTEXT_NAME_PARAMETER + "' is null.");

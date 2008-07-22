@@ -45,52 +45,41 @@ public class StandaloneContainerInitializedListener implements
    */
   private static final String CONF_URL_PARAMETER = "org.exoplatform.container.standalone.config";
   
-  //private final static String CONTAINER_CONFIG = "conf/exo-configuration.xml";
-
+  /**
+   * Container.
+   */
   private StandaloneContainer container;
 
-  /* (non-Javadoc)
-   * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
+  /**
+   * {@inheritDoc}
    */
-
   public void contextInitialized(ServletContextEvent event) {
     String configurationURL = event.getServletContext().getInitParameter(CONF_URL_PARAMETER);
-    /*if(configurationURL == null) {
-      configurationURL = Thread.currentThread().getContextClassLoader().getResource(
-          CONTAINER_CONFIG).toString();
-    }*/
     try {
       StandaloneContainer.addConfigurationURL(configurationURL);
-      //if configurationURL is still == null StandaloneContainer will search
-      // "exo-configuration.xml" in root of AS, then "conf/exo-configuration.xml"
-      //in current classpath, then "conf/standalone/configuration.xml" in current classpath 
     } catch (MalformedURLException e1) {
     }
 
     try {
-      container = StandaloneContainer.getInstance(Thread.currentThread()
-          .getContextClassLoader());
+      container = StandaloneContainer.getInstance(Thread.currentThread().getContextClassLoader());
 
 
       // Patch for tomcat InitialContext
       InitialContextInitializer ic = (InitialContextInitializer) container
           .getComponentInstanceOfType(InitialContextInitializer.class);
+
       if (ic != null)
         ic.recall();
-      // ////////////////////////////////
 
-      event.getServletContext().setAttribute("org.exoplatform.frameworks.web.eXoContainer",
-          container);
+      event.getServletContext().setAttribute("org.exoplatform.frameworks.web.eXoContainer", container);
     } catch (Exception e) {
       e.printStackTrace();
     }
 
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
+  /**
+   * {@inheritDoc}
    */
   public void contextDestroyed(ServletContextEvent event) {
     //container.stop();
