@@ -26,11 +26,21 @@ import org.exoplatform.services.rest.container.ResourceContainer;
 import org.exoplatform.services.rest.transformer.StringInputTransformer;
 import org.exoplatform.services.rest.transformer.StringOutputTransformer;
 
+/**
+ * This service does not do real work, it useful to check rest-ejb connector.
+ */
 @URITemplate("/simple-service/")
 public class SimpleService implements ResourceContainer {
 
+  /**
+   * Keeps data.
+   */
   private String data;
 
+  /**
+   * Get actual data.
+   * @return response with actual data as body or response with status 404 if data is null. 
+   */
   @HTTPMethod("GET")
   @OutputTransformer(StringOutputTransformer.class)
   public Response get() {
@@ -40,20 +50,34 @@ public class SimpleService implements ResourceContainer {
     return Response.Builder.notFound().build();
   }
 
+  /**
+   * Set data.
+   * @param data the data.
+   * @return response with status 201.
+   */
   @HTTPMethod("POST")
   @InputTransformer(StringInputTransformer.class)
-  public Response post(String data) throws Exception {
+  public Response post(String data) {
     this.data = data;
-    return Response.Builder.created("/ejb/simple-service/").build();
+    return Response.Builder.created("/simple-service/").build();
   }
 
+  /**
+   * Set data.
+   * @param data the data.
+   * @return response with status 201.
+   */
   @HTTPMethod("PUT")
   @InputTransformer(StringInputTransformer.class)
-  public Response put(String data) throws Exception {
+  public Response put(String data) {
     this.data = data;
-    return Response.Builder.created("/ejb/simple-service/").build();
+    return Response.Builder.created("/simple-service/").build();
   }
 
+  /**
+   * Delete data.
+   * @return response with status 204.
+   */
   @HTTPMethod("DELETE")
   public Response delete() {
     this.data = null;

@@ -35,48 +35,73 @@ import org.exoplatform.services.rest.transformer.XSLT4DOMOutputTransformer;
 import org.exoplatform.services.rest.transformer.XSLTConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 /**
+ * Simple service for REST demo.
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 public class XMLBookService implements ResourceContainer {
-  private BookStorage books_;
   
-  private static final Log LOGGER = ExoLogger.getLogger("ws.XMLBookService");
+  /**
+   * Books storage.
+   */
+  private BookStorage bookStorage;
   
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger("ws.XMLBookService");
+  
+  /**
+   * Constructs new instance of XMLBookService. 
+   * @param books BookStorage.
+   */
   public XMLBookService(BookStorage books) {
-    books_ = books;
+    bookStorage = books;
   }
   
+  /**
+   * Return request with XML body which represent Book object.
+   * @param key the key.
+   * @return @see {@link Response} .
+   */
   @HTTPMethod("GET")                                                                                                                                                                                           
   @URITemplate("/xml/{key}/")                                                                                                                                                                                   
   @OutputTransformer(XMLOutputTransformer.class)                                                                                                                                                         
   public Response get(@URIParam("key") String key) {    
-    Book book = books_.getBook(key);
+    Book book = bookStorage.getBook(key);
     if (book == null)
       return Response.Builder.notFound().build();
-    LOGGER.info("GET: " + book);
+    LOG.info("GET: " + book);
     Document doc = null;
     try {
       doc = createDocument(book);
     } catch (Exception e) {
+      e.printStackTrace();
       return Response.Builder.withStatus(500).errorMessage(e.getMessage()).build();
     }
     return Response.Builder.ok(doc).mediaType("text/xml").build();  
   }
                                                                                                                                                                                                                
+  /**
+   * Return request with HTML body which represent Book object.
+   * @param key the key.
+   * @return @see {@link Response} .
+   */
   @HTTPMethod("GET")                                                                                                                                                                                           
   @URITemplate("/html/{key}/")                                                                                                                                                                                   
   @OutputTransformer(XSLT4DOMOutputTransformer.class)                                                                                                                                                         
   public Response get2(@URIParam("key") String key) {    
-    Book book = books_.getBook(key);
+    Book book = bookStorage.getBook(key);
     if (book == null)
       return Response.Builder.notFound().build();
-    LOGGER.info("GET: " + book);
+    LOG.info("GET: " + book);
     Document doc = null;
     try {
       doc = createDocument(book);
     } catch (Exception e) {
+      e.printStackTrace();
       return Response.Builder.withStatus(500).errorMessage(e.getMessage()).build();
     }
     Map<String, String> p = new HashMap<String, String>();
@@ -85,6 +110,12 @@ public class XMLBookService implements ResourceContainer {
       .mediaType("text/html").build();  
   }
   
+  /**
+   * Create XML representation of Book object.
+   * @param book Book.
+   * @return Document.
+   * @throws Exception if any errors occurs.
+   */
   private Document createDocument(Book book) throws Exception {
     Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
     Element root = doc.createElement("book");

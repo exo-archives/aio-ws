@@ -19,7 +19,6 @@ package org.exoplatform.services.ws.rest.samples;
 
 import org.exoplatform.services.rest.HTTPMethod;
 import org.exoplatform.services.rest.OutputTransformer;
-import org.exoplatform.services.rest.QueryParam;
 import org.exoplatform.services.rest.QueryTemplate;
 import org.exoplatform.services.rest.Response;
 import org.exoplatform.services.rest.URIParam;
@@ -28,48 +27,69 @@ import org.exoplatform.services.rest.container.ResourceContainer;
 import org.exoplatform.services.rest.transformer.StringOutputTransformer;
 
 /**
+ * Simple service for REST demo.
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 public class Calculator implements ResourceContainer {
 
+  /**
+   * Add two items.
+   * @param firstItem the first item.
+   * @param secondItem the second item.
+   * @return result.
+   */
   @HTTPMethod("GET")                                                                                                                                                                                           
   @URITemplate("/calculator/{1}/{2}/")
   @QueryTemplate("operation=add")
   @OutputTransformer(StringOutputTransformer.class)                                                                                                                                                         
   public Response add(@URIParam("1") Integer firstItem,
-      @URIParam("2") Integer secondItem,
-      @QueryParam("operation") String op) {
+      @URIParam("2") Integer secondItem) {
     return Response.Builder.ok(firstItem + secondItem + "").mediaType("text/plain").build();  
   }
   
+  /**
+   * Subtract second item from first one.
+   * @param firstItem the first item.
+   * @param secondItem the second item.
+   * @return result.
+   */
   @HTTPMethod("GET")                                                                                                                                                                                           
   @URITemplate("/calculator/{1}/{2}/")
   @QueryTemplate("operation=subtract")
   @OutputTransformer(StringOutputTransformer.class)                                                                                                                                                         
   public Response subtract(@URIParam("1") Integer firstItem,
-      @URIParam("2") Integer secondItem,
-      @QueryParam("operation") String op) {
+      @URIParam("2") Integer secondItem) {
     return Response.Builder.ok(firstItem - secondItem + "").mediaType("text/plain").build();  
   }
 
+  /**
+   * Multiply two items.
+   * @param firstItem the first item.
+   * @param secondItem the second item.
+   * @return result.
+   */
   @HTTPMethod("GET")                                                                                                                                                                                           
   @URITemplate("/calculator/{1}/{2}/")
   @QueryTemplate("operation=multiply")
   @OutputTransformer(StringOutputTransformer.class)                                                                                                                                                         
   public Response multiply(@URIParam("1") Integer firstItem,
-      @URIParam("2") Integer secondItem,
-      @QueryParam("operation") String op) {
+      @URIParam("2") Integer secondItem) {
     return Response.Builder.ok(firstItem * secondItem + "").mediaType("text/plain").build();  
   }
 
+  /**
+   * Divide two items.
+   * @param firstItem the first item.
+   * @param secondItem the second item.
+   * @return result.
+   */
   @HTTPMethod("GET")                                                                                                                                                                                           
   @URITemplate("/calculator/{1}/{2}/")
   @QueryTemplate("operation=divide")
   @OutputTransformer(StringOutputTransformer.class)                                                                                                                                                         
   public Response divide(@URIParam("1") Integer firstItem,
-      @URIParam("2") Integer secondItem,
-      @QueryParam("operation") String op) {
+      @URIParam("2") Integer secondItem) {
     return Response.Builder.ok(firstItem / secondItem + "").mediaType("text/plain").build();  
   }
 }

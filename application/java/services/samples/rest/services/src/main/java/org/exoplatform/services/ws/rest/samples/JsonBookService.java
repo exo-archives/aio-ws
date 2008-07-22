@@ -32,40 +32,63 @@ import org.exoplatform.ws.frameworks.json.transformer.Bean2JsonOutputTransformer
 import org.exoplatform.ws.frameworks.json.transformer.Json2BeanInputTransformer;
 
 /**
+ * Simple service for REST demo.
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 public class JsonBookService implements ResourceContainer {
 
-  private BookStorage books_;
+  /**
+   * BookStorage. 
+   */
+  private BookStorage bookStorage;
   
-  private static final Log LOGGER = ExoLogger.getLogger("ws.JsonBookService");
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger("ws.JsonBookService");
   
+  /**
+   * Constructs new instance of JsonBookService. 
+   * @param books BookStorage.
+   */
   public JsonBookService(BookStorage books) {
-    books_ = books;
+    bookStorage = books;
   }
   
+  /**
+   * Return request with JSON body which represent Book object.
+   * @param key the key.
+   * @return @see {@link Response} .
+   */
   @HTTPMethod("GET")                                                                                                                                                                                           
   @URITemplate("/json/{key}/")                                                                                                                                                                                   
   @OutputTransformer(Bean2JsonOutputTransformer.class)                                                                                                                                                         
   public Response get(@URIParam("key") String key) {    
-    Book book = books_.getBook(key);
+    Book book = bookStorage.getBook(key);
     if (book == null)
       return Response.Builder.notFound().build();
-    LOGGER.info("GET: " + book);
-    LOGGER.info("In storage now: " + books_.numberOfBooks());
-    return Response.Builder.ok(books_.getBook(key)).mediaType("application/json").build();  
+    LOG.info("GET: " + book);
+    LOG.info("In storage now: " + bookStorage.numberOfBooks());
+    return Response.Builder.ok(bookStorage.getBook(key)).mediaType("application/json").build();  
   }
                                                                                                                                                                                                                
+  /**
+   * Create new Book in BookStorage with specified key.
+   * @param key the key.
+   * @param baseURI the base URL.
+   * @param book Book.
+   * @return response with status 201, @see {@link Response} .
+   */
   @HTTPMethod("POST")                                                                                                                                                                                           
   @URITemplate("/json/{key}/")                                                                                                                                                                                   
   @InputTransformer(Json2BeanInputTransformer.class)                                                                                                                                                         
   public Response post(@URIParam("key") String key,
           @ContextParam(ResourceDispatcher.CONTEXT_PARAM_BASE_URI) String baseURI,
           Book book) {    
-    LOGGER.info("POST: " + book);
-    books_.addBook(key, book);
-    LOGGER.info("In storage now: " + books_.numberOfBooks());
+    LOG.info("POST: " + book);
+    bookStorage.addBook(key, book);
+    LOG.info("In storage now: " + bookStorage.numberOfBooks());
     return Response.Builder.created(baseURI + "json" + "/" + key).build();  
   }
     

@@ -23,61 +23,118 @@ package org.exoplatform.services.ws.rest.samples;
  */
 public class Book {
   
-  private String title_;
-  private String author_;
-  private int pages_;
-  private double price_;
-  private String isdn_;
+  /**
+   * Title.
+   */
+  private String title;
   
+  /**
+   * Author. 
+   */
+  private String author;
+  
+  /**
+   * Number of pages.
+   */
+  private int pages;
+  
+  /**
+   * Price.
+   */
+  private double price;
+  
+  /**
+   * ISDN.
+   */
+  private String isdn;
+  
+  /**
+   * @return author name.
+   */
   public String getAuthor() {
-    return author_;
+    return author;
   }
 
+  /**
+   * Set author name.
+   * @param author author name.
+   */
   public void setAuthor(String author) {
-    this.author_ = author;
+    this.author = author;
   }
 
+  /**
+   * @return ISDN.
+   */
   public String getIsdn() {
-    return isdn_;
+    return isdn;
   }
 
+  /**
+   * Set ISDN.
+   * @param isdn ISDN.
+   */
   public void setIsdn(String isdn) {
-    this.isdn_ = isdn;
+    this.isdn = isdn;
   }
 
+  /**
+   * @return number of pages.
+   */
   public int getPages() {
-    return pages_;
+    return pages;
   }
 
+  /**
+   * Set number of pages.
+   * @param pages number of pages.
+   */
   public void setPages(int pages) {
-    this.pages_ = pages;
+    this.pages = pages;
   }
 
+  /**
+   * @return price.
+   */
   public Double getPrice() {
-    return price_;
+    return price;
   }
 
+  /**
+   * Set book's price.
+   * @param price price.
+   */
   public void setPrice(Double price) {
-    this.price_ = price;
+    this.price = price;
   }
 
+  /**
+   * @return book's title.
+   */
   public String getTitle() {
-    return title_;
+    return title;
   }
 
+  /**
+   * Set book's title.
+   * @param title title.
+   */
   public void setTitle(String title) {
-    this.title_ = title;
+    this.title = title;
   }
   
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
     sb.append("Book:{")
-    .append("Author: ").append(author_).append(" ")
-    .append("Title: ").append(title_).append(" ")
-    .append("Pages: ").append(pages_).append(" ")
-    .append("Price: ").append(price_).append(" ")
-    .append("ISDN: ").append(isdn_).append("} ");
+    .append("Author: ").append(author).append(" ")
+    .append("Title: ").append(title).append(" ")
+    .append("Pages: ").append(pages).append(" ")
+    .append("Price: ").append(price).append(" ")
+    .append("ISDN: ").append(isdn).append("} ");
     return sb.toString();
   }
 }

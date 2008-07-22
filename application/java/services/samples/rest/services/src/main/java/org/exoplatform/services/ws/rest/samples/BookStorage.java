@@ -21,17 +21,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Simple service for REST demo.
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 public class BookStorage {
   
-  private Map<String, Book> books_ = new HashMap<String, Book>();
+  /**
+   * Keeps books.
+   */
+  private Map<String, Book> books = new HashMap<String, Book>();
   
+  /**
+   * Construct new instance of BookStorage.
+   */
   public BookStorage() {
     init();
   }
 
+  /**
+   * Initialize BookStorgae.
+   */
   private void init() {
     Book book = new Book();
     book.setTitle("JUnit in Action");
@@ -39,18 +49,31 @@ public class BookStorage {
     book.setPages(386);
     book.setPrice(19.37);
     book.setIsdn("1234567890");
-    books_.put("1234567890", book);
+    books.put("1234567890", book);
   }
   
+  /**
+   * Get Book with specified key.
+   * @param key the key.
+   * @return Book.
+   */
   public Book getBook(String key) {
-    return books_.get(key); 
+    return books.get(key); 
   }
   
+  /**
+   * Add new Book in storage.
+   * @param key the key.
+   * @param book the book.
+   */
   public void addBook(String key, Book book) {
-    books_.put(key, book);
+    books.put(key, book);
   }
   
+  /**
+   * @return BookStorage size.
+   */
   public int numberOfBooks() {
-    return books_.size();
+    return books.size();
   }
 }

@@ -25,33 +25,65 @@ import java.util.Date;
  */
 public class Ticket {
   
-  private String passenger_;
-  private String departing_;
-  private String arriving_;
-  private Date departureDate_;
-  private long order_;
+  /**
+   * Passenger.
+   */
+  private String passenger;
   
+  /**
+   * Departing place. 
+   */
+  private String departing;
+  
+  /**
+   * Arriving place.
+   */
+  private String arriving;
+  
+  /**
+   * Departure date. 
+   */
+  private Date departureDate;
+  
+  /**
+   * Order. 
+   */
+  private long order;
+  
+  /**
+   * Construct new instance of Ticket.
+   * @param passenger the passenger.
+   * @param departing the departing place.
+   * @param arriving the arriving place.
+   * @param departureDate the departure date.
+   */
   public Ticket(String passenger, String departing,
       String arriving, Date departureDate) {
-    passenger_ = passenger;
-    departing_ = departing;
-    arriving_ = arriving;
-    departureDate_ = departureDate;
-    order_ = System.currentTimeMillis();
+    this.passenger = passenger;
+    this.departing = departing;
+    this.arriving = arriving;
+    this.departureDate = departureDate;
+    this.order = System.currentTimeMillis();
   }
   
+  /**
+   * @return ticket order.
+   */
   public long getOrder() {
-    return order_;
+    return order;
   }
   
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
-    sb.append("Ticket {").append(passenger_).append(", ")
-      .append(arriving_).append(", ")
-      .append(departing_).append(", ")
-      .append(departureDate_).append(", ")
-      .append(order_).append("}");
+    sb.append("Ticket {").append(passenger).append(", ")
+      .append(arriving).append(", ")
+      .append(departing).append(", ")
+      .append(departureDate).append(", ")
+      .append(order).append("}");
     return sb.toString();
   }
 

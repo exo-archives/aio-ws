@@ -29,6 +29,7 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.ws.AbstractWebService;
 
 /**
+ * Simple ticket service for SOAP demo.
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
@@ -37,10 +38,23 @@ import org.exoplatform.services.ws.AbstractWebService;
     targetNamespace = "http://exoplatform.org/soap/xfire")
 public class TicketOrderService implements AbstractWebService {
   
-  private static final Log LOGGER = ExoLogger.getLogger("ws.TicketOrderService");
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger("ws.TicketOrderService");
   
+  /**
+   * Ticket.
+   */
   private Ticket ticket;
   
+  /**
+   * @param departing departing place.
+   * @param arriving arriving place.
+   * @param departureDate departure date.
+   * @param passenger passenger.
+   * @return ticket order.
+   */
   @WebMethod(operationName = "getTicket", action = "urn:GetTicket")
   @WebResult(name = "Ticket")
   public long getTicket(@WebParam(name = "departing", header = true) String departing,
@@ -48,13 +62,16 @@ public class TicketOrderService implements AbstractWebService {
       @WebParam(name = "departureDate", header = true) Date departureDate,
       @WebParam(name = "passenger", header = true) String passenger) {
     ticket = new Ticket(passenger, departing, arriving, departureDate);
-    LOGGER.info(ticket);
+    LOG.info(ticket);
     return ticket.getOrder();
   }
   
+  /**
+   * @param confirmation confirm or not.
+   */
   @WebMethod(operationName = "confirmation", action = "urn:Confirmation")
   public void confirmation(@WebParam(name = "confirm", header = true) boolean confirmation) {
-    LOGGER.info("Confirmation : " + confirmation + " for order '" + ticket.getOrder() + "'.");
+    LOG.info("Confirmation : " + confirmation + " for order '" + ticket.getOrder() + "'.");
   }
 
 }

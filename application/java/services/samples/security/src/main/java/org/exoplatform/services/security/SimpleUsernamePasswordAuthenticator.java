@@ -17,6 +17,9 @@
 
 package org.exoplatform.services.security;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import javax.security.auth.login.LoginException;
 
 /**
@@ -25,18 +28,19 @@ import javax.security.auth.login.LoginException;
  */
 public class SimpleUsernamePasswordAuthenticator implements Authenticator {
 
-  /*
-   * (non-Javadoc)
-   * @see org.exoplatform.services.security.Authenticator#createIdentity(java.lang.String)
+  /**
+   * {@inheritDoc}
    */
-  public Identity createIdentity(String arg0) throws Exception {
-    throw new UnsupportedOperationException("This is simple authenticator, "
-        + "can only validate username and password!");
+  public Identity createIdentity(String user) throws Exception {
+    Collection<String> roles = new ArrayList<String>(1);
+    roles.add("users");
+    return new Identity(user, new ArrayList<MembershipEntry>(), roles);
+//    throw new UnsupportedOperationException("This is simple authenticator, "
+//        + "can only validate username and password!");
   }
 
-  /*
-   * (non-Javadoc)
-   * @see org.exoplatform.services.security.Authenticator#validateUser(org.exoplatform.services.security.Credential[])
+  /**
+   * {@inheritDoc}
    */
   public final String validateUser(Credential[] credentials) throws LoginException, Exception {
     String user = null;
