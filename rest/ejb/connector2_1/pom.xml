@@ -1,0 +1,20 @@
+<project>
+  <parent>
+    <groupId>org.exoplatform.ws</groupId>
+    <artifactId>config</artifactId>
+    <version>1.2.1</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.exoplatform.ws</groupId>
+  <artifactId>exo.ws.rest.ejbconnector2_1.config</artifactId>
+  <name>Config ejb to rest connector ejb2.1</name>
+  <version>${org.exoplatform.ws.version}</version>
+  <packaging>pom</packaging>
+  
+  <modules>
+    <!--module>../../../commons</module-->
+    <module>modules/connector</module>
+    <module>modules/client</module>
+  </modules>
+
+</project>

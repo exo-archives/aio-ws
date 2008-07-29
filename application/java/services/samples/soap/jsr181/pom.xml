@@ -1,0 +1,116 @@
+<project>
+  <parent>
+    <groupId>org.exoplatform.ws</groupId>
+    <artifactId>config</artifactId>
+    <version>1.2.1</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>exo.ws.application.soap.xfire.samples</artifactId>
+  <version>${org.exoplatform.ws.version}</version>
+  <name>SOAP XFire JSR181 impl examples</name>
+  <description></description>
+  <dependencies>
+    <dependency>
+      <groupId>commons-httpclient</groupId>
+      <artifactId>commons-httpclient</artifactId>
+      <version>3.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.xfire</groupId>
+      <artifactId>xfire-all</artifactId>
+      <version>1.2.6</version>
+    </dependency>
+    <dependency>
+      <groupId>wsdl4j</groupId>
+      <artifactId>wsdl4j</artifactId>
+      <version>1.6.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.xfire</groupId>
+      <artifactId>xfire-jsr181-api</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.xml.bind</groupId>
+      <artifactId>jaxb-api</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.xml.stream</groupId>
+      <artifactId>sjsxp</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>stax</groupId>
+      <artifactId>stax-api</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.ws</groupId>
+      <artifactId>exo.ws.soap.xfire.jsr181</artifactId>
+      <version>${org.exoplatform.ws.version}</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.2-SNAPSHOT</version>
+        <dependencies>
+          <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-xjc</artifactId>
+            <version>2.0.2</version>
+          </dependency>
+          <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.0.2</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.ws.commons</groupId>
+            <artifactId>XmlSchema</artifactId>
+            <version>1.1</version>
+          </dependency>
+        </dependencies>
+        <!-- 
+  		<executions>
+  			<execution>
+ 					<phase>package</phase>
+	  			<goals>
+  					<goal>run</goal>
+  				</goals>
+  		-->
+        <configuration>
+          <tasks>
+            <echo>Run client code generator</echo>
+            <delete dir="${basedir}/client"/>
+            <taskdef name="wsgen" classname="org.codehaus.xfire.gen.WsGenTask" 
+              classpathref="maven.compile.classpath"/>
+            
+            <wsgen outputDirectory="${basedir}/target/client/generated-src"
+            wsdl="${basedir}/target/TicketOrderService.wsdl"
+            package="org.exoplatform.services.ws.soap.jsr181.client" overwrite="true"/>
+
+            <mkdir dir="${basedir}/target/client/classes"/>
+            
+            <property name="compile_classpath" refid="maven.compile.classpath"/>
+            <property name="build.compiler" value="extJavac"/>
+            <javac srcdir="${basedir}/target/client/generated-src"
+             destdir="${basedir}/target/client/classes" source="1.5"
+             classpath="${compile_classpath}"/>
+            
+            <jar destfile="${basedir}/target/client/exo.ws.soap.xfire.jsr181.samples.client-${org.exoplatform.ws.version}.jar">
+              <fileset dir="${basedir}/target/client/classes" includes="**/*.class"/>
+            </jar>
+          </tasks>
+        </configuration>
+        <!-- 
+  			</execution>	
+  		</executions>
+  		-->
+      </plugin>
+    </plugins>
+  </build>
+</project>
