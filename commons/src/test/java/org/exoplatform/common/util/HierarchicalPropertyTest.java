@@ -62,5 +62,14 @@ public class HierarchicalPropertyTest extends TestCase {
     assertTrue(hp.getAttributes().size() == 0);
     assertTrue(hp.getChildren().size() == 0);
   } 
+  
+  public void testNoNSProperty() throws Exception {
+
+    QName name = new QName("localpart");
+    HierarchicalProperty hp = new HierarchicalProperty(name, "value");
+    assertEquals(name, hp.getName());
+    assertEquals("localpart", hp.getStringName());
+
+  }
 }
 
