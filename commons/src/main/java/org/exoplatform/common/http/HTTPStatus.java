@@ -205,4 +205,9 @@ public interface HTTPStatus {
    */
   public static final int  VERSION = 505;
   
+  /**
+   * HTTP Status-Code 207: Multistatus.
+   */
+  public static final int MULTISTATUS = 207;
+  
 }
