@@ -53,7 +53,7 @@ public class TransferMessages implements ResourceContainer {
   
   
   
-  @HTTPMethod(HTTPMethods.GET)
+/*  @HTTPMethod(HTTPMethods.GET)
   @URITemplate("/ext/gettoken/{exoid}/")
   @OutputTransformer(StringOutputTransformer.class)
   public Response getToken(@URIParam("exoid") String exoid){
@@ -63,7 +63,7 @@ public class TransferMessages implements ResourceContainer {
     log.info("send tokken " + token);
     return Response.Builder.ok(token).build();
   }
-  
+ */ 
   
   @HTTPMethod(HTTPMethods.POST)
   @URITemplate("/ext/sendprivatemessage/")
