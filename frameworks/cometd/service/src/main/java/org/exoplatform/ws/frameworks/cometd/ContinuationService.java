@@ -1,102 +1,163 @@
 package org.exoplatform.ws.frameworks.cometd;
 
+/*
+ * Copyright (C) 2003-2008 eXo Platform SAS.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, see<http://www.gnu.org/licenses/>.
+ */
+import java.util.Collection;
+import java.util.Iterator;
 import org.apache.commons.logging.Log;
 import org.exoplatform.container.ExoContainer;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.RootContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.mortbay.cometd.AbstractBayeux;
+import org.mortbay.cometd.ChannelImpl;
 import org.mortbay.cometd.continuation.EXoContinuationBayeux;
 import org.mortbay.cometd.continuation.EXoContinuationClient;
-
-
+import dojox.cometd.Client;
 
 /**
- * TODO create an interface for this and be enable to change the implementation.
- * We will need another implementation that call a remote Bayeux server using WS
- *
- * TODO: add some other message to broadcast message to all the users
- *
+ * Created by The eXo Platform SAS.
+ * 
+ * @author <a href="mailto:vitaly.parfonov@gmail.com">Vitaly Parfonov</a>
+ * @version $Id: $
  */
+
 public class ContinuationService {
-    private static final Log LOGGER = ExoLogger.getLogger("ContinuationService");
 
-    protected AbstractBayeux getBayeux(){
+  /**
+   * LOGGER output.
+   */
+  private static final Log LOGGER = ExoLogger.getLogger("ws.ContinuationService");
 
-        ExoContainer container = RootContainer.getInstance();
-        container = ((RootContainer)container).getPortalContainer("portal");
-        EXoContinuationBayeux bayeux = (EXoContinuationBayeux) container.getComponentInstanceOfType(AbstractBayeux.class);
-        return bayeux;
-    }
+  /**
+   * @return instance of EXoContinuationBayeux.
+   */
+  protected AbstractBayeux getBayeux() {
 
-    /**
-     *
-     * @param eXoId  the user ID
-     * @param channel  the channel you want to send the message. The client must listen to this channel to
-     * receive it
-     * @param data the data you want to send to the client
-     */
-    public void sendMessage(String eXoId, String channel, Object data) {
-        EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
-        bayeux.sendMessage(eXoId, channel, data);
-    }
-    
-    public EXoContinuationClient getClientByExoId(String exoId) {
-      EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
-      return bayeux.getClientByEXoId(exoId);
-    }
-    
-    public EXoContinuationClient getClient(String id) {
-      EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
-      return (EXoContinuationClient) bayeux.getClient(id);
-    }
-    
-    public long getTimeout(){
-      EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
-      return bayeux.getTimeout();
-    }
+    ExoContainer container = ExoContainerContext.getCurrentContainer();
 
-    /*    public boolean isSubscribe(String eXoId, String channel) {
-        throw new Exception();
+    if (container == null) {
+      container = ExoContainerContext.getContainerByName("portal");
     }
-
-	public boolean isConnected(String eXoId) {
-		throw new Exception();
-	}
-	
-	public boolean sendMessageOnChannel(String channel, Object data) {
-		throw new Exception();
-	}
-	
-	public boolean sendMessageToGroup(String group, String channel, Object data) {
-		throw new Exception();
-		}*/
-    
-    
-//    public boolean isClientAlive(String eXoId) throws NullPointerException{
-//      EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
-//      Set<EXoContinuationClient> set = bayeux.getClientByEXoId(eXoId);
-//      Date date = new Date();
-//      for (EXoContinuationClient exoClient : set) {
-//       try{ 
-////        exoClient.getContinuation().isPending();
-////        exoClient.getContinuation().isExpired();
-//        long l = date.getTime() - exoClient.lastAccessed();
-//        System.out.println("exoClient.lastAccessed() = " + l + " : " + new Date(exoClient.lastAccessed())) ;
-//        System.out.println("timeout " + exoClient._timeout.isExpired());
-//        System.out.println("timeout " + exoClient._timeout.isScheduled());
-//        System.out.println("timeout " + exoClient._timeout.getTimestamp());
-//       } catch (Exception e) {
-//         e.printStackTrace();
-//         throw(new NullPointerException());
-//      }
-//      }
-//      return true;
-//    }
-
-    public String getUserToken(String eXoId) {
-        EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
-        return bayeux.getUserToken(eXoId);
+    if (container instanceof RootContainer) {
+      container = RootContainer.getInstance().getPortalContainer("portal");
     }
+    EXoContinuationBayeux bayeux = (EXoContinuationBayeux) container.getComponentInstanceOfType(AbstractBayeux.class);
+    return bayeux;
+  }
 
+  /**
+   * Send individual message to client.
+   * 
+   * @param eXoId the user ID
+   * @param channel the channel you want to send the message. The client must
+   *          listen to this channel to receive it
+   * @param data the data you want to send to the client
+   * @param id the id of message
+   */
+  public void sendMessage(String eXoId, String channel, Object data, String id) {
+    EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
+    bayeux.sendMessage(eXoId, channel, data, id);
+    LOGGER.info("Send message : " + data.toString() + " to client : " + eXoId + " by channel "
+        + channel);
+  }
+
+  /**
+   * @param exoId the id of client (exoId).
+   * @return Get client by eXoId.
+   */
+  public EXoContinuationClient getClientByExoId(String exoId) {
+    EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
+    return bayeux.getClientByEXoId(exoId);
+  }
+
+  /**
+   * @param id the id of client (cometd id)
+   * @return Get client by id (id generated by cometd service).
+   */
+  public EXoContinuationClient getClient(String id) {
+    EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
+    return (EXoContinuationClient) bayeux.getClient(id);
+  }
+
+  /**
+   * @return all registered client.
+   */
+  public Collection<Client> getClients() {
+    EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
+    return bayeux.getClients();
+  }
+
+  /**
+   * @param channel the channel id.
+   * @return Return true if channel exist else false.
+   */
+  public boolean hasChannel(String channel) {
+    EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
+    return bayeux.hasChannel(channel);
+  }
+
+  /**
+   * @return timeout of client reconnect.
+   */
+  public long getTimeout() {
+    EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
+    return bayeux.getTimeout();
+  }
+
+  /**
+   * @param eXoId the client id (as eXoId).
+   * @param channel the id of channel.
+   * @return true if client subscribe to channel else false.
+   */
+  public boolean isSubscribe(String eXoId, String channel) {
+    EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
+    ChannelImpl channelImpl = bayeux.getChannel(channel);
+    Collection<Client> collection = channelImpl.getSubscribers();
+    for (Iterator<Client> iterator = collection.iterator(); iterator.hasNext();) {
+      Client client = (Client) iterator.next();
+      if (client instanceof EXoContinuationClient) {
+        EXoContinuationClient exoClient = (EXoContinuationClient) client;
+        if (exoClient.getEXoId().equals(eXoId))
+          return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Send message to all client that listen channel.
+   * 
+   * @param channel the id of channel that need send message
+   * @param data that send
+   * @param msgId id of message
+   */
+  public void sendBroadcastMessage(String channel, Object data, String msgId) {
+    EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
+    bayeux.sendBroadcastMessage(channel, data, msgId);
+  }
+
+  /**
+   * @param eXoId the client id (as eXoId).
+   * @return Return userToken for the client.
+   */
+  public String getUserToken(String eXoId) {
+    EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
+    return bayeux.getUserToken(eXoId);
+  }
 
 }
