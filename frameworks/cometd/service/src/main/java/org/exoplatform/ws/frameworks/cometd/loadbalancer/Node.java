@@ -73,6 +73,7 @@ public class Node {
   }
   
   public Node() {
+    this.alive = true;
   }
 
   /**
