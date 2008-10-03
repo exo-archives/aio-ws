@@ -63,7 +63,7 @@ public class TransferMessages implements ResourceContainer {
     log.info("send tokken " + token);
     return Response.Builder.ok(token).build();
   }
- */ 
+*/  
   
   @HTTPMethod(HTTPMethods.POST)
   @URITemplate("/ext/sendprivatemessage/")

@@ -151,4 +151,10 @@ public class LoadBalancerImpl implements LoadBalancer {
       return null;
     }
   }
+  
+  public static class LoadBalancerConf {
+    
+    
+    
+  }
 }
