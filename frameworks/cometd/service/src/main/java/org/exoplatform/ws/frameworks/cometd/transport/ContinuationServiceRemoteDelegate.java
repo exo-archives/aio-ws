@@ -156,7 +156,6 @@ public class ContinuationServiceRemoteDelegate implements ContinuationServiceDel
         URL url = new URL(u);
         HTTPConnection connection = new HTTPConnection(url);
         boolean b = Boolean.parseBoolean(new String(connection.Get(url.getFile()).getData()));
-        System.out.println("ContinuationServiceRemoteDelegate.getCometdURLsByChannel()" + b + " : : " + curl);
         if (b) urls.add(curl);
       }
       return urls;
