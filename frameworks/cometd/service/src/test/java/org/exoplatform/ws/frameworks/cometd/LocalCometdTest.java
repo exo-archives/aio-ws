@@ -36,7 +36,7 @@ import org.exoplatform.common.http.client.HTTPConnection;
 import org.exoplatform.common.http.client.HTTPResponse;
 import org.exoplatform.common.http.client.NVPair;
 import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.ws.frameworks.cometd.transport.DlegateMessage;
+import org.exoplatform.ws.frameworks.cometd.transport.DelegateMessage;
 import org.exoplatform.ws.frameworks.json.JsonHandler;
 import org.exoplatform.ws.frameworks.json.JsonParser;
 import org.exoplatform.ws.frameworks.json.impl.BeanBuilder;

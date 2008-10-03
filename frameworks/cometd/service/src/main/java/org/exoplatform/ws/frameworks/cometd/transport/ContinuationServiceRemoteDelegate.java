@@ -82,7 +82,7 @@ public class ContinuationServiceRemoteDelegate implements ContinuationServiceDel
       String baseURICometdServer = getBaseCometdURL(exoID);
       URL url = new URL(baseURICometdServer + "/rest/sendprivatemessage/");
       HTTPConnection connection = new HTTPConnection(url);
-      DlegateMessage transportData = new DlegateMessage(channel, exoID, message, msgId);
+      DelegateMessage transportData = new DelegateMessage(channel, exoID, message, msgId);
       JsonGeneratorImpl generatorImpl = new JsonGeneratorImpl();
       JsonValue json = generatorImpl.createJsonObject(transportData);
       HTTPResponse response = connection.Post(url.getFile(), json.toString());
@@ -109,7 +109,7 @@ public class ContinuationServiceRemoteDelegate implements ContinuationServiceDel
       if (us != null) {
         for (String u : us) {
           URL url = new URL(u + "/rest/sendbroadcastmessage/");
-          DlegateMessage transportData = new DlegateMessage(channel, message, msgId);
+          DelegateMessage transportData = new DelegateMessage(channel, message, msgId);
           JsonGeneratorImpl generatorImpl = new JsonGeneratorImpl();
           JsonValue json = generatorImpl.createJsonObject(transportData);
           HTTPConnection connection = new HTTPConnection(url);

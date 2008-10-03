@@ -25,11 +25,8 @@ import org.exoplatform.services.log.ExoLogger;
  * @author <a href="mailto:vitaly.parfonov@gmail.com">Vitaly Parfonov</a>
  * @version $Id: $
  */
-/**
- * @author vetal
- *
- */
-public class DlegateMessage {
+
+public class DelegateMessage {
   /**
    * Class logger.
    */
@@ -58,7 +55,7 @@ public class DlegateMessage {
   /**
    * 
    */
-  public DlegateMessage() {
+  public DelegateMessage() {
   }
 
   /**
@@ -67,7 +64,7 @@ public class DlegateMessage {
    * @param message the message 
    * @param msgId id of message
    */
-  public DlegateMessage(String channel, String exoId, String message, String msgId) {
+  public DelegateMessage(String channel, String exoId, String message, String msgId) {
     super();
     this.channel = channel;
     this.exoId = exoId;
@@ -80,7 +77,7 @@ public class DlegateMessage {
    * @param message the message 
    * @param msgId id of message
    */
-  public DlegateMessage(String channel, String message, String msgId) {
+  public DelegateMessage(String channel, String message, String msgId) {
     super();
     this.channel = channel;
     this.message = message;

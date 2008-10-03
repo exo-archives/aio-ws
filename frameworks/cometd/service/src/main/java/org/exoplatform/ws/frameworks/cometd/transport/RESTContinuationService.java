@@ -101,7 +101,7 @@ public class RESTContinuationService implements ResourceContainer {
   @HTTPMethod(HTTPMethods.POST)
   @URITemplate("/sendprivatemessage/")
   @InputTransformer(Json2BeanInputTransformer.class)
-  public Response sendMessage(DlegateMessage data) {
+  public Response sendMessage(DelegateMessage data) {
     ContinuationService continuation = getContinuationService();
     continuation.sendMessage(data.getExoId(), data.getChannel(), data.getMessage(), data.getId());
     if (log.isInfoEnabled())
@@ -116,7 +116,7 @@ public class RESTContinuationService implements ResourceContainer {
   @HTTPMethod(HTTPMethods.POST)
   @URITemplate("/sendbroadcastmessage/")
   @InputTransformer(Json2BeanInputTransformer.class)
-  public Response sendBroadcastMessage(DlegateMessage data) {
+  public Response sendBroadcastMessage(DelegateMessage data) {
     ContinuationService continuation = getContinuationService();
     continuation.sendBroadcastMessage(data.getChannel(), data.getMessage(), data.getId());
     if (log.isInfoEnabled())

@@ -37,7 +37,7 @@ public class Node {
   /**
    * The max connection allowed on this node.
    */
-  private int       maxConenction;
+  private int       maxConnection;
 
   /**
    * How much already connected.
@@ -56,7 +56,7 @@ public class Node {
   public Node(String id, String url, int maxConenction) {
     this.id = id;
     this.url = url;
-    this.maxConenction = maxConenction;
+    this.maxConnection = maxConenction;
     this.alive = true;
     this.connected = 0;
   }
@@ -67,9 +67,12 @@ public class Node {
   public Node(String id, String url) {
     this.id = id;
     this.url = url;
-    this.maxConenction = 0;
+    this.maxConnection = 0;
     this.alive = true;
     this.connected = 0;
+  }
+  
+  public Node() {
   }
 
   /**
@@ -89,15 +92,15 @@ public class Node {
   /**
    * @return the max allowed connection on this node.  
    */
-  public int getMaxConenction() {
-    return maxConenction;
+  public int getMaxConnection() {
+    return maxConnection;
   }
 
   /**
-   * @param maxConenction set max allowed connection on this node.
+   * @param maxConnenction set max allowed connection on this node.
    */
-  public void setMaxConenction(int maxConenction) {
-    this.maxConenction = maxConenction;
+  public void setMaxConnection(int maxConnenction) {
+    this.maxConnection = maxConnenction;
   }
 
   /**

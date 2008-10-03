@@ -20,12 +20,43 @@
   <key>org.exoplatform.ws.frameworks.cometd.loadbalancer.LoadBalancer</key>
   <type>org.exoplatform.ws.frameworks.cometd.loadbalancer.LoadBalancerImpl</type>
   <init-params>
-    <values-param>
-      <name>cluster-conf</name>
-      <value>1;http://localhost:8080;10</value>
-      <value>2;http://localhost:8081;15</value>
-    </values-param> 
-  </init-params>
+  <object-param>
+  <name>cometd.lb.configuration</name>
+  <description>cometd lb nodes</description>
+  <object type="org.exoplatform.ws.frameworks.cometd.loadbalancer.LoadBalancerImpl$LoadBalancerConf">
+   <field name="nodes">
+    <collection type="java.util.ArrayList">
+     <value>
+      <object type="org.exoplatform.ws.frameworks.cometd.loadbalancer.Node">
+       <field name="id">
+        <string>1</string>
+       </field>
+       <field name="url">
+        <string>http://localhost:8080</string>
+       </field>
+       <field name="maxConnection">
+        <int>10</int>
+       </field>
+      </object>
+     </value>
+     <value>
+      <object type="org.exoplatform.ws.frameworks.cometd.loadbalancer.Node">
+       <field name="id">
+        <string>2</string>
+       </field>
+       <field name="url">
+        <string>http://localhost:8081</string>
+       </field>
+       <field name="maxConnection">
+        <int>15</int>
+       </field>
+      </object>
+     </value>
+    </collection>
+   </field>
+  </object>
+ </object-param>
+</init-params>
  </component>
 </configuration>  
    

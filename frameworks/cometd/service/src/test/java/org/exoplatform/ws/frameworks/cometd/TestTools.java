@@ -25,7 +25,7 @@ import org.exoplatform.common.http.HTTPStatus;
 import org.exoplatform.common.http.client.HTTPConnection;
 import org.exoplatform.common.http.client.HTTPResponse;
 import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.ws.frameworks.cometd.transport.DlegateMessage;
+import org.exoplatform.ws.frameworks.cometd.transport.DelegateMessage;
 import org.exoplatform.ws.frameworks.json.JsonHandler;
 import org.exoplatform.ws.frameworks.json.JsonParser;
 import org.exoplatform.ws.frameworks.json.impl.BeanBuilder;
@@ -81,7 +81,7 @@ public class TestTools {
                                  String msgId,
                                  String baseURI) {
     try {
-      DlegateMessage data = new DlegateMessage(channel, exoid, message, msgId);
+      DelegateMessage data = new DelegateMessage(channel, exoid, message, msgId);
       URL url = new URL(baseURI);// + "ext/sendprivatemessage/");
       JsonGeneratorImpl generatorImpl = new JsonGeneratorImpl();
       JsonValue json = generatorImpl.createJsonObject(data);
@@ -97,7 +97,7 @@ public class TestTools {
                                           String msgId,
                                           String baseURI) {
     try {
-      DlegateMessage data = new DlegateMessage(channel, message, msgId);
+      DelegateMessage data = new DelegateMessage(channel, message, msgId);
       JsonGeneratorImpl generatorImpl = new JsonGeneratorImpl();
       JsonValue json = generatorImpl.createJsonObject(data);
       URL url = new URL(baseURI);// + "ext/sendbroadcastmessage/");

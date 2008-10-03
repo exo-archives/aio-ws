@@ -31,7 +31,7 @@ import org.exoplatform.services.rest.URITemplate;
 import org.exoplatform.services.rest.container.ResourceContainer;
 import org.exoplatform.services.rest.transformer.StringOutputTransformer;
 import org.exoplatform.ws.frameworks.cometd.transport.ContinuationServiceDelegate;
-import org.exoplatform.ws.frameworks.cometd.transport.DlegateMessage;
+import org.exoplatform.ws.frameworks.cometd.transport.DelegateMessage;
 import org.exoplatform.ws.frameworks.json.transformer.Json2BeanInputTransformer;
 
 
@@ -48,27 +48,14 @@ public class TransferMessages implements ResourceContainer {
    */
   private final Log log = ExoLogger.getLogger("ws.CometdTestSendMessage");
   
-//  private List<String> messges;
+ 
   
-  
-  
-  
-/*  @HTTPMethod(HTTPMethods.GET)
-  @URITemplate("/ext/gettoken/{exoid}/")
-  @OutputTransformer(StringOutputTransformer.class)
-  public Response getToken(@URIParam("exoid") String exoid){
-    System.out.println("TransferMessages.getToken() " + exoid);
-    ContinuationServiceDelegate transport = getCometdTransport();
-    String token = transport.getUserToken(exoid);
-    log.info("send tokken " + token);
-    return Response.Builder.ok(token).build();
-  }
-*/  
+
   
   @HTTPMethod(HTTPMethods.POST)
   @URITemplate("/ext/sendprivatemessage/")
   @InputTransformer(Json2BeanInputTransformer.class)
-  public Response sendMessage(DlegateMessage transportData){
+  public Response sendMessage(DelegateMessage transportData){
     System.out.println("TransferMessages.sendMessage() channel : " + transportData.getChannel() + " exoid " + transportData.getExoId() + " : " + transportData.getMessage());
     ContinuationServiceDelegate transport = getCometdTransport();
     transport.sendMessage(transportData.getChannel(), transportData.getExoId(), transportData.getMessage(),transportData.getId());
@@ -79,7 +66,7 @@ public class TransferMessages implements ResourceContainer {
   @HTTPMethod(HTTPMethods.POST)
   @URITemplate("/ext/sendbroadcastmessage/")
   @InputTransformer(Json2BeanInputTransformer.class)
-  public Response sendBroadcastMessage(DlegateMessage data){
+  public Response sendBroadcastMessage(DelegateMessage data){
     ContinuationServiceDelegate transport = getCometdTransport();
     transport.sendBroadcastMessage(data.getChannel(), data.getMessage(),data.getId());
     log.info("send broadcast message " + data.getMessage());

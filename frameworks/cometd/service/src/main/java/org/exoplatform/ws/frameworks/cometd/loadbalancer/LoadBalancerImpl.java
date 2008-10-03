@@ -18,13 +18,13 @@ package org.exoplatform.ws.frameworks.cometd.loadbalancer;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.ObjectParameter;
 import org.exoplatform.container.xml.ValuesParam;
 import org.exoplatform.services.log.ExoLogger;
 
@@ -55,19 +55,26 @@ public class LoadBalancerImpl implements LoadBalancer {
    */
   public LoadBalancerImpl(InitParams params) {
     if (params != null){
-      ValuesParam vps = params.getValuesParam("cluster-conf");
-      List<String> vs = vps.getValues();
-      for (String v : vs) {
-        String [] arr = v.split(";");
-        if (arr.length == 2){
-          Node node = new Node(arr[0],arr[1]);
-          nodes.put(arr[0], node);
-        } else if (arr.length == 3){
-          int max = Integer.parseInt(arr[2]);
-          Node node = new Node(arr[0],arr[1],max);
-          nodes.put(arr[0], node);
-        }
+      ObjectParameter parameter = params.getObjectParam("cometd.lb.configuration");
+      LoadBalancerConf conf = (LoadBalancerConf) parameter.getObject();
+      List<Node> list = conf.getNodes();
+      for (Node node : list) {
+        nodes.put(node.getId(),node);
+        System.out.println("LoadBalancerImpl" + node.getUrl() + " : " + node.getConnected() + " : " + node.getMaxConnection());
       }
+//      ValuesParam vps = params.getValuesParam("cluster-conf");
+//      List<String> vs = vps.getValues();
+//      for (String v : vs) {
+//        String [] arr = v.split(";");
+//        if (arr.length == 2){
+//          Node node = new Node(arr[0],arr[1]);
+//          nodes.put(arr[0], node);
+//        } else if (arr.length == 3){
+//          int max = Integer.parseInt(arr[2]);
+//          Node node = new Node(arr[0],arr[1],max);
+//          nodes.put(arr[0], node);
+//        }
+//      }
     }
   }
   
@@ -139,8 +146,8 @@ public class LoadBalancerImpl implements LoadBalancer {
     } else {
       Collection<Node> ns = nodes.values();
       for (Node node : ns) {
-        System.out.println("LoadBalancerImpl.getNodeURL()" + node.getUrl() + " : " + node.getConnected() + " : " + node.getMaxConenction());
-        if (node.getConnected() < node.getMaxConenction()) {
+        System.out.println("LoadBalancerImpl.getNodeURL()" + node.getUrl() + " : " + node.getConnected() + " : " + node.getMaxConnection());
+        if (node.getConnected() < node.getMaxConnection()) {
           node.addConnection();
           nodes.put(node.getId(), node);
           connectionMap.put(exoId, node.getId());
@@ -153,6 +160,24 @@ public class LoadBalancerImpl implements LoadBalancer {
   }
   
   public static class LoadBalancerConf {
+    
+   private List<Node> nodes = new ArrayList<Node>();
+
+  /**
+   * @return the nodes
+   */
+  public List<Node> getNodes() {
+    return nodes;
+  }
+
+  /**
+   * @param nodes the nodes to set
+   */
+  public void setNodes(List<Node> nodes) {
+    this.nodes = nodes;
+  }
+   
+   
     
     
     
