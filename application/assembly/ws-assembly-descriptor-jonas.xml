@@ -30,16 +30,6 @@
         <exclude>org.springframework:spring</exclude>
         <exclude>javax.servlet:servlet-api</exclude>
         <exclude>javax.ejb:ejb</exclude>
-        <exclude>org.codehaus.xfire:xfire-aegis</exclude>
-        <exclude>org.codehaus.xfire:xfire-annotations</exclude>
-        <exclude>org.codehaus.xfire:xfire-generator</exclude>
-        <exclude>org.codehaus.xfire:xfire-java5</exclude>
-        <exclude>org.codehaus.xfire:xfire-jaxb2</exclude>
-        <exclude>org.codehaus.xfire:xfire-jaxws</exclude>
-        <exclude>org.codehaus.xfire:xfire-spring</exclude>
-        <exclude>org.codehaus.xfire:xfire-ws-security</exclude>
-        <exclude>org.codehaus.xfire:xfire-xmlbeans</exclude>
-        <exclude>xfire:xfire-jsr181-api</exclude>
         <exclude>org.apache.ws.commons:XmlSchema</exclude>
         <exclude>org.apache.ant:ant</exclude>
         <exclude>ant:ant</exclude>

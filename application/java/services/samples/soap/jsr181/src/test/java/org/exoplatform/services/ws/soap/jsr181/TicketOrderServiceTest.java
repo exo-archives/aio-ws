@@ -47,19 +47,19 @@ public class TicketOrderServiceTest extends TestCase {
   }
   
   public void testSayHelloService() throws Exception {
-    List < AbstractWebService > l =
+    List < AbstractWebService > services =
       container.getComponentInstancesOfType(AbstractWebService.class);
-    for (AbstractWebService sc : l) {
-      if (sc.getClass().getAnnotation(WebService.class).serviceName().equals(SERVICE_NAME)) {
+    for (AbstractWebService as : services) {
+      if (as.getClass().getAnnotation(WebService.class).serviceName().equals(SERVICE_NAME)) {
         XFire xfire = XFireFactory.newInstance().getXFire();
         assertNotNull(xfire);
         AnnotationServiceFactory annotationServiceFactory = new AnnotationServiceFactory();
-        Service s = annotationServiceFactory.create(sc.getClass());
-        xfire.getServiceRegistry().register(s);
+        Service ws = annotationServiceFactory.create(as.getClass());
+        xfire.getServiceRegistry().register(ws);
         assertTrue(xfire.getServiceRegistry().hasService(SERVICE_NAME));
         System.out.println("TicketOrderService, name: "
             + xfire.getServiceRegistry().getService(SERVICE_NAME).getName());
-        xfire.generateWSDL(s.getSimpleName(), new FileOutputStream("target/TicketOrderService.wsdl"));
+        xfire.generateWSDL(ws.getSimpleName(), new FileOutputStream("target/TicketOrderService.wsdl"));
       }
     }
   }

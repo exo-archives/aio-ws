@@ -52,26 +52,26 @@
     <load-on-startup>3</load-on-startup>
   </servlet>  
   
-  <servlet>                                                                                                                                             
-    <servlet-name>XFireServlet</servlet-name>                                                                                                           
-    <display-name>XFire Servlet</display-name>                                                                                                          
-    <servlet-class>org.exoplatform.services.ws.impl.xfire.transport.http.XFireServlet</servlet-class>                                                   
-  </servlet>                                                                                                                                            
+  <servlet>
+    <servlet-name>SOAPServlet</servlet-name>
+    <display-name>SOAP Servlet</display-name>
+    <servlet-class>org.exoplatform.services.ws.impl.cxf.transport.http.SOAPServlet</servlet-class>
+  </servlet>                                                                                                                                           
 
   <servlet>
     <servlet-name>OAuthCallbackServlet</servlet-name>
     <servlet-class>org.exoplatform.ws.security.oauth.http.OAuthCallbackServlet</servlet-class>
   </servlet>
   
-  <servlet-mapping>                                                                                                                                     
-    <servlet-name>XFireServlet</servlet-name>                                                                                                           
-    <url-pattern>/soap/servlet/XFireServlet/*</url-pattern>                                                                                                  
-  </servlet-mapping>                                                                                                                                    
+  <servlet-mapping>
+    <servlet-name>SOAPServlet</servlet-name>
+    <url-pattern>/soap/servlet/SOAPServlet/*</url-pattern>
+  </servlet-mapping>
   
-  <servlet-mapping>                                                                                                                                     
-    <servlet-name>XFireServlet</servlet-name>                                                                                                           
-    <url-pattern>/soap/services/*</url-pattern>                                                                                                              
-  </servlet-mapping>                       
+  <servlet-mapping>
+    <servlet-name>SOAPServlet</servlet-name>
+    <url-pattern>/soap/services/*</url-pattern>
+  </servlet-mapping>                    
   
   <servlet-mapping>
     <servlet-name>RestServer</servlet-name>
