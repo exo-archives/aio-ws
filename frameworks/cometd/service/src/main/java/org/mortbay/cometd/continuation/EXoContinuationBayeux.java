@@ -158,12 +158,9 @@ public class EXoContinuationBayeux extends ContinuationBayeux {
     Channel ch = getChannel(channel);
     if (ch != null) {
       ch.publish(fromClient, data, msgId);
-      if (log.isInfoEnabled())
-        log.info("Send broadcast message " + data.toString() + " on channel " + channel);
+      log.info("Send broadcast message " + data.toString() + " on channel " + channel);
     } else {
-      if (log.isErrorEnabled()) {
-        log.error("Message " + data.toString() + " not send. Channel " + channel + " not exist!");
-      }
+      log.error("Message " + data.toString() + " not send. Channel " + channel + " not exist!");
     }
   }
 
@@ -190,12 +187,9 @@ public class EXoContinuationBayeux extends ContinuationBayeux {
     ClientImpl fromClient = (ClientImpl) this.newClient("EXoContinuationBayeux");
     if (toClient != null) {
       toClient.deliver(fromClient, channel, data, id);
-      if (log.isInfoEnabled())
-        log.info("Send message " + data.toString() + " on channel " + channel + " to client " + eXoId);
+      log.info("Send message " + data.toString() + " on channel " + channel + " to client " + eXoId);
     } else {
-      if (log.isErrorEnabled()) {
-        log.error("Message " + data.toString() + " not send on channel " + channel + " client " + eXoId + " not exist!");
-      }
+      log.error("Message " + data.toString() + " not send on channel " + channel + " client " + eXoId + " not exist!");
     }
   }
 
