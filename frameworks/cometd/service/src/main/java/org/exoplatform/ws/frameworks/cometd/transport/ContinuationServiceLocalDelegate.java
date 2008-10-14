@@ -48,7 +48,7 @@ public class ContinuationServiceLocalDelegate implements ContinuationServiceDele
   /**
    * {@inheritDoc}
    */
-  public void sendMessage(String channel, String exoId, String message, String msgId) {
+  public void sendMessage(String exoId, String channel, String message, String msgId) {
     ContinuationService continuation = getContinuationService();
     continuation.sendMessage(exoId, channel, message, msgId);
   }

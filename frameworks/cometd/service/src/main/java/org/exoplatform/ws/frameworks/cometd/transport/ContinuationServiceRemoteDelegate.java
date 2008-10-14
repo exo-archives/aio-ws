@@ -77,7 +77,7 @@ public class ContinuationServiceRemoteDelegate implements ContinuationServiceDel
   /**
    * {@inheritDoc}
    */
-  public void sendMessage(String channel, String exoID, String message, String msgId) {
+  public void sendMessage(String exoID, String channel, String message, String msgId) {
     try {
       String baseURICometdServer = getBaseCometdURL(exoID);
       URL url = new URL(baseURICometdServer + "/rest/sendprivatemessage/");
@@ -87,12 +87,10 @@ public class ContinuationServiceRemoteDelegate implements ContinuationServiceDel
       JsonValue json = generatorImpl.createJsonObject(transportData);
       HTTPResponse response = connection.Post(url.getFile(), json.toString());
       if (response.getStatusCode() == HTTPStatus.OK) {
-        if (log.isInfoEnabled())
-          log.info("Send private message : " + message + " to client " + exoID + " by cahnnel "
+         log.info("Send private message : " + message + " to client " + exoID + " by cahnnel "
               + channel + " success");
       } else {
-        if (log.isWarnEnabled())
-          log.warn("Send private message : " + message + " to client " + exoID + " by cahnnel "
+         log.warn("Send private message : " + message + " to client " + exoID + " by cahnnel "
               + channel + " fail!");
       }
     } catch (Exception e) {
