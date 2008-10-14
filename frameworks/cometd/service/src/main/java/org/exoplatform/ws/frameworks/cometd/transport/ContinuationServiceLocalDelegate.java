@@ -34,7 +34,7 @@ public class ContinuationServiceLocalDelegate implements ContinuationServiceDele
    * Class logger.
    */
 
-  private final Log log = ExoLogger.getLogger("ws.LocalVersionCometdTransport");
+  private final Log log = ExoLogger.getLogger("ws.ContinuationServiceLocalDelegate");
 
 
   /**

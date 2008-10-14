@@ -8,7 +8,7 @@
  </component>
  <component>
   <key>org.exoplatform.ws.frameworks.cometd.transport.ContinuationServiceDelegate</key>
-  <type>org.exoplatform.ws.frameworks.cometd.transport.ContinuationServiceRemoteDelegate</type>
+  <type>org.exoplatform.ws.frameworks.cometd.transport.ContinuationServiceLocalDelegate</type>
  </component>
  <component>
   <type>org.exoplatform.ws.frameworks.cometd.transport.RESTContinuationService</type>
@@ -35,20 +35,7 @@
         <string>http://localhost:8080</string>
        </field>
        <field name="maxConnection">
-        <int>10</int>
-       </field>
-      </object>
-     </value>
-     <value>
-      <object type="org.exoplatform.ws.frameworks.cometd.loadbalancer.Node">
-       <field name="id">
-        <string>2</string>
-       </field>
-       <field name="url">
-        <string>http://localhost:8081</string>
-       </field>
-       <field name="maxConnection">
-        <int>15</int>
+        <int>10000</int>
        </field>
       </object>
      </value>

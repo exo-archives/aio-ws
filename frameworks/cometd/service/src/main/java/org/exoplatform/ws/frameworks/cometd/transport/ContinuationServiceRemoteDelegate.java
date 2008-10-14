@@ -44,7 +44,7 @@ public class ContinuationServiceRemoteDelegate implements ContinuationServiceDel
   /**
    * Class logger.
    */
-  private final Log log = ExoLogger.getLogger("ws.HTTPVersionCometdTransport");
+  private final Log log = ExoLogger.getLogger("ws.ContinuationServiceRemoteDelegate");
 
   /**
    * @param exoID the id of client.
