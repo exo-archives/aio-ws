@@ -85,7 +85,7 @@
 
   <build>
     <plugins>
-
+<!--
       <plugin>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-java2ws-plugin</artifactId>
@@ -104,8 +104,8 @@
         </dependencies>
         <executions>
           <execution>
-            <id>test-compile</id>
-            <phase>test-compile</phase>
+            <id>test</id>
+            <phase>test</phase>
             <configuration>
               <className>org.exoplatform.services.ws.soap.jsr181.TicketOrderService</className>
               <classpath>${basedir}/target/test-classes</classpath>
@@ -118,7 +118,7 @@
           </execution>
         </executions>
       </plugin>
-
+-->
       <plugin>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-codegen-plugin</artifactId>
