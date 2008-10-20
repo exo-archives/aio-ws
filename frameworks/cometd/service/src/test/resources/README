@@ -1,4 +1,4 @@
-For running test need:
+For runing test need:
 1.Configure file cometd/service/src/test/java/conf/test-configuration.xml
   <configuration clients="15" repeat="1" sleep-connection="500" sleep-sending="200">
     <container containerStart="false" port="8080" home=""/>
