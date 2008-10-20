@@ -212,8 +212,12 @@ public class JsonParserImpl implements JsonParser {
     } else {
       // not string (numeric or boolean or null)
       CharArrayWriter cw = new CharArrayWriter();
-      while ("{[,]}\"".indexOf(c = next()) < 0)
+      while ("{[,]}\"".indexOf(c = next()) < 0) {
+        // Bug : WS-66
+        if (c == 0)
+          throw new JsonException("Unexpected end of stream.");
         cw.append(c);
+      }
       back(c);
       jsonHandler.characters(cw.toCharArray());
     }
