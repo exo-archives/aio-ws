@@ -7,6 +7,6 @@
   <version>trunk</version>
   <name>eXo WS samples</name>
   <build>
-    <finalName>ws_examples</finalName>
+    <finalName>ws-examples</finalName>
   </build>
 </project>

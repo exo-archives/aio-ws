@@ -12,7 +12,12 @@
   <packaging>pom</packaging>
 
   <dependencies>
-
+    <dependency>
+      <groupId>org.exoplatform.core</groupId>
+      <artifactId>exo.core.component.organization.api</artifactId>
+      <version>${org.exoplatform.core.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <groupId>org.exoplatform.ws</groupId>
       <artifactId>exo.ws.application.webapps</artifactId>
@@ -44,44 +49,18 @@
       <version>${org.exoplatform.ws.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!--
     <dependency>
       <groupId>org.exoplatform.ws</groupId>
       <artifactId>exo.ws.application.soap.cxf.samples</artifactId>
       <version>${org.exoplatform.ws.version}</version>
       <scope>runtime</scope>
     </dependency>
-    -->
     <dependency>
       <groupId>org.exoplatform.ws</groupId>
       <artifactId>exo.ws.rest.core</artifactId>
       <version>${org.exoplatform.ws.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!--dependency>
-      <groupId>org.exoplatform.ws</groupId>
-      <artifactId>exo.ws.rest.ejbconnector21</artifactId>
-      <version>${org.exoplatform.ws.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.ws</groupId>
-      <artifactId>exo.ws.application.ejbconnector21.client21</artifactId>
-      <version>${org.exoplatform.ws.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.ws</groupId>
-      <artifactId>exo.ws.rest.ejbconnector30</artifactId>
-      <version>${org.exoplatform.ws.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.ws</groupId>
-      <artifactId>exo.ws.application.ejbconnector30.client30</artifactId>
-      <version>${org.exoplatform.ws.version}</version>
-      <scope>runtime</scope>
-    </dependency-->
     <dependency>
       <groupId>org.exoplatform.ws</groupId>
       <artifactId>exo.ws.application.rest.samples</artifactId>
@@ -107,14 +86,6 @@
       <version>${org.exoplatform.ws.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <dependency>
-      <groupId>org.exoplatform.ws</groupId>
-      <artifactId>exo.ws.security.samples</artifactId>
-      <version>${org.exoplatform.ws.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    
-
   </dependencies>
 
 </project>
