@@ -58,7 +58,7 @@ public class TransferMessages implements ResourceContainer {
   public Response sendMessage(DelegateMessage transportData){
     System.out.println("TransferMessages.sendMessage() channel : " + transportData.getChannel() + " exoid " + transportData.getExoId() + " : " + transportData.getMessage());
     ContinuationServiceDelegate transport = getCometdTransport();
-    transport.sendMessage(transportData.getChannel(), transportData.getExoId(), transportData.getMessage(),transportData.getId());
+    transport.sendMessage(transportData.getExoId(), transportData.getChannel(),transportData.getMessage(),transportData.getId());
     log.info("send message " + transportData.getMessage());
     return Response.Builder.ok().build();
   }

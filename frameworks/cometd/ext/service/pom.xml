@@ -7,39 +7,39 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.exoplatform.ws</groupId>
 	<artifactId>exo.ws.frameworks.cometd.ext</artifactId>
-	<version>trunk</version>
-	<name>Cometd External</name>
+	<version>${org.exoplatform.ws.version}</version>
+	<name>Cometd External (use for test only)</name>
 	<description>for test only</description>
 	<dependencies>
 		<dependency>
 			<groupId>org.exoplatform.ws</groupId>
 			<artifactId>exo.ws.rest.core</artifactId>
-			<version>1.2</version>
+			<version>${org.exoplatform.ws.version}</version>
 		</dependency>
 		<dependency>
                         <groupId>org.exoplatform.ws</groupId>
                         <artifactId>exo.ws.commons</artifactId>
-                        <version>1.2</version>
+                        <version>${org.exoplatform.ws.version}</version>
                 </dependency>
 		<dependency>
 			<groupId>org.exoplatform.kernel</groupId>
 			<artifactId>exo.kernel.container</artifactId>
-			<version>2.0.2</version>
+			<version>${org.exoplatform.kernel.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.exoplatform.kernel</groupId>
 			<artifactId>exo.kernel.component.common</artifactId>
-			<version>2.0.2</version>
+			<version>${org.exoplatform.kernel.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.exoplatform.ws</groupId>
 			<artifactId>exo.ws.frameworks.cometd.service</artifactId>
-			<version>trunk</version>
+			<version>${org.exoplatform.ws.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.exoplatform.ws</groupId>
 			<artifactId>exo.ws.frameworks.json</artifactId>
-			<version>1.2</version>
+			<version>${org.exoplatform.ws.version}</version>
 		</dependency>
 	</dependencies>	
 </project>
