@@ -41,7 +41,6 @@
         <exclude>org.apache.xbean:xbean-spring</exclude>
         <exclude>xmlbeans:xbean</exclude>
         <exclude>xml-apis:xml-apis</exclude>
-        <exclude>xml-resolver:xml-resolver</exclude>
         <exclude>xerces:xmlParserAPIs</exclude>
         <exclude>xerces:xercesImpl</exclude>
         <exclude>javax.portlet:portlet-api</exclude>
