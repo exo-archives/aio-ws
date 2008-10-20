@@ -19,8 +19,6 @@
     <module>frameworks/json</module>
     <module>frameworks/servlet</module>
     <module>soap/jsr181</module>
-    <!-- module>rest/ejb/connector21</module -->
-    <!-- module>rest/ejb/connector30</module -->
     <module>frameworks/cometd/service</module>
     <module>frameworks/cometd/webapp</module>
     <module>security/oauth/consumer</module>
@@ -32,12 +30,9 @@
     <module>security/spnego/tomcat</module>
     <module>application/config</module>
     <module>application/java/web/samples</module>
-    <!-- module>application/java/services/samples/rest/ejb/client21</module -->
-    <!-- module>application/java/services/samples/rest/ejb/client30</module -->
     <module>application/java/services/samples/rest/ejb/simple-service</module>
     <module>application/java/services/samples/rest/services</module>
     <module>application/java/services/samples/soap/jsr181</module>
-    <module>application/java/services/samples/security</module>
 
   </modules>
   <dependencies>
