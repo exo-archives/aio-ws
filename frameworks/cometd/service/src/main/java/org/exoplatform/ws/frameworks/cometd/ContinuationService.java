@@ -49,7 +49,6 @@ public class ContinuationService {
   protected AbstractBayeux getBayeux() {
 
     ExoContainer container = ExoContainerContext.getCurrentContainer();
-
     if (container == null) {
       container = ExoContainerContext.getContainerByName("portal");
     }
