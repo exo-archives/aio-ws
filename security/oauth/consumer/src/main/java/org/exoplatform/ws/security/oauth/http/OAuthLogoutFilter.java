@@ -57,6 +57,11 @@ public class OAuthLogoutFilter implements Filter {
   private String consumerName;
   
   /**
+   * URL for redirect after logout.
+   */
+  private String redirectToUrl;
+
+  /**
    * Logger.
    */
   private static final Log LOG = ExoLogger.getLogger("ws.security.OAuthLogoutFilter");  
@@ -123,6 +128,12 @@ public class OAuthLogoutFilter implements Filter {
       // remove secret cookie
       if (secretCookie != null)
         httpResponse.addCookie(CookieUtils.deleteCookie(secretCookie));
+
+      if (redirectToUrl != null) {
+        httpResponse.setStatus(HttpServletResponse.SC_TEMPORARY_REDIRECT);
+        httpResponse.setHeader("Location", redirectToUrl);
+        return;
+      }
     }
     chain.doFilter(httpRequest, httpResponse);
   }
@@ -134,6 +145,8 @@ public class OAuthLogoutFilter implements Filter {
     consumerName = config.getInitParameter("consumer");
     if (consumerName == null) 
       throw new ServletException("Consumer name is not found in filter init parameters!");
+    // optinal, can be null. If not set user will not be redirected after logout
+    redirectToUrl = config.getInitParameter("redirectToUrl");
   }
 
 }
