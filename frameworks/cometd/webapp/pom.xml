@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>exo.ws.frameworks.cometd.webapp</artifactId>
   <version>${org.exoplatform.ws.version}</version>
-  <name>cometd-webapp</name>
+  <name>Cometd WebApp</name>
   <packaging>war</packaging>
   <description></description>
   <dependencies>

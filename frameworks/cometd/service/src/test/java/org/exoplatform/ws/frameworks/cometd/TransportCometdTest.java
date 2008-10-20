@@ -313,7 +313,7 @@ public class TransportCometdTest extends TestCase {
                 }
                 i++;
               }
-            }
+            } 
           }
         }
         assertTrue(TestTools.release(baseURI + "/releasecometd/" + id));
