@@ -1,5 +1,7 @@
 For runing test need:
+
 1.Configure file cometd/service/src/test/java/conf/test-configuration.xml
+
   <configuration clients="15" repeat="1" sleep-connection="500" sleep-sending="200">
     <container containerStart="false" port="8080" home=""/>
     <messages>
@@ -12,8 +14,13 @@ For runing test need:
         <channel>/eXo/comedt/test</channel>
     </channels>
   </configuration>
-     This test running two servers tomcat (in role eXo-server) and jetty (cometd server).
-     In this configure say that we do 15 cometd connection with interval 500 ms. sending 2 message (1 broadcast) with time-out 200 ms, “base-url” - its URL of eXo-server, clients subscribe to “/eXo/comedt/test” channel.
+  
+  This test running two servers tomcat (in role eXo-server) and jetty (cometd server).
+  In this configure say that we do 15 cometd connection with interval 500 ms. sending 2
+  messages (1 broadcast) with time-out 200 ms, 'base-url' - URL of eXo-server,
+  clients subscribe to '/eXo/comedt/test' channel.
+  
 2.Need build projects with cometd/pom.xml.
+
 3.Go to cometd/service and run 
   mvn clean install -f pom-test.xml -Dexo.test.skip=false -Djetty.home="./target/jetty" 
