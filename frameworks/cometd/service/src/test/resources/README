@@ -19,8 +19,15 @@ For runing test need:
   In this configure say that we do 15 cometd connection with interval 500 ms. sending 2
   messages (1 broadcast) with time-out 200 ms, 'base-url' - URL of eXo-server,
   clients subscribe to '/eXo/comedt/test' channel.
-  
-2.Need build projects with cometd/pom.xml.
+  During testing run 2 test:
+    - TransportCometdTest - the test with Cometd server that work on Jetty, and eXo server on Tomcat.
+    - LocalCometdTest - the test then Comet server and eXo server work on Tomcat (it not work with many connections, so must be exclude) 
+      "comedt-url" use with local test.
+2.Also need configure cometd/service/src/main/java/conf/configuration.xml        
+  detail information about how to config server please visit 
+  http://wiki.exoplatform.org/xwiki/bin/view/Internal+Space/Cometd+Cluster+with+LoadBalancing
+3.Need build projects with cometd/pom.xml.
 
-3.Go to cometd/service and run 
+4.Go to cometd/service and run 
   mvn clean install -f pom-test.xml -Dexo.test.skip=false -Djetty.home="./target/jetty" 
+  You must see information about count connected clients and messges that they get.
