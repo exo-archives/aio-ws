@@ -102,6 +102,9 @@
     <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-surefire-plugin</artifactId>
     <configuration>
+     <excludes>
+       <exclude>**/LocalCometdTest.java</exclude>
+     </excludes>
      <systemProperties>
       <property>
        <name>testPath</name>
