@@ -25,7 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ObjectParameter;
-import org.exoplatform.container.xml.ValuesParam;
 import org.exoplatform.services.log.ExoLogger;
 
 
@@ -43,7 +42,7 @@ public class LoadBalancerImpl implements LoadBalancer {
   /**
    * 
    */
-  private ConcurrentHashMap<String,Node> nodes = new ConcurrentHashMap<String, Node>();
+  private ConcurrentHashMap<String, Node> nodes = new ConcurrentHashMap<String, Node>();
   
   /**
    * 
@@ -54,27 +53,13 @@ public class LoadBalancerImpl implements LoadBalancer {
    * @param params the initial parameters.
    */
   public LoadBalancerImpl(InitParams params) {
-    if (params != null){
+    if (params != null) {
       ObjectParameter parameter = params.getObjectParam("cometd.lb.configuration");
       LoadBalancerConf conf = (LoadBalancerConf) parameter.getObject();
       List<Node> list = conf.getNodes();
       for (Node node : list) {
-        nodes.put(node.getId(),node);
-        System.out.println("LoadBalancerImpl" + node.getUrl() + " : " + node.getConnected() + " : " + node.getMaxConnection());
+        nodes.put(node.getId(), node);
       }
-//      ValuesParam vps = params.getValuesParam("cluster-conf");
-//      List<String> vs = vps.getValues();
-//      for (String v : vs) {
-//        String [] arr = v.split(";");
-//        if (arr.length == 2){
-//          Node node = new Node(arr[0],arr[1]);
-//          nodes.put(arr[0], node);
-//        } else if (arr.length == 3){
-//          int max = Integer.parseInt(arr[2]);
-//          Node node = new Node(arr[0],arr[1],max);
-//          nodes.put(arr[0], node);
-//        }
-//      }
     }
   }
   
@@ -83,7 +68,7 @@ public class LoadBalancerImpl implements LoadBalancer {
    * {@inheritDoc}
    */
   public void addNode(Node node) {
-    this.nodes.put(node.getId(),node);
+    this.nodes.put(node.getId(), node);
   }
 
   /**
@@ -159,9 +144,16 @@ public class LoadBalancerImpl implements LoadBalancer {
     }
   }
   
+  /**
+   * @author vetal
+   *
+   */
   public static class LoadBalancerConf {
     
-   private List<Node> nodes = new ArrayList<Node>();
+   /**
+   * List node of  cluster.
+   */
+  private List<Node> nodes = new ArrayList<Node>();
 
   /**
    * @return the nodes
@@ -177,9 +169,5 @@ public class LoadBalancerImpl implements LoadBalancer {
     this.nodes = nodes;
   }
    
-   
-    
-    
-    
   }
 }

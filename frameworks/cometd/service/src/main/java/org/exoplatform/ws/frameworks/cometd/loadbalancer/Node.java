@@ -50,6 +50,7 @@ public class Node {
   private boolean   alive;
 
   /**
+   * @param id the unique id  of node.
    * @param url the base URL of node.
    * @param maxConenction the max count of allowed connection.
    */
@@ -61,8 +62,10 @@ public class Node {
     this.connected = 0;
   }
   
+  
   /**
-   * 
+   * @param id the unique id  of node.
+   * @param url the base URL of node.
    */
   public Node(String id, String url) {
     this.id = id;
@@ -72,6 +75,9 @@ public class Node {
     this.connected = 0;
   }
   
+  /**
+   * Default constructor.
+   */
   public Node() {
     this.alive = true;
   }

@@ -24,12 +24,9 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.rest.HTTPMethod;
 import org.exoplatform.services.rest.InputTransformer;
-import org.exoplatform.services.rest.OutputTransformer;
 import org.exoplatform.services.rest.Response;
-import org.exoplatform.services.rest.URIParam;
 import org.exoplatform.services.rest.URITemplate;
 import org.exoplatform.services.rest.container.ResourceContainer;
-import org.exoplatform.services.rest.transformer.StringOutputTransformer;
 import org.exoplatform.ws.frameworks.cometd.transport.ContinuationServiceDelegate;
 import org.exoplatform.ws.frameworks.cometd.transport.DelegateMessage;
 import org.exoplatform.ws.frameworks.json.transformer.Json2BeanInputTransformer;
@@ -55,10 +52,10 @@ public class TransferMessages implements ResourceContainer {
   @HTTPMethod(HTTPMethods.POST)
   @URITemplate("/ext/sendprivatemessage/")
   @InputTransformer(Json2BeanInputTransformer.class)
-  public Response sendMessage(DelegateMessage transportData){
+  public Response sendMessage(DelegateMessage transportData) {
     System.out.println("TransferMessages.sendMessage() channel : " + transportData.getChannel() + " exoid " + transportData.getExoId() + " : " + transportData.getMessage());
     ContinuationServiceDelegate transport = getCometdTransport();
-    transport.sendMessage(transportData.getExoId(), transportData.getChannel(),transportData.getMessage(),transportData.getId());
+    transport.sendMessage(transportData.getExoId(), transportData.getChannel(), transportData.getMessage(), transportData.getId());
     log.info("send message " + transportData.getMessage());
     return Response.Builder.ok().build();
   }
@@ -66,14 +63,14 @@ public class TransferMessages implements ResourceContainer {
   @HTTPMethod(HTTPMethods.POST)
   @URITemplate("/ext/sendbroadcastmessage/")
   @InputTransformer(Json2BeanInputTransformer.class)
-  public Response sendBroadcastMessage(DelegateMessage data){
+  public Response sendBroadcastMessage(DelegateMessage data) {
     ContinuationServiceDelegate transport = getCometdTransport();
-    transport.sendBroadcastMessage(data.getChannel(), data.getMessage(),data.getId());
+    transport.sendBroadcastMessage(data.getChannel(), data.getMessage(), data.getId());
     log.info("send broadcast message " + data.getMessage());
     return Response.Builder.ok().build();
   }
   
-  private ContinuationServiceDelegate getCometdTransport(){
+  private ContinuationServiceDelegate getCometdTransport() {
     ExoContainer container = ExoContainerContext.getCurrentContainer();
     ContinuationServiceDelegate transport = (ContinuationServiceDelegate) container.getComponentInstanceOfType(ContinuationServiceDelegate.class);
     return transport;
