@@ -89,11 +89,11 @@
       <version>${org.exoplatform.ws.version}</version>
     </dependency>
   </dependencies>
-  
+
   <build>
-    <sourceDirectory>../../../../../../soap/jsr181/src/test/java</sourceDirectory>
 
     <plugins>
+
 
       <plugin>
         <groupId>org.apache.cxf</groupId>
@@ -113,13 +113,17 @@
         </dependencies>
         <executions>
           <execution>
-            <id>test-compile</id>
-            <phase>test-compile</phase>
+            <id>compile</id>
+            <phase>compile</phase>
             <configuration>
               <className>org.exoplatform.services.ws.soap.jsr181.TicketOrderService</className>
-              <classpath>${basedir}/target/classes</classpath>
+              <classpath>${basedir}/target</classpath>
+              <outputFile>${basedir}/target/generated/wsdl/TicketOrderService.wsdl</outputFile>
               <genWsdl>true</genWsdl>
+              <!--              <genServer>true</genServer>-->
+              <!--              <genClient>true</genClient>-->
               <verbose>true</verbose>
+              <!--              <argline>-s ${basedir}/target/generated/wsdl</argline>-->
             </configuration>
             <goals>
               <goal>java2ws</goal>
@@ -128,8 +132,60 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-codegen-plugin</artifactId>
+        <version>2.1.2</version>
+        <executions>
+          <execution>
+            <id>compile</id>
+            <phase>compile</phase>
+            <configuration>
+              <sourceRoot>${basedir}/target/generated/</sourceRoot>
+              <wsdlOptions>
+                <wsdlOption>
+                  <wsdl>${basedir}/target/generated/wsdl/TicketOrderService.wsdl</wsdl>
+                  <extraargs>
+                    <extraarg>-p</extraarg>
+                    <extraarg>org.exoplatform.services.ws.soap.jsr181</extraarg>
+                    <extraarg>-validate</extraarg>
+                    <!--                    <extraarg>-all</extraarg>-->
+                    <extraarg>-client</extraarg>
+                    <!--                    <extraarg>-server</extraarg> -->
+                    <extraarg>-compile</extraarg>
+                  </extraargs>
+                </wsdlOption>
+              </wsdlOptions>
+            </configuration>
+            <goals>
+              <goal>wsdl2java</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.2-SNAPSHOT</version>
+
+        <configuration>
+          <tasks>
+            <echo>Run client code generator</echo>
+            <mkdir dir="${basedir}/target/client" />
+            <jar destfile="${basedir}/target/client/exo.ws.soap.cxf.jsr181.samples.client-${org.exoplatform.ws.version}.jar">
+              <fileset dir="${basedir}/target/generated" includes="**/*.class" />
+            </jar>
+            <copy todir="${basedir}/target/client/" verbose="true" overwrite="true">
+              <fileset dir="${basedir}/client/" includes="*.*" />
+            </copy>
+          </tasks>
+        </configuration>
+
+      </plugin>
+
     </plugins>
 
   </build>
-  
+
 </project>
