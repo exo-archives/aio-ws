@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>       
+  <component>  
+    <type>org.exoplatform.services.ws.rest.samples.JsonBookService</type>  
+  </component>   
+  <component>  
+    <type>org.exoplatform.services.ws.rest.samples.XMLBookService</type>  
+  </component>  
+  <component>    
+    <type>org.exoplatform.services.ws.rest.samples.BookStorage</type>   
+  </component>  
+  <component>  
+    <type>org.exoplatform.services.ws.rest.samples.Calculator</type>
+  </component> 
+  <component>
+    <type>org.exoplatform.services.ws.rest.samples.SimpleService</type>  
+  </component>    
+  
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.xml.transform.impl.trax.TRAXTemplatesServiceImpl</target-component>
+    <component-plugin>
+      <name>add.xslschema</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.services.xml.transform.impl.trax.TRAXTemplatesLoaderPlugin</type>
+      <init-params>
+      <properties-param>
+        <name>xsl-source-urls</name>
+        <property name="book" value="xslt/book.xsl"/>
+      </properties-param>
+    </init-params>
+    </component-plugin>
+  </external-component-plugins>
+</configuration>
