@@ -91,10 +91,7 @@
   </dependencies>
 
   <build>
-
     <plugins>
-
-
       <plugin>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-java2ws-plugin</artifactId>
@@ -120,10 +117,7 @@
               <classpath>${basedir}/target</classpath>
               <outputFile>${basedir}/target/generated/wsdl/TicketOrderService.wsdl</outputFile>
               <genWsdl>true</genWsdl>
-              <!--              <genServer>true</genServer>-->
-              <!--              <genClient>true</genClient>-->
               <verbose>true</verbose>
-              <!--              <argline>-s ${basedir}/target/generated/wsdl</argline>-->
             </configuration>
             <goals>
               <goal>java2ws</goal>
@@ -149,9 +143,7 @@
                     <extraarg>-p</extraarg>
                     <extraarg>org.exoplatform.services.ws.soap.jsr181</extraarg>
                     <extraarg>-validate</extraarg>
-                    <!--                    <extraarg>-all</extraarg>-->
                     <extraarg>-client</extraarg>
-                    <!--                    <extraarg>-server</extraarg> -->
                     <extraarg>-compile</extraarg>
                   </extraargs>
                 </wsdlOption>
@@ -172,13 +164,9 @@
         <configuration>
           <tasks>
             <echo>Run client code generator</echo>
-            <mkdir dir="${basedir}/target/client" />
-            <jar destfile="${basedir}/target/client/exo.ws.soap.cxf.jsr181.samples.client-${org.exoplatform.ws.version}.jar">
+            <jar destfile="${basedir}/target/exo.ws.soap.cxf.jsr181.samples.client-${org.exoplatform.ws.version}.jar">
               <fileset dir="${basedir}/target/generated" includes="**/*.class" />
             </jar>
-            <copy todir="${basedir}/target/client/" verbose="true" overwrite="true">
-              <fileset dir="${basedir}/client/" includes="*.*" />
-            </copy>
           </tasks>
         </configuration>
 
