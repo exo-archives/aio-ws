@@ -25,9 +25,6 @@ import org.apache.commons.logging.Log;
 import org.exoplatform.common.http.HTTPStatus;
 import org.exoplatform.common.http.client.HTTPConnection;
 import org.exoplatform.common.http.client.HTTPResponse;
-import org.exoplatform.container.ExoContainer;
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.container.RootContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.ws.frameworks.cometd.loadbalancer.LoadBalancer;
 import org.exoplatform.ws.frameworks.json.impl.JsonGeneratorImpl;
@@ -45,13 +42,19 @@ public class ContinuationServiceRemoteDelegate implements ContinuationServiceDel
    * Class logger.
    */
   private final Log log = ExoLogger.getLogger("ws.ContinuationServiceRemoteDelegate");
+  
+  private final LoadBalancer loadBalancer;
+  
+  public ContinuationServiceRemoteDelegate(LoadBalancer loadBalancer) {
+    this.loadBalancer = loadBalancer;
+  }
 
   /**
    * @param exoID the id of client.
    * @return base URL of cometd server for user with exoID.
    */
   private String getBaseCometdURL(String exoID) {
-    return getLoadBalancrer().connection(exoID);
+    return loadBalancer.connection(exoID);
   }
 
 
@@ -65,8 +68,8 @@ public class ContinuationServiceRemoteDelegate implements ContinuationServiceDel
       HTTPConnection connection = new HTTPConnection(url);
       HTTPResponse response = connection.Get(url.getFile());
       String bol = new String(response.getData());
-      if (log.isInfoEnabled())
-        log.info("Check user " + exoID + " subscription to cahnnel " + channel);
+      if (log.isDebugEnabled())
+        log.debug("Check user " + exoID + " subscription to cahnnel " + channel);
       return new Boolean(bol);
     } catch (Exception e) {
       log.error("Check user subscription error ", e);
@@ -87,10 +90,12 @@ public class ContinuationServiceRemoteDelegate implements ContinuationServiceDel
       JsonValue json = generatorImpl.createJsonObject(transportData);
       HTTPResponse response = connection.Post(url.getFile(), json.toString());
       if (response.getStatusCode() == HTTPStatus.OK) {
-         log.info("Send private message : " + message + " to client " + exoID + " by cahnnel "
+        if (log.isDebugEnabled())
+         log.debug("Send private message : " + message + " to client " + exoID + " by cahnnel "
               + channel + " success");
       } else {
-         log.warn("Send private message : " + message + " to client " + exoID + " by cahnnel "
+        if (log.isDebugEnabled())
+         log.debug("Send private message : " + message + " to client " + exoID + " by cahnnel "
               + channel + " fail!");
       }
     } catch (Exception e) {
@@ -113,11 +118,11 @@ public class ContinuationServiceRemoteDelegate implements ContinuationServiceDel
           HTTPConnection connection = new HTTPConnection(url);
           HTTPResponse response = connection.Post(url.getFile(), json.toString());
           if (response.getStatusCode() == HTTPStatus.OK) {
-            if (log.isInfoEnabled())
-              log.info("Send public message : " + message + " to channel " + channel + " success");
+            if (log.isDebugEnabled())
+              log.debug("Send public message : " + message + " to channel " + channel + " success");
           } else {
-            if (log.isWarnEnabled())
-              log.warn("Send public message : " + message + " to channel " + channel + " fail!");
+            if (log.isDebugEnabled())
+              log.debug("Send public message : " + message + " to channel " + channel + " fail!");
           }
         }
       }
@@ -126,28 +131,14 @@ public class ContinuationServiceRemoteDelegate implements ContinuationServiceDel
     }
   }
 
-  /**
-   * @return loadbalancer.
-   */
-  private LoadBalancer getLoadBalancrer() {
-    ExoContainer container = ExoContainerContext.getCurrentContainer();
-    if (container == null) {
-      container = ExoContainerContext.getContainerByName("portal");
-    }
-    if (container instanceof RootContainer) {
-      container = RootContainer.getInstance().getPortalContainer("portal");
-    }
-    LoadBalancer balancer = (LoadBalancer) container.getComponentInstanceOfType(LoadBalancer.class);
-    return balancer;
-  }
-
+  
   /**
    * @param channel id of channel.
    * @return Array of URL of cometd server there exist users subscribed on channel
    */
   private List<String> getCometdURLsByChannel(String channel) {
     try {
-      Collection<String> curls = getLoadBalancrer().getAliveNodesURL();
+      Collection<String> curls = loadBalancer.getAliveNodesURL();
       List<String> urls = new ArrayList<String>();
       for (String curl : curls) {
         String u = new String(curl + "/rest/haschannel?channel=" + channel);

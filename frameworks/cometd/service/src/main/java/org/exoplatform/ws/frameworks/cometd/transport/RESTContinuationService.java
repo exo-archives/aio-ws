@@ -47,6 +47,12 @@ public class RESTContinuationService implements ResourceContainer {
    */
   private final Log log = ExoLogger.getLogger("ws.RestServiceForCometdTransport");
 
+  private final ContinuationService continuation;
+  
+  public RESTContinuationService(ContinuationService continuationService) {
+    this.continuation = continuationService;
+  }
+  
   /**
    * @param exoID the id of client. 
    * @return userToken for user 
@@ -55,10 +61,9 @@ public class RESTContinuationService implements ResourceContainer {
   @URITemplate("/gettoken/{exoID}/")
   @OutputTransformer(StringOutputTransformer.class)
   public Response getToken(@URIParam("exoID") String exoID) {
-    ContinuationService continuation = getContinuationService();
     String token = continuation.getUserToken(exoID);
-    if (log.isInfoEnabled())
-      log.info("Client with exoId " + exoID + " get token " + token);
+    if (log.isDebugEnabled())
+      log.debug("Client with exoId " + exoID + " get token " + token);
     return Response.Builder.ok(token, "text/txt").build();
   }
 
@@ -72,10 +77,9 @@ public class RESTContinuationService implements ResourceContainer {
   @OutputTransformer(StringOutputTransformer.class)
   public Response isSubscribed(@URIParam("exoID") String exoID,
                                @QueryParam("channel") String channel) {
-    ContinuationService continuation = getContinuationService();
     Boolean b = continuation.isSubscribe(exoID, channel);
-    if (log.isInfoEnabled())
-      log.info("Is subcribed client " + exoID + " on channel " + channel + " " + b);
+    if (log.isDebugEnabled())
+      log.debug("Is subcribed client " + exoID + " on channel " + channel + " " + b);
     return Response.Builder.ok(b.toString(), "text/txt").build();
   }
 
@@ -87,10 +91,9 @@ public class RESTContinuationService implements ResourceContainer {
   @URITemplate("/haschannel/")
   @OutputTransformer(StringOutputTransformer.class)
   public Response hasChannel(@QueryParam("channel") String channel) {
-    ContinuationService continuation = getContinuationService();
     Boolean b = continuation.hasChannel(channel);
-    if (log.isInfoEnabled())
-      log.info("Has channel " + channel + " " + b);
+    if (log.isDebugEnabled())
+      log.debug("Has channel " + channel + " " + b);
     return Response.Builder.ok(b.toString(), "text/txt").build();
   }
 
@@ -102,10 +105,9 @@ public class RESTContinuationService implements ResourceContainer {
   @URITemplate("/sendprivatemessage/")
   @InputTransformer(Json2BeanInputTransformer.class)
   public Response sendMessage(DelegateMessage data) {
-    ContinuationService continuation = getContinuationService();
     continuation.sendMessage(data.getExoId(), data.getChannel(), data.getMessage(), data.getId());
-    if (log.isInfoEnabled())
-     log.info("Send private message " + data.getMessage() + " on channel " + data.getChannel() + " to client " + data.getExoId());
+    if (log.isDebugEnabled())
+     log.debug("Send private message " + data.getMessage() + " on channel " + data.getChannel() + " to client " + data.getExoId());
     return Response.Builder.ok().build();
   }
 
@@ -117,26 +119,12 @@ public class RESTContinuationService implements ResourceContainer {
   @URITemplate("/sendbroadcastmessage/")
   @InputTransformer(Json2BeanInputTransformer.class)
   public Response sendBroadcastMessage(DelegateMessage data) {
-    ContinuationService continuation = getContinuationService();
     continuation.sendBroadcastMessage(data.getChannel(), data.getMessage(), data.getId());
-    if (log.isInfoEnabled())
-      log.info("Send broadcast message " + data.getMessage() + " on channel " + data.getChannel());
+    if (log.isDebugEnabled())
+      log.debug("Send broadcast message " + data.getMessage() + " on channel " + data.getChannel());
     return Response.Builder.ok().build();
   }
 
-  /**
-   * @return Continuation service.
-   */
-  private ContinuationService getContinuationService() {
-    ExoContainer container = ExoContainerContext.getCurrentContainer();
-    if (container == null) {
-      container = ExoContainerContext.getContainerByName("portal");
-    }
-    if (container instanceof RootContainer) {
-      container = RootContainer.getInstance().getPortalContainer("portal");
-    }
-    ContinuationService continuation = (ContinuationService) container.getComponentInstanceOfType(ContinuationService.class);
-    return continuation;
-  }
+  
 
 }

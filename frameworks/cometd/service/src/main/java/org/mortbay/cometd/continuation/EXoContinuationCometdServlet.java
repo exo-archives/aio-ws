@@ -50,8 +50,8 @@ public class EXoContinuationCometdServlet extends ContinuationCometdServlet {
       if (container instanceof RootContainer) {
         container = RootContainer.getInstance().getPortalContainer("portal");
       }
-      if (log.isInfoEnabled())
-        log.info("EXoContinuationCometdServlet - Current Container-ExoContainer: " + container);
+      if (log.isDebugEnabled())
+        log.debug("EXoContinuationCometdServlet - Current Container-ExoContainer: " + container);
       EXoContinuationBayeux bayeux = (EXoContinuationBayeux) container.getComponentInstanceOfType(AbstractBayeux.class);
       bayeux.setTimeout(Long.parseLong(getInitParameter("timeout")));
       if (log.isDebugEnabled())

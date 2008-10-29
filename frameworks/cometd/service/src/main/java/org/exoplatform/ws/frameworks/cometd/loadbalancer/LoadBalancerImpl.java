@@ -131,7 +131,6 @@ public class LoadBalancerImpl implements LoadBalancer {
     } else {
       Collection<Node> ns = nodes.values();
       for (Node node : ns) {
-        System.out.println("LoadBalancerImpl.getNodeURL()" + node.getUrl() + " : " + node.getConnected() + " : " + node.getMaxConnection());
         if (node.getConnected() < node.getMaxConnection()) {
           node.addConnection();
           nodes.put(node.getId(), node);
@@ -139,7 +138,8 @@ public class LoadBalancerImpl implements LoadBalancer {
           return node.getUrl();
         }
       }
-      log.error("Overflow new client cannot connect!");
+      if (log.isDebugEnabled())
+        log.debug("Overflow new client cannot connect!");
       return null;
     }
   }

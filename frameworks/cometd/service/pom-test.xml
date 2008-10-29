@@ -241,7 +241,7 @@
         <artifactItem>
          <groupId>org.exoplatform.kernel</groupId>
          <artifactId>exo.kernel.commons</artifactId>
-         <version>${org.exoplatform.ws.version}</version>
+         <version>${org.exoplatform.kernel.version}</version>
          <type>jar</type>
         </artifactItem>
         <artifactItem>
