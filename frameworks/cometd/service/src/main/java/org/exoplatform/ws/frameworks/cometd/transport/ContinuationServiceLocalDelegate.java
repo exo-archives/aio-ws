@@ -30,18 +30,17 @@ import org.exoplatform.ws.frameworks.cometd.ContinuationService;
  * @version $Id: $
  */
 public class ContinuationServiceLocalDelegate implements ContinuationServiceDelegate {
-  /**
-   * Class logger.
-   */
-
-  private final Log log = ExoLogger.getLogger("ws.ContinuationServiceLocalDelegate");
-
-
+  
+  private final ContinuationService continuation;
+  
+  public ContinuationServiceLocalDelegate(ContinuationService continuationService) {
+    continuation = continuationService;
+  }
+  
   /**
    * {@inheritDoc}
    */
   public Boolean isSubscribed(String exoID, String channel) {
-    ContinuationService continuation = getContinuationService();
     return continuation.isSubscribe(exoID, channel);
   }
 
@@ -49,7 +48,6 @@ public class ContinuationServiceLocalDelegate implements ContinuationServiceDele
    * {@inheritDoc}
    */
   public void sendMessage(String exoId, String channel, String message, String msgId) {
-    ContinuationService continuation = getContinuationService();
     continuation.sendMessage(exoId, channel, message, msgId);
   }
 
@@ -57,23 +55,9 @@ public class ContinuationServiceLocalDelegate implements ContinuationServiceDele
    * {@inheritDoc}
    */
   public void sendBroadcastMessage(String channel, String message, String msgId) {
-    ContinuationService continuation = getContinuationService();
     continuation.sendBroadcastMessage(channel, message, msgId);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  protected ContinuationService getContinuationService() {
-    ExoContainer container = ExoContainerContext.getCurrentContainer();
-    if (container == null) {
-      container = ExoContainerContext.getContainerByName("portal");
-    }
-    if (container instanceof RootContainer) {
-      container = RootContainer.getInstance().getPortalContainer("portal");
-    }
-    ContinuationService continuation = (ContinuationService) container.getComponentInstanceOfType(ContinuationService.class);
-    return continuation;
-  }
+  
 
 }

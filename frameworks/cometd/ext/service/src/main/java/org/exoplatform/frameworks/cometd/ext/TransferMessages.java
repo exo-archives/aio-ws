@@ -53,10 +53,8 @@ public class TransferMessages implements ResourceContainer {
   @URITemplate("/ext/sendprivatemessage/")
   @InputTransformer(Json2BeanInputTransformer.class)
   public Response sendMessage(DelegateMessage transportData) {
-    System.out.println("TransferMessages.sendMessage() channel : " + transportData.getChannel() + " exoid " + transportData.getExoId() + " : " + transportData.getMessage());
     ContinuationServiceDelegate transport = getCometdTransport();
     transport.sendMessage(transportData.getExoId(), transportData.getChannel(), transportData.getMessage(), transportData.getId());
-    log.info("send message " + transportData.getMessage());
     return Response.Builder.ok().build();
   }
   
@@ -66,7 +64,6 @@ public class TransferMessages implements ResourceContainer {
   public Response sendBroadcastMessage(DelegateMessage data) {
     ContinuationServiceDelegate transport = getCometdTransport();
     transport.sendBroadcastMessage(data.getChannel(), data.getMessage(), data.getId());
-    log.info("send broadcast message " + data.getMessage());
     return Response.Builder.ok().build();
   }
   

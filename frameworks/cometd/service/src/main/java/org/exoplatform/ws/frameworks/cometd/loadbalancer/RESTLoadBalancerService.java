@@ -61,12 +61,12 @@ public class RESTLoadBalancerService implements ResourceContainer {
   public Response getCometdURL(@URIParam("exoid") String exoid) {
     String url = balancer.connection(exoid);
     if (!(url.equals("") || url.length() == 0)) {
-      if (log.isInfoEnabled()) 
-        log.info("Client with exoid " + exoid + " get URL " + url + " for cometd connection");
+      if (log.isDebugEnabled()) 
+        log.debug("Client with exoid " + exoid + " get URL " + url + " for cometd connection");
       return Response.Builder.ok(url).build();
     } else { 
-      if (log.isErrorEnabled()) 
-        log.error("All nodes are owerflow client with exoid " + exoid + " can't connect to cometd!");
+      if (log.isDebugEnabled()) 
+        log.debug("All nodes are owerflow client with exoid " + exoid + " can't connect to cometd!");
       return Response.Builder.forbidden().errorMessage("Owerflow!").build();
     }
   }
