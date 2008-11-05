@@ -14,38 +14,37 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.services.ws.soap.jsr181;
+package org.exoplatform.services.ws.soap.jsr181.custom;
 
-import junit.framework.TestCase;
+import java.util.Date;
 
-import org.exoplatform.container.StandaloneContainer;
+import javax.jws.WebService;
+
+import org.exoplatform.services.ws.AbstractMultiWebService;
+import org.exoplatform.services.ws.AbstractSingletonWebService;
 
 /**
  * Created by The eXo Platform SAS .
  * 
  * @author <a href="mailto:alexey.zavizionov@exoplatform.com.ua">Alexey
  *         Zavizionov</a>
- * @version $Id: $ Nov 5, 2008
+ * @version $Id: $ Sep 17, 2008
  */
-public class BaseTest extends TestCase {
+@WebService
+public interface TicketOrderService {
 
   /**
-   * Container.
+   * @param departing departing place.
+   * @param arriving arriving place.
+   * @param departureDate departure date.
+   * @param passenger passenger.
+   * @return ticket order.
    */
-  protected StandaloneContainer container;
+  public String getTicket(String departing, String arriving, Date departureDate, String passenger);
 
   /**
-   * Set up.
-   * 
-   * @see junit.framework.TestCase#setUp()
+   * @param confirmation confirm or not.
    */
-  @Override
-  public void setUp() throws Exception {
-    System.out.println(">>> BaseTest.setUp() = entered ");
-    StandaloneContainer.setConfigurationPath("src/test/java/conf/test-configuration.xml");
-    container = StandaloneContainer.getInstance();
-    System.out.println(">>> BaseTest.setUp() container size is = "
-        + container.getComponentInstances().size());
-  }
+  public void confirmation(boolean confirmation);
 
 }

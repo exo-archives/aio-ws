@@ -39,6 +39,12 @@ import org.exoplatform.test.mocks.servlet.MockServletContext;
  */
 public class WebServiceLoaderTest extends BaseTest {
 
+  @Override
+  public void setUp() throws Exception {
+    System.out.println(">>> WebServiceLoaderTest.setUp() = entered ======================= ");
+    super.setUp();
+  }
+  
   /**
    * Test say hello service.
    * 
@@ -85,8 +91,6 @@ public class WebServiceLoaderTest extends BaseTest {
       bus = BusFactory.newInstance().createBus();
     }
     ResourceManager resourceManager = bus.getExtension(ResourceManager.class);
-    System.out.println(">>> EXOMAN WebServiceLoaderTest.loadBusNoConfig() resourceManager = "
-        + resourceManager);
     resourceManager.addResourceResolver(new ServletContextResourceResolver(new MockServletContext()));
     replaceDestinationFactory();
   }
@@ -98,7 +102,6 @@ public class WebServiceLoaderTest extends BaseTest {
     DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
     try {
       DestinationFactory df = dfm.getDestinationFactory("http://cxf.apache.org/transports/http/configuration");
-      System.out.println(">>> EXOMAN WebServiceLoaderTest.replaceDestinationFactory() df = " + df);
       if (df instanceof ServletTransportFactory) {
         servletTransportFactory = (ServletTransportFactory) df;
         return;
@@ -106,10 +109,7 @@ public class WebServiceLoaderTest extends BaseTest {
     } catch (BusException e) {
     }
     DestinationFactory factory = createServletTransportFactory();
-    System.out.println(">>> EXOMAN WebServiceLoaderTest.replaceDestinationFactory() factory = "
-        + factory);
     for (String s : factory.getTransportIds()) {
-      System.out.println(">>> EXOMAN WebServiceLoaderTest.replaceDestinationFactory() s = " + s);
       registerTransport(factory, s);
     }
   }

@@ -15,7 +15,7 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.ws.soap.jsr181.multiinstance;
+package org.exoplatform.services.ws.soap.jsr181.custom;
 
 import java.util.Date;
 
@@ -31,8 +31,8 @@ import org.exoplatform.services.ws.soap.jsr181.Ticket;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-@WebService(serviceName = "TicketOrderServiceMultiinstance", 
-            portName = "TicketOrderServiceMultiinstancePort", 
+@WebService(serviceName = "TicketOrderServiceCustom", 
+            portName = "TicketOrderServiceCustomPort", 
             targetNamespace = "http://exoplatform.org/soap/cxf")
 public class TicketOrderServiceImpl implements TicketOrderService {
 

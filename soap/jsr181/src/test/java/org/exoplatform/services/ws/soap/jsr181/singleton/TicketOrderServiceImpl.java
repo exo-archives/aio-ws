@@ -31,8 +31,8 @@ import org.exoplatform.services.ws.soap.jsr181.Ticket;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-@WebService(serviceName = "TicketOrderService", 
-            portName = "TicketOrderServicePort", 
+@WebService(serviceName = "TicketOrderServiceSingleton", 
+            portName = "TicketOrderServiceSingletonPort", 
             targetNamespace = "http://exoplatform.org/soap/cxf")
 public class TicketOrderServiceImpl implements TicketOrderService {
 

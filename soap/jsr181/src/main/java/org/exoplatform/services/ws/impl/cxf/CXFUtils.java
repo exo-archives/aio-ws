@@ -157,7 +157,6 @@ public class CXFUtils {
    * @param object
    */
   public static Endpoint simpleDeployService(String address, Object object) {
-    System.out.println(">>> EXOMAN CXFUtils.simpleDeployService() address = " + address);
     if (log.isDebugEnabled())
       log.debug("Starting Service: object = " + object + " at the address = " + address);
     return Endpoint.publish(address, object);
