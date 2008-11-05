@@ -141,7 +141,7 @@
                   <wsdl>${basedir}/target/generated/wsdl/TicketOrderService.wsdl</wsdl>
                   <extraargs>
                     <extraarg>-p</extraarg>
-                    <extraarg>org.exoplatform.services.ws.soap.jsr181</extraarg>
+                    <extraarg>org.exoplatform.services.ws.soap.jsr181.singleton</extraarg>
                     <extraarg>-validate</extraarg>
                     <extraarg>-client</extraarg>
                     <extraarg>-compile</extraarg>

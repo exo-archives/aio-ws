@@ -1,5 +1,8 @@
 <configuration>
   <component>
-    <type>org.exoplatform.services.ws.soap.jsr181.TicketOrderServiceImpl</type>
+    <type>org.exoplatform.services.ws.soap.jsr181.singleton.TicketOrderServiceImpl</type>
+  </component>
+  <component>
+    <type>org.exoplatform.services.ws.soap.jsr181.multiinstance.TicketOrderServiceImpl</type>
   </component>
 </configuration>

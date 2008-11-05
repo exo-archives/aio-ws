@@ -21,27 +21,23 @@ import java.util.Date;
 import java.util.List;
 
 import javax.jws.WebService;
+import javax.xml.ws.Endpoint;
 
-import junit.framework.TestCase;
-
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-import org.exoplatform.container.StandaloneContainer;
+import org.exoplatform.services.ws.AbstractMultiWebService;
 import org.exoplatform.services.ws.AbstractSingletonWebService;
 import org.exoplatform.services.ws.impl.cxf.CXFUtils;
+import org.exoplatform.services.ws.soap.jsr181.singleton.TicketOrderService;
 
 /**
  * @author <a href="mailto:alexey.zavizionov@exoplatform.com.ua">Alexey
  *         Zavizionov</a>
  * @version $Id: $
  */
-public class TicketOrderServiceTest extends TestCase {
-
-  /**
-   * Container.
-   */
-  private StandaloneContainer container;
+public class TicketOrderServiceTest extends BaseTest {
 
   /**
    * Service name.
@@ -57,34 +53,24 @@ public class TicketOrderServiceTest extends TestCase {
 //private final static String address = "http://localhost:8080/ws-examples/soap/TicketOrderService";
 
   /**
-   * Set up.
-   * 
-   * @see junit.framework.TestCase#setUp()
-   */
-  @Override
-  public void setUp() throws Exception {
-    StandaloneContainer.setConfigurationPath("src/test/java/conf/test-configuration.xml");
-    container = StandaloneContainer.getInstance();
-  }
-
-  /**
    * Test say hello service.
    * 
    * @throws Exception
    */
   @SuppressWarnings("unchecked")
-  public void testTicketService() throws Exception {
-    System.out.println(">>> TicketOrderServiceTest.testTicketService()");
+  public void testTicketSingletonService() throws Exception {
+
+    System.out.println(">>> TicketOrderServiceTest.testTicketSingletonService()");
     List<AbstractSingletonWebService> l = container.getComponentInstancesOfType(AbstractSingletonWebService.class);
     for (AbstractSingletonWebService sc : l) {
       if (sc.getClass().getAnnotation(WebService.class).serviceName().equals(SERVICE_NAME)) {
 
         // test starting service
-        CXFUtils.simpleDeployService(address, sc);
+        Endpoint endpoint = CXFUtils.simpleDeployService(address, sc);
         try {
           CXFUtils.checkConnectionAndPrint(address);
         } catch (Exception e) {
-          System.out.println(">>> TicketOrderServiceTest.checkConnection(): There is no service at '"
+          System.out.println(">>> TicketOrderServiceTest.testTicketSingletonService() checkConnection: There is no service at '"
               + address + "?wsdl'");
           e.printStackTrace();
           fail(e.getMessage());
@@ -93,9 +79,49 @@ public class TicketOrderServiceTest extends TestCase {
         // test started service
         TicketOrderService ticket = getTicketOrderService();
         String ticketOrder = ticket.getTicket("Kyiv", "Paris", new Date(), "Passenger");
-        System.out.println(">>> TicketOrderServiceTest.testTicketService() ticketOrder = "
+        System.out.println(">>> TicketOrderServiceTest.testTicketSingletonService() ticketOrder = "
             + ticketOrder);
         assertNotNull(ticketOrder);
+
+        endpoint.stop();
+        return;
+      }
+    }
+    fail("There is no service with name" + SERVICE_NAME);
+  }
+
+  /**
+   * Test say hello service.
+   * 
+   * @throws Exception
+   */
+  @SuppressWarnings("unchecked")
+  public void testTicketMultiinstanceService() throws Exception {
+
+    System.out.println(">>> TicketOrderServiceTest.testTicketMultiinstanceService()");
+    List<AbstractMultiWebService> l = container.getComponentInstancesOfType(AbstractMultiWebService.class);
+    for (AbstractMultiWebService sc : l) {
+      if (sc.getClass().getAnnotation(WebService.class).serviceName().equals(SERVICE_NAME)) {
+
+        // test starting service
+        Server server = CXFUtils.complexDeployServiceMultiInstance(address, sc, null);
+        try {
+          CXFUtils.checkConnectionAndPrint(address);
+        } catch (Exception e) {
+          System.out.println(">>> TicketOrderServiceTest.testTicketMultiinstanceService() checkConnection: There is no service at '"
+              + address + "?wsdl'");
+          e.printStackTrace();
+          fail(e.getMessage());
+        }
+
+        // test started service
+        TicketOrderService ticket = getTicketOrderService();
+        String ticketOrder = ticket.getTicket("Kyiv", "Paris", new Date(), "Passenger");
+        System.out.println(">>> TicketOrderServiceTest.testTicketMultiinstanceService() ticketOrder = "
+            + ticketOrder);
+        assertNotNull(ticketOrder);
+
+        server.stop();
         return;
       }
     }

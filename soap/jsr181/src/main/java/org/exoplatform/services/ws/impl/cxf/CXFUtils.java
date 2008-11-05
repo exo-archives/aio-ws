@@ -87,7 +87,7 @@ public class CXFUtils {
    * @param address
    * @param object
    */
-  public static void complexDeployService(String address, Object object) {
+  public static Server complexDeployService(String address, Object object) {
     if (log.isDebugEnabled())
       log.debug("Starting Service: object = " + object + " at the address = " + address);
 
@@ -109,6 +109,7 @@ public class CXFUtils {
     Service service = server.getEndpoint().getService();
     service.setInvoker(new BeanInvoker(object));
     server.start();
+    return server;
   }
 
   /**
@@ -117,7 +118,7 @@ public class CXFUtils {
    * @param address
    * @param object
    */
-  public static void complexDeployServiceMultiInstance(String address,
+  public static Server complexDeployServiceMultiInstance(String address,
                                                        Object object,
                                                        Integer poolSize) {
     if (log.isDebugEnabled())
@@ -146,6 +147,7 @@ public class CXFUtils {
     Service service = server.getEndpoint().getService();
     service.setInvoker(new BeanInvoker(object));
     server.start();
+    return server;
   }
 
   /**
@@ -154,11 +156,11 @@ public class CXFUtils {
    * @param address
    * @param object
    */
-  public static void simpleDeployService(String address, Object object) {
+  public static Endpoint simpleDeployService(String address, Object object) {
+    System.out.println(">>> EXOMAN CXFUtils.simpleDeployService() address = " + address);
     if (log.isDebugEnabled())
       log.debug("Starting Service: object = " + object + " at the address = " + address);
-    
-    Endpoint.publish(address, object);
+    return Endpoint.publish(address, object);
   }
 
 }

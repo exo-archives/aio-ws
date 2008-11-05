@@ -15,7 +15,7 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.ws.soap.jsr181;
+package org.exoplatform.services.ws.soap.jsr181.multiinstance;
 
 import java.util.Date;
 
@@ -23,6 +23,7 @@ import javax.jws.WebService;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.ws.soap.jsr181.Ticket;
 
 /**
  * Simple ticket service for SOAP demo.

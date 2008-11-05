@@ -17,6 +17,7 @@
 
 package org.exoplatform.services.ws.impl.cxf;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.jws.WebService;
@@ -24,17 +25,17 @@ import javax.jws.WebService;
 import org.apache.commons.logging.Log;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.ws.AbstractMultiWebService;
 import org.exoplatform.services.ws.AbstractSingletonWebService;
-import org.picocontainer.Startable;
 
 /**
  * @author <a href="mailto:alexey.zavizionov@exoplatform.com.ua">Alexey
  *         Zavizionov</a>
  * @version $Id: $
  */
-public class WebServiceLoader implements Startable {
+public class WebServiceLoader {
 
   /**
    * ExoContainer.
@@ -57,6 +58,11 @@ public class WebServiceLoader implements Startable {
    * Logger.
    */
   private static final Log                  LOG = ExoLogger.getLogger(WebServiceLoader.class);
+  
+  /**
+   * Java classes for services which came from external plugin.
+   */
+  private final List<Class<?>> jcs = new ArrayList<Class<?>>();
 
   /**
    * Constructs instance of WebServiceLoader.
@@ -70,52 +76,59 @@ public class WebServiceLoader implements Startable {
   }
 
   /**
-   * Register all available container components in a CXF engine.
+   * Register all available container components in a CXF engine from Servlet.
    */
   public void init() {
 
+    // Deploy Single services
     singleservices = (List<AbstractSingletonWebService>) container.getComponentInstancesOfType(AbstractSingletonWebService.class);
     if (LOG.isDebugEnabled())
       LOG.debug("WebServiceLoader.init() singleservices = " + singleservices);
     for (AbstractSingletonWebService implementor : singleservices) {
-      String address = "/" + implementor.getClass().getAnnotation(WebService.class).serviceName();
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("loadBus() - single address = " + address);
-        LOG.debug("loadBus() - single implementor = " + implementor);
+      String address = getAddress(implementor);
+      if (address != null) {
+        CXFUtils.simpleDeployService(address, implementor);
+        LOG.info("New singleton WebService '" + address + "' registered.");
       }
-      CXFUtils.simpleDeployService(address, implementor);
-      LOG.info("New singleton WebService '" + address + "' registered.");
     }
 
+    // Deploy Multi services
     multiservices = (List<AbstractMultiWebService>) container.getComponentInstancesOfType(AbstractMultiWebService.class);
     if (LOG.isDebugEnabled())
       LOG.debug("WebServiceLoader.init() multiservices = " + multiservices);
     for (AbstractMultiWebService implementor : multiservices) {
-      String address = "/" + implementor.getClass().getAnnotation(WebService.class).serviceName();
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("loadBus() - multi address = " + address);
-        LOG.debug("loadBus() - multi implementor = " + implementor);
+      String address = getAddress(implementor);
+      if (address != null) {
+        CXFUtils.complexDeployServiceMultiInstance(address, implementor, null);
+        LOG.info("New multi-instance WebService '" + address + "' registered.");
       }
-      CXFUtils.complexDeployServiceMultiInstance(address, implementor, null);
-      LOG.info("New multi-instance WebService '" + address + "' registered.");
+    }
+
+    // Deploy Custom services
+    if (LOG.isDebugEnabled())
+      LOG.debug("WebServiceLoader.init() customservices = " + jcs);
+    for (Class<?> implementor : jcs) {
+      String address = getAddress(implementor);
+      if (address != null) {
+        CXFUtils.simpleDeployService(address, implementor);
+        LOG.info("New custom WebService '" + address + "' registered.");
+      }
     }
 
   }
 
-  /**
-   * Start. {@inheritDoc}
-   */
-  public void start() {
-    if (LOG.isDebugEnabled())
-      LOG.debug("WebServiceLoader.start() entering.");
+  private String getAddress(Object implementor) {
+    String address = "/" + implementor.getClass().getAnnotation(WebService.class).serviceName();
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("loadBus() - address = " + address);
+      LOG.debug("loadBus() - implementor = " + implementor);
+    }
+    return address;
   }
 
-  /**
-   * Stop. {@inheritDoc}
-   */
-  public void stop() {
-    if (LOG.isDebugEnabled())
-      LOG.debug("WebServiceLoader.stop() entering.");
+  public void addPlugin(BaseComponentPlugin plugin) {
+    if (plugin instanceof WebServiceLoaderPlugin)
+      jcs.addAll(((WebServiceLoaderPlugin) plugin).getJcs());
   }
 
 }
