@@ -7,6 +7,7 @@
     <servlet-name>SOAPServlet</servlet-name>
     <display-name>SOAP Servlet</display-name>
     <servlet-class>org.exoplatform.services.ws.impl.cxf.transport.http.SOAPServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
   </servlet>
 
   <servlet-mapping>

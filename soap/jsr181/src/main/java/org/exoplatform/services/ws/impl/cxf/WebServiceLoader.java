@@ -58,11 +58,11 @@ public class WebServiceLoader {
    * Logger.
    */
   private static final Log                  LOG = ExoLogger.getLogger(WebServiceLoader.class);
-  
+
   /**
    * Java classes for services which came from external plugin.
    */
-  private final List<Class<?>> jcs = new ArrayList<Class<?>>();
+  private final List<Class<?>>              jcs = new ArrayList<Class<?>>();
 
   /**
    * Constructs instance of WebServiceLoader.
@@ -108,17 +108,21 @@ public class WebServiceLoader {
     if (LOG.isDebugEnabled())
       LOG.debug("WebServiceLoader.init() customservices = " + jcs);
     for (Class<?> implementor : jcs) {
-      String address = getAddress(implementor);
-      if (address != null) {
-        CXFUtils.simpleDeployService(address, implementor);
-        LOG.info("New custom WebService '" + address + "' registered.");
+      try {
+        Object implem = implementor.newInstance();
+        String address = getAddress(implem);
+        if (address != null) {
+          CXFUtils.simpleDeployService(address, implem);
+          LOG.info("New custom WebService '" + address + "' registered.");
+        }
+      } catch (Exception e) {
+        LOG.error("Error at implementor.newInstance()",e);
       }
     }
-
   }
 
   private String getAddress(Object implementor) {
-    String address = "/" + implementor.getClass().getAnnotation(WebService.class).serviceName();
+    String address = "/" + implementor.getClass().getAnnotation(WebService.class).portName();//name();//portName();//serviceName();
     if (LOG.isDebugEnabled()) {
       LOG.debug("loadBus() - address = " + address);
       LOG.debug("loadBus() - implementor = " + implementor);

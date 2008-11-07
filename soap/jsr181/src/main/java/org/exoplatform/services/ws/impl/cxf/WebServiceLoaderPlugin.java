@@ -58,6 +58,7 @@ public class WebServiceLoaderPlugin extends BaseComponentPlugin {
           try {
             Class c = Class.forName(fqn);
             jcs.add(c);
+            LOG.info("Loaded class " + c.getName());
           } catch (ClassNotFoundException e) {
             LOG.warn("Can't find for class with name " + fqn, e);
           }

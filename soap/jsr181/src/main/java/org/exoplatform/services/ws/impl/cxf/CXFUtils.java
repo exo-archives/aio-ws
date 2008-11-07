@@ -159,7 +159,10 @@ public class CXFUtils {
   public static Endpoint simpleDeployService(String address, Object object) {
     if (log.isDebugEnabled())
       log.debug("Starting Service: object = " + object + " at the address = " + address);
-    return Endpoint.publish(address, object);
+    Endpoint endpoint = Endpoint.publish(address, object);  
+    if (endpoint.isPublished())
+      log.info("The WebService '" + address + "' has been published!");
+    return endpoint;
   }
 
 }
