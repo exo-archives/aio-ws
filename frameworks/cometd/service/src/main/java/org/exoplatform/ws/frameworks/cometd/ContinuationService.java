@@ -41,7 +41,17 @@ public class ContinuationService {
     this.bayeux = bayeux;
   }
 
-  
+  /**
+   * Send individual message to client.
+   * 
+   * @param eXoId the user ID
+   * @param channel the channel you want to send the message. The client must
+   *          listen to this channel to receive it
+   * @param data the data you want to send to the client
+   */
+  public void sendMessage(String eXoId, String channel, Object data) {
+    sendMessage(eXoId, channel, data, null); 
+  }
 
   /**
    * Send individual message to client.
@@ -50,7 +60,7 @@ public class ContinuationService {
    * @param channel the channel you want to send the message. The client must
    *          listen to this channel to receive it
    * @param data the data you want to send to the client
-   * @param id the id of message
+   * @param id the id of message if you set null will be generate automatically
    */
   public void sendMessage(String eXoId, String channel, Object data, String id) {
     bayeux.sendMessage(eXoId, channel, data, id);
@@ -113,6 +123,17 @@ public class ContinuationService {
     return false;
   }
 
+  /**
+   * Send message to all client that listen channel.
+   * 
+   * @param channel the id of channel that need send message
+   * @param data that send
+   */
+  public void sendBroadcastMessage(String channel, Object data) {
+    sendBroadcastMessage(channel, data, null);
+  }
+  
+  
   /**
    * Send message to all client that listen channel.
    * 
