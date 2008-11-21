@@ -7,3 +7,10 @@ Where MODULE_XML_FILE is one of the files:
 
 For example, to deploy on JOnAS use: 
 "mvn clean install -f product-exo-ws-as-jonas.xml antrun:run"
+
+
+Run and browse:
+
+/java/exo-working/exo-tomcat/bin$ ./eXo.sh run
+
+Application available at http://localhost:8080/ws-examples/
