@@ -1,0 +1,5 @@
+<configuration>
+  <component>
+    <type>org.exoplatform.services.ws.impl.cxf.WebServiceLoader</type>
+  </component>
+</configuration>
