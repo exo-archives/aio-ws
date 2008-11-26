@@ -43,13 +43,11 @@ public class EXoContinuationCometdServlet extends ContinuationCometdServlet {
    */
   protected EXoContinuationBayeux newBayeux() {
     try {
-      ExoContainer container = ExoContainerContext.getCurrentContainer();
-      if (container == null) {
-        container = ExoContainerContext.getContainerByName("portal");
-      }
-      if (container instanceof RootContainer) {
-        container = RootContainer.getInstance().getPortalContainer("portal");
-      }
+      ExoContainer container;
+      if (getInitParameter("containerName") != null)
+         container = ExoContainerContext.getContainerByName(getInitParameter("containerName"));
+      else
+         container = ExoContainerContext.getCurrentContainer();
       if (log.isDebugEnabled())
         log.debug("EXoContinuationCometdServlet - Current Container-ExoContainer: " + container);
       EXoContinuationBayeux bayeux = (EXoContinuationBayeux) container.getComponentInstanceOfType(AbstractBayeux.class);
@@ -62,5 +60,6 @@ public class EXoContinuationCometdServlet extends ContinuationCometdServlet {
       return null;
     }
   }
+
 
 }

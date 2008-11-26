@@ -61,6 +61,10 @@
       <param-name>alwaysResumePoll</param-name>
       <param-value>false</param-value> <!-- use true for x-site cometd -->
     </init-param>
+    <init-param>
+      <param-name>containerName</param-name>
+      <param-value>portal</param-value> 
+    </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>
 
