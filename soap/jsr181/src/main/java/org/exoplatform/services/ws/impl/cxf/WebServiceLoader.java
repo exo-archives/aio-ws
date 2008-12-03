@@ -116,7 +116,7 @@ public class WebServiceLoader {
           LOG.info("New custom WebService '" + address + "' registered.");
         }
       } catch (Exception e) {
-        LOG.error("Error at implementor.newInstance()",e);
+        LOG.error("Error at implementor.newInstance()", e);
       }
     }
   }

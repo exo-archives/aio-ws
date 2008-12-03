@@ -119,21 +119,23 @@ public class CXFUtils {
    * @param object
    */
   public static Server complexDeployServiceMultiInstance(String address,
-                                                       Object object,
-                                                       Integer poolSize) {
+                                                         Object object,
+                                                         Integer poolSize) {
     if (log.isDebugEnabled())
-      log.debug("Starting Service: object = " + object + " at the address = " + address + " with pool size is '" + poolSize + "'");
+      log.debug("Starting Service: object = " + object + " at the address = " + address
+          + " with pool size is '" + poolSize + "'");
 
     Factory factory = new PerRequestFactory(object.getClass());
-//    If the purpose is to make sure a single request enters the instance at a time
-//    (not thread safe), you can do: 
-    factory = new PooledFactory(factory, poolSize != null ? poolSize.intValue() : 4);
-    JAXWSMethodInvoker invoker = new JAXWSMethodInvoker(factory);
+
     JaxWsServerFactoryBean serverFactory = new JaxWsServerFactoryBean();
 //serverFactory.setBindingFactory(new HttpBindingInfoFactoryBean());
     serverFactory.getServiceFactory().setDataBinding(new JAXBDataBinding());
     serverFactory.setServiceClass(object.getClass());
     serverFactory.setAddress(address);
+    //  If the purpose is to make sure a single request enters the instance at a time
+    //  (not thread safe), you can do: 
+    factory = new PooledFactory(factory, poolSize != null ? poolSize.intValue() : 4);
+    JAXWSMethodInvoker invoker = new JAXWSMethodInvoker(factory);
     serverFactory.setInvoker(invoker);
     Server server = serverFactory.create();
     serverFactory.getServiceFactory()
@@ -159,7 +161,7 @@ public class CXFUtils {
   public static Endpoint simpleDeployService(String address, Object object) {
     if (log.isDebugEnabled())
       log.debug("Starting Service: object = " + object + " at the address = " + address);
-    Endpoint endpoint = Endpoint.publish(address, object);  
+    Endpoint endpoint = Endpoint.publish(address, object);
     if (endpoint.isPublished())
       log.info("The WebService '" + address + "' has been published!");
     return endpoint;
