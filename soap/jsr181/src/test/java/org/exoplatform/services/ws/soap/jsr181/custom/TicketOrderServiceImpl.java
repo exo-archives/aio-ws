@@ -56,6 +56,11 @@ public class TicketOrderServiceImpl implements TicketOrderService {
   public String getTicket(String departing, String arriving, Date departureDate, String passenger) {
     ticket = new Ticket(passenger, departing, arriving, departureDate);
     LOG.info(ticket);
+    try {
+      System.out.println(">>> TicketOrderServiceImpl.getTicket() sleeping for 2 sec ");
+      Thread.currentThread().sleep(1000);
+    } catch (Exception e) {
+    }
     return String.valueOf(ticket.getOrder());
   }
 

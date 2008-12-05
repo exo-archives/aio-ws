@@ -17,19 +17,25 @@
 
 package org.exoplatform.services.ws.soap.jsr181;
 
+import java.net.URL;
 import java.util.Date;
 import java.util.List;
 
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.exoplatform.services.ws.AbstractMultiWebService;
 import org.exoplatform.services.ws.AbstractSingletonWebService;
 import org.exoplatform.services.ws.impl.cxf.CXFUtils;
+import org.exoplatform.services.ws.soap.jsr181.custom.TicketOrderServiceImpl;
 import org.exoplatform.services.ws.soap.jsr181.singleton.TicketOrderService;
 
 /**
@@ -50,6 +56,11 @@ public class TicketOrderServiceTest extends BaseTest {
   private final static String SERVICE_NAME_MULTIINSTANCE    = "TicketOrderServiceMultiinstance";
 
   /**
+   * Custom service name.
+   */
+  private final static String SERVICE_NAME_CUSTOM           = "TicketOrderServiceCustom";
+
+  /**
    * Address for Singleton.
    */
   private final static String SERVICE_ADDRESS_SINGLETON     = "http://localhost:8080/"
@@ -60,6 +71,12 @@ public class TicketOrderServiceTest extends BaseTest {
    */
   private final static String SERVICE_ADDRESS_MULTIINSTANCE = "http://localhost:8080/"
                                                                 + SERVICE_NAME_MULTIINSTANCE;
+
+  /**
+   * Address for Custom.
+   */
+  private final static String SERVICE_ADDRESS_CUSTOM        = "http://localhost:8080/"
+                                                                + SERVICE_NAME_CUSTOM;
 
 //private final static String address = "local://TicketOrderService";
 //private final static String address = "http://localhost:8080/ws-examples/soap/TicketOrderService";
@@ -122,10 +139,15 @@ public class TicketOrderServiceTest extends BaseTest {
     System.out.println(">>> TicketOrderServiceTest.testTicketMultiinstanceService()");
     List<AbstractMultiWebService> l = container.getComponentInstancesOfType(AbstractMultiWebService.class);
     for (AbstractMultiWebService sc : l) {
-      if (sc.getClass().getAnnotation(WebService.class).serviceName().equals(SERVICE_NAME_MULTIINSTANCE)) {
+      if (sc.getClass()
+            .getAnnotation(WebService.class)
+            .serviceName()
+            .equals(SERVICE_NAME_MULTIINSTANCE)) {
 
         // test starting service
-        Server server = CXFUtils.complexDeployServiceMultiInstance(SERVICE_ADDRESS_MULTIINSTANCE, sc, null);
+        Server server = CXFUtils.complexDeployServiceMultiInstance(SERVICE_ADDRESS_MULTIINSTANCE,
+                                                                   sc,
+                                                                   null);
         try {
           CXFUtils.checkConnectionAndPrint(SERVICE_ADDRESS_MULTIINSTANCE);
         } catch (Exception e) {
@@ -162,6 +184,78 @@ public class TicketOrderServiceTest extends BaseTest {
     client.getOutInterceptors().add(new LoggingOutInterceptor());
     Object obj = client.create();
     return (TicketOrderService) obj;
+  }
+
+  /**
+   * Test say hello service.
+   * 
+   * @throws Exception
+   */
+  @SuppressWarnings("unchecked")
+  public void testTicketServiceServiceWithTimeOut() throws Exception {
+
+    System.out.println(">>> TicketOrderServiceTest.testTicketServiceService()");
+
+    // test starting service
+    Endpoint endpoint = CXFUtils.simpleDeployService(SERVICE_ADDRESS_CUSTOM,
+                                                     new TicketOrderServiceImpl());
+    try {
+      CXFUtils.checkConnectionAndPrint(SERVICE_ADDRESS_CUSTOM);
+    } catch (Exception e) {
+      System.out.println(">>> TicketOrderServiceTest.testTicketServiceService() checkConnection: There is no service at '"
+          + SERVICE_ADDRESS_CUSTOM + "?wsdl'");
+      e.printStackTrace();
+      fail(e.getMessage());
+    }
+
+    // test started service
+    URL wsdl = new URL(SERVICE_ADDRESS_CUSTOM + "?wsdl");
+    assertNotNull(wsdl);
+
+    TicketOrderServiceService service = new TicketOrderServiceService(wsdl);
+    org.exoplatform.services.ws.soap.jsr181.custom.TicketOrderService ticket = service.getTicketOrderServicePort();
+
+    Client client = ClientProxy.getClient(ticket);
+    HTTPConduit http = (HTTPConduit) client.getConduit();
+    HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+    httpClientPolicy.setConnectionTimeout(100);
+    httpClientPolicy.setAllowChunking(false);
+    httpClientPolicy.setReceiveTimeout(100);
+    http.setClient(httpClientPolicy);
+
+    // test started service
+    String ticketOrder = null;
+    try {
+      ticketOrder = ticket.getTicket("Kyiv", "Paris", new Date(), "Passenger");
+      System.out.println(">>> TicketOrderServiceTest.testTicketSingletonService() ticketOrder = "
+          + ticketOrder);
+      fail();
+    } catch (Exception e) {
+    }
+
+    client = ClientProxy.getClient(ticket);
+    http = (HTTPConduit) client.getConduit();
+    httpClientPolicy = new HTTPClientPolicy();
+    httpClientPolicy.setConnectionTimeout(10000);
+    httpClientPolicy.setAllowChunking(false);
+    httpClientPolicy.setReceiveTimeout(10000);
+    http.setClient(httpClientPolicy);
+
+    // test started service
+    ticketOrder = null;
+    try {
+      ticketOrder = ticket.getTicket("Kyiv", "Paris", new Date(), "Passenger");
+      System.out.println(">>> TicketOrderServiceTest.testTicketSingletonService() ticketOrder = "
+          + ticketOrder);
+    } catch (Exception e) {
+      fail();
+    }
+
+    assertNotNull(ticketOrder);
+
+    endpoint.stop();
+    return;
+
   }
 
 }

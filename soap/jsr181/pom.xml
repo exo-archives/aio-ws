@@ -86,8 +86,9 @@
   <properties>
     <cxf.version>2.1.2</cxf.version>
   </properties>
-  
+
   <build>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -99,7 +100,7 @@
           <testFailureIgnore>${exo.test.failure.ignore}</testFailureIgnore>
           <classesDirectory>${exo.test.classesdirectory}</classesDirectory>
           <includes>
-            <include>**/WebServiceLoaderTest.java</include>            
+            <!--            <include>**/WebServiceLoaderTest.java</include>            -->
             <include>**/TicketOrderServiceTest.java</include>
           </includes>
           <systemProperties>
