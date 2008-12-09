@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Tests of the Webdav library</title>
+<script language="JavaScript" src="jsunit/app/jsUnitCore.js"></script>
+<script language="JavaScript" src="../js/webdav.js"></script>
+<script language="JavaScript" type="text/javascript" src="webdavTestSetUpPages.js"></script>
+<script>
+	/**
+	 * Created by The eXo Platform SAS.
+	 * @author: <a href="mailto:dmitry.ndp@exoplatform.com.ua">Dmytro Nochevnov</a>
+	 * @version $Id: $ Dec 09, 2008
+	 * @copyright Copyright (C) 2003-2008 eXo Platform SAS.
+	 * @license http://www.gnu.org/licenses/ GNU General Public License
+	 */
+
+    function exposeTestFunctionNames() {
+        return ['testSetUp', 'testPROPFIND_PROPPATCH'];
+    }
+    
+    function testSetUp() {
+        assertNotNull('Expected webdav is an object', webdav);
+        // clean of the test folder (twice delete the folder)
+        webdav.DELETE('', test_folder + '/');
+        var result = webdav.DELETE('', test_folder + '/');        
+        assertEquals('Clean of test folder - test of status', 404, result.status);
+		assertFalse('Clean of test folder - test of isSuccess() ', webdav.isSuccess(result.status));		
+		assertTrue('Clean of test folder - test if Header "Server" is existed', result.headers['Server'] != 'undefined');		
+    }
+
+    function testPROPFIND_PROPPATCH(){
+        // create collection
+        var result = webdav.MKCOL('', test_folder);
+        assertEquals('test of creating of collection', 201, result.status);
+
+        // create a file and save some contents
+        result = webdav.PUT('', test_folder + '/приклад.txt', {content: 'приклад'});
+        assertEquals('test of creating of resource', 201, result.status);
+
+		// test of PROPFIND
+		// test of PROPFIND with without options
+        result = webdav.PROPFIND('', test_folder + '/', {});
+        assertEquals('test of propfind - test of status', 207, result.status);
+        assertTrue('test of propfind - test of Header "Content-Type"', result.headers['Content-Type'].indexOf('text/xml') >= 0);
+
+		// test of PROPFIND to the collection
+        var options = {
+            depth: 1,
+            operation: 'allprop'
+        };
+        result = webdav.PROPFIND('', test_folder + '/', options);
+        assertEquals('test of PROPFIND "allprop" request to the collection "' + test_folder + '"', 207, result.status);
+
+		// test of set properity of collection ("Test PROPPATCH.1")
+        var options = {
+            set_properties_list: {	publish: 'true', 
+									author: 'noname'}
+        };
+        result = webdav.PROPPATCH('', test_folder + '/', options);
+        assertEquals('test of set property of resource ("Test PROPPATCH.1")', 207, result.status);
+		var content_after_setting = XMLtoString(result.content);
+		assertTrue('test of set properity of collection "' + test_folder + ' ("Test PROPPATCH.1")', content_after_setting.indexOf('<ns0:publish/>') >=0 && content_after_setting.indexOf('<ns0:author/>') >=0);
+
+		// test of PROPFIND
+        options = {
+            depth: '0',
+            operation: 'properties_list',
+            properties_list: ['publish', 'author']
+        };
+        result = webdav.PROPFIND('', test_folder + '/', options);
+        properties_after_setting = XMLtoString(result.content); 
+        assertEquals('test of PROPFIND to the "' + test_folder, 207, result.status);
+        assertTrue('test of PROPFIND to the "' + test_folder + ' - verifying of present of properties "publish" and "author"', properties_after_setting.search(/<ns0:publish>.*\n*.*true/) >= 0 && properties_after_setting.search(/<ns0:author>.*\n*.*noname/) >= 0);
+		
+		// test of remove properties of collection
+        options = {
+            remove_properties_list: ['publish', 'author']
+        };		
+        result = webdav.PROPPATCH('', test_folder + '/', options);
+        assertEquals('test of remove property of collection', 207, result.status);
+		var content_after_removing = XMLtoString(result.content);
+			
+		// test of PROPFIND
+        options = {
+            depth: 1,
+            operation: 'allprop'
+        };
+        result = webdav.PROPFIND('', test_folder + '/', options);
+        properties_after_setting = XMLtoString(result.content); 
+        assertEquals('test of PROPFIND to the ' + test_folder, 207, result.status);
+        assertFalse('test of PROPFIND to the ' + test_folder + ' - verifying of present of properties "publish" and "author"', properties_after_setting.indexOf('<ns0:publish>') >=0 && properties_after_setting.indexOf('<ns0:author>') >=0);
+
+		// test of PROPFIND to the resource
+        var options = {
+            depth: 0,
+            operation: 'propname'
+        };
+        result = webdav.PROPFIND('', test_folder + '/приклад.txt', options);
+        var initial_properties = XMLtoString(result.content); 
+        assertEquals('test of PROPFIND to the "' + test_folder + '/приклад.txt"', 207, result.status);
+        assertFalse('test of PROPFIND to the "' + test_folder + '/приклад.txt" - verifying of absent of properties "publish" and "author"', initial_properties.indexOf('<ns0:publish>') >=0 && initial_properties.indexOf('<ns0:author>') >=0);		
+        
+		// test of set properity of resource
+        var options = {
+            set_properties_list: {	publish: 'true', 
+									author: 'noname'}
+        };
+        result = webdav.PROPPATCH('', test_folder + '/приклад.txt', options);
+        assertEquals('test of set property of resource', 207, result.status);
+		var content_after_setting = XMLtoString(result.content);
+		assertTrue('test of set properity of resource "' + test_folder + '/приклад.txt"', content_after_setting.indexOf('<ns0:publish/>') >=0 && content_after_setting.indexOf('<ns0:author/>') >=0);
+
+		// test of PROPFIND
+        options = {
+            depth: 'infinity',
+            operation: 'properties_list',
+            properties_list: ['publish', 'author']
+        };
+        result = webdav.PROPFIND('', test_folder + '/приклад.txt', options);
+        properties_after_setting = XMLtoString(result.content); 
+        assertEquals('test of PROPFIND to the "' + test_folder + '/приклад.txt"', 207, result.status);
+        assertTrue('test of PROPFIND to the "' + test_folder + '/приклад.txt" - verifying of present of properties "publish" and "author"', properties_after_setting.search(/<ns0:publish>.*\n*.*true/) >= 0 && properties_after_setting.search(/<ns0:author>.*\n*.*noname/) >= 0);
+		
+		// test of remove properties of resource
+        options = {
+            remove_properties_list: ['publish', 'author']
+        };		
+        result = webdav.PROPPATCH('', test_folder + '/приклад.txt', options);
+        assertEquals('test of remove property of resource', 207, result.status);
+		var content_after_removing = XMLtoString(result.content);
+			
+		// test of PROPFIND
+        options = {
+            depth: 1,
+            operation: 'allprop'
+        };
+        result = webdav.PROPFIND('', test_folder + '/приклад.txt', options);
+        properties_after_setting = XMLtoString(result.content); 
+        assertEquals('test of PROPFIND to the "' + test_folder + '/приклад.txt"', 207, result.status);
+        assertFalse('test of PROPFIND to the "' + test_folder + '/приклад.txt" - verifying of present of properties "publish" and "author"', properties_after_setting.indexOf('<ns0:publish>') >=0 && properties_after_setting.indexOf('<ns0:author>') >=0);		
+
+		// delete the resource
+        result = webdav.DELETE('', test_folder + '/приклад.txt');
+        assertEquals('test of removing of resource', 204, result.status);
+
+        // delete the collection
+        result = webdav.DELETE('', test_folder + '/');
+        assertEquals('test of deleting of collection', 204, result.status);        
+    }
+</script>
+</head>
+<body>
+	<h1>eXo Platform Client Library of WebDAV Test Suite</h1>
+	<p>This page contains a JSUnit tests of eXo Platform Client Library of WebDAV.</p>
+</body>
+</html>
