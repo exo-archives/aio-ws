@@ -1,17 +1,20 @@
-/**
- * @classDescription Client library of WebDAV
- * <hr />This program is free software; you can redistribute it and/or
+/*
+ * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; either version 3
  * of the License, or (at your option) any later version.
- * <br /><br />
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * <br /><br />
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>
+*/
+
+/**
+ * @classDescription Client library of WebDAV
  * Created by The eXo Platform SAS.
  * @author: <a href="mailto:dmitry.ndp@exoplatform.com.ua">Dmytro Nochevnov</a>
  * @version $Id: $ Dec 09, 2008
@@ -234,6 +237,7 @@ Webdav.prototype.parseHeaders = function(headers) {
  * sets additional headers of response
  * @param {Object} request
  * @param {Object} additionalHeaders
+ * @private
  */
 Webdav.prototype.setAdditionalHeaders = function (request, additionalHeaders) {
     for( var headerName in additionalHeaders ) {
@@ -535,7 +539,7 @@ Webdav.prototype.GET = function(handler, path, options) {
 };
 
 /**
- * performs a PUT method - to save the contents of a resource to the server
+ * performs a PUT method - to save the content of a resource to the server
  * @param {Object} handler - functions to call when the request either succeeds or fails, and completes
  * @param {Function} handler.onSuccess - will call if the request succeeds
  * @param {Function} handler.onError - will call if the request fails
@@ -543,6 +547,7 @@ Webdav.prototype.GET = function(handler, path, options) {
  * @param {String} path  (on default = '')
  * @param {Object} options - collection of options:
  * @param {String} options.content - content of resource (on default = '')
+ * @param {String} options.content_type - MIME type of content + encoding language (e.g. 'text/plain; charset=UTF-8')
  * @param {String} options.locktoken - the opaque lock token, as can be retrieved from 'Lock-Token' header of the LOCK request (on default = '')
  * @param {Object} options.additional_headers - e.g. {If-Match: '10880-22388', ETag: '870be-8f0-39ee6a4d'}   
  * @return {Object} result :
@@ -557,7 +562,7 @@ Webdav.prototype.PUT = function(handler, path, options) {
 
 	var options = {
 			content: options.content || '',
-			content_type: options.content_type || 'text/plain, charset=UTF-8',
+			content_type: options.content_type || 'text/plain; charset=UTF-8',
 			locktoken: options.locktoken || '',
 			additional_headers: options.additional_headers || '' 						
 		};
@@ -577,7 +582,7 @@ Webdav.prototype.PUT = function(handler, path, options) {
 };
 
 /**
- * performs a DELETE method - to remove a resource or collection (recursively) 
+ * performs a DELETE method - to remove a resource or collection. 
  * @param {Object} handler - functions to call when the request either succeeds or fails, and completes
  * @param {Function} handler.onSuccess - will call if the request succeeds
  * @param {Function} handler.onError - will call if the request fails
@@ -614,7 +619,7 @@ Webdav.prototype.DELETE = function(handler, path, options) {
 };
 
 /**
- * performs an OPTIONS method - to return the HTTP methods that the server supports for specified URL. This can be used to check the functionality of a web server by requesting '*' instead of a specific resource. 
+ * performs an OPTIONS method - to return the HTTP methods that the server supports for specified URL. 
  * @param {Object} handler - functions to call when the request either succeeds or fails, and completes
  * @param {Function} handler.onSuccess - will call if the request succeeds
  * @param {Function} handler.onError - will call if the request fails
