@@ -209,7 +209,7 @@ ul.inheritsList
 			<p class="description">
 				
 			
-				Client library of WebDAV<hr />This program is free software; you can redistribute it and/ormodify it under the terms of the GNU Affero General Public Licenseas published by the Free Software Foundation; either version 3of the License, or (at your option) any later version.<br /><br />This program is distributed in the hope that it will be useful,but WITHOUT ANY WARRANTY; without even the implied warranty ofMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See theGNU General Public License for more details.<br /><br />You should have received a copy of the GNU General Public Licensealong with this program; if not, see <http://www.gnu.org/licenses/>Created by The eXo Platform SAS.
+				Client library of WebDAVCreated by The eXo Platform SAS.
 				
 				
 					<br /><i>Defined in: </i> <a href="../symbols/src/webdav.js.html">webdav.js</a>.
@@ -347,7 +347,7 @@ ul.inheritsList
 							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/Webdav.html#DELETE">DELETE</a></b>(handler, path, options)
 								</div>
-								<div class="description">performs a DELETE method - to remove a resource or collection (recursively)</div>
+								<div class="description">performs a DELETE method - to remove a resource or collection.</div>
 							</td>
 						</tr>
 					
@@ -455,7 +455,7 @@ ul.inheritsList
 							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/Webdav.html#PUT">PUT</a></b>(handler, path, options)
 								</div>
-								<div class="description">performs a PUT method - to save the contents of a resource to the server</div>
+								<div class="description">performs a PUT method - to save the content of a resource to the server</div>
 							</td>
 						</tr>
 					
@@ -474,15 +474,6 @@ ul.inheritsList
 								<div class="fixedFont"><b><a href="../symbols/Webdav.html#SEARCH">SEARCH</a></b>(handler, path, options)
 								</div>
 								<div class="description">performs a SEARCH method - a lightweight search method to transport queries and result sets that allows clients to make use of server-side search facilities retrieve properties, stored as XML, from a resource.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/Webdav.html#setAdditionalHeaders">setAdditionalHeaders</a></b>(request, additionalHeaders)
-								</div>
-								<div class="description">sets additional headers of response</div>
 							</td>
 						</tr>
 					
@@ -968,7 +959,7 @@ ul.inheritsList
 					
 					</div>
 					<div class="description">
-						performs a DELETE method - to remove a resource or collection (recursively)
+						performs a DELETE method - to remove a resource or collection.
 						
 						
 					</div>
@@ -1624,7 +1615,7 @@ ul.inheritsList
 					
 					</div>
 					<div class="description">
-						performs an OPTIONS method - to return the HTTP methods that the server supports for specified URL. This can be used to check the functionality of a web server by requesting '*' instead of a specific resource.
+						performs an OPTIONS method - to return the HTTP methods that the server supports for specified URL.
 						
 						
 					</div>
@@ -2018,7 +2009,7 @@ ul.inheritsList
 					
 					</div>
 					<div class="description">
-						performs a PUT method - to save the contents of a resource to the server
+						performs a PUT method - to save the content of a resource to the server
 						
 						
 					</div>
@@ -2070,6 +2061,12 @@ ul.inheritsList
 									
 								</dt>
 								<dd>- content of resource (on default = '')</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>options.content_type</b>
+									
+								</dt>
+								<dd>- MIME type of content + encoding language (e.g. 'text/plain; charset=UTF-8')</dd>
 							
 								<dt>
 									<span class="light fixedFont">{String}</span> <b>options.locktoken</b>
@@ -2283,48 +2280,6 @@ ul.inheritsList
 								<dd><span class="light fixedFont">{Object}</span> result :<br />- {Number} <b>result.status</b> = status of XMLHttp response <br />- {Number} <b>result.statusstring</b> -  an explanation of status <br />- {Object} <b>result.headers</b> - hash of request.getAllResponseHeaders() (e.g. header "Content-Type: test/plain" => result.headers['Content-Type'] = 'test/plain')<br />- {Object} <b>result.content</b> = XMLHttp response.responseXML if header['Content-Type'] consists 'xml'<br />- {String} <b>result.content</b> = XMLHttp response.responseText otherwise</dd>
 							
 							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name="setAdditionalHeaders"> </a>
-					<div class="fixedFont">
-					
-					
-					<b>setAdditionalHeaders</b>(request, additionalHeaders)
-					
-					</div>
-					<div class="description">
-						sets additional headers of response
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{Object}</span> <b>request</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<span class="light fixedFont">{Object}</span> <b>additionalHeaders</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
 						
 						
 						
@@ -2650,7 +2605,7 @@ ul.inheritsList
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://www.jsdoctoolkit.org/" target="_blank">JsDoc Toolkit</a> 2.0.2 on Tue Dec 09 2008 17:05:05 GMT+0200 (EET)
+			Documentation generated by <a href="http://www.jsdoctoolkit.org/" target="_blank">JsDoc Toolkit</a> 2.0.2 on Fri Dec 12 2008 12:40:23 GMT+0200 (EET)
 		</div>
 	</body>
 </html>
