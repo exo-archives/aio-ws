@@ -228,7 +228,7 @@
 			headers: new Array,
 			body: 'приклад'
 		}
-		options.headers['Content-type'] = 'text/plain, charset=UTF-8';
+		options.headers['Content-type'] = 'text/plain; charset=UTF-8';
 		
         result = webdav.ExtensionMethod('', test_folder + '/приклад.txt', options);
         assertEquals('test of creating of resource with UTF-8 encoded name and save UTF-8 encoded contents by using an ExtensionMethod', 201, result.status);
