@@ -57,7 +57,7 @@
 		// test of SEARCH in the test_folder with 'xpath' search language
         var options = {
             search_language: 'xpath',
-            search_request: "(*, nt:unstructured)|[jcr:contains(., 'текст для пошуку')]"
+            search_request: "element(*, nt:unstructured)[jcr:contains(., 'текст для пошуку')]"
         };				
 
         result = webdav.SEARCH('', test_folder + '/', options);
