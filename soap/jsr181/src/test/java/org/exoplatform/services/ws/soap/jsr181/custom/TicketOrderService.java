@@ -47,4 +47,6 @@ public interface TicketOrderService {
    */
   public void confirmation(boolean confirmation);
 
+  public String getUnregistered() throws InvalidRegistration;
+  
 }

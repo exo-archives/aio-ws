@@ -47,6 +47,8 @@ public class TicketOrderServiceImpl implements TicketOrderService {
   private Ticket           ticket;
 
   /**
+   * Get ticket service with one second delay.
+   * 
    * @param departing departing place.
    * @param arriving arriving place.
    * @param departureDate departure date.
@@ -57,7 +59,7 @@ public class TicketOrderServiceImpl implements TicketOrderService {
     ticket = new Ticket(passenger, departing, arriving, departureDate);
     LOG.info(ticket);
     try {
-      System.out.println(">>> TicketOrderServiceImpl.getTicket() sleeping for 2 sec ");
+      System.out.println(">>> TicketOrderServiceImpl.getTicket() sleeping for 1 sec ... ");
       Thread.currentThread().sleep(1000);
     } catch (Exception e) {
     }
@@ -65,10 +67,17 @@ public class TicketOrderServiceImpl implements TicketOrderService {
   }
 
   /**
+   * Confirmation service operation.
+   * 
    * @param confirmation confirm or not.
    */
   public void confirmation(boolean confirmation) {
     LOG.info("Confirmation : " + confirmation + " for order '" + ticket.getOrder() + "'.");
+  }
+  
+  public String getUnregistered() throws InvalidRegistration {
+    LOG.info("getUnregistered");
+    throw new InvalidRegistration("he-he", new InvalidRegistrationFault(), new Exception());
   }
 
 }

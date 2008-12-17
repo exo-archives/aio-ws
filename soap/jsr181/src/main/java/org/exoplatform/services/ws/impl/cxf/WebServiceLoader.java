@@ -87,7 +87,8 @@ public class WebServiceLoader {
     for (AbstractSingletonWebService implementor : singleservices) {
       String address = getAddress(implementor);
       if (address != null) {
-        CXFUtils.simpleDeployService(address, implementor);
+        ExoDeployCXFUtils.simpleDeployService(address, implementor);
+        
         LOG.info("New singleton WebService '" + address + "' registered.");
       }
     }
@@ -99,7 +100,7 @@ public class WebServiceLoader {
     for (AbstractMultiWebService implementor : multiservices) {
       String address = getAddress(implementor);
       if (address != null) {
-        CXFUtils.complexDeployServiceMultiInstance(address, implementor, null);
+        ExoDeployCXFUtils.complexDeployServiceMultiInstance(address, implementor, null);
         LOG.info("New multi-instance WebService '" + address + "' registered.");
       }
     }
@@ -112,7 +113,7 @@ public class WebServiceLoader {
         Object implem = implementor.newInstance();
         String address = getAddress(implem);
         if (address != null) {
-          CXFUtils.simpleDeployService(address, implem);
+          ExoDeployCXFUtils.simpleDeployService(address, implem);
           LOG.info("New custom WebService '" + address + "' registered.");
         }
       } catch (Exception e) {
