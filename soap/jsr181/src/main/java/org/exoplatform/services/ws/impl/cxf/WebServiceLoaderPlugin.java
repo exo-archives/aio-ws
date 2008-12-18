@@ -29,6 +29,23 @@ import org.exoplatform.services.log.ExoLogger;
 /**
  * Created by The eXo Platform SAS .
  * 
+ * Usage:
+ *  &lt;external-component-plugins&gt;
+ *    &lt;target-component&gt;org.exoplatform.services.ws.impl.cxf.WebServiceLoader&lt;/target-component&gt;
+ *    &lt;component-plugin&gt;
+ *      &lt;name&gt;WebService loader plugin&lt;/name&gt;
+ *      &lt;set-method&gt;addPlugin&lt;/set-method&gt;
+ *      &lt;type&gt;org.exoplatform.services.ws.impl.cxf.WebServiceLoaderPlugin&lt;/type&gt;
+ *      &lt;description&gt;Custom service loader plugin&lt;/description&gt;
+ *      &lt;init-params&gt;
+ *        &lt;values-param&gt;
+ *          &lt;name&gt;&lt;/name&gt;
+ *          &lt;value&gt;org.exoplatform.services.MySimpleService&lt;/value&gt;
+ *        &lt;/values-param&gt;
+ *      &lt;/init-params&gt;
+ *    &lt;/component-plugin&gt;
+ *  &lt;/external-component-plugins&gt;
+ * 
  * @author <a href="mailto:alexey.zavizionov@exoplatform.com.ua">Alexey
  *         Zavizionov</a>
  * @version $Id: $ Nov 4, 2008
