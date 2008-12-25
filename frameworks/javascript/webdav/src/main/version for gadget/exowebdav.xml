@@ -1,0 +1,689 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+ **
+ * Created by The eXo Platform SAS
+ * Author : Dmytro Nochevnov
+ *          dmitry.ndp@gmail.com
+ * Dec, 2008
+ *
+-->
+<Module>
+	<ModulePrefs 
+		author="Dmytro Nochevnov"
+		title="eXo WebDAV"
+		title_url="http://www.exoplatform.org"
+		description="eXo WebDAV Gadget."	
+		author_email="dmitry.ndp@gmail.com"
+		author_affiliation="eXo Platform SAS"
+		height="600"
+		scrolling="true">
+		<Require feature="exo-webdav" />
+	</ModulePrefs>
+	<Content type="html">
+	<![CDATA[
+        <script>    
+		/**
+		 * Serialize an XML Document or Element and return it as a string.
+		 */
+		function XMLtoString(node) {
+			if (typeof node != 'object') return node; 
+			if (typeof XMLSerializer != "undefined")
+		        return (new XMLSerializer( )).serializeToString(node);
+		    else if (node.xml) return node.xml;
+		    else throw "XML.serialize is not supported or can't serialize " + node;
+		};
+				
+		// Define a generic toString( ) method that may be of interest to other classes.
+		function ObjectToString(object) {
+		    var props = [];
+		    for(var name in object) {
+		        if (!object.hasOwnProperty(name)) continue;
+		        var value = object[name];
+		        var s = "<b>" + name + "</b>: ";
+		        switch(typeof value) {
+		        case 'function':
+		            s += "function";
+		            break;
+		        case 'object':
+		            if (value instanceof Array) s += "array"
+		            else s += value.toString( );
+		            break;
+		        default:
+		            s += String(value);
+		            break;
+		        }
+		        props.push(s);
+		    }
+		    return props.join("<br />");
+		}
+
+		/**
+		 * parse of headers string
+		 * @private
+		 * @param {String} headers - string
+		 * @return {Object} hash of Headers (e.g. header "Content-Type: test/plain" => headers['Content-Type'] = 'test/plain')
+		 */
+		function parseHeaders(headers) {
+			var headerPattern = /([^:]+):.(.+)/;
+			var lines = headers.split('\n');
+		    var hash = {}; 
+			var name = ''; 
+			var value = '';
+		
+		    for (var i = 0; i < lines.length; i++) {
+		        var header = lines[i].match(headerPattern);
+				if ( header != null && 
+						typeof(header[1]) != 'undefined') 
+				{
+					name = header[1];
+					if (typeof(header[2]) != 'undefined') {
+						value = header[2];
+					} else {
+						value = '';
+					}
+		    	    hash[name] = value;
+				}
+		    };
+		    
+		    return hash;
+		};
+
+        function perform_method(select){
+            var webdav = getWebdavObject();
+            var method = select.options[select.selectedIndex].value;
+            if (!method) {
+                return; 
+            }
+            if (! document.getElementById('webdav_host').value) {
+                alert('Please type host with webdav folder');
+                document.getElementById('webdav_host').focus();
+                return;
+            }
+            clear_table();
+            eval('define_' + method + '_options()');
+        }
+
+        function clear_table() {
+            document.getElementById("options_cell").innerHTML = '&nbsp;';
+            document.getElementById("results_cell").innerHTML = '&nbsp;';                
+        }
+
+		// define webdav methods handlers
+        function handler_onSuccess(result) {
+            alert('Request SUCCEEDED with status = ' + result.status + ': ' + result.statusstring);
+        };
+
+        function handler_onError(result) {
+            alert('Request FAILED with status = ' + result.status + ': ' + result.statusstring);
+        };
+
+        function handler_onComplete(result) {
+            if (result.headers['Content-Type'] && result.headers['Content-Type'].indexOf('xml') >= 0) {
+				result.content = "<textarea cols=60 rows=50>" + XMLtoString(result.content) + "</textarea>";
+			} else {
+				result.content = "<pre>" + result.content + "</pre>";
+			}
+			var results_text = "<b><u>Status:</u></b><br />" + result.status + ":" + result.statusstring + "<hr />"
+                + "<b><u>Headers:</u></b><br />" + ObjectToString(result.headers) + "<hr />"
+                + "<b><u>Content:</u></b><br />" + result.content + "<hr />";   
+            document.getElementById('results_cell').innerHTML = results_text;
+        };
+
+		var handler = {
+			onSuccess: handler_onSuccess,
+			onError: handler_onError,
+			onComplete: handler_onComplete
+		}
+
+		var webdav = {};
+
+		// get and setup webdav object
+        function getWebdavObject(){
+			if ( ! gadgets.util.hasFeature('exo-webdav') || typeof gadgets.webdav == "undefined" ) {
+				alert('Feature "exo-webdav" is unavailable.');
+				exit;
+			}
+            var host = document.getElementById('webdav_host').value;
+            var port = document.getElementById('webdav_port').value;
+
+            webdav = new gadgets.webdav(host, port);
+            
+            webdav.username = document.getElementById('webdav_username').value;
+            webdav.password = document.getElementById('webdav_password').value;
+            
+            return webdav;
+        }
+
+// for eXoPlatform webdav
+		var default_webdav_path = '/rest/jcr/repository/gadgets/';
+
+		// method PROPFIND        
+        function define_PROPFIND_options() {
+            var options_text = "Path: <input type='text' name='path' value='" + default_webdav_path + "'/><br />"
+                + "Depth: <select name='depth'>"
+                + "       	<option value='0'>0</option>"                                        
+                + "         <option value='1'>1</option>"
+                + "         <option value='Infinity'>Infinity</option>"							
+                + "       </select><br />"           
+                + "Operation: <select name='operation'>"
+                + "                <option value='allprop'>allprop</option>"
+                + "                <option value='propname'>propname</option>"                                        
+                + "                <option value='properties_list'>specified properties</option>"
+                + "              </select><br />"
+                + "Specified properties (comma seperated target properties e.g. 'getetag, getlastmodified'): <input type='text' name='properties_list' value=''><br />"            
+				+ "Additional Headers (e.g. If-Match: 10880-22388<br />ETag: 870be-8f0-39ee6a4d):<br /><textarea name='additional_headers' cols=15 rows=2></textarea><br /><br />"
+                + "<input type='button' value='PROPFIND request' onClick='performs_PROPFIND()'/>";
+            document.getElementById("options_cell").innerHTML = options_text;
+        }
+        
+        function performs_PROPFIND() {
+            var path = document.getElementsByName("path")[0].value;
+            var options = {
+                depth: document.getElementsByName("depth")[0].options[document.getElementsByName("depth")[0].selectedIndex].value,
+                operation: document.getElementsByName("operation")[0].options[document.getElementsByName("operation")[0].selectedIndex].value,
+                properties_list: document.getElementsByName("properties_list")[0].value,
+				additional_headers: parseHeaders(document.getElementsByName("additional_headers")[0].value)
+            };
+            if (options.properties_list) {
+                options.properties_list = options.properties_list.split(',');                
+            }
+            webdav.PROPFIND(handler, path, options);
+        }
+        
+		// method PUT
+        function define_PUT_options() {
+            var options_text = "Path: <input type='text' name='path' value='" + default_webdav_path + "приклад.txt'><br />"
+				+ "Content-Type: <input type='text' name='content_type' value='text/plain, charset=UTF-8'><br />"
+                + "Lock-Token: <input type='text' name='locktoken' value=''><br />"
+				+ "Content of :<br /><textarea name='content' cols=15 rows=5></textarea><br />"
+				+ "<input type='button' value='PUT request' onClick='performs_PUT()'/>";
+            document.getElementById("options_cell").innerHTML = options_text;
+        }
+        
+        function performs_PUT() {
+            var path = document.getElementsByName('path')[0].value;
+			var options = {
+				content: document.getElementsByName('content')[0].value,
+				content_type: document.getElementsByName('content_type')[0].value,
+				locktoken: document.getElementsByName('locktoken')[0].value		 
+			}
+            webdav.PUT(handler, path, options);                
+        }
+        
+		// method GET        
+        function define_GET_options() {
+            var options_text = "Path: <input type='text' name='path' value='" + default_webdav_path + "приклад.txt'/><br /><br />"
+            	+ "<input type='button' value='GET request' onClick='performs_GET()'/>";
+            document.getElementById("options_cell").innerHTML = options_text;
+        }
+        
+        function performs_GET() {
+            var path = document.getElementsByName('path')[0].value;
+            webdav.GET(handler, path);                
+        }
+		
+		// method MKCOL        
+        function define_MKCOL_options() {
+            var options_text = "Path: <input type='text' name='path' value='" + default_webdav_path + "приклад'/><br />"
+                + "Lock-Token: <input type='text' name='locktoken' value=''><br /><br />"
+            	+ "<input type='button' value='MKCOL request' onClick='performs_MKCOL()'/>";
+            document.getElementById("options_cell").innerHTML = options_text;
+        }
+        
+        function performs_MKCOL() {
+            var path = document.getElementsByName('path')[0].value;
+            var options = { 
+				locktoken: document.getElementsByName('locktoken')[0].value 
+			}
+			webdav.MKCOL(handler, path, options);                
+        }
+
+		// method DELETE       
+        function define_DELETE_options() {
+            var options_text = "Path: <input type='text' name='path' value='" + default_webdav_path + "приклад/'/><br />"
+                + "Lock-Token: <input type='text' name='locktoken' value=''><br /><br />"
+            	+ "<input type='button' value='DELETE request' onClick='performs_DELETE()'/>";
+            document.getElementById("options_cell").innerHTML = options_text;
+        }
+        
+        function performs_DELETE() {
+            var path = document.getElementsByName('path')[0].value;
+            var options = { 
+				locktoken: document.getElementsByName('locktoken')[0].value 
+			}
+            webdav.DELETE(handler, path, options);                
+        }
+		
+		// method OPTIONS       
+        function define_OPTIONS_options() {
+            var options_text = "Path: <input type='text' name='path' value='" + default_webdav_path + "'/><br /><br />"
+	            + "<input type='button' value='OPTIONS request' onClick='performs_OPTIONS()'/>";
+            document.getElementById("options_cell").innerHTML = options_text;
+        }
+        
+        function performs_OPTIONS() {
+            var path = document.getElementsByName('path')[0].value;
+            webdav.OPTIONS(handler, path);                
+        }
+
+		// method LOCK        
+        function define_LOCK_options() {
+			var default_owner = 'http://' + document.getElementById('webdav_host').value + ':' + document.getElementById('webdav_port').value + default_webdav_path;
+            var options_text = "Path: <input type='text' name='path' value='" + default_webdav_path + "приклад/'><br />"
+                + "Owner (href): <input type='text' name='owner' value='" + default_owner + "'><br />"   
+                + "Scope: <select name='scope'>"
+                + "       	<option value='exclusive'>exclusive</option>"                                        
+                + "         <option value='shared'>shared</option>"
+                + "       </select><br />"
+                + "Depth: <select name='depth'>"
+                + "       	<option value='0'>0</option>"                                        
+                + "         <option value='1'>1</option>"
+                + "         <option value='Infinity'>Infinity</option>"							
+                + "       </select><br />"
+                + "Timeout (in sec. or '' if = Infinity): <input type='text' name='timeout' value=''><br />"							
+                + "Locktoken: <input type='text' name='locktoken' value=''><br />"
+				+ "Additional Headers (e.g. If-Match: 10880-22388<br />ETag: 870be-8f0-39ee6a4d):<br /><textarea name='additional_headers' cols=15 rows=2></textarea><br /><br />"
+                + "<input type='button' value='LOCK request' onClick='performs_LOCK()'/>";
+            document.getElementById("options_cell").innerHTML = options_text;
+        }
+        
+        function performs_LOCK() {
+            var path = document.getElementsByName("path")[0].value;
+            var options = {
+	            scope: document.getElementsByName("scope")[0].options[document.getElementsByName("scope")[0].selectedIndex].value,
+	            owner: document.getElementsByName('owner')[0].value,
+                depth: document.getElementsByName("depth")[0].options[document.getElementsByName("depth")[0].selectedIndex].value,
+	            timeout: document.getElementsByName('timeout')[0].value,
+	            locktoken: document.getElementsByName('locktoken')[0].value,				
+				additional_headers: parseHeaders(document.getElementsByName("additional_headers")[0].value)								
+            };
+            webdav.LOCK(handler, path, options);
+        }
+
+		// method UNLOCK       
+        function define_UNLOCK_options() {
+            var options_text = "Path: <input type='text' name='path' value='" + default_webdav_path + "приклад/'/><br />"
+				+ "Locktoken: <input type='text' name='locktoken' value=''/><br /><br />"			
+            	+ "<input type='button' value='UNLOCK request' onClick='performs_UNLOCK()'/>";
+            document.getElementById("options_cell").innerHTML = options_text;
+        }
+        
+        function performs_UNLOCK() {
+            var path = document.getElementsByName('path')[0].value;
+			var options = { 
+				locktoken: document.getElementsByName('locktoken')[0].value 
+			}
+            webdav.UNLOCK(handler, path, options);                
+        }
+
+		// method COPY        
+        function define_COPY_options() {
+            var options_text = "Path: <input type='text' name='path' value='" + default_webdav_path + "приклад/'><br />"
+                + "Depth: <select name='depth'>"
+                + "       	<option value='0'>0</option>"                                        
+                + "         <option value='Infinity'>Infinity</option>"							
+                + "       </select><br />"
+				+ "Destination: <input type='text' name='destination' value='" + default_webdav_path + "приклад_новий/'><br />"
+                + "Overwrite: <select name='overwrite'>"
+                + "       	<option value='true'>true</option>"                                        
+                + "         <option value='false'>false</option>"						
+                + "       </select><br />"						
+                + "Locktoken: <input type='text' name='locktoken' value=''><br />"
+				+ "Additional Headers (e.g. If-Match: 10880-22388<br />ETag: 870be-8f0-39ee6a4d):<br /><textarea name='additional_headers' cols=15 rows=2></textarea><br /><br />"
+                + "<input type='button' value='COPY request' onClick='performs_COPY()'/>";
+            document.getElementById("options_cell").innerHTML = options_text;
+        }
+        
+        function performs_COPY() {
+            var path = document.getElementsByName("path")[0].value;
+            var options = {
+                depth: document.getElementsByName("depth")[0].options[document.getElementsByName("depth")[0].selectedIndex].value,
+	            destination: document.getElementsByName("destination")[0].value,
+				overwrite: document.getElementsByName("overwrite")[0].options[document.getElementsByName("overwrite")[0].selectedIndex].value == 'true',
+	            locktoken: document.getElementsByName('locktoken')[0].value,
+				additional_headers: parseHeaders(document.getElementsByName("additional_headers")[0].value)							
+            };
+            webdav.COPY(handler, path, options);
+        }
+
+		// method MOVE        
+        function define_MOVE_options() {
+            var options_text = "Path: <input type='text' name='path' value='" + default_webdav_path + "приклад/'><br />"
+                + "Depth: <select name='depth'>"
+                + "       	<option value='0'>0</option>"                                        
+                + "         <option value='Infinity'>Infinity</option>"							
+                + "       </select><br />"
+				+ "Destination: <input type='text' name='destination' value='" + default_webdav_path + "приклад_новий/'><br />"
+                + "Overwrite: <select name='overwrite'>"
+                + "       	<option value='true'>true</option>"                                        
+                + "         <option value='false'>false</option>"						
+                + "       </select><br />"						
+                + "Locktoken: <input type='text' name='locktoken' value=''><br />"
+				+ "Additional Headers (e.g. If-Match: 10880-22388<br />ETag: 870be-8f0-39ee6a4d):<br /><textarea name='additional_headers' cols=15 rows=2></textarea><br /><br />"
+                + "<input type='button' value='MOVE request' onClick='performs_MOVE()'/>";
+            document.getElementById("options_cell").innerHTML = options_text;
+        }
+        
+        function performs_MOVE() {
+            var path = document.getElementsByName("path")[0].value;
+            var options = {
+                depth: document.getElementsByName("depth")[0].options[document.getElementsByName("depth")[0].selectedIndex].value,
+	            destination: document.getElementsByName("destination")[0].value,
+				overwrite: document.getElementsByName("overwrite")[0].options[document.getElementsByName("overwrite")[0].selectedIndex].value == 'true',
+	            locktoken: document.getElementsByName('locktoken')[0].value,
+				additional_headers: parseHeaders(document.getElementsByName("additional_headers")[0].value)
+            };
+            webdav.MOVE(handler, path, options);
+        }
+
+		// method HEAD        
+        function define_HEAD_options() {
+            var options_text = "Path: <input type='text' name='path' value='" + default_webdav_path + "приклад.txt'/><br /><br />"
+            	+ "<input type='button' value='HEAD request' onClick='performs_HEAD()'/>";
+            document.getElementById("options_cell").innerHTML = options_text;
+        }
+        
+        function performs_HEAD() {
+            var path = document.getElementsByName('path')[0].value;
+            webdav.HEAD(handler, path);                
+        }
+
+		// method PROPPATCH        
+        function define_PROPPATCH_options() {
+            var options_text = "Path: <input type='text' name='path' value='" + default_webdav_path + "'/><br />"
+				+ "Specify properties to set (e.g. publish: true<br />author: noname):<br /><textarea name='set_properties_list' cols=15 rows=2></textarea><br /><br />"            
+                + "Specify properties to remove (comma seperated target properties e.g. 'publish, author'): <input type='text' name='remove_properties_list' value=''><br />"				
+				+ "Additional Headers (e.g. If-Match: 10880-22388<br />ETag: 870be-8f0-39ee6a4d):<br /><textarea name='additional_headers' cols=15 rows=2></textarea><br />"
+				+ "Locktoken: <input type='text' name='locktoken' value=''><br /><br />"
+                + "<input type='button' value='PROPPATCH request' onClick='performs_PROPPATCH()'/>";
+            document.getElementById("options_cell").innerHTML = options_text;
+        }
+        
+        function performs_PROPPATCH() {
+            var path = document.getElementsByName("path")[0].value;
+            var options = {
+                set_properties_list: webdav.parseHeaders(document.getElementsByName("set_properties_list")[0].value),
+                remove_properties_list: document.getElementsByName("remove_properties_list")[0].value,
+	            locktoken: document.getElementsByName('locktoken')[0].value,								
+				additional_headers: parseHeaders(document.getElementsByName("additional_headers")[0].value)
+            };
+
+            if (options.remove_properties_list) {
+                options.remove_properties_list = options.remove_properties_list.split(',');                
+            }			
+			
+            webdav.PROPPATCH(handler, path, options);
+        }
+
+		// method VERSIONCONTROL        
+        function define_VERSIONCONTROL_options() {
+            var options_text = "Path: <input type='text' name='path' value='" + default_webdav_path + "приклад/'/><br />"          
+                + "Specify href of versions (comma seperated target properties e.g. 'http://repo.webdav.org/his/12/ver/V3'): <input type='text' name='version_href_list' value=''><br />"				
+				+ "Locktoken: <input type='text' name='locktoken' value=''><br />"
+				+ "Additional Headers (e.g. If-Match: 10880-22388<br />ETag: 870be-8f0-39ee6a4d):<br /><textarea name='additional_headers' cols=15 rows=2></textarea><br /><br />"
+                + "<input type='button' value='VERSIONCONTROL request' onClick='performs_VERSIONCONTROL()'/>";
+            document.getElementById("options_cell").innerHTML = options_text;
+        }
+        
+        function performs_VERSIONCONTROL() {
+            var path = document.getElementsByName("path")[0].value;
+            var options = {
+                version_href_list: document.getElementsByName("version_href_list")[0].value,
+	            locktoken: document.getElementsByName('locktoken')[0].value,								
+				additional_headers: parseHeaders(document.getElementsByName("additional_headers")[0].value)
+            };
+
+            if (options.version_href_list) {
+                options.version_href_list = options.version_href_list.split(',');                
+            }			
+			
+            webdav.VERSIONCONTROL(handler, path, options);
+        }
+
+		// method CHECKOUT
+        function define_CHECKOUT_options() {
+            var options_text = "Path: <input type='text' name='path' value='" + default_webdav_path + "приклад/'/><br />"          			
+				+ "Locktoken: <input type='text' name='locktoken' value=''><br />"
+				+ "Additional Headers (e.g. If-Match: 10880-22388<br />ETag: 870be-8f0-39ee6a4d):<br /><textarea name='additional_headers' cols=15 rows=2></textarea><br /><br />"				
+                + "<input type='button' value='CHECKOUT request' onClick='performs_CHECKOUT()'/>";
+            document.getElementById("options_cell").innerHTML = options_text;
+        }
+        
+        function performs_CHECKOUT() {
+            var path = document.getElementsByName("path")[0].value;
+            var options = {
+	            locktoken: document.getElementsByName('locktoken')[0].value,								
+				additional_headers: parseHeaders(document.getElementsByName("additional_headers")[0].value)
+            };
+
+            if (options.version_href_list) {
+                options.version_href_list = options.version_href_list.split(',');                
+            }			
+			
+            webdav.CHECKOUT(handler, path, options);
+        }
+
+		// method CHECKIN
+        function define_CHECKIN_options() {
+            var options_text = "Path: <input type='text' name='path' value='" + default_webdav_path + "приклад/'/><br />"          			
+				+ "Locktoken: <input type='text' name='locktoken' value=''><br />"
+				+ "Additional Headers (e.g. If-Match: 10880-22388<br />ETag: 870be-8f0-39ee6a4d):<br /><textarea name='additional_headers' cols=15 rows=2></textarea><br /><br />"
+                + "<input type='button' value='CHECKIN request' onClick='performs_CHECKIN()'/>";
+            document.getElementById("options_cell").innerHTML = options_text;
+        }
+        
+        function performs_CHECKIN() {
+            var path = document.getElementsByName("path")[0].value;
+            var options = {
+	            locktoken: document.getElementsByName('locktoken')[0].value,								
+				additional_headers: parseHeaders(document.getElementsByName("additional_headers")[0].value)
+            };
+
+            if (options.version_href_list) {
+                options.version_href_list = options.version_href_list.split(',');                
+            }			
+			
+            webdav.CHECKIN(handler, path, options);
+        }
+
+		// method UNCHECKOUT
+        function define_UNCHECKOUT_options() {
+            var options_text = "Path: <input type='text' name='path' value='" + default_webdav_path + "приклад/'/><br />"          			
+				+ "Locktoken: <input type='text' name='locktoken' value=''><br />"
+				+ "Additional Headers (e.g. If-Match: 10880-22388<br />ETag: 870be-8f0-39ee6a4d):<br /><textarea name='additional_headers' cols=15 rows=2></textarea><br /><br />"
+                + "<input type='button' value='UNCHECKOUT request' onClick='performs_UNCHECKOUT()'/>";
+            document.getElementById("options_cell").innerHTML = options_text;
+        }
+        
+        function performs_UNCHECKOUT() {
+            var path = document.getElementsByName("path")[0].value;
+            var options = {
+	            locktoken: document.getElementsByName('locktoken')[0].value,								
+				additional_headers: parseHeaders(document.getElementsByName("additional_headers")[0].value)
+            };
+
+            if (options.version_href_list) {
+                options.version_href_list = options.version_href_list.split(',');                
+            }			
+			
+            webdav.UNCHECKOUT(handler, path, options);
+        }
+
+		// method REPORT        
+        function define_REPORT_options() {
+            var options_text = "Path: <input type='text' name='path' value='" + default_webdav_path + "'/><br />"
+                + "Depth: <select name='depth'>"
+                + "       	<option value='0'>0</option>"                                        
+                + "         <option value='1'>1</option>"
+                + "         <option value='Infinity'>Infinity</option>"							
+                + "       </select><br />"           
+                + "Operation: <select name='type'>"
+                + "                <option value='version-tree'>version-tree</option>"
+                + "              </select><br />"
+                + "Specified properties of version-tree (comma seperated target properties e.g. 'getetag, getlastmodified'): <input type='text' name='properties_list' value=''><br />"            
+				+ "Additional Headers (e.g. If-Match: 10880-22388<br />ETag: 870be-8f0-39ee6a4d):<br /><textarea name='additional_headers' cols=15 rows=2></textarea><br /><br />"
+                + "<input type='button' value='REPORT request' onClick='performs_REPORT()'/>";
+            document.getElementById("options_cell").innerHTML = options_text;
+        }
+        
+        function performs_REPORT() {
+            var path = document.getElementsByName("path")[0].value;
+            var options = {
+                depth: document.getElementsByName("depth")[0].options[document.getElementsByName("depth")[0].selectedIndex].value,
+                type: document.getElementsByName("type")[0].options[document.getElementsByName("type")[0].selectedIndex].value,
+                properties_list: document.getElementsByName("properties_list")[0].value,
+				additional_headers: parseHeaders(document.getElementsByName("additional_headers")[0].value)
+            };
+            if (options.properties_list) {
+                options.properties_list = options.properties_list.split(',');                
+            }
+            webdav.REPORT(handler, path, options);
+        }
+
+		// method ORDERPATCH        
+        function define_ORDERPATCH_options() {
+			var default_ordering_type_href = 'http://' + document.getElementById('webdav_host').value + ':' + document.getElementById('webdav_port').value + default_webdav_path;
+            var options_text = "Path: <input type='text' name='path' value='" + default_webdav_path + "'/><br />"
+				+ "HREF for ordering-type property (e.g. http://example.com/col/example.txt): <input type='text' name='ordering_type_href' value='" + default_ordering_type_href + "'/><br />";
+			for (var i = 0; i < 3; i++) {
+                options_text += "Order member " + i + ":<br />"
+					+ "	&nbsp; segment name = <input type='text' name='order_member_segment" + i + "'/><br />"
+					+ "	&nbsp; position = <select name='order_member_position" + i + "'>"
+	                + "       	<option value='first'>first</option>"
+	                + "         <option value='last'>last</option>"
+	                + "       	<option value='before'>before</option>"
+	                + "         <option value='after'>after</option>"					
+	                + "       </select><br />"
+					+ "	&nbsp; parent segment name (if position is 'before' or 'after') = <input type='text' name='order_member_parent_segment" + i + "'/><br /><br />";				
+			}
+			options_text += "Locktoken: <input type='text' name='locktoken' value=''><br />"            
+				+ "Additional Headers (e.g. If-Match: 10880-22388<br />ETag: 870be-8f0-39ee6a4d):<br /><textarea name='additional_headers' cols=15 rows=2></textarea><br /><br />"
+                + "<input type='button' value='ORDERPATCH request' onClick='performs_ORDERPATCH()'/>";
+            document.getElementById("options_cell").innerHTML = options_text;
+        }
+        
+        function performs_ORDERPATCH() {
+            var path = document.getElementsByName("path")[0].value;
+            var options = {
+	            ordering_type_href: document.getElementsByName('ordering_type_href')[0].value,
+				order_members: new Array(),				
+	            locktoken: document.getElementsByName('locktoken')[0].value,
+				additional_headers: parseHeaders(document.getElementsByName("additional_headers")[0].value)
+            };
+			for (var i = 0; i < 3; i++) {
+				if (document.getElementsByName('order_member_segment' + i)[0].value) {
+					options.order_members.push({segment: document.getElementsByName('order_member_segment' + i)[0].value,
+												position: document.getElementsByName('order_member_position' + i)[0].options[document.getElementsByName('order_member_position' + i)[0].selectedIndex].value,
+												parent_segment: document.getElementsByName('order_member_parent_segment' + i)[0].value});
+				}
+			}
+			
+            webdav.ORDERPATCH(handler, path, options);
+        }
+
+		// method SEARCH        
+        function define_SEARCH_options() {
+            var options_text = "Path: <input type='text' name='path' value='" + default_webdav_path + "'/><br />"
+                + "Search language: <select name='search_language'>"
+                + "       				<option value='sql'>sql</option>"                                        
+                + " 			        <option value='xpath'>xpath</option>"						
+                + "       			</select><br />"           
+				+ "Search request :<br /><textarea name='search_request' cols=15 rows=7></textarea><br />"            
+				+ "Additional Headers (e.g. If-Match: 10880-22388<br />ETag: 870be-8f0-39ee6a4d):<br /><textarea name='additional_headers' cols=15 rows=2></textarea><br /><br />"
+                + "<input type='button' value='SEARCH request' onClick='performs_SEARCH()'/>";
+            document.getElementById("options_cell").innerHTML = options_text;
+        }
+        
+        function performs_SEARCH() {
+            var path = document.getElementsByName("path")[0].value;
+            var options = {
+                search_language: document.getElementsByName("search_language")[0].options[document.getElementsByName("search_language")[0].selectedIndex].value,
+                search_request: document.getElementsByName("search_request")[0].value,
+				additional_headers: parseHeaders(document.getElementsByName("additional_headers")[0].value)
+            };
+			
+            webdav.SEARCH(handler, path, options);
+        }
+
+		// user-defined ExrensionMethod         
+        function define_ExtensionMethod_options() {
+            var options_text = "Path: <input type='text' name='path' value='" + default_webdav_path + "'/><br />"
+                + "Request Method name (e.g. 'PUT'): <input type='text' name='method'/><br />"                      
+				+ "Request Headers (e.g. Content-Type: text/plain, charset=UTF-8<br />ETag: 870be-8f0-39ee6a4d):<br /><textarea name='headers' cols=15 rows=3></textarea><br /><br />"
+				+ "Request Body (e.g. 'some content'):<br /><textarea name='body' cols=15 rows=7></textarea><br />"
+                + "<input type='button' value='ExtensionMethod request' onClick='performs_ExtensionMethod()'/>";
+            document.getElementById("options_cell").innerHTML = options_text;
+        }
+        
+        function performs_ExtensionMethod() {
+            var path = document.getElementsByName("path")[0].value;
+            var options = {
+                method: document.getElementsByName("method")[0].value,
+                body: document.getElementsByName("body")[0].value,
+				headers: parseHeaders(document.getElementsByName("headers")[0].value)
+            };
+			
+            webdav.ExtensionMethod(handler, path, options);
+        }
+		
+		</script>	
+		<body>
+	        <b>Demonstration of the eXo Platform WebDAV gadget</b><hr />
+			<table border="0" style="font-size: 9pt;">
+	            <tr>
+	                <td>
+						host = <input type="text" id="webdav_host" value="127.0.0.1"/>
+						<br />port = <input type="text" id="webdav_port" value="8080"/>
+	                	<br />username = <input type="text" id="webdav_username" value="root"/>
+						<br />password = <input type="text" id="webdav_password" value="exo"/>
+					</td>
+	            </tr>
+	            <tr>
+	                <td>
+						Select the WebDAV method to perform:<br />
+	                    <select id="webdav_method" onchange="perform_method(this);" onclick="perform_method(this);">
+	                        <option value="ExtensionMethod">ExtensionMethod</option>
+	                        <option>---- Modifications to HTTP:</option>
+	                        <option value="PUT">PUT</option>
+	                        <option value="GET">GET</option>
+	                        <option value="DELETE">DELETE</option>
+	                        <option value="OPTIONS">OPTIONS</option>						
+	                        <option value="MKCOL">MKCOL</option>
+	                        <option value="COPY">COPY</option>
+	                        <option value="MOVE">MOVE</option>												
+	                        <option value="HEAD">HEAD</option>
+	                        <option>---- Property Operations:</option>
+	                        <option value="PROPFIND">PROPFIND</option>
+	                        <option value="PROPPATCH">PROPPATCH</option>						
+	                        <option>---- Lock Operations:</option>                        
+							<option value="LOCK">LOCK</option>
+	                        <option value="UNLOCK">UNLOCK</option>
+	                        <option>---- Versioning Extensions:</option>                        
+							<option value="VERSIONCONTROL">VERSIONCONTROL</option>											
+							<option value="CHECKOUT">CHECKOUT</option>
+							<option value="CHECKIN">CHECKIN</option>
+							<option value="UNCHECKOUT">UNCHECKOUT</option>
+							<option value="REPORT">REPORT</option>
+							<option value="ORDERPATCH">ORDERPATCH</option>
+							<option>---- Search Operation:</option>
+							<option value="SEARCH">SEARCH</option>				
+	                    </select>
+	                </td>
+	            </tr>
+	        </table>
+			<div style="overflow : auto; height: 350px; width: 100%;">
+		        <table border='1' width=100%>
+		            <tr style="font-size: 9pt;">
+		                <td width="30%" align="center"><i>Options of method</i></td>
+		                <td width="70%" align="center"><i>Response</i></td>        
+		            </tr>
+		            <tr style="font-size: 9pt;">
+		                <td width="30%" id="options_cell" valign="top">&nbsp;</td>
+		                <td width="70%" id="results_cell" valign="top">&nbsp;</td>
+		            </tr>
+		        </table>
+			</div>
+		</body>
+	]]>
+	</Content>
+</Module>
