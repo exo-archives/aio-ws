@@ -25,50 +25,50 @@
  * @param {String} port - port where the WebDAV folder is, e.g. 8080
  */
 function Webdav(host, port) {
-	if (port) {
-		port = ':' + port
-	}
-	/**
-	 * url
-	 */
-	this.url = 'http://' + host + port;
-	this.request = null;
-	
-	/**
-	 * mode of request processing: if asynchronous = true then 'mode of processing = asynchronous', else : 'synchronous'.
-	 */ 
-	this.asynchronous = true;
-	
-	/**
-	 * username which will be used in the header 'Authorization' of XMLHttp request
-	 */
-	this.username = '';
-	
-	/**
-	 * password which will be used in the header 'Authorization' of XMLHttp request if username would not be empty 
-	 */
-	this.password = '';
+    if (port) {
+        port = ':' + port
+    }
+    /**
+     * url
+     */
+    this.url = 'http://' + host + port;
+    this.request = null;
+    
+    /**
+     * mode of request processing: if asynchronous = true then 'mode of processing = asynchronous', else : 'synchronous'.
+     */ 
+    this.asynchronous = true;
+    
+    /**
+     * username which will be used in the header 'Authorization' of XMLHttp request
+     */
+    this.username = '';
+    
+    /**
+     * password which will be used in the header 'Authorization' of XMLHttp request if username would not be empty 
+     */
+    this.password = '';
 }
 
 /**
  * set synchronous mode of XMLHttp interchange
  */
 Webdav.prototype.setSynchronous = function() {
-	this.asynchronous = false;
+    this.asynchronous = false;
 }
 
 /**
  * defines if this mode of XMLHttp interchange is asynchronous
  */
 Webdav.prototype.isAsynchronous = function() {
-	return this.asynchronous;
+    return this.asynchronous;
 }
 
 /**
  * sets an asynchronous mode of XMLHttp interchange
  */
 Webdav.prototype.setAsynchronous = function () {
-	this.asynchronous = true;
+    this.asynchronous = true;
 }
 
 /**
@@ -76,23 +76,23 @@ Webdav.prototype.setAsynchronous = function () {
  * @private
  */
 Webdav.prototype.getRequest = function () {
-	// define the Ajax library 
-	try {
-	 	// Firefox, Opera 8.0+, Safari
-	 	return new XMLHttpRequest();
-	}
-	catch (e) {
-	 	//Internet Explorer
-	 	try {
-	  		return new ActiveXObject("Msxml2.XMLHTTP");
-	  	}
-	 	catch (e) {
-	  		return new ActiveXObject("Microsoft.XMLHTTP");
-	  	}
-	}
-	
-	alert ("Browser does not support HTTP Request");
-	return null;
+    // define the Ajax library 
+    try {
+         // Firefox, Opera 8.0+, Safari
+         return new XMLHttpRequest();
+    }
+    catch (e) {
+         //Internet Explorer
+         try {
+              return new ActiveXObject("Msxml2.XMLHTTP");
+          }
+         catch (e) {
+              return new ActiveXObject("Microsoft.XMLHTTP");
+          }
+    }
+    
+    alert ("Browser does not support HTTP Request");
+    return null;
 }
 
 /**
@@ -106,31 +106,31 @@ Webdav.prototype.getRequest = function () {
  */
 Webdav.prototype.openRequest = function(handler, method, path, additionalHeaders) {
     var request = this.getRequest();
-	if (request === null) {
-		return null;
-	}
+    if (request === null) {
+        return null;
+    }
 
-   	/* prepare a request */
+       /* prepare a request */
     request.onreadystatechange = this.wrapperHandler(handler, request);
-	var url = encodeURI(this.url + path);
+    var url = encodeURI(this.url + path);
 
-	request.open(method, url, this.asynchronous);
+    request.open(method, url, this.asynchronous);
 
     // refuse all encoding, since the browsers don't seem to support it...
     request.setRequestHeader('Accept-Encoding', ' ');
 
-	// set header for authorization
-	if (this.username) {
-		var auth = make_base_auth(this.username, this.password);
-		request.setRequestHeader('Authorization', auth);
-	}
-	
-	// set additional request headers
-	if ( additionalHeaders ) {
-		this.setAdditionalHeaders(request, additionalHeaders);
-	}
+    // set header for authorization
+    if (this.username) {
+        var auth = make_base_auth(this.username, this.password);
+        request.setRequestHeader('Authorization', auth);
+    }
+    
+    // set additional request headers
+    if ( additionalHeaders ) {
+        this.setAdditionalHeaders(request, additionalHeaders);
+    }
 
-	return request;
+    return request;
 }
 
 /**
@@ -146,25 +146,25 @@ Webdav.prototype.openRequest = function(handler, method, path, additionalHeaders
 Webdav.prototype.wrapperHandler = function(handler, request) {
     var self = this;
     function Handler() {
-		handler = {
-			onSuccess: handler.onSuccess || function(){},
-			onError: handler.onError || function(){},
-			onComplete: handler.onComplete || function(){}
-		}
+        handler = {
+            onSuccess: handler.onSuccess || function(){},
+            onError: handler.onError || function(){},
+            onComplete: handler.onComplete || function(){}
+        }
         this.execute = function() {
             if (request.readyState == 4) {
-				var result = self.parseResponse(request);
-				request = null;
-				
-				// Check to see if the request was successful
-				if ( self.isSuccess(result.status) ) {
-					handler.onSuccess.call('', result);
-				} else {
-					handler.onError.call('', result);
-				}
+                var result = self.parseResponse(request);
+                request = null;
                 
-				// Call the completion callback
-				handler.onComplete.call('', result);
+                // Check to see if the request was successful
+                if ( self.isSuccess(result.status) ) {
+                    handler.onSuccess.call('', result);
+                } else {
+                    handler.onError.call('', result);
+                }
+                
+                // Call the completion callback
+                handler.onComplete.call('', result);
             };
         };
     };
@@ -183,23 +183,23 @@ Webdav.prototype.wrapperHandler = function(handler, request) {
  * <br />- {String} <b>result.content</b> = XMLHttp response.responseText otherwise
  */
 Webdav.prototype.parseResponse = function(request){
-	// define source of response content
-	if ( request.getResponseHeader("content-type") &&
-			request.getResponseHeader("content-type").indexOf("xml") >= 0 )
-	{
-		var content = request.responseXML;					
-	} else {
-		var content = request.responseText;					
-	}
-	
-	var result = {
-		status: request.status,
-		statusstring: this.STATUS_CODES[request.status.toString()],
-		headers: this.parseHeaders(request.getAllResponseHeaders()),
-		content: content
-	};
-	
-	return result; 
+    // define source of response content
+    if ( request.getResponseHeader("content-type") &&
+            request.getResponseHeader("content-type").indexOf("xml") >= 0 )
+    {
+        var content = request.responseXML;                    
+    } else {
+        var content = request.responseText;                    
+    }
+    
+    var result = {
+        status: request.status,
+        statusstring: this.STATUS_CODES[request.status.toString()],
+        headers: this.parseHeaders(request.getAllResponseHeaders()),
+        content: content
+    };
+    
+    return result; 
 }
 
 /**
@@ -209,25 +209,25 @@ Webdav.prototype.parseResponse = function(request){
  * @return {Object} hash of Headers (e.g. header "Content-Type: test/plain" => headers['Content-Type'] = 'test/plain')
  */
 Webdav.prototype.parseHeaders = function(headers) {
-	var headerPattern = /([^:]+):.(.+)/;
-	var lines = headers.split('\n');
+    var headerPattern = /([^:]+):.(.+)/;
+    var lines = headers.split('\n');
     var hash = {}; 
-	var name = ''; 
-	var value = '';
+    var name = ''; 
+    var value = '';
 
     for (var i = 0; i < lines.length; i++) {
         var header = lines[i].match(headerPattern);
-		if ( header != null && 
-				typeof(header[1]) != 'undefined') 
-		{
-			name = header[1];
-			if (typeof(header[2]) != 'undefined') {
-				value = header[2];
-			} else {
-				value = '';
-			}
-    	    hash[name] = value;
-		}
+        if ( header != null && 
+                typeof(header[1]) != 'undefined') 
+        {
+            name = header[1];
+            if (typeof(header[2]) != 'undefined') {
+                value = header[2];
+            } else {
+                value = '';
+            }
+            hash[name] = value;
+        }
     };
     
     return hash;
@@ -243,7 +243,7 @@ Webdav.prototype.setAdditionalHeaders = function (request, additionalHeaders) {
     for( var headerName in additionalHeaders ) {
         if (!additionalHeaders.hasOwnProperty(headerName)) continue;
         var headerValue = additionalHeaders[headerName];
-		request.setRequestHeader(headerName, headerValue);
+        request.setRequestHeader(headerName, headerValue);
     }
 }
 
@@ -254,8 +254,8 @@ Webdav.prototype.setAdditionalHeaders = function (request, additionalHeaders) {
  * @return {Boolean} True if response is success, or False otherwise 
  */
 Webdav.prototype.isSuccess = function(status){
-	return (status >= 200 && status < 300 ) ||
-				  status == 304;
+    return (status >= 200 && status < 300 ) ||
+                  status == 304;
 }
 
 /**
@@ -485,22 +485,22 @@ var Base64 = {
  * <br />- {String} <b>result.content</b> = XMLHttp response.responseText otherwise 
  */
 Webdav.prototype.ExtensionMethod = function (handler, path, options) {
-	if (typeof(options) == 'undefined' || ! options.method ) return;
-	
-	var options = {
-			method: options.method,
-			headers: options.headers || {},
-			body: options.body || ''			
-		};
-	
-	var request = this.openRequest(handler, options.method, path, options.headers);
-	request.send( options.body );
+    if (typeof(options) == 'undefined' || ! options.method ) return;
+    
+    var options = {
+            method: options.method,
+            headers: options.headers || {},
+            body: options.body || ''            
+        };
+    
+    var request = this.openRequest(handler, options.method, path, options.headers);
+    request.send( options.body );
 
-	if ( ! this.isAsynchronous() ) {	
-		var result = this.parseResponse(request);
-		request = null;
-		return result;
-	}
+    if ( ! this.isAsynchronous() ) {    
+        var result = this.parseResponse(request);
+        request = null;
+        return result;
+    }
 }
 
 
@@ -522,20 +522,20 @@ Webdav.prototype.ExtensionMethod = function (handler, path, options) {
  * <br />- {Object} <b>result.content</b> = XMLHttp response.responseXML if header['Content-Type'] consists 'xml'
  * <br />- {String} <b>result.content</b> = XMLHttp response.responseText otherwise */
 Webdav.prototype.GET = function(handler, path, options) {
-	if (typeof(options) == 'undefined') options = {};
+    if (typeof(options) == 'undefined') options = {};
 
-	var options = { 
-		additional_headers: options.additional_headers || {}
-	};
-	
+    var options = { 
+        additional_headers: options.additional_headers || {}
+    };
+    
     var request = this.openRequest(handler, 'GET', path || '', options.additional_headers);
-	request.send('');
+    request.send(null);
 
-	if ( ! this.isAsynchronous() ) {	
-		var result = this.parseResponse(request);
-		request = null;
-		return result;
-	}
+    if ( ! this.isAsynchronous() ) {    
+        var result = this.parseResponse(request);
+        request = null;
+        return result;
+    }
 };
 
 /**
@@ -558,27 +558,27 @@ Webdav.prototype.GET = function(handler, path, options) {
  * <br />- {String} <b>result.content</b> = XMLHttp response.responseText otherwise 
  */
 Webdav.prototype.PUT = function(handler, path, options) {
-	if (typeof(options) == 'undefined') options = {};
+    if (typeof(options) == 'undefined') options = {};
 
-	var options = {
-			content: options.content || '',
-			content_type: options.content_type || 'text/plain; charset=UTF-8',
-			locktoken: options.locktoken || '',
-			additional_headers: options.additional_headers || '' 						
-		};
+    var options = {
+            content: options.content || '',
+            content_type: options.content_type || 'text/plain; charset=UTF-8',
+            locktoken: options.locktoken || '',
+            additional_headers: options.additional_headers || ''                         
+        };
 
     var request = this.openRequest(handler, 'PUT', path || '', options.additional_headers);
-    request.setRequestHeader("Content-type", options.content_type);	
+    request.setRequestHeader("Content-type", options.content_type);    
     if (options.locktoken) {
         request.setRequestHeader('If', '(<' + options.locktoken + '>)');
     };
     request.send(options.content);
 
-	if ( ! this.isAsynchronous() ) {	
-		var result = this.parseResponse(request);
-		request = null;
-		return result;
-	}
+    if ( ! this.isAsynchronous() ) {    
+        var result = this.parseResponse(request);
+        request = null;
+        return result;
+    }
 };
 
 /**
@@ -598,24 +598,24 @@ Webdav.prototype.PUT = function(handler, path, options) {
  * <br />- {Object} <b>result.content</b> = XMLHttp response.responseXML if header['Content-Type'] consists 'xml'
  * <br />- {String} <b>result.content</b> = XMLHttp response.responseText otherwise */
 Webdav.prototype.DELETE = function(handler, path, options) {
-	if (typeof(options) == 'undefined') options = {};
+    if (typeof(options) == 'undefined') options = {};
 
-	var options = { 
-		locktoken: options.locktoken || '',
-		additional_headers: options.additional_headers || {}
-	};
+    var options = { 
+        locktoken: options.locktoken || '',
+        additional_headers: options.additional_headers || {}
+    };
 
     var request = this.openRequest(handler, 'DELETE', path || '', options.additional_headers);
     if (options.locktoken) {
         request.setRequestHeader('If', '(<' + options.locktoken + '>)');
     };
-	request.send('');
+    request.send(null);
 
-	if ( ! this.isAsynchronous() ) {	
-		var result = this.parseResponse(request);
-		request = null;
-		return result;
-	}
+    if ( ! this.isAsynchronous() ) {    
+        var result = this.parseResponse(request);
+        request = null;
+        return result;
+    }
 };
 
 /**
@@ -636,20 +636,20 @@ Webdav.prototype.DELETE = function(handler, path, options) {
  * <br />- {String} b>result.content</b> = XMLHttp response.responseText otherwise 
 */
 Webdav.prototype.OPTIONS = function(handler, path, options) {
-	if (typeof(options) == 'undefined') options = {};
+    if (typeof(options) == 'undefined') options = {};
 
-	var options = { 
-		additional_headers: options.additional_headers || {}
-	};
+    var options = { 
+        additional_headers: options.additional_headers || {}
+    };
 
     var request = this.openRequest(handler, 'OPTIONS', path || '', options.additional_headers);
-    request.send('');
+    request.send(null);
 
-	if ( ! this.isAsynchronous() ) {	
-		var result = this.parseResponse(request);
-		request = null;
-		return result;
-	}
+    if ( ! this.isAsynchronous() ) {    
+        var result = this.parseResponse(request);
+        request = null;
+        return result;
+    }
 };
 
 /**
@@ -670,25 +670,25 @@ Webdav.prototype.OPTIONS = function(handler, path, options) {
  * <br />- {String} <b>result.content</b> = XMLHttp response.responseText otherwise 
  */
 Webdav.prototype.MKCOL = function(handler, path, options) {
-	if (typeof(options) == 'undefined') options = {};
-	
-	var options = { 
-		locktoken: options.locktoken || '',
-		additional_headers: options.additional_headers || {}
-	};
+    if (typeof(options) == 'undefined') options = {};
+    
+    var options = { 
+        locktoken: options.locktoken || '',
+        additional_headers: options.additional_headers || {}
+    };
 
 
-	var request = this.openRequest(handler, 'MKCOL', path || '', options.additional_headers);
+    var request = this.openRequest(handler, 'MKCOL', path || '', options.additional_headers);
     if (options.locktoken) {
         request.setRequestHeader('If', '(<' + options.locktoken + '>)');
     };
-	request.send('');
+    request.send(null);
 
-	if ( ! this.isAsynchronous() ) {	
-		var result = this.parseResponse(request);
-		request = null;
-		return result;
-	} 
+    if ( ! this.isAsynchronous() ) {    
+        var result = this.parseResponse(request);
+        request = null;
+        return result;
+    } 
 }
 
 /**
@@ -711,34 +711,34 @@ Webdav.prototype.MKCOL = function(handler, path, options) {
  * <br />- {Object} <b>result.content</b> = XMLHttp response.responseXML if header['Content-Type'] consists 'xml'
  * <br />- {String} <b>result.content</b> = XMLHttp response.responseText otherwise */
 Webdav.prototype.COPY = function(handler, path, options) {
-	if (typeof(options) == 'undefined') options = {};
+    if (typeof(options) == 'undefined') options = {};
 
-	var options = {
-			depth: options.depth,
-			destination: options.destination || '',
-			overwrite: ! options.hasOwnProperty('overwrite') || options.overwrite,
-			locktoken: options.locktoken || '',
-			additional_headers: options.additional_headers || {}			
-		};
-		
+    var options = {
+            depth: options.depth,
+            destination: options.destination || '',
+            overwrite: ! options.hasOwnProperty('overwrite') || options.overwrite,
+            locktoken: options.locktoken || '',
+            additional_headers: options.additional_headers || {}            
+        };
+        
     var request = this.openRequest(handler, 'COPY', path || '', options.additional_headers);
     if ( typeof(options.depth) != 'undefined' ) request.setRequestHeader('Depth', options.depth);
-	request.setRequestHeader('Destination', encodeURI(this.url + options.destination));
+    request.setRequestHeader('Destination', encodeURI(this.url + options.destination));
     if (options.overwrite) {
         request.setRequestHeader('Overwrite', 'T');
     } else {
-        request.setRequestHeader('Overwrite', 'F');		
-	};
+        request.setRequestHeader('Overwrite', 'F');        
+    };
     if (options.locktoken) {
         request.setRequestHeader('If', '<' + options.locktoken + '>');
     };
-	request.send('');
+    request.send(null);
 
-	if ( ! this.isAsynchronous() ) {	
-		var result = this.parseResponse(request);
-		request = null;
-		return result;
-	}
+    if ( ! this.isAsynchronous() ) {    
+        var result = this.parseResponse(request);
+        request = null;
+        return result;
+    }
 };
 
 /**
@@ -761,34 +761,34 @@ Webdav.prototype.COPY = function(handler, path, options) {
  * <br />- {Object} <b>result.content</b> = XMLHttp response.responseXML if header['Content-Type'] consists 'xml'
  * <br />- {String} <b>result.content</b> = XMLHttp response.responseText otherwise */
 Webdav.prototype.MOVE = function(handler, path, options) {
-	if (typeof(options) == 'undefined') options = {};
-	
-	var options = {
-			depth: options.depth,
-			destination: options.destination || '',
-			overwrite: ! options.hasOwnProperty('overwrite') || options.overwrite,
-			locktoken: options.locktoken || '',
-			additional_headers: options.additional_headers || {}			
-		};
-		
+    if (typeof(options) == 'undefined') options = {};
+    
+    var options = {
+            depth: options.depth,
+            destination: options.destination || '',
+            overwrite: ! options.hasOwnProperty('overwrite') || options.overwrite,
+            locktoken: options.locktoken || '',
+            additional_headers: options.additional_headers || {}            
+        };
+        
     var request = this.openRequest(handler, 'MOVE', path || '', options.additional_headers);
     if ( typeof(options.depth) != 'undefined' ) request.setRequestHeader('Depth', options.depth);
-	request.setRequestHeader('Destination', encodeURI(this.url + options.destination));
+    request.setRequestHeader('Destination', encodeURI(this.url + options.destination));
     if (options.overwrite) {
         request.setRequestHeader('Overwrite', 'T');
     } else {
-        request.setRequestHeader('Overwrite', 'F');		
-	};
+        request.setRequestHeader('Overwrite', 'F');        
+    };
     if (options.locktoken) {
         request.setRequestHeader('If', '<' + options.locktoken + '>');
     };
-	request.send('');
+    request.send(null);
 
-	if ( ! this.isAsynchronous() ) {	
-		var result = this.parseResponse(request);
-		request = null;
-		return result;
-	}
+    if ( ! this.isAsynchronous() ) {    
+        var result = this.parseResponse(request);
+        request = null;
+        return result;
+    }
 };
 
 /**
@@ -807,20 +807,20 @@ Webdav.prototype.MOVE = function(handler, path, options) {
  * <br />- {Object} <b>result.content</b> = XMLHttp response.responseXML if header['Content-Type'] consists 'xml'
  * <br />- {String} <b>result.content</b> = XMLHttp response.responseText otherwise */
 Webdav.prototype.HEAD = function(handler, path, options) {
-	if (typeof(options) == 'undefined') options = {};
+    if (typeof(options) == 'undefined') options = {};
 
-	var options = { 
-		additional_headers: options.additional_headers || {}
-	};
-	
+    var options = { 
+        additional_headers: options.additional_headers || {}
+    };
+    
     var request = this.openRequest(handler, 'HEAD', path || '', options.additional_headers);
-	request.send('');
+    request.send(null);
 
-	if ( ! this.isAsynchronous() ) {	
-		var result = this.parseResponse(request);
-		request = null;
-		return result;
-	}
+    if ( ! this.isAsynchronous() ) {    
+        var result = this.parseResponse(request);
+        request = null;
+        return result;
+    }
 };
 
 // -------- WebDAV Property Operations --------
@@ -845,50 +845,50 @@ Webdav.prototype.HEAD = function(handler, path, options) {
  * <br />- {String} <b>result.content</b> = XMLHttp response.responseText otherwise 
  */
 Webdav.prototype.PROPFIND = function (handler, path, options) {
-	if (typeof(options) == 'undefined') options = {};
+    if (typeof(options) == 'undefined') options = {};
 
-	var options = {
-			depth: options.depth,
-			operation: options.operation || 'allprop',
-			properties_list: options.properties_list || new Array(),
-			additional_headers: options.additional_headers || {}			
-		};
-	
-	var request = this.openRequest(handler, 'PROPFIND', path, options.additional_headers);
-	
-	var xml = '<?xml version="1.0" encoding="UTF-8" ?>\n';
-	switch(options.operation) {
-	case 'propname':
-		xml += '<propfind xmlns="DAV:">\n';
-	    xml += '	<propname/>\n';
+    var options = {
+            depth: options.depth,
+            operation: options.operation || 'allprop',
+            properties_list: options.properties_list || new Array(),
+            additional_headers: options.additional_headers || {}            
+        };
+    
+    var request = this.openRequest(handler, 'PROPFIND', path, options.additional_headers);
+    
+    var xml = '<?xml version="1.0" encoding="UTF-8" ?>\n';
+    switch(options.operation) {
+    case 'propname':
+        xml += '<propfind xmlns="DAV:">\n';
+        xml += '    <propname/>\n';
         xml += '</propfind>\n';
-		break;
-	case 'properties_list':
-		xml += '<D:propfind xmlns:D="DAV:">\n';
-		xml += '	<D:prop>\n';
-		for (var i = 0; i < options.properties_list.length; i++) {
-			xml += '<D:' + options.properties_list[i].replace(/\s/g, "") + '/>\n';
-		}
-		xml += '	</D:prop>\n';
+        break;
+    case 'properties_list':
+        xml += '<D:propfind xmlns:D="DAV:">\n';
+        xml += '    <D:prop>\n';
+        for (var i = 0; i < options.properties_list.length; i++) {
+            xml += '<D:' + options.properties_list[i].replace(/\s/g, "") + '/>\n';
+        }
+        xml += '    </D:prop>\n';
         xml += '</D:propfind>\n';
-		break;
-	case 'allprop':
-	default:
-		xml += '<D:propfind xmlns:D="DAV:">\n';
-	    xml += '	<D:allprop/>\n';
+        break;
+    case 'allprop':
+    default:
+        xml += '<D:propfind xmlns:D="DAV:">\n';
+        xml += '    <D:allprop/>\n';
         xml += '</D:propfind>\n';
-		break;
-	}
+        break;
+    }
 
     if ( typeof(options.depth) != 'undefined' ) request.setRequestHeader('Depth', options.depth);
     request.setRequestHeader('Content-type', 'text/xml; charset=UTF-8');
-	request.send( xml );
+    request.send( xml );
 
-	if ( ! this.isAsynchronous() ) {	
-		var result = this.parseResponse(request);
-		request = null;
-		return result;
-	}
+    if ( ! this.isAsynchronous() ) {    
+        var result = this.parseResponse(request);
+        request = null;
+        return result;
+    }
 }
 
 /**
@@ -911,41 +911,41 @@ Webdav.prototype.PROPFIND = function (handler, path, options) {
  * <br />- {String} <b>result.content</b> = XMLHttp response.responseText otherwise 
  */
 Webdav.prototype.PROPPATCH = function (handler, path, options) {
-	if (typeof(options) == 'undefined') options = {};
+    if (typeof(options) == 'undefined') options = {};
 
-	var options = {
-			set_properties_list: options.set_properties_list || {},
-			remove_properties_list: options.remove_properties_list || new Array(),
-			locktoken: options.locktoken || '',			
-			additional_headers: options.additional_headers || {}			
-		};
-	
-	var request = this.openRequest(handler, 'PROPPATCH', path, options.additional_headers);
-	
-	var xml = '<?xml version="1.0" encoding="UTF-8" ?>\n';
-	xml += '<D:propertyupdate xmlns:D="DAV:">\n';
-	
-	// properties to set
-	xml += '	<D:set>\n';
-	xml += '		<D:prop>\n';
+    var options = {
+            set_properties_list: options.set_properties_list || {},
+            remove_properties_list: options.remove_properties_list || new Array(),
+            locktoken: options.locktoken || '',            
+            additional_headers: options.additional_headers || {}            
+        };
+    
+    var request = this.openRequest(handler, 'PROPPATCH', path, options.additional_headers);
+    
+    var xml = '<?xml version="1.0" encoding="UTF-8" ?>\n';
+    xml += '<D:propertyupdate xmlns:D="DAV:">\n';
+    
+    // properties to set
+    xml += '    <D:set>\n';
+    xml += '        <D:prop>\n';
     for( var propName in options.set_properties_list ) {
         if (!options.set_properties_list.hasOwnProperty(propName)) continue;
         var propValue = options.set_properties_list[propName];
-		xml += '			<D:' + propName.replace(/\s/g, "") + '>\n';
-		xml += '				' + propValue + '\n';
-		xml += '			</D:' + propName.replace(/\s/g, "") + '>\n';
+        xml += '            <D:' + propName.replace(/\s/g, "") + '>\n';
+        xml += '                ' + propValue + '\n';
+        xml += '            </D:' + propName.replace(/\s/g, "") + '>\n';
     }
-	xml += '		</D:prop>\n';
-	xml += '	</D:set>\n';
+    xml += '        </D:prop>\n';
+    xml += '    </D:set>\n';
 
-	// properties to remove	
-	xml += '	<D:remove>\n';
-	xml += '		<D:prop>\n';
-	for (var i = 0; i < options.remove_properties_list.length; i++) {
-		xml += '<D:' + options.remove_properties_list[i].replace(/\s/g, "") + '/>\n';
-	}
-	xml += '		</D:prop>\n';
-	xml += '	</D:remove>\n';			
+    // properties to remove    
+    xml += '    <D:remove>\n';
+    xml += '        <D:prop>\n';
+    for (var i = 0; i < options.remove_properties_list.length; i++) {
+        xml += '<D:' + options.remove_properties_list[i].replace(/\s/g, "") + '/>\n';
+    }
+    xml += '        </D:prop>\n';
+    xml += '    </D:remove>\n';            
 
     xml += '</D:propertyupdate>\n';
 
@@ -955,13 +955,13 @@ Webdav.prototype.PROPPATCH = function (handler, path, options) {
         request.setRequestHeader('If', '<' + options.locktoken + '>');
     };
 
-	request.send( xml );
+    request.send( xml );
 
-	if ( ! this.isAsynchronous() ) {	
-		var result = this.parseResponse(request);
-		request = null;
-		return result;
-	}
+    if ( ! this.isAsynchronous() ) {    
+        var result = this.parseResponse(request);
+        request = null;
+        return result;
+    }
 }
 
 
@@ -989,15 +989,15 @@ Webdav.prototype.PROPPATCH = function (handler, path, options) {
  * <br />- {String} <b>result.content</b> = XMLHttp response.responseText otherwise 
  */
 Webdav.prototype.LOCK = function (handler, path, options) {
-	if (typeof(options) == 'undefined') options = {};
+    if (typeof(options) == 'undefined') options = {};
 
-	var options = {
+    var options = {
             owner: options.owner || '',
             scope: options.scope || 'exclusive',
             depth: options.depth,
-			locktoken: options.locktoken || '',
-			additional_headers: options.additional_headers || {}			
-		};
+            locktoken: options.locktoken || '',
+            additional_headers: options.additional_headers || {}            
+        };
 
     if (!options.timeout) {
         options.timeout = "Infinite, Second-60480000";
@@ -1005,19 +1005,19 @@ Webdav.prototype.LOCK = function (handler, path, options) {
         options.timeout = 'Second-' + options.timeout;
     }
 
-	var request = this.openRequest(handler, 'LOCK', path, options.additional_headers);
+    var request = this.openRequest(handler, 'LOCK', path, options.additional_headers);
 
-	var xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
-		+ '<D:lockinfo xmlns:D="DAV:">\n'
-        + '	<D:lockscope><D:' + options.scope + ' /></D:lockscope>\n'
-        + '	<D:locktype><D:write/></D:locktype>\n'
-        + '	<D:owner>\n'
-		+ '		<D:href>\n' 
-        +   		encodeURI(options.owner) + '\n' 
-        + '		</D:href>\n'
-		+ '	</D:owner>\n'
+    var xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+        + '<D:lockinfo xmlns:D="DAV:">\n'
+        + '    <D:lockscope><D:' + options.scope + ' /></D:lockscope>\n'
+        + '    <D:locktype><D:write/></D:locktype>\n'
+        + '    <D:owner>\n'
+        + '        <D:href>\n' 
+        +           encodeURI(options.owner) + '\n' 
+        + '        </D:href>\n'
+        + '    </D:owner>\n'
         + '</D:lockinfo>\n';
-	
+    
     if ( typeof(options.depth) != 'undefined' ) request.setRequestHeader('Depth', options.depth);
     request.setRequestHeader('Content-type', 'text/xml; charset=UTF-8');
     request.setRequestHeader('Timeout', options.timeout);
@@ -1026,13 +1026,13 @@ Webdav.prototype.LOCK = function (handler, path, options) {
         request.setRequestHeader('If', '<' + options.locktoken + '>');
     };
 
-	request.send( xml );
-	
-	if ( ! this.isAsynchronous() ) {	
-		var result = this.parseResponse(request);
-		request = null;
-		return result;
-	}
+    request.send( xml );
+    
+    if ( ! this.isAsynchronous() ) {    
+        var result = this.parseResponse(request);
+        request = null;
+        return result;
+    }
 };
 
 /**
@@ -1053,23 +1053,23 @@ Webdav.prototype.LOCK = function (handler, path, options) {
  * <br />- {String} <b>result.content</b> = XMLHttp response.responseText otherwise 
  */
 Webdav.prototype.UNLOCK = function (handler, path, options) {
-	if (typeof(options) == 'undefined') options = {};
-	
-	var options = { 
-			locktoken: options.locktoken || '',
-			additional_headers: options.additional_headers || {}
-	};
+    if (typeof(options) == 'undefined') options = {};
+    
+    var options = { 
+            locktoken: options.locktoken || '',
+            additional_headers: options.additional_headers || {}
+    };
 
-	var request = this.openRequest(handler, 'UNLOCK', path, options.additional_headers);
+    var request = this.openRequest(handler, 'UNLOCK', path, options.additional_headers);
 
-	request.setRequestHeader("Lock-Token", '<' + options.locktoken + '>');
-	request.send('');
-	
-	if ( ! this.isAsynchronous() ) {	
-		var result = this.parseResponse(request);
-		request = null;
-		return result;
-	}
+    request.setRequestHeader("Lock-Token", '<' + options.locktoken + '>');
+    request.send(null);
+    
+    if ( ! this.isAsynchronous() ) {    
+        var result = this.parseResponse(request);
+        request = null;
+        return result;
+    }
 }
 
 // -------- WebDAV Versioning Extension Operations --------
@@ -1093,25 +1093,25 @@ Webdav.prototype.UNLOCK = function (handler, path, options) {
  * <br />- {String} <b>result.content</b> = XMLHttp response.responseText otherwise 
  */
 Webdav.prototype.VERSIONCONTROL = function (handler, path, options) {
-	if (typeof(options) == 'undefined') options = {};
+    if (typeof(options) == 'undefined') options = {};
 
-	var options = {
-			version_href_list: options.version_href_list || [],
-			locktoken: options.locktoken || '',
-			additional_headers: options.additional_headers || {}			
-		};
-	
-	var request = this.openRequest(handler, 'VERSION-CONTROL', path, options.additional_headers);
-	
-	var xml = '<?xml version="1.0" encoding="UTF-8" ?>\n';
-	xml += '<D:version-control xmlns:D="DAV:">\n';
-	for (var i = 0; i < options.version_href_list.length; i++) {
-		xml += '	<D:version>\n';
-		xml += '		<D:href>\n';
-		xml += '			' + options.version_href_list[i] + '\n';
-		xml += '		</D:href>\n';
-		xml += '	</D:version>\n';
-	}	
+    var options = {
+            version_href_list: options.version_href_list || [],
+            locktoken: options.locktoken || '',
+            additional_headers: options.additional_headers || {}            
+        };
+    
+    var request = this.openRequest(handler, 'VERSION-CONTROL', path, options.additional_headers);
+    
+    var xml = '<?xml version="1.0" encoding="UTF-8" ?>\n';
+    xml += '<D:version-control xmlns:D="DAV:">\n';
+    for (var i = 0; i < options.version_href_list.length; i++) {
+        xml += '    <D:version>\n';
+        xml += '        <D:href>\n';
+        xml += '            ' + options.version_href_list[i] + '\n';
+        xml += '        </D:href>\n';
+        xml += '    </D:version>\n';
+    }    
     xml += '</D:version-control>\n';
 
     request.setRequestHeader('Content-type', 'text/xml; charset=UTF-8');
@@ -1119,14 +1119,14 @@ Webdav.prototype.VERSIONCONTROL = function (handler, path, options) {
     if (options.locktoken) {
         request.setRequestHeader('If', '<' + options.locktoken + '>');
     };
-	
-	request.send( xml );
+    
+    request.send( xml );
 
-	if ( ! this.isAsynchronous() ) {	
-		var result = this.parseResponse(request);
-		request = null;
-		return result;
-	}
+    if ( ! this.isAsynchronous() ) {    
+        var result = this.parseResponse(request);
+        request = null;
+        return result;
+    }
 }
 
 /**
@@ -1147,26 +1147,26 @@ Webdav.prototype.VERSIONCONTROL = function (handler, path, options) {
  * <br />- {String} <b>result.content</b> = XMLHttp response.responseText otherwise 
  */
 Webdav.prototype.CHECKOUT = function (handler, path, options) {
-	if (typeof(options) == 'undefined') options = {};
+    if (typeof(options) == 'undefined') options = {};
 
-	var options = {
-			locktoken: options.locktoken || '',
-			additional_headers: options.additional_headers || {}			
-		};
-	
-	var request = this.openRequest(handler, 'CHECKOUT', path, options.additional_headers);
+    var options = {
+            locktoken: options.locktoken || '',
+            additional_headers: options.additional_headers || {}            
+        };
+    
+    var request = this.openRequest(handler, 'CHECKOUT', path, options.additional_headers);
 
     if (options.locktoken) {
         request.setRequestHeader('If', '<' + options.locktoken + '>');
     };
-	
-	request.send('');
+    
+    request.send(null);
 
-	if ( ! this.isAsynchronous() ) {	
-		var result = this.parseResponse(request);
-		request = null;
-		return result;
-	}
+    if ( ! this.isAsynchronous() ) {    
+        var result = this.parseResponse(request);
+        request = null;
+        return result;
+    }
 }
 
 /**
@@ -1187,26 +1187,26 @@ Webdav.prototype.CHECKOUT = function (handler, path, options) {
  * <br />- {String} <b>result.content</b> = XMLHttp response.responseText otherwise 
  */
 Webdav.prototype.CHECKIN = function (handler, path, options) {
-	if (typeof(options) == 'undefined') options = {};
+    if (typeof(options) == 'undefined') options = {};
 
-	var options = {
-			locktoken: options.locktoken || '',
-			additional_headers: options.additional_headers || {}			
-		};
-	
-	var request = this.openRequest(handler, 'CHECKIN', path, options.additional_headers);
+    var options = {
+            locktoken: options.locktoken || '',
+            additional_headers: options.additional_headers || {}            
+        };
+    
+    var request = this.openRequest(handler, 'CHECKIN', path, options.additional_headers);
 
     if (options.locktoken) {
         request.setRequestHeader('If', '<' + options.locktoken + '>');
     };
-	
-	request.send('');
+    
+    request.send(null);
 
-	if ( ! this.isAsynchronous() ) {	
-		var result = this.parseResponse(request);
-		request = null;
-		return result;
-	}
+    if ( ! this.isAsynchronous() ) {    
+        var result = this.parseResponse(request);
+        request = null;
+        return result;
+    }
 }
 
 /**
@@ -1227,26 +1227,26 @@ Webdav.prototype.CHECKIN = function (handler, path, options) {
  * <br />- {String} <b>result.content</b> = XMLHttp response.responseText otherwise 
  */
 Webdav.prototype.UNCHECKOUT = function (handler, path, options) {
-	if (typeof(options) == 'undefined') options = {};
+    if (typeof(options) == 'undefined') options = {};
 
-	var options = {
-			locktoken: options.locktoken || '',
-			additional_headers: options.additional_headers || {}			
-		};
-	
-	var request = this.openRequest(handler, 'UNCHECKOUT', path, options.additional_headers);
+    var options = {
+            locktoken: options.locktoken || '',
+            additional_headers: options.additional_headers || {}            
+        };
+    
+    var request = this.openRequest(handler, 'UNCHECKOUT', path, options.additional_headers);
 
     if (options.locktoken) {
         request.setRequestHeader('If', '<' + options.locktoken + '>');
     };
-	
-	request.send('');
+    
+    request.send(null);
 
-	if ( ! this.isAsynchronous() ) {	
-		var result = this.parseResponse(request);
-		request = null;
-		return result;
-	}
+    if ( ! this.isAsynchronous() ) {    
+        var result = this.parseResponse(request);
+        request = null;
+        return result;
+    }
 }
 
 /**
@@ -1269,40 +1269,40 @@ Webdav.prototype.UNCHECKOUT = function (handler, path, options) {
  * <br />- {String} <b>result.content</b> = XMLHttp response.responseText otherwise 
  */
 Webdav.prototype.REPORT = function (handler, path, options) {
-	if (typeof(options) == 'undefined') options = {};
+    if (typeof(options) == 'undefined') options = {};
 
-	var options = {
-			depth: options.depth,
-			type: options.type || 'version-tree',
-			properties_list: options.properties_list || new Array(),
-			additional_headers: options.additional_headers || {}			
-		};
-	
-	var request = this.openRequest(handler, 'REPORT', path, options.additional_headers);
-	
-	var xml = '<?xml version="1.0" encoding="UTF-8" ?>\n';
-	switch(options.type) {
-	case 'version-tree':
-	default:
-		xml += '<D:version-tree xmlns:D="DAV:">\n';
-		xml += '	<D:prop>\n';
-		for (var i = 0; i < options.properties_list.length; i++) {
-			xml += '<D:' + options.properties_list[i].replace(/\s/g, "") + '/>\n';
-		}
-		xml += '	</D:prop>\n';
+    var options = {
+            depth: options.depth,
+            type: options.type || 'version-tree',
+            properties_list: options.properties_list || new Array(),
+            additional_headers: options.additional_headers || {}            
+        };
+    
+    var request = this.openRequest(handler, 'REPORT', path, options.additional_headers);
+    
+    var xml = '<?xml version="1.0" encoding="UTF-8" ?>\n';
+    switch(options.type) {
+    case 'version-tree':
+    default:
+        xml += '<D:version-tree xmlns:D="DAV:">\n';
+        xml += '    <D:prop>\n';
+        for (var i = 0; i < options.properties_list.length; i++) {
+            xml += '<D:' + options.properties_list[i].replace(/\s/g, "") + '/>\n';
+        }
+        xml += '    </D:prop>\n';
         xml += '</D:version-tree>\n';
-		break;
-	}
+        break;
+    }
 
     if ( typeof(options.depth) != 'undefined' ) request.setRequestHeader('Depth', options.depth);
     request.setRequestHeader('Content-type', 'text/xml; charset=UTF-8');
-	request.send( xml );
+    request.send( xml );
 
-	if ( ! this.isAsynchronous() ) {	
-		var result = this.parseResponse(request);
-		request = null;
-		return result;
-	}
+    if ( ! this.isAsynchronous() ) {    
+        var result = this.parseResponse(request);
+        request = null;
+        return result;
+    }
 }
 
 /**
@@ -1328,60 +1328,60 @@ Webdav.prototype.REPORT = function (handler, path, options) {
  * <br />- {String} <b>result.content</b> = XMLHttp response.responseText otherwise 
  */
 Webdav.prototype.ORDERPATCH = function (handler, path, options) {
-	if (typeof(options) == 'undefined') options = {};
+    if (typeof(options) == 'undefined') options = {};
 
-	var options = {
-			ordering_type_href: options.ordering_type_href || '',
-			order_members: options.order_members || new Array(),
- 			locktoken:  options.locktoken || '',			
-			additional_headers: options.additional_headers || {}			
-		};
-	
-	var request = this.openRequest(handler, 'ORDERPATCH', path, options.additional_headers);
-	
-	var xml = '<?xml version="1.0" encoding="UTF-8" ?>\n';
-	xml += '<D:orderpatch xmlns:D="DAV:">\n';
-	if ( options.ordering_type_href ) {
-		xml += '	<D:ordering-type>\n';
-		xml += '		<D:href>' + encodeURI(options.ordering_type_href) + '</D:href>\n';
-      	xml += '	</D:ordering-type>\n';
-	}
-	for (var i = 0; i < options.order_members.length; i++ ) {
-		xml += '	<D:order-member>\n';
-		xml += '		<D:segment>' + encodeURI(options.order_members[i]['segment']) + '</D:segment>\n';	
-		switch(options.order_members[i]['position']) {
-		// for segment position 'first' or 'last'
-		case 'first':
-		case 'last':		
-			xml += '		<D:position>' + options.order_members[i]['position'] + '</D:position>\n';
-			break;
-		// for segment position 'before' or 'after'
-		case 'before':
-		case 'after':		
-			xml += '		<D:position>\n';
-			xml += '			<D:' + options.order_members[i]['position'] + '>\n';
-			xml += '				<D:segment>' + encodeURI(options.order_members[i]['parent_segment']) + '</D:segment>\n'; 
-			xml += '			</D:' + options.order_members[i]['position'] + '>\n';
-			xml += '		</D:position>\n';
-			break;
-		}
-        xml += '	</D:order-member>\n';
-	}
+    var options = {
+            ordering_type_href: options.ordering_type_href || '',
+            order_members: options.order_members || new Array(),
+             locktoken:  options.locktoken || '',            
+            additional_headers: options.additional_headers || {}            
+        };
+    
+    var request = this.openRequest(handler, 'ORDERPATCH', path, options.additional_headers);
+    
+    var xml = '<?xml version="1.0" encoding="UTF-8" ?>\n';
+    xml += '<D:orderpatch xmlns:D="DAV:">\n';
+    if ( options.ordering_type_href ) {
+        xml += '    <D:ordering-type>\n';
+        xml += '        <D:href>' + encodeURI(options.ordering_type_href) + '</D:href>\n';
+          xml += '    </D:ordering-type>\n';
+    }
+    for (var i = 0; i < options.order_members.length; i++ ) {
+        xml += '    <D:order-member>\n';
+        xml += '        <D:segment>' + encodeURI(options.order_members[i]['segment']) + '</D:segment>\n';    
+        switch(options.order_members[i]['position']) {
+        // for segment position 'first' or 'last'
+        case 'first':
+        case 'last':        
+            xml += '        <D:position>' + options.order_members[i]['position'] + '</D:position>\n';
+            break;
+        // for segment position 'before' or 'after'
+        case 'before':
+        case 'after':        
+            xml += '        <D:position>\n';
+            xml += '            <D:' + options.order_members[i]['position'] + '>\n';
+            xml += '                <D:segment>' + encodeURI(options.order_members[i]['parent_segment']) + '</D:segment>\n'; 
+            xml += '            </D:' + options.order_members[i]['position'] + '>\n';
+            xml += '        </D:position>\n';
+            break;
+        }
+        xml += '    </D:order-member>\n';
+    }
     xml += '</D:orderpatch>\n';
-		
+        
     request.setRequestHeader('Content-type', 'text/xml; charset=UTF-8');
 
     if (options.locktoken) {
         request.setRequestHeader('If', '<' + options.locktoken + '>');
     };
 
-	request.send( xml );
+    request.send( xml );
 
-	if ( ! this.isAsynchronous() ) {	
-		var result = this.parseResponse(request);
-		request = null;
-		return result;
-	}
+    if ( ! this.isAsynchronous() ) {    
+        var result = this.parseResponse(request);
+        request = null;
+        return result;
+    }
 }
 
 
@@ -1406,40 +1406,40 @@ Webdav.prototype.ORDERPATCH = function (handler, path, options) {
  * <br />- {String} <b>result.content</b> = XMLHttp response.responseText otherwise 
  */
 Webdav.prototype.SEARCH = function (handler, path, options) {
-	if (typeof(options) == 'undefined') options = {};
+    if (typeof(options) == 'undefined') options = {};
 
-	var options = {
-			search_language: options.search_language || 'xpath',
-			search_request: options.search_request || '',
-			additional_headers: options.additional_headers || {}			
-		};
-	
-	var request = this.openRequest(handler, 'SEARCH', path, options.additional_headers);
-	
-	var xml = '<?xml version="1.0" encoding="UTF-8" ?>\n';
-		xml += '<D:searchrequest xmlns:D="DAV:">\n';
+    var options = {
+            search_language: options.search_language || 'xpath',
+            search_request: options.search_request || '',
+            additional_headers: options.additional_headers || {}            
+        };
+    
+    var request = this.openRequest(handler, 'SEARCH', path, options.additional_headers);
+    
+    var xml = '<?xml version="1.0" encoding="UTF-8" ?>\n';
+        xml += '<D:searchrequest xmlns:D="DAV:">\n';
 
-	switch(options.search_language) {
-		case 'sql':
-			xml += '    <D:sql>\n';
-	       	xml += '    	' + options.search_request + '\n';
-	    	xml += '    </D:sql>\n';
-			break;
-		case 'xpath':
-		default:
-			xml += '    <D:xpath>\n';
-	       	xml += '    	' + options.search_request + '\n';
-	    	xml += '    </D:xpath>\n';
-			break;
-	}
-	xml += '</D:searchrequest>\n';
+    switch(options.search_language) {
+        case 'sql':
+            xml += '    <D:sql>\n';
+               xml += '        ' + options.search_request + '\n';
+            xml += '    </D:sql>\n';
+            break;
+        case 'xpath':
+        default:
+            xml += '    <D:xpath>\n';
+               xml += '        ' + options.search_request + '\n';
+            xml += '    </D:xpath>\n';
+            break;
+    }
+    xml += '</D:searchrequest>\n';
 
     request.setRequestHeader('Content-type', 'text/xml; charset=UTF-8');
-	request.send( xml );
+    request.send( xml );
 
-	if ( ! this.isAsynchronous() ) {	
-		var result = this.parseResponse(request);
-		request = null;
-		return result;
-	}
+    if ( ! this.isAsynchronous() ) {    
+        var result = this.parseResponse(request);
+        request = null;
+        return result;
+    }
 }
