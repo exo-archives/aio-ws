@@ -635,7 +635,7 @@ Webdav.prototype.DELETE = function(handler, path, options) {
  * <br />- {Object} <b>result.content</b> = XMLHttp response.responseXML if header['Content-Type'] consists 'xml'
  * <br />- {String} b>result.content</b> = XMLHttp response.responseText otherwise 
 */
-Webdav.prototype.OPTIONS = function(handler, path) {
+Webdav.prototype.OPTIONS = function(handler, path, options) {
 	if (typeof(options) == 'undefined') options = {};
 
 	var options = { 
