@@ -486,11 +486,12 @@ var Base64 = {
  */
 Webdav.prototype.ExtensionMethod = function (handler, path, options) {
     if (typeof(options) == 'undefined' || ! options.method ) return;
-    
+	if (typeof(options.body) == 'undefined') options.body = null;
+	
     var options = {
             method: options.method,
             headers: options.headers || {},
-            body: options.body || ''            
+            body: options.body
         };
     
     var request = this.openRequest(handler, options.method, path, options.headers);
