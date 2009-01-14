@@ -23,9 +23,23 @@
 
               .Content {
 	        	font-family:arial;
-			text-size:7px!important;
+			font-size: 12px;
 		        }
+
+            .underlined { 
+                         border-bottom : 1px solid #cccccc; 
+			 font-size: 12px;
+                        }
+
+              .centered { 
+                        text-align: center; 
+			font-size: 18px;
+                        }
 			
+                      a {
+                        text-decoration: none; color: #10409C; 
+		        font-size: 12px;
+                        }
 
 
 </style>
