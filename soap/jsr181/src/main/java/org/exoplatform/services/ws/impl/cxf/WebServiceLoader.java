@@ -92,7 +92,6 @@ public class WebServiceLoader {
       String address = getAddress(implementor);
       if (address != null) {
         ExoDeployCXFUtils.simpleDeployService(address, implementor);
-        
         LOG.info("New singleton WebService '" + address + "' registered.");
       }
     }
@@ -128,6 +127,11 @@ public class WebServiceLoader {
     }
   }
 
+  /**
+   * Get service address with WebService annotation for implementor.
+   * @param implementor
+   * @return
+   */
   private String getAddress(Object implementor) {
     String address = "/" + implementor.getClass().getAnnotation(WebService.class).portName();//name();//portName();//serviceName();
     if (LOG.isDebugEnabled()) {
@@ -137,11 +141,18 @@ public class WebServiceLoader {
     return address;
   }
 
+  /**
+   * Add plugin component for deploy service.
+   * @param plugin
+   */
   public void addPlugin(BaseComponentPlugin plugin) {
     if (plugin instanceof WebServiceLoaderPlugin)
       jcs.addAll(((WebServiceLoaderPlugin) plugin).getJcs());
   }
   
+  /**
+   * Comparator for deploy order.
+   */
   private static final Comparator<Object> COMPARATOR = new Comparator<Object>() {
 
     public int compare(Object o1, Object o2) {
