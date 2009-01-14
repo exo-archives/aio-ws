@@ -61,12 +61,12 @@
 
     for (i=0;i<arr.length; i++) {
 
-     if (arr[i].indexOf("?download") == -1) {
+     if (arr[i].indexOf("?view") > -1) {
        text = text.replace(arr[i], "<a href=\"#\" onclick=\"ajaxFunction\('" + stripTags(arr[i]) + "'\)\">"    );	
       }
 
     }
-//    alert(text);
+    alert(text);
     return text;    
 }
 
@@ -83,7 +83,7 @@
 <body>
 
 <div id="addrform"><font size="2"><b>Enter the URL to browse:</b></font>
-<input type="text" id="address" name="address" size="30" value="http://localhost:8080/portal/rest/maven2">&nbsp;<input type="button" value="Browse" onclick="ajaxFunction(document.getElementById('address').value);">
+<input type="text" id="address" name="address" size="30" value="http://localhost:8080/portal/rest/maven2">&nbsp;<input type="button" value="Browse" onclick="ajaxFunction(document.getElementById('address').value + '?view=true&gadget=true');">
 </div>
 
 <div id="content" class="Content">
