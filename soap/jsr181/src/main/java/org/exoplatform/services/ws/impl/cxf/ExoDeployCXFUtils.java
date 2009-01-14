@@ -72,7 +72,6 @@ public class ExoDeployCXFUtils {
    */
   public static void checkConnectionAndPrint(String address, boolean doprintwsdl) throws java.net.ConnectException,
                                                                                  Exception {
-    System.out.println(">>> EXOMAN ExoDeployCXFUtils.checkConnectionAndPrint()  entered ");
     if (LOG.isDebugEnabled())
       LOG.debug("Check service at the address = " + address);
 
