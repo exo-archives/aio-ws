@@ -18,6 +18,8 @@
 package org.exoplatform.services.ws.impl.cxf;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.jws.WebService;
@@ -78,10 +80,12 @@ public class WebServiceLoader {
   /**
    * Register all available container components in a CXF engine from Servlet.
    */
+  @SuppressWarnings("unchecked")
   public void init() {
 
     // Deploy Single services
     singleservices = (List<AbstractSingletonWebService>) container.getComponentInstancesOfType(AbstractSingletonWebService.class);
+    Collections.sort(singleservices, COMPARATOR);
     if (LOG.isDebugEnabled())
       LOG.debug("WebServiceLoader.init() singleservices = " + singleservices);
     for (AbstractSingletonWebService implementor : singleservices) {
@@ -95,6 +99,7 @@ public class WebServiceLoader {
 
     // Deploy Multi services
     multiservices = (List<AbstractMultiWebService>) container.getComponentInstancesOfType(AbstractMultiWebService.class);
+    Collections.sort(multiservices, COMPARATOR);
     if (LOG.isDebugEnabled())
       LOG.debug("WebServiceLoader.init() multiservices = " + multiservices);
     for (AbstractMultiWebService implementor : multiservices) {
@@ -108,6 +113,7 @@ public class WebServiceLoader {
     // Deploy Custom services
     if (LOG.isDebugEnabled())
       LOG.debug("WebServiceLoader.init() customservices = " + jcs);
+    Collections.sort(jcs, COMPARATOR);
     for (Class<?> implementor : jcs) {
       try {
         Object implem = implementor.newInstance();
@@ -135,5 +141,13 @@ public class WebServiceLoader {
     if (plugin instanceof WebServiceLoaderPlugin)
       jcs.addAll(((WebServiceLoaderPlugin) plugin).getJcs());
   }
+  
+  private static final Comparator<Object> COMPARATOR = new Comparator<Object>() {
 
+    public int compare(Object o1, Object o2) {
+      return o1.getClass().getName().compareTo(o2.getClass().getName());
+    }
+    
+  };
+  
 }
