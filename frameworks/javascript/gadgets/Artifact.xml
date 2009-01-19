@@ -72,13 +72,16 @@
     var find = /<a href="(\S{2,})">/ig;  //Any URL;
 
     var arr = text.match(find);
-
+  
+    if (arr != null) {
+ 
     for (i=0;i<arr.length; i++) {
 
      if (arr[i].indexOf("?view") > -1) {
        text = text.replace(arr[i], "<a href=\"#\" onclick=\"ajaxFunction\('" + stripTags(arr[i]) + "'\)\">"    );	
       }
 
+     }
     }
 //    alert(text);
     return text;    
