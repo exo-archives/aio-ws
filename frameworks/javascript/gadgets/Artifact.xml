@@ -24,6 +24,12 @@
               .Content {
 	        	font-family:arial;
 			font-size: 12px;
+			height: 335px;
+			overflow-x: hidden;
+			overflow-y: auto;
+                        margin-right: 0px;
+                        padding-right: 0px;
+			width: 100%;
 		        }
 
             .underlined { 
@@ -33,7 +39,7 @@
 
               .centered { 
                         text-align: center; 
-			font-size: 14px;
+			font-size: 12px;
                         }
 			
                       a {
@@ -60,13 +66,16 @@
 		      {      xmlHttp=new ActiveXObject("Microsoft.XMLHTTP");      }
 		    catch (e)
 		      {      alert("Your browser does not support AJAX!");      return false;      }    }  }
+         try {
         xmlHttp.open("GET", url, 0); 
         xmlHttp.send(""); 
         document.getElementById("content").innerHTML = rewriteLinks(xmlHttp.responseText); 
         document.getElementById("addrform").style.display = "none";
+        } catch (e) {
+	 document.getElementById("content").innerHTML = "<br><center><font color=\"red\">Error fetching page from this URL.</font></center>"; 
+        }
         var xmlHttp = null; 
        }
-
 
     function rewriteLinks(text){
     var find = /<a href="(\S{2,})">/ig;  //Any URL;
