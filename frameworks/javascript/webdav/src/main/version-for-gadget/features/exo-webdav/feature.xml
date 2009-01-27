@@ -19,6 +19,7 @@ specific language governing permissions and limitations under the License.
 <feature>
   <name>exo-webdav</name>
   <gadget>
-    <script src="exo-webdav.js"/>
+    <script src="exowebdav.js"/>
+    <script src="exowebdavtest.js"/>		
   </gadget>
 </feature>
