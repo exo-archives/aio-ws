@@ -569,7 +569,7 @@ Webdav.prototype.PUT = function(handler, path, options) {
         };
 
     var request = this.openRequest(handler, 'PUT', path || '', options.additional_headers);
-    request.setRequestHeader("Content-type", options.content_type);    
+    request.setRequestHeader("Content-Type", options.content_type);    
     if (options.locktoken) {
         request.setRequestHeader('If', '(<' + options.locktoken + '>)');
     };
@@ -882,7 +882,7 @@ Webdav.prototype.PROPFIND = function (handler, path, options) {
     }
 
     if ( typeof(options.depth) != 'undefined' ) request.setRequestHeader('Depth', options.depth);
-    request.setRequestHeader('Content-type', 'text/xml; charset=UTF-8');
+    request.setRequestHeader('Content-Type', 'text/xml; charset=UTF-8');
     request.send( xml );
 
     if ( ! this.isAsynchronous() ) {    
@@ -950,7 +950,7 @@ Webdav.prototype.PROPPATCH = function (handler, path, options) {
 
     xml += '</D:propertyupdate>\n';
 
-    request.setRequestHeader('Content-type', 'text/xml; charset=UTF-8');
+    request.setRequestHeader('Content-Type', 'text/xml; charset=UTF-8');
 
     if (options.locktoken) {
         request.setRequestHeader('If', '<' + options.locktoken + '>');
@@ -1020,7 +1020,7 @@ Webdav.prototype.LOCK = function (handler, path, options) {
         + '</D:lockinfo>\n';
     
     if ( typeof(options.depth) != 'undefined' ) request.setRequestHeader('Depth', options.depth);
-    request.setRequestHeader('Content-type', 'text/xml; charset=UTF-8');
+    request.setRequestHeader('Content-Type', 'text/xml; charset=UTF-8');
     request.setRequestHeader('Timeout', options.timeout);
 
     if (options.locktoken) {
@@ -1115,7 +1115,7 @@ Webdav.prototype.VERSIONCONTROL = function (handler, path, options) {
     }    
     xml += '</D:version-control>\n';
 
-    request.setRequestHeader('Content-type', 'text/xml; charset=UTF-8');
+    request.setRequestHeader('Content-Type', 'text/xml; charset=UTF-8');
 
     if (options.locktoken) {
         request.setRequestHeader('If', '<' + options.locktoken + '>');
@@ -1296,7 +1296,7 @@ Webdav.prototype.REPORT = function (handler, path, options) {
     }
 
     if ( typeof(options.depth) != 'undefined' ) request.setRequestHeader('Depth', options.depth);
-    request.setRequestHeader('Content-type', 'text/xml; charset=UTF-8');
+    request.setRequestHeader('Content-Type', 'text/xml; charset=UTF-8');
     request.send( xml );
 
     if ( ! this.isAsynchronous() ) {    
@@ -1370,7 +1370,7 @@ Webdav.prototype.ORDERPATCH = function (handler, path, options) {
     }
     xml += '</D:orderpatch>\n';
         
-    request.setRequestHeader('Content-type', 'text/xml; charset=UTF-8');
+    request.setRequestHeader('Content-Type', 'text/xml; charset=UTF-8');
 
     if (options.locktoken) {
         request.setRequestHeader('If', '<' + options.locktoken + '>');
@@ -1435,7 +1435,7 @@ Webdav.prototype.SEARCH = function (handler, path, options) {
     }
     xml += '</D:searchrequest>\n';
 
-    request.setRequestHeader('Content-type', 'text/xml; charset=UTF-8');
+    request.setRequestHeader('Content-Type', 'text/xml; charset=UTF-8');
     request.send( xml );
 
     if ( ! this.isAsynchronous() ) {    
