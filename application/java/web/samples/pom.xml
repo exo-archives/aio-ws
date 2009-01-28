@@ -4,7 +4,7 @@
   <groupId>org.exoplatform.ws</groupId>
   <artifactId>exo.ws.application.webapps</artifactId>
   <packaging>war</packaging>
-  <version>1.3.2-SNAPSHOT</version>
+  <version>1.3.2</version>
   <name>eXo WS samples</name>
   <build>
     <finalName>ws-examples</finalName>
