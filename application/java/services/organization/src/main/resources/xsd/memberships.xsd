@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            elementFormDefault="unqualified"
+            xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+            jaxb:version="2.0"
+            xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+            jaxb:extensionBindingPrefixes="xjc">
+    
+    <xsd:include schemaLocation="type-membership.xsd"/>
+    
+    <xsd:element name="memberships">
+	    <xsd:complexType>
+		    <xsd:sequence>
+		      <xsd:element name="membership" type="_typeMembership_" maxOccurs="unbounded"/>
+		    </xsd:sequence>
+	    </xsd:complexType>
+    </xsd:element>        
+            
+</xsd:schema>

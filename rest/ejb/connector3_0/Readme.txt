@@ -1,0 +1,1 @@
+Build modules/client and modules/connector before build this project.

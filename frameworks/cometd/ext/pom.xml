@@ -1,0 +1,20 @@
+<project>
+
+    <parent>
+      <groupId>org.exoplatform.ws</groupId>
+      <artifactId>config</artifactId>
+      <version>2.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.exoplatform.ws</groupId>
+    <artifactId>exo.ws.frameworks.cometd.ext.config</artifactId>
+    <name>eXo WS Cometd Ext (for test)</name>
+    <version>${org.exoplatform.ws.version}</version>
+    <packaging>pom</packaging>
+
+  <modules>
+    <module>service</module>
+    <module>webapp-rest</module>
+    <module>webapp-cometd</module>
+  </modules>
+</project>

@@ -1,0 +1,419 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Tests of the Webdav library</title>
+<script language="JavaScript" src="jsunit/app/jsUnitCore.js"></script>
+<script language="JavaScript" src="../js/webdav.js"></script>
+<script language="JavaScript" src="webdavTestSetUpPages.js"></script>
+<script>
+	/**
+	 * Created by The eXo Platform SAS.
+	 * @author: <a href="mailto:dmitry.ndp@exoplatform.com.ua">Dmytro Nochevnov</a>
+	 * @version $Id: $ Dec 09, 2008
+	 * @copyright Copyright (C) 2003-2008 eXo Platform SAS.
+	 * @license http://www.gnu.org/licenses/ GNU General Public License
+	 */
+
+/*
+ * TestPlan
+
+testSetUp:
+----------
+	MCKOL /rest/jcr/repository/collaboration/приклад20
+	PUT /rest/jcr/repository/collaboration/приклад20/приклад1.txt
+	PROPFIND /rest/jcr/repository/collaboration/приклад20/приклад1.txt
+	
+testVERSIONCONTROL_REPORT:
+--------------------------
+	(Test REPORT.1)
+	REPORT /rest/jcr/repository/collaboration/приклад20/приклад1.txt with type=version-tree, Depth= 0, prop = 'version-name, successor-set, creator-displayname' - 
+		Response Status = 207:Multi-Status
+	
+	VERSIONCONTROL /rest/jcr/repository/collaboration/приклад20/приклад1.txt - Status = 200:OK
+	
+	(Test VERSIONCONTROL.1)
+	PROPFIND /rest/jcr/repository/collaboration/приклад20/приклад1.txt
+		Response with <D:checked-out />
+	
+	(test REPORT.2)
+	REPORT /rest/jcr/repository/collaboration/приклад20/приклад1.txt with type=version-tree, Depth= 0, prop = 'version-name, successor-set, creator-displayname' - 
+		Response Status = 207:Multi-Status, <href>http://localhost:8080/rest/jcr/repository/collaboration/приклад20/приклад1.txt.1</href> and <D:version-name>V1</D:version-name>
+	
+	(test VERSIONCONTROL.2)
+	CHECKIN /rest/jcr/repository/collaboration/приклад20/приклад1.txt - error Status 409:Conflict
+		Response
+		<?xml version="1.0" encoding="utf-8" ?>
+		<D:error xmlns:D="DAV:">
+		<D:must-be-checked-out/>
+		</D:error>
+	
+testCHECKIN_CHECKOUT_REPORT:
+----------------------------
+	
+	(test CHECKOUT.1)
+	CHECKOUT /rest/jcr/repository/collaboration/приклад20/приклад1.txt - Status 200:OK
+	
+	(test CHECKOUT.2)
+	PROPFIND /rest/jcr/repository/collaboration/приклад20/приклад1.txt
+		Response with <D:checked-out />
+	
+	(test CHECKOUT.3)
+	CHECKOUT /rest/jcr/repository/collaboration/приклад20/приклад1.txt - error Status 409:Conflict
+		Response
+		<?xml version="1.0" encoding="utf-8" ?>
+		<D:error xmlns:D="DAV:">
+		<D:must-be-checked-in/>
+		</D:error>
+	
+	PUT /rest/jcr/repository/collaboration/приклад20/приклад1.txt - 201:Created
+	
+	(test CHECKIN.1.5)
+	CHECKIN /rest/jcr/repository/collaboration/приклад20/приклад1.txt - Status 201:Created
+	
+	(test REPORT.3)
+	REPORT /rest/jcr/repository/collaboration/приклад20/приклад1.txt with type=version-tree, Depth= 0, prop = 'version-name, successor-set, creator-displayname' - 
+		Response Status = 207:Multi-Status, <href>http://localhost:8080/rest/jcr/repository/collaboration/приклад20/приклад1.txt.2</href> and <D:version-name>V2</D:version-name>
+	
+	(test CHECKIN.1.6)
+	PROPFIND /rest/jcr/repository/collaboration/приклад20/приклад1.txt
+		Response with <D:checked-in />
+	
+	(test CHECKIN.1.7)
+	CHECKIN /rest/jcr/repository/collaboration/приклад20/приклад1.txt - error Status 409:Conflict
+		<?xml version="1.0" encoding="utf-8" ?>
+		<D:error xmlns:D="DAV:">
+		<D:must-be-checked-out/>
+		</D:error>
+	
+testCHECKOUT_UNCHECKOUT_REPORT:
+-------------------------------
+	(test UNCHECKOUT.2)
+	UNCHECKOUT /rest/jcr/repository/collaboration/приклад20/приклад1.txt - error Status 409:Conflict
+		Response
+		<?xml version="1.0" encoding="utf-8" ?>
+		<D:error xmlns:D="DAV:">
+		<D:must-be-checked-out/>
+		</D:error>
+	
+	CHECKOUT /rest/jcr/repository/collaboration/приклад20/приклад1.txt - 200:OK
+	
+	(test CHECKOUT.2)
+	PROPFIND /rest/jcr/repository/collaboration/приклад20/приклад1.txt
+		Response with <D:checked-out />
+	
+	UNCHECKOUT /rest/jcr/repository/collaboration/приклад20/приклад1.txt - 200:OK
+	
+	(test UNCHECKOUT.1)
+	PROPFIND /rest/jcr/repository/collaboration/приклад20/приклад1.txt
+		Response with <D:checked-in />
+	
+	(test UNCHECKOUT.3)
+	UNCHECKOUT /rest/jcr/repository/collaboration/приклад20/приклад1.txt - error Status 409:Conflict
+		Response
+		<?xml version="1.0" encoding="utf-8" ?>
+		<D:error xmlns:D="DAV:">
+		<D:must-be-checked-out/>
+		</D:error>
+
+
+testORDERPATCH
+--------------
+PUT /rest/jcr/repository/collaboration/приклад/файл1.txt
+PUT /rest/jcr/repository/collaboration/приклад/файл2.txt
+PUT /rest/jcr/repository/collaboration/приклад/файл3.txt
+PUT /rest/jcr/repository/collaboration/приклад/файл4.txt
+PUT /rest/jcr/repository/collaboration/приклад/зразок.ord
+
+PROPFIND /rest/jcr/repository/collaboration/приклад/ with Depth = 1
+    result:
+<?xml version="1.0" encoding="UTF-8"?>
+<D:multistatus xmlns:D="DAV:" xmlns:b="urn:uuid:c2f41010-65b3-11d1-a29f-00aa00c14882/"><D:response><D:href>http://localhost:8080/rest/jcr/repository/collaboration/приклад</D:href><D:propstat><D:prop><exo:dateModified xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">2008-12-02T13:10:22.906+02:00</exo:dateModified><D:creationdate b:dt="dateTime.tz">2008-12-02T11:10:22Z</D:creationdate><jcr:mixinTypes xmlns:jcr="http://www.jcp.org/jcr/1.0">exo:datetime</jcr:mixinTypes><exo:dateCreated xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">2008-12-02T13:10:22.906+02:00</exo:dateCreated><exo:owner xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">root</exo:owner><D:resourcetype><D:collection/></D:resourcetype><D:displayname>приклад</D:displayname></D:prop><D:status>HTTP/1.1 200 OK</D:status></D:propstat></D:response><D:response><D:href>http://localhost:8080/rest/jcr/repository/collaboration/приклад/файл1.txt</D:href><D:propstat><D:prop><D:getcontentlength>9</D:getcontentlength><exo:owner xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">root</exo:owner><exo:internalUse xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">false</exo:internalUse><exo:dateCreated xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">2008-12-05T17:19:04.640+02:00</exo:dateCreated><D:resourcetype/><D:getlastmodified b:dt="dateTime.rfc1123">Fri, 05 Dec 2008 15:19:04 GMT</D:getlastmodified><exo:dateModified xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">2008-12-05T17:19:04.640+02:00</exo:dateModified><D:getcontenttype>text/plain; charset=UTF-8, charset=UTF-8</D:getcontenttype><D:displayname>файл1.txt</D:displayname><D:creationdate b:dt="dateTime.tz">2008-12-05T15:19:04Z</D:creationdate></D:prop><D:status>HTTP/1.1 200 OK</D:status></D:propstat></D:response><D:response><D:href>http://localhost:8080/rest/jcr/repository/collaboration/приклад/файл2.txt</D:href><D:propstat><D:prop><D:getlastmodified b:dt="dateTime.rfc1123">Fri, 05 Dec 2008 15:19:15 GMT</D:getlastmodified><exo:dateModified xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">2008-12-05T17:19:15.921+02:00</exo:dateModified><exo:dateCreated xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">2008-12-05T17:19:15.921+02:00</exo:dateCreated><D:resourcetype/><exo:owner xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">root</exo:owner><D:getcontentlength>9</D:getcontentlength><D:creationdate b:dt="dateTime.tz">2008-12-05T15:19:15Z</D:creationdate><exo:internalUse xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">false</exo:internalUse><D:getcontenttype>text/plain; charset=UTF-8, charset=UTF-8</D:getcontenttype><D:displayname>файл2.txt</D:displayname></D:prop><D:status>HTTP/1.1 200 OK</D:status></D:propstat></D:response><D:response><D:href>http://localhost:8080/rest/jcr/repository/collaboration/приклад/файл3.txt</D:href><D:propstat><D:prop><D:getcontentlength>9</D:getcontentlength><exo:dateModified xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">2008-12-05T17:19:23.875+02:00</exo:dateModified><exo:owner xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">root</exo:owner><D:creationdate b:dt="dateTime.tz">2008-12-05T15:19:23Z</D:creationdate><D:displayname>файл3.txt</D:displayname><D:resourcetype/><D:getcontenttype>text/plain; charset=UTF-8, charset=UTF-8</D:getcontenttype><D:getlastmodified b:dt="dateTime.rfc1123">Fri, 05 Dec 2008 15:19:23 GMT</D:getlastmodified><exo:internalUse xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">false</exo:internalUse><exo:dateCreated xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">2008-12-05T17:19:23.875+02:00</exo:dateCreated></D:prop><D:status>HTTP/1.1 200 OK</D:status></D:propstat></D:response></D:multistatus>
+
+ORDERPATCH /rest/jcr/repository/collaboration/приклад/ with
+    HREF for ordering-type property = http://localhost:8080/rest/jcr/repository/collaboration/приклад/зразок.ord
+    Order member 0:
+        segment name: файл2.txt
+        position: first
+    Order member 1: 
+        segment name: файл1.txt
+        position: last
+    Order member 2:
+        segment name: файл3.txt
+        position: before
+            parent segment: файл4.txt
+
+Request.content
+"<?xml version="1.0" encoding="UTF-8" ?>\n
+<D:orderpatch xmlns:D="DAV:">\n
+    <D:ordering-type>\n
+        <D:href>http://localhost:8080/rest/jcr/repository/collaboration/приклад/зразок.ord</D:href>\n
+    </D:ordering-type>\n
+    <D:order-member>\n
+        <D:segment>файл2.txt</D:segment>\n
+        <D:position>first</D:position>\n
+    </D:order-member>\n
+    <D:order-member>\n
+        <D:segment>файл1.txt</D:segment>\n
+        <D:position>last</D:position>\n
+    </D:order-member>\n
+    <D:order-member>\n
+        <D:segment>файл3.txt</D:segment>\n
+        <D:position>\n
+            <D:before>\n
+                <D:segment>файл4.txt</D:segment>\n
+            </D:before>\n
+        </D:position>\n
+    </D:order-member>\n
+</D:orderpatch>\n"
+
+Expected returns:
+200 OK
+
+Actually returns 
+Status:
+500:Internal Server Error
+
+PROPFIND /rest/jcr/repository/collaboration/приклад/ with Depth = 1
+
+<?xml version="1.0" encoding="UTF-8"?>
+<D:multistatus xmlns:D="DAV:" xmlns:b="urn:uuid:c2f41010-65b3-11d1-a29f-00aa00c14882/"><D:response><D:href>http://localhost:8080/rest/jcr/repository/collaboration/приклад</D:href><D:propstat><D:prop><exo:dateCreated xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">2008-12-02T13:10:22.906+02:00</exo:dateCreated><jcr:mixinTypes xmlns:jcr="http://www.jcp.org/jcr/1.0">exo:datetime</jcr:mixinTypes><D:displayname>приклад</D:displayname><exo:dateModified xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">2008-12-02T13:10:22.906+02:00</exo:dateModified><D:resourcetype><D:collection/></D:resourcetype><exo:owner xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">root</exo:owner><D:creationdate b:dt="dateTime.tz">2008-12-02T11:10:22Z</D:creationdate></D:prop><D:status>HTTP/1.1 200 OK</D:status></D:propstat></D:response><D:response><D:href>http://localhost:8080/rest/jcr/repository/collaboration/приклад/файл1.txt</D:href><D:propstat><D:prop><D:resourcetype/><exo:dateCreated xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">2008-12-05T17:19:04.640+02:00</exo:dateCreated><D:getlastmodified b:dt="dateTime.rfc1123">Fri, 05 Dec 2008 15:19:04 GMT</D:getlastmodified><exo:internalUse xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">false</exo:internalUse><D:displayname>файл1.txt</D:displayname><exo:dateModified xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">2008-12-05T17:19:04.640+02:00</exo:dateModified><exo:owner xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">root</exo:owner><D:creationdate b:dt="dateTime.tz">2008-12-05T15:19:04Z</D:creationdate><D:getcontenttype>text/plain; charset=UTF-8, charset=UTF-8</D:getcontenttype><D:getcontentlength>9</D:getcontentlength></D:prop><D:status>HTTP/1.1 200 OK</D:status></D:propstat></D:response><D:response><D:href>http://localhost:8080/rest/jcr/repository/collaboration/приклад/файл2.txt</D:href><D:propstat><D:prop><exo:internalUse xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">false</exo:internalUse><D:creationdate b:dt="dateTime.tz">2008-12-05T15:19:15Z</D:creationdate><exo:dateCreated xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">2008-12-05T17:19:15.921+02:00</exo:dateCreated><D:getcontentlength>9</D:getcontentlength><D:displayname>файл2.txt</D:displayname><D:resourcetype/><D:getlastmodified b:dt="dateTime.rfc1123">Fri, 05 Dec 2008 15:19:15 GMT</D:getlastmodified><exo:dateModified xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">2008-12-05T17:19:15.921+02:00</exo:dateModified><exo:owner xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">root</exo:owner><D:getcontenttype>text/plain; charset=UTF-8, charset=UTF-8</D:getcontenttype></D:prop><D:status>HTTP/1.1 200 OK</D:status></D:propstat></D:response><D:response><D:href>http://localhost:8080/rest/jcr/repository/collaboration/приклад/файл3.txt</D:href><D:propstat><D:prop><D:getcontentlength>9</D:getcontentlength><D:getlastmodified b:dt="dateTime.rfc1123">Fri, 05 Dec 2008 15:19:23 GMT</D:getlastmodified><exo:dateModified xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">2008-12-05T17:19:23.875+02:00</exo:dateModified><D:creationdate b:dt="dateTime.tz">2008-12-05T15:19:23Z</D:creationdate><exo:internalUse xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">false</exo:internalUse><exo:dateCreated xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">2008-12-05T17:19:23.875+02:00</exo:dateCreated><D:resourcetype/><exo:owner xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">root</exo:owner><D:getcontenttype>text/plain; charset=UTF-8, charset=UTF-8</D:getcontenttype><D:displayname>файл3.txt</D:displayname></D:prop><D:status>HTTP/1.1 200 OK</D:status></D:propstat></D:response><D:response><D:href>http://localhost:8080/rest/jcr/repository/collaboration/приклад/файл4.txt</D:href><D:propstat><D:prop><exo:dateCreated xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">2008-12-05T17:34:11.625+02:00</exo:dateCreated><D:getcontentlength>9</D:getcontentlength><D:getlastmodified b:dt="dateTime.rfc1123">Fri, 05 Dec 2008 15:34:11 GMT</D:getlastmodified><D:creationdate b:dt="dateTime.tz">2008-12-05T15:34:11Z</D:creationdate><D:getcontenttype>text/plain; charset=UTF-8, charset=UTF-8</D:getcontenttype><exo:dateModified xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">2008-12-05T17:34:11.625+02:00</exo:dateModified><exo:owner xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">root</exo:owner><exo:internalUse xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">false</exo:internalUse><D:displayname>файл4.txt</D:displayname><D:resourcetype/></D:prop><D:status>HTTP/1.1 200 OK</D:status></D:propstat></D:response></D:multistatus>
+
+*/
+
+    function exposeTestFunctionNames() {
+        return ['testSetUp', 'testVERSIONCONTROL_REPORT', 'testCHECKOUT_CHECKIN_REPORT', 'testCHECKOUT_UNCHECKOUT', 'testORDERPATCH', 'testTearDown'];
+    }
+    
+    function testSetUp() {
+        assertNotNull('Expected webdav is an object', webdav);
+        // clean of the test folder (twice delete the folder)
+        webdav.DELETE('', test_folder + '/');
+        var result = webdav.DELETE('', test_folder + '/');        
+        assertEquals('Clean of test folder - test of status', 404, result.status);
+		assertFalse('Clean of test folder - test of isSuccess() ', webdav.isSuccess(result.status));		
+		assertTrue('Clean of test folder - test if Header "Server" is existed', result.headers['Server'] != 'undefined');
+		
+        // create collection
+        var result = webdav.MKCOL('', test_folder);
+        assertEquals('test of creating of collection', 201, result.status);
+
+        // create a file test_folder/приклад1.txt and save some contents
+        result = webdav.PUT('', test_folder + '/приклад1.txt', {content: 'версія2'});
+        assertEquals('test of creating of resource ' + test_folder + '/приклад1.txt', 201, result.status);				
+
+		// test of PROPFIND to the test_folder/приклад1.txt - verifying of absent of properties "checked-out"
+        result = webdav.PROPFIND('', test_folder + '/приклад1.txt');
+        assertEquals('test of PROPFIND to the resource "' + test_folder + '/приклад1.txt"', 207, result.status);	
+        assertFalse('test of PROPFIND to the "' + test_folder + '/приклад1.txt" - verifying of absent of property "checked-out"', XMLtoString(result.content).search(/checked-out/) >= 0);
+        assertFalse('test of PROPFIND to the "' + test_folder + '/приклад1.txt" - verifying of absent of property "checked-in"', XMLtoString(result.content).search(/checked-in/) >= 0);		
+    }
+
+    function testVERSIONCONTROL_REPORT(){
+		// test of REPORT to the non-version-controled resource test_folder/приклад1.txt (Test REPORT.1)
+        var options = {
+            depth: '0',
+            type: 'version-tree'
+        };
+        var result = webdav.REPORT('', test_folder + '/приклад1.txt', options);
+        assertEquals('test of REPORT to the non-version-controled resource "' + test_folder + '/приклад1.txt" (Test REPORT.1)', 207, result.status);	
+
+		// create a version-control resource test_folder/приклад1.txt  
+        result = webdav.VERSIONCONTROL('', test_folder + '/приклад1.txt');
+        assertEquals('test of creating of version-control of resource' + test_folder + '/приклад1.txt', 200, result.status);		 
+
+		// test of PROPFIND to the test_folder/приклад1.txt (Test VERSIONCONTROL.1)
+        result = webdav.PROPFIND('', test_folder + '/приклад1.txt');
+        assertEquals('test of PROPFIND to the version-controled resource "' + test_folder + '/приклад1.txt"', 207, result.status);	
+        assertFalse('test of PROPFIND to the version-controled resource "' + test_folder + '/приклад1.txt" - verifying of absent of property "checked-out"(Test VERSIONCONTROL.1)', XMLtoString(result.content).search(/checked-out/) >= 0);
+        assertTrue('test of PROPFIND to the version-controled resource "' + test_folder + '/приклад1.txt" - verifying of present of property "checked-in" (Test VERSIONCONTROL.1)', XMLtoString(result.content).search(/checked-in/) >= 0);				
+
+		// test of REPORT to the version-controled resource test_folder/приклад1.txt (test REPORT.2)
+        options = {
+            depth: '0',
+            type: 'version-tree',
+			properties_list: ['successor-set', 'creator-displayname']
+        };
+        result = webdav.REPORT('', test_folder + '/приклад1.txt', options);
+        assertEquals('test of REPORT to the version-controled resource "' + test_folder + '/приклад1.txt"', 207, result.status);
+		result.content = XMLtoString(result.content);
+		var href = webdav.url + test_folder + '/приклад1.txt.1';
+        assertNotUndefined('test of REPORT to the version-controled resource "' + test_folder + '/приклад1.txt" - verifying of present of properties "href" (test REPORT.2)', result.content.match(/<D:href>\n*(.*)\n*<\/D:href>/)[1]);
+        assertEquals('test of REPORT "' + test_folder + '/приклад1.txt" - verifying of present of href = ' + href, href, result.content.match(/<D:href>\n*(.*)\n*<\/D:href>/)[1]);
+        assertTrue('test of REPORT to the version-controled resource "' + test_folder + '/приклад1.txt" - verifying of present of properties "successor-set, creator-displayname" (test REPORT.2)', result.content.search(/successor-set/) >= 0 && result.content.search(/creator-displayname/) >= 0);
+        assertFalse('test of REPORT to the version-controled resource "' + test_folder + '/приклад1.txt" - verifying of absent of properties "version-name" (test REPORT.2)', result.content.search(/version-name/) >= 0 );		
+
+        // CHECKIN of version-controled earlier test_folder/приклад1.txt (test VERSIONCONTROL.2)
+		var result = webdav.CHECKIN('', test_folder + '/приклад1.txt');
+        assertEquals('test of CHECKIN of version-controled earlier  "' + test_folder + '/приклад1.txt" (test VERSIONCONTROL.2)', 409, result.status);
+        assertTrue('test of CHECKIN of version-controled earlier "' + test_folder + '/приклад1.txt" - verifying of present of error code "must-be-checked-out" (test VERSIONCONTROL.2)', XMLtoString(result.content).search(/must-be-checked-out/) >= 0);
+    }
+	
+	function testCHECKOUT_CHECKIN_REPORT(){
+        // CHECKOUT of version-controled earlier test_folder/приклад1.txt (test CHECKOUT.1)
+		var result = webdav.CHECKOUT('', test_folder + '/приклад1.txt');
+        assertEquals('test of CHECKOUT of version-controled earlier "' + test_folder + '/приклад1.txt" (test CHECKOUT.1)', 200, result.status);
+
+		// test of PROPFIND to the test_folder/приклад1.txt (test CHECKOUT.2)
+        result = webdav.PROPFIND('', test_folder + '/приклад1.txt');
+        assertEquals('test of PROPFIND to the checked-out resource "' + test_folder + '/приклад1.txt"', 207, result.status);	
+        assertTrue('test of PROPFIND to the checked-out resource "' + test_folder + '/приклад1.txt" - verifying of present of property "checked-out" (test CHECKOUT.2)', XMLtoString(result.content).search(/checked-out/) >= 0);
+        assertFalse('test of PROPFIND to the checked-out resource "' + test_folder + '/приклад1.txt" - verifying of absent of property "checked-in" (test CHECKOUT.2)', XMLtoString(result.content).search(/checked-in/) >= 0);				
+
+        // CHECKOUT of checked-out earlier test_folder/приклад1.txt (test CHECKOUT.3)
+		var result = webdav.CHECKOUT('', test_folder + '/приклад1.txt');
+        assertEquals('test of CHECKOUT of checked-out earlier  "' + test_folder + '/приклад1.txt" (test CHECKOUT.3)', 409, result.status);
+        assertTrue('test of CHECKOUT of checked-out earlier "' + test_folder + '/приклад1.txt" - verifying of present of error code "must-be-checked-in" (test CHECKOUT.3)', XMLtoString(result.content).search(/must-be-checked-in/) >= 0);
+	
+        // modify a resource test_folder/приклад1.txt
+        result = webdav.PUT('', test_folder + '/приклад1.txt', {content: 'версія2'});
+        assertEquals('test of updating of resource ' + test_folder + '/приклад1.txt', 201, result.status);				
+
+		// CHECKIN a resource test_folder/приклад1.txt (test CHECKIN.1.5)
+        result = webdav.CHECKIN('', test_folder + '/приклад1.txt');
+        assertEquals('test of checkin of resource' + test_folder + '/приклад1.txt (test CHECKIN.1.5)', 201, result.status);
+		
+		// test of REPORT to the checkin resource test_folder/приклад1.txt (test REPORT.3)
+        result = webdav.REPORT('', test_folder + '/приклад1.txt');
+        assertEquals('test of version-tree REPORT about resource "' + test_folder + '/приклад1.txt"', 207, result.status);
+		result.content = XMLtoString(result.content);
+		var href = webdav.url + test_folder + '/приклад1.txt.2';
+        assertNotUndefined('test of REPORT to the checked-in resource "' + test_folder + '/приклад1.txt" - verifying of present of properties "href" (test REPORT.3)', result.content.match(/<D:href>\n*(.*)\n*<\/D:href>/)[1]);
+        assertEquals('test of REPORT "' + test_folder + '/приклад1.txt" - verifying of present of href = ' + href + ' (test REPORT.3)', href, XMLtoString(result.content).match(/<D:href>\n*(.*)\n*<\/D:href>/)[1]);
+        assertNotUndefined('test of REPORT to the checked-in resource "' + test_folder + '/приклад1.txt" - verifying of present of properties "version-name" (test REPORT.3)', result.content.match(/<D:version-name>\n*(.*)\n*<\/D:version-name>/)[1]);
+        assertEquals('test of REPORT to the checked-in resource "' + test_folder + '/приклад1.txt" - verifying of present of properties "version-name" = V2 (test REPORT.3)', 'V2', result.content.match(/<D:version-name>\n*(.*)\n*<\/D:version-name>/)[1]);					 
+        assertTrue('test of REPORT to the checked-in resource "' + test_folder + '/приклад1.txt" - verifying of present of properties "successor-set, creator-displayname" (test REPORT.3)', result.content.search(/successor-set/) >= 0 && result.content.search(/creator-displayname/) >= 0);
+		 
+		// test of PROPFIND to the checked-in test_folder/приклад1.txt (test CHECKIN.1.6)
+        result = webdav.PROPFIND('', test_folder + '/приклад1.txt');
+        assertEquals('test of PROPFIND to the checked-in resource "' + test_folder + '/приклад1.txt"', 207, result.status);	
+        assertFalse('test of PROPFIND to the checked-in resource "' + test_folder + '/приклад1.txt" - verifying of absent of property "checked-out" (test CHECKIN.1.6)', XMLtoString(result.content).search(/checked-out/) >= 0);
+        assertTrue('test of PROPFIND to the checked-in resource "' + test_folder + '/приклад1.txt" - verifying of present of property "checked-in" (test CHECKIN.1.6)', XMLtoString(result.content).search(/checked-in/) >= 0);				
+
+		// CHECKIN of checked-in earlier resource test_folder/приклад1.txt (test CHECKIN.1.7)
+        result = webdav.CHECKIN('', test_folder + '/приклад1.txt');
+        assertEquals('test of CHECKIN of of checked-in earlier resource "' + test_folder + '/приклад1.txt" (test CHECKIN.1.7)', 409, result.status);
+        assertTrue('test of CHECKIN of checked-in earlier resource  "' + test_folder + '/приклад1.txt" - verifying of present of error code "must-be-checked-out" (test CHECKIN.1.7)', XMLtoString(result.content).search(/must-be-checked-out/) >= 0);
+    }
+
+	function testCHECKOUT_UNCHECKOUT(){
+        // UNCHECKOUT of checked-in earlier test_folder/приклад1.txt (test UNCHECKOUT.2)
+		var result = webdav.UNCHECKOUT('', test_folder + '/приклад1.txt');
+        assertEquals('test of UNCHECKOUT of checked-in earlier resource "' + test_folder + '/приклад1.txt" (test UNCHECKOUT.2)', 409, result.status);
+        assertTrue('test of UNCHECKOUT of checked-in earlier "' + test_folder + '/приклад1.txt" - verifying of present of error code "must-be-checked-out" (test UNCHECKOUT.2)', XMLtoString(result.content).search(/must-be-checked-out/) >= 0);
+		
+        // CHECKOUT of checked-in earlier test_folder/приклад1.txt
+		var result = webdav.CHECKOUT('', test_folder + '/приклад1.txt');
+        assertEquals('test of CHECKOUT of checkouted earlier  "' + test_folder + '/приклад1.txt"', 200, result.status);	
+
+		// test of PROPFIND to the checked-out test_folder/приклад1.txt (test CHECKOUT.2)
+        result = webdav.PROPFIND('', test_folder + '/приклад1.txt');
+        assertEquals('test of PROPFIND to the checked-out resource "' + test_folder + '/приклад1.txt"', 207, result.status);	
+        assertTrue('test of PROPFIND to the checked-out "' + test_folder + '/приклад1.txt" - verifying of present of property "checked-out" (test CHECKOUT.2)', XMLtoString(result.content).search(/checked-out/) >= 0);
+        assertFalse('test of PROPFIND to the checked-out "' + test_folder + '/приклад1.txt" - verifying of absent of property "checked-in" (test CHECKOUT.2)', XMLtoString(result.content).search(/checked-in/) >= 0);				
+
+        // UNCHECKOUT of checked-out earlier test_folder/приклад1.txt
+		var result = webdav.UNCHECKOUT('', test_folder + '/приклад1.txt');
+        assertEquals('test of UNCHECKOUT of checked-out earlier resource "' + test_folder + '/приклад1.txt"', 200, result.status);
+
+		// test of PROPFIND to the unchecked-out test_folder/приклад1.txt (test UNCHECKOUT.1)
+        result = webdav.PROPFIND('', test_folder + '/приклад1.txt');
+        assertEquals('test of PROPFIND to the unchecked-out resource "' + test_folder + '/приклад1.txt"', 207, result.status);	
+        assertFalse('test of PROPFIND to the unchecked-out "' + test_folder + '/приклад1.txt" - verifying of absent of property "checked-out" (test UNCHECKOUT.1)', XMLtoString(result.content).search(/checked-out/) >= 0);
+        assertTrue('test of PROPFIND to the unchecked-out "' + test_folder + '/приклад1.txt" - verifying of present of property "checked-in" (test UNCHECKOUT.1)', XMLtoString(result.content).search(/checked-in/) >= 0);
+
+        // UNCHECKOUT of unchecked-out earlier test_folder/приклад1.txt (test UNCHECKOUT.3)
+		var result = webdav.UNCHECKOUT('', test_folder + '/приклад1.txt');
+        assertEquals('test of UNCHECKOUT of unchecked-out earlier resource "' + test_folder + '/приклад1.txt" (test UNCHECKOUT.3)', 409, result.status);
+        assertTrue('test of UNCHECKOUT of unchecked-in earlier "' + test_folder + '/приклад1.txt" - verifying of present of error code "must-be-checked-out" (test UNCHECKOUT.3)', XMLtoString(result.content).search(/must-be-checked-out/) >= 0);
+		
+        // delete the collection
+        result = webdav.DELETE('', test_folder + '/');
+        assertEquals('test of deleting of collection', 204, result.status);
+    }
+
+    function testORDERPATCH(){
+        // create collection
+        var result = webdav.MKCOL('', test_folder);
+        assertEquals('test of creating of collection', 201, result.status);
+
+        // create a resource test_folder/файл1.txt and save some contents
+        result = webdav.PUT('', test_folder + '/файл1.txt', {content: 'файл1.txt'});
+        assertEquals('test of creating of resource', 201, result.status);
+
+        // create a resource test_folder/файл2.txt and save some contents
+        result = webdav.PUT('', test_folder + '/файл2.txt', {content: 'файл2.txt'});
+        assertEquals('test of creating of resource', 201, result.status);
+		
+        // create a resource test_folder/файл3.txt and save some contents
+        result = webdav.PUT('', test_folder + '/файл3.txt', {content: 'файл3.txt'});
+        assertEquals('test of creating of resource', 201, result.status);
+
+        // create a resource test_folder/файл4.txt and save some contents
+        result = webdav.PUT('', test_folder + '/файл4.txt', {content: 'файл4.txt'});
+        assertEquals('test of creating of resource', 201, result.status);
+
+        // create a resource test_folder/зразок.ord and save some contents
+        result = webdav.PUT('', test_folder + '/зразок.ord', {content: 'зразок.ord'});
+        assertEquals('test of creating of resource', 201, result.status);
+
+		// test of PROPFIND to the test_folder before the position properties will be set
+        var options = {
+            depth: 1,
+            operation: 'propname'
+        };
+        result = webdav.PROPFIND('', test_folder + '/', options);
+        assertEquals('test of PROPFIND to the "' + test_folder + '/"', 207, result.status);	
+        assertFalse('test of PROPFIND to "' + test_folder + '/" - verifying of absent of property "position"', XMLtoString(result.content).search(/position>/i) >= 0);
+
+		// set new position properties of resource using ORDERPATCH method
+        var order_members = new Array(3);
+		order_members[0] = {			
+			segment_name: 'файл2.txt',
+			position: 'first'
+		}
+		order_members[1] = {			
+			segment_name: 'файл1.txt',
+			position: 'last'
+		}
+		order_members[2] = {			
+			segment_name: 'файл3.txt',
+			position: 'before',
+			parent_segment: 'файл4.txt'
+		}
+
+		var options = {
+            ordering_type_href: test_folder + '/зразок.ord',
+			order_members: order_members,
+        };
+
+        result = webdav.ORDERPATCH('', test_folder + '/', options);
+        assertEquals('test of ORDERPATCH of the collection ' + test_folder + '/ (Test ORDERPATCH.1, JCR-656)', 200, result.status);		
+
+		// test of PROPFIND to the test_folder after setting of the position properties
+        var options = {
+            depth: 1,
+            operation: 'allprop'
+        };
+        result = webdav.PROPFIND('', test_folder + '/', options);
+        assertEquals('test of PROPFIND to the "' + test_folder + '/"', 207, result.status);	
+        assertTrue('test of PROPFIND to "' + test_folder + '/" - verifying of presence of property "position"  (Test ORDERPATCH.1, JCR-656)', XMLtoString(result.content).search(/position>/i) >= 0);
+
+        // delete the collection
+        result = webdav.DELETE('', test_folder + '/');
+        assertEquals('test of deleting of collection', 204, result.status);        
+    }
+
+	function testTearDown(){
+		// delete the collection
+        result = webdav.DELETE('', test_folder + '/');
+        assertEquals('test of deleting of collection', 204, result.status);        
+	}
+
+</script>
+</head>
+<body>
+	<h1>eXo Platform Client Library of WebDAV Test Suite</h1>
+	<p>This page contains a JSUnit tests of eXo Platform Client Library of WebDAV.</p>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app>
+  <display-name>eXo WS Samples</display-name>
+  <filter>
+    <filter-name>RestContentFilter</filter-name>
+    <filter-class>org.exoplatform.services.rest.servlet.RestEncodingFilter</filter-class>
+    <init-param>
+      <param-name>REQUEST_ENCODING</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+  </filter>
+  <filter>
+    <filter-name>OAuthConsumerFilter</filter-name>
+    <filter-class>org.exoplatform.ws.security.oauth.http.OAuthConsumerFilter</filter-class>
+    <init-param>
+      <param-name>consumer</param-name>
+      <param-value>exo1</param-value>
+    </init-param>
+  </filter>
+  <filter>
+    <filter-name>OAuthRequestWrapperFilter</filter-name>
+    <filter-class>org.exoplatform.ws.security.oauth.http.OAuthRequestWrapperFilter</filter-class>
+  </filter>
+  <filter>
+    <filter-name>OAuthLogoutFilter</filter-name>
+    <filter-class>org.exoplatform.ws.security.oauth.http.OAuthLogoutFilter</filter-class>
+    <init-param>
+      <param-name>consumer</param-name>
+      <param-value>exo1</param-value>
+    </init-param>
+    <init-param>
+      <param-name>redirectToUrl</param-name>
+      <param-value>http://localhost:8080/ws-examples</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>RestContentFilter</filter-name>
+    <url-pattern>/rest/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>OAuthConsumerFilter</filter-name>
+    <url-pattern>/rest/samples/security/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>OAuthRequestWrapperFilter</filter-name>
+    <url-pattern>/rest/samples/security/*</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>OAuthConsumerFilter</filter-name>
+    <url-pattern>/oauth/protected/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>OAuthRequestWrapperFilter</filter-name>
+    <url-pattern>/oauth/protected/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>OAuthLogoutFilter</filter-name>
+    <url-pattern>/oauth/protected/*</url-pattern>
+  </filter-mapping>
+
+  <listener>
+    <listener-class>org.exoplatform.ws.frameworks.servlet.StandaloneContainerInitializedListener</listener-class>
+  </listener>
+
+  <servlet>
+    <servlet-name>RestServer</servlet-name>
+    <description>eXo - Platform REST Server</description>
+    <servlet-class>org.exoplatform.services.rest.servlet.RestServlet</servlet-class>
+    <load-on-startup>3</load-on-startup>
+  </servlet>
+  <servlet>
+    <servlet-name>SOAPServlet</servlet-name>
+    <display-name>SOAP Servlet</display-name>
+    <servlet-class>org.exoplatform.services.ws.impl.cxf.transport.http.SOAPServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>OAuthCallbackServlet</servlet-name>
+    <servlet-class>org.exoplatform.ws.security.oauth.http.OAuthCallbackServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SOAPServlet</servlet-name>
+    <url-pattern>/soap/servlet/SOAPServlet/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>SOAPServlet</servlet-name>
+    <url-pattern>/soap/services/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>RestServer</servlet-name>
+    <url-pattern>/rest/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>OAuthCallbackServlet</servlet-name>
+    <url-pattern>/callback/*</url-pattern>
+  </servlet-mapping>
+</web-app>
