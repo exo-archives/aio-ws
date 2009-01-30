@@ -1,1 +1,0 @@
-Congratulations! You received message using cross-domain AJAX!

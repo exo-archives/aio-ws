@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-  elementFormDefault="unqualified">
-
-  <xsd:include schemaLocation="type-groupinfo.xsd" />
-  
-  <xsd:element name="groupInfo" type="_groupInfo_"/>
-  
-</xsd:schema>
