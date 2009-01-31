@@ -1,21 +1,15 @@
 <project>
-
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.exoplatform.ws</groupId>
   <artifactId>config</artifactId>
   <name>eXo WS Config</name>
   <version>2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-
   <modules>
-  
     <module>commons</module>
-    
     <module>frameworks/json</module>
     <module>frameworks/servlet</module>
     <module>frameworks/cometd</module>
-    
-    
     <module>rest/core</module>
     <module>rest/ext</module>
     <module>rest/ejb/connector2_1/modules/connector</module>
@@ -24,9 +18,7 @@
     <module>rest/ejb/connector3_0/modules/connector</module>
     <module>rest/ejb/connector3_0/modules/client</module>
     <module>rest/ejb/connector3_0</module>
-    
     <module>soap/jsr181</module>
-    
     <module>security/oauth/consumer</module>
     <module>security/oauth/provider/service</module>
     <module>security/oauth/provider/webapp</module>
@@ -34,12 +26,10 @@
     <module>security/cas/client</module>
     <module>security/spnego/core</module>
     <module>security/spnego/tomcat</module>
-    
     <module>application/config</module>
     <module>application/java/web/samples</module>
     <module>application/java/services/samples/rest/services</module>
     <module>application/java/services/samples/soap/jsr181</module>
-
   </modules>
   <dependencies>
     <dependency>
@@ -50,13 +40,11 @@
     </dependency>
   </dependencies>
   <build>
-<!--
-    <sourceDirectory>src/main/java</sourceDirectory>
-    <outputDirectory>target/classes</outputDirectory>
-    <testSourceDirectory>src/test/java</testSourceDirectory>
-    <testOutputDirectory>target/test-classes</testOutputDirectory>
--->
 
+<!--  <sourceDirectory>src/main/java</sourceDirectory>-->
+<!--  <outputDirectory>target/classes</outputDirectory>-->
+<!--  <testSourceDirectory>src/test/java</testSourceDirectory>-->
+<!--  <testOutputDirectory>target/test-classes</testOutputDirectory>-->
     <resources>
       <resource>
         <directory>src/main/java</directory>
@@ -114,7 +102,6 @@
         </includes>
       </testResource>
     </testResources>
-
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -125,7 +112,6 @@
           <optimize>${exo.compile.optimize}</optimize>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -189,13 +175,13 @@
                 <echo message="[EMMA] Start report generation..." />
                 <taskdef resource="emma_ant.properties" classpathref="maven.dependency.classpath" />
                 <emma enabled="true">
-                  <!-- merged file will be rewritted by last project -->
+<!--                   merged file will be rewritted by last project -->
                   <merge outfile="${exo.projects.directory.src}/ws/trunk/target/coverage.es">
-                    <fileset dir="${exo.projects.directory.src}/ws/trunk">
+                    <fileset dir="${exo.projects.directory.src}/ws/trunk/">
                       <include name="**/target/emma/*.e*" />
                       <include name="**/target/emma/*.e*" />
                     </fileset>
-                    <!-- just for the first launnch -->
+<!--                     just for the first launnch -->
                     <fileset file="${exo.projects.directory.config}/coverage.es" />
                   </merge>
                   <report>
@@ -204,7 +190,7 @@
                         <include name="**/src/**/java" />
                       </dirset>
                     </sourcepath>
-                    <fileset dir="${exo.projects.directory.src}/ws/trunk/">
+                    <fileset dir="${exo.projects.directory.src}/ws/trunk/target/">
                       <include name="*.es" />
                     </fileset>
                     <html outfile="${exo.projects.directory.src}/ws/trunk/target/coverage.html" />
