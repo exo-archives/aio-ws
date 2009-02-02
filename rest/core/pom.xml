@@ -84,7 +84,7 @@
         <configuration>
           <excludes>
             <exclude>**/AnnotationInheritanceTest.java</exclude>
-            <exclude>**/AcceptResourceTest.java</exclude>
+            <!--exclude>**/AcceptResourceTest.java</exclude-->
           </excludes>
         </configuration>
       </plugin>
