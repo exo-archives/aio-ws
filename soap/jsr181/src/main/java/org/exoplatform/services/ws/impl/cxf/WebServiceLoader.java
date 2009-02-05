@@ -137,6 +137,11 @@ public class WebServiceLoader {
     String serviceName = implementor.getClass().getAnnotation(WebService.class).serviceName();
     String portName = implementor.getClass().getAnnotation(WebService.class).portName();
 
+    if (LOG.isDebugEnabled())
+      LOG.debug(" serviceName = " + serviceName);
+    if (LOG.isDebugEnabled())
+      LOG.debug(" portName = " + portName);
+    
     String address = new String();
     if (serviceName != null && serviceName.length() != 0)
       address += "/" + serviceName;
@@ -145,8 +150,8 @@ public class WebServiceLoader {
       address += "/" + portName;
 
     if (LOG.isDebugEnabled()) {
-      LOG.debug("loadBus() - address = " + address);
-      LOG.debug("loadBus() - implementor = " + implementor);
+      LOG.debug("getAddress() - address = " + address);
+      LOG.debug("getAddress() - implementor = " + implementor);
     }
     return address;
   }
