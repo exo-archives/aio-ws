@@ -12,10 +12,6 @@
 
   <servlet-mapping>
     <servlet-name>SOAPServlet</servlet-name>
-    <url-pattern>/soap/servlet/SOAPServlet/*</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>SOAPServlet</servlet-name>
     <url-pattern>/soap/services/*</url-pattern>
   </servlet-mapping>
 
