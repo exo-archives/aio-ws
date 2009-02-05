@@ -453,10 +453,9 @@ public final class RequestDispatcher {
     }
 
     List<MediaType> acceptable = request.getAcceptableMediaTypes();
-    ListIterator<ResourceMethodDescriptor> i = methods.listIterator();
     float previousQValue = 0.0F;
     int n = 0, p = 0;
-    while (i.hasNext()) {
+    for (ListIterator<ResourceMethodDescriptor> i = methods.listIterator(); i.hasNext();) {
       n = i.nextIndex();
       ResourceMethodDescriptor rmd = i.next();
       float qValue = MediaTypeHelper.processQuality(acceptable, rmd.produces());
@@ -470,8 +469,14 @@ public final class RequestDispatcher {
 
     if (!methods.isEmpty()) {
       // remove all with lower q value
-      if (methods.size() > 1)
-        methods = methods.subList(p, methods.size());
+      if (methods.size() > 1) {
+        n = 0;
+        for (Iterator<ResourceMethodDescriptor> i = methods.listIterator(); i.hasNext(); i.remove(), n++) {
+          i.next();
+          if (n == p)
+            break; // get index p in list then stop removing
+        }
+      }
 
       return true;
     }

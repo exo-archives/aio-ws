@@ -153,12 +153,12 @@ public class AcceptResourceTest extends AbstractResourceTest {
 
     assertEquals("m3", testAcceptedMediaType("image/jpeg;q=0.8,  image/png;q=0.9"));
     assertEquals("m3", testAcceptedMediaType("image/foo;q=0.8,  image/png;q=0.9"));
-    assertEquals("m3", testAcceptedMediaType("image/foo;q=0.9,  image/png;q=0.8"));
+    assertEquals("m2", testAcceptedMediaType("image/foo;q=0.9,  image/png;q=0.8"));
     
     assertEquals("m2", testAcceptedMediaType("image/foo;q=0.9,  image/gif;q=0.8"));
     
     assertEquals("m4", testAcceptedMediaType("application/x-www-form-urlencoded"));
-    assertEquals("m0", testAcceptedMediaType("application/x-www-form-urlencoded,text/plain;q=0.5"));
+    assertEquals("m0", testAcceptedMediaType("application/x-www-form-urlencoded;q=0.5,text/plain"));
     unregistry(r2);
   }
   
@@ -166,12 +166,12 @@ public class AcceptResourceTest extends AbstractResourceTest {
     Resource3 r3 = new Resource3();
     registry(r3);
     assertEquals("m3", testComplex("text/plain", "text/plain;q=0.9"));
-    assertEquals("m0", testComplex("text/plain", "text/plain;q=0.9,text/xml;q=0.3"));
-    assertEquals("m2", testComplex("text/xml", "text/plain;q=0.9,text/html;q=0.3"));
-    assertEquals("m0", testComplex("text/xml", "text/xml;q=0.9,text/*;q=0.3"));
+    assertEquals("m0", testComplex("text/plain", "text/plain;q=0.3,text/xml;q=0.9"));
+    assertEquals("m3", testComplex("text/xml", "text/plain;q=0.9,text/html;q=0.3"));
+    assertEquals("m0", testComplex("text/xml", "text/xml,text/*;q=0.3"));
     assertEquals("m1", testComplex("image/*", "image/*"));
     assertEquals("m3", testComplex("image/*", "image/png"));
-    assertEquals("m1", testComplex("image/*", "image/png,image/gif;q=0.1"));
+    assertEquals("m3", testComplex("image/*", "image/png,image/gif;q=0.1"));
     assertEquals("m1", testComplex("image/*", "image/*,image/gif;q=0.1"));
     assertEquals("m3", testComplex("foo/bar", "foo/bar"));
     
