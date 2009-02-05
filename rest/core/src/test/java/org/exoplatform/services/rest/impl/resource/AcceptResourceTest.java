@@ -168,7 +168,7 @@ public class AcceptResourceTest extends AbstractResourceTest {
     assertEquals("m3", testComplex("text/plain", "text/plain;q=0.9"));
     assertEquals("m0", testComplex("text/plain", "text/plain;q=0.9,text/xml;q=0.3"));
     assertEquals("m2", testComplex("text/xml", "text/plain;q=0.9,text/html;q=0.3"));
-    assertEquals("m0", testComplex("text/xml", "text/xml;q=0.3,text/*;q=0.9"));
+    assertEquals("m0", testComplex("text/xml", "text/xml;q=0.9,text/*;q=0.3"));
     assertEquals("m1", testComplex("image/*", "image/*"));
     assertEquals("m3", testComplex("image/*", "image/png"));
     assertEquals("m1", testComplex("image/*", "image/png,image/gif;q=0.1"));
