@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            elementFormDefault="unqualified">
+
+  <xsd:include schemaLocation="type-group.xsd"/>
+  
+  <xsd:element name="groups">
+    <xsd:complexType>
+	  	<xsd:sequence>
+	      <xsd:element name="group" type="_typeGroup_" maxOccurs="unbounded"/>
+	 	  </xsd:sequence>
+  	</xsd:complexType> 
+  </xsd:element>
+</xsd:schema>

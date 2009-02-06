@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>                                                                                                                                         
+  <component>                                                                                                                                           
+    <type>org.exoplatform.services.ws.rest.samples.JsonBookService</type>                                                                             
+  </component>                                                                                                                                          
+  <component>                                                                                                                                           
+    <type>org.exoplatform.services.ws.rest.samples.JSR250AnnotationExample</type>                                                                             
+  </component>                                                                                                                                          
+  <component>                                                                                                                                           
+    <type>org.exoplatform.services.ws.rest.samples.BookStorage</type>                                                                       
+  </component>                                                                                                                                          
+  <component>                                                                                                                                           
+    <type>org.exoplatform.services.ws.rest.samples.Calculator</type>                                                                       
+  </component>
+  <component>                                                                                                                                           
+    <type>org.exoplatform.services.ws.rest.samples.SimpleService</type>                                                                      
+  </component>
+</configuration>

@@ -1,0 +1,45 @@
+<assembly>
+  <id>2.0</id>
+  <formats>
+    <format>dir</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+
+  <fileSets>
+    <fileSet>
+      <directory>target/classes</directory>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>
+  </fileSets>
+
+  <dependencySets>
+    <dependencySet>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <outputDirectory>/</outputDirectory>
+
+      <excludes>
+        <exclude>org.springframework:spring</exclude>
+        <exclude>javax.servlet:servlet-api</exclude>
+        <exclude>javax.ejb:ejb</exclude>
+        <exclude>org.apache.ws.commons:XmlSchema</exclude>
+        <exclude>org.apache.ant:ant</exclude>
+        <exclude>ant:ant</exclude>
+        <exclude>org.apache.ant:ant-launcher</exclude>
+        <exclude>ant:ant-launcher</exclude>
+        <exclude>org.objectweb.carol:carol</exclude>
+        <exclude>org.apache.xbean:xbean</exclude>
+        <exclude>org.apache.xbean:xbean-spring</exclude>
+        <exclude>xmlbeans:xbean</exclude>
+        <exclude>xml-apis:xml-apis</exclude>
+        <exclude>xerces:xmlParserAPIs</exclude>
+        <exclude>xerces:xercesImpl</exclude>
+        <exclude>javax.portlet:portlet-api</exclude>
+      </excludes>
+
+    </dependencySet>
+  </dependencySets>
+
+  <componentDescriptors />
+
+</assembly>

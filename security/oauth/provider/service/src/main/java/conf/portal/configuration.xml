@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <component>
+    <type>org.exoplatform.ws.security.oauth.impl.OAuthProviderServiceImpl</type>
+    <init-params>
+      <properties-param>
+        <name>exo1</name>
+        <property name="consumer.secret" value="81d1b5d080d1" />
+        <property name="consumer.description" value="exo oauth consumer" />
+        <property name="consumer.callbackURL" value="http://localhost:8080/ws-examples/callback" />
+      </properties-param>
+    </init-params>
+  </component>
+</configuration>

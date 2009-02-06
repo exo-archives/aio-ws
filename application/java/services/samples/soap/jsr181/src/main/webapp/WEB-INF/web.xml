@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app>
+  <display-name>eXo WS Samples</display-name>
+
+  <servlet>
+    <servlet-name>SOAPServlet</servlet-name>
+    <display-name>SOAP Servlet</display-name>
+    <servlet-class>org.exoplatform.services.ws.impl.cxf.transport.http.SOAPServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>SOAPServlet</servlet-name>
+    <url-pattern>/soap/services/*</url-pattern>
+  </servlet-mapping>
+
+  <mime-mapping>
+    <extension>wsdl</extension>
+    <mime-type>text/xml</mime-type>
+  </mime-mapping>
+
+  <mime-mapping>
+    <extension>xsd</extension>
+    <mime-type>text/xml</mime-type>
+  </mime-mapping>
+
+  <security-role>
+    <role-name>auth-user</role-name>
+  </security-role>
+
+</web-app>

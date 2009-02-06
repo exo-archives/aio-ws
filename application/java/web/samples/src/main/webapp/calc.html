@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="js/json2.js"></script> 
+    <script type="text/javascript" src="js/prototype.js"></script>
+    <title>Calculator</title>
+  </head>
+  
+  <script type="text/javascript">
+    <!--
+    
+    var a = 0;
+    var b = 0;
+    var op = null;
+    
+    function _clear_() {
+      $('calc_result').value = "";
+      a = 0;
+      b = 0;
+      op = null;
+    }
+    
+    function calculate() {
+      $('calc_result').value = "";
+      var request = new Ajax.Request(                                                                                                                       
+        "rest/samples/calculator/" + op + "/" + a + "/" + b,                                                                                                                                                
+        {          
+          method: "GET",
+          requestHeaders:{ 'Accept':'text/plain' },
+          onSuccess: update,                                                                                                                            
+          onFailure: _error_
+        }                                                                                                                                                   
+      );                              
+      a = 0;
+      b = 0;
+      op = null;
+    }
+
+    function operation(o) {
+      $('calc_result').value = "";
+      op = o;
+    }
+
+    function dig(d) {
+      if(op == null)
+        if (a == 0)
+          a = d;
+        else 
+          a += d;
+      else
+        if (b == 0)
+          b = d;
+        else 
+          b += d;
+      $('calc_result').value += d;
+    }
+
+    function _error_(req) {
+//      alert("HTTP error "+req.status+": "+req.statusText);
+      $('server_status').innerHTML = "server status: " + req.status;
+      $('server_message').innerHTML = "server message: " + req.statusText;
+    }
+
+    function update(req) {
+      $('calc_result').value = req.responseText.replace(/(^\s*)|(\s*$)/g, "");
+      $('server_status').innerHTML = "server status: " + req.status;
+      $('server_message').innerHTML = "server message: " + req.statusText;
+    }
+//-->
+  </script>
+  
+  <style type="text/css">
+    .input {
+      font-size: 12px;
+      font-family: Verdana;
+      border: solid 1px #cccccc;
+    }
+  </style>
+  
+  <body onload="_clear_();">
+    <table>
+        <tr><td colspan="4"><input class="input" id="calc_result" type="text" value="" readonly="yes"/></td></tr>        
+        <tr><td><input class="input" type="button" value="1" onclick="dig(this.value);"/></td>
+        <td><input class="input" type="button" value="2" onclick="dig(this.value);"/></td>
+        <td><input class="input" type="button" value="3" onclick="dig(this.value);"/></td>
+        <td><input class="input" type="button" value="+" onclick="operation('add');"/></td>
+            </tr>
+        <tr><td><input class="input" type="button" value="4" onclick="dig(this.value);"/></td>
+        <td><input class="input" type="button" value="5" onclick="dig(this.value);"/></td>
+        <td><input class="input" type="button" value="6" onclick="dig(this.value);"/></td>
+        <td><input class="input" type="button" value="-" onclick="operation('subtract');"/></td>
+            </tr>
+        <tr><td><input class="input" type="button" value="7" onclick="dig(this.value);"/></td>
+        <td><input class="input" type="button" value="8" onclick="dig(this.value);"/></td>
+        <td><input class="input" type="button" value="9" onclick="dig(this.value);"/></td>
+        <td><input class="input" type="button" value="*" onclick="operation('multiply');"/></td>
+            </tr>
+        <tr><td><input class="input" type="button" value="0" onclick="dig(this.value);"/></td>
+        <td><input class="input" type="button" value="=" onclick="calculate();"/></td>
+        <td><input class="input" type="button" value="C" onclick="_clear_();"/></td>
+        <td><input class="input" type="button" value="/" onclick="operation('divide');"/></td>
+            </tr>
+        </table>
+    <span id="server_status" ></span><br/>
+    <span id="server_message" ></span> 
+    
+    
+  </body>
+  
+</html>

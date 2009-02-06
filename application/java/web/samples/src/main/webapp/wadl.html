@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+        <title>WADL</title>
+        <script type="text/javascript" src="js/webdav.js"></script>
+        <script>
+            /**
+             * Serialize an XML Document or Element and return it as a string.
+             */
+            function XMLtoString(node) {
+                if (typeof node != 'object') return node; 
+                if (typeof XMLSerializer != "undefined")
+                    return (new XMLSerializer( )).serializeToString(node);
+                else if (node.xml) return node.xml;
+                else throw "XML.serialize is not supported or can't serialize " + node;
+            };
+
+            // Define a generic toString( ) method that may be of interest to other classes.
+            function ObjectToString(object) {
+                var props = [];
+                for(var name in object) {
+                    if (!object.hasOwnProperty(name)) continue;
+                    var value = object[name];
+                    var s = "<b>" + name + "</b>: ";
+                    switch(typeof value) {
+                    case 'function':
+                        s += "function";
+                        break;
+                    case 'object':
+                        if (value instanceof Array) s += "array"
+                        else s += value.toString( );
+                        break;
+                    default:
+                        s += String(value);
+                        break;
+                    }
+                    props.push(s);
+                }
+                return props.join("<br />");
+            }
+
+            function clear_table() {
+                document.getElementById("results_cell").innerHTML = '&nbsp;';                
+            }
+    
+            // define webdav methods handlers
+            function handler_onSuccess(result) {
+                alert('Request SUCCEEDED with status = ' + result.status + ': ' + result.statusstring);
+            };
+    
+            function handler_onError(result) {
+                alert('Request FAILED with status = ' + result.status + ': ' + result.statusstring);
+            };
+    
+            function handler_onComplete(result) {
+                result.content = "<textarea cols=60 rows=30 readonly='readonly'>" + XMLtoString(result.content) + "</textarea>";
+                var results_text = "<b><u>Status:</u></b><br />" + result.status + ":" + result.statusstring + "<hr />"
+                + "<b><u>Content:</u></b><br />" + decodeURI(result.content) + "<hr />";                
+                document.getElementById('results_cell').innerHTML = results_text;
+            };
+    
+            var handler = {
+                onSuccess: handler_onSuccess,
+                onError: handler_onError,
+                onComplete: handler_onComplete
+            }
+    
+            // get and setup webdav object
+            function getWebdavObject(){
+                var host = document.getElementById('webdav_host').value;
+                var port = document.getElementById('webdav_port').value;
+    
+                webdav = new Webdav(host, port);
+                /*
+                webdav.username = document.getElementById('webdav_username').value;
+                webdav.password = document.getElementById('webdav_password').value;
+                */
+                return webdav;
+            }
+            
+            function performs_WADL() {
+                var webdav = getWebdavObject();
+                if (! document.getElementById('webdav_host').value) {
+                    alert('Please type host with webdav folder');
+                    document.getElementById('webdav_host').focus();
+                    return;
+                }
+                clear_table();
+
+                var path = document.getElementById('path').value;
+                var options = {
+                    additional_headers: new Array
+                }
+                options.additional_headers['Accept'] = 'application/vnd.sun.wadl+xml';
+                webdav.OPTIONS(handler, path, options);                
+            }
+        </script>
+    </head>
+    <body>
+        <table border='0' width=80%>
+            <tr>
+                <td width="30%" align="center"><i>Parameters of request</i></td>
+                <td width="70%" align="center"><i>Response</i></td>        
+            </tr>
+            <tr>
+                <td width="30%" id="options_cell" valign="top">
+                <!-- 
+                    username = <input type="text" id="username" value="root"/><br />
+                    password = <input type="text" id="password" value="exo"/><br />
+                    -->
+                    URL: <br />
+                    host = <input type="text" id="webdav_host" value="localhost"/><br />
+                    port = <input type="text" id="webdav_port" value="8080"/><br />
+                    path = <input type="text" id="path" value="/ws-examples/rest/samples/json" />
+                    <input type='button' value='Get WADL' onClick='performs_WADL()'/>                    
+                </td>
+                <td width="70%" id="results_cell" valign="top">&nbsp;</td>
+            </tr>
+        </table>
+    </body>
+</html>

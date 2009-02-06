@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<group>
+	<id>gfdhfghdgfhd</id>
+	<parentId>/exo</parentId>
+	<name>name</name>
+	<label>label</label>
+	<description>description</description>
+	<members>
+		<member>
+			<userName>demo</userName>
+			<firstName>Demo</firstName>
+			<lastName>exo</lastName>
+			<email>demo@mail.com</email>
+		</member>
+		<member>
+			<userName>demo</userName>
+			<firstName>Demo</firstName>
+			<lastName>exo</lastName>
+			<email>demo@mail.com</email>
+		</member>
+	</members>
+</group>

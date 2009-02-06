@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+ **
+ * Created by The eXo Platform SARL
+ * Author : Max Shaposhnik
+ * 
+ * Jan 09, 2009          
+ *
+-->
+<Module>
+	<ModulePrefs author="eXoPlatform"
+		title="Artifact"
+		directory_title="Artifact gadget"
+		title_url="http://www.exoplatform.org"
+		description="Artifact managing gadget"
+		thumbnail="http://localhost:8080/eXoGadgets/skin/DefaultSkin/portletIcons/Calendar.png"
+		height="335">
+	</ModulePrefs>
+	<Content type="html">
+	<![CDATA[
+
+<style type="text/css">
+
+              .Content {
+	        	font-family:arial;
+			font-size: 12px;
+			height: 335px;
+			overflow-x: hidden;
+			overflow-y: auto;
+                        margin-right: 0px;
+                        padding-right: 0px;
+                        width: 100%;
+		        }
+
+               .Addform {
+                         font-family:arial;
+			 font-size: 12px;
+                         width: 100%;
+                         }
+
+            .underlined { 
+                         border-bottom : 1px solid #cccccc; 
+			 font-size: 12px;
+                         text-align: center;
+                        }
+
+              .centered { 
+                        text-align: center; 
+			font-size: 12px;
+                        padding-left: 2px;
+                        padding-right: 2px;
+                        }
+              .fileicon {
+                        background: url(/eXoGadgets/gadgets/Artifact/BlueInfoBox.gif) center left no-repeat;
+                        }
+
+              .foldericon {
+                          background: url(/eXoGadgets/gadgets/Artifact/Box.gif) center left no-repeat;
+                          }
+              .parenticon {
+                          background: url(/eXoGadgets/gadgets/Artifact/BackArrowBlue.gif) center left no-repeat;
+                          }
+			
+                      a {
+                        text-decoration: none; color: #10409C; 
+		        font-size: 12px;
+                        text-align: left;
+                        vertical-align: top;
+                        }
+
+
+</style>
+
+
+<script type="text/javascript">
+
+	function ajaxFunction(url)
+	 {
+	    var xmlHttp;
+	    try
+	      {xmlHttp=new XMLHttpRequest();}
+	       catch (e)
+	 	 {    try
+		    {    xmlHttp=new ActiveXObject("Msxml2.XMLHTTP");    }
+		  catch (e)
+		    {    try
+		      {      xmlHttp=new ActiveXObject("Microsoft.XMLHTTP");      }
+		    catch (e)
+		      {      alert("Your browser does not support AJAX!");      return false;      }    }  }
+         try {
+        xmlHttp.open("GET", url, 0); 
+        xmlHttp.send(""); 
+        document.getElementById("content").innerHTML = rewriteLinks(xmlHttp.responseText); 
+        document.getElementById("addrform").style.display = "none";
+        } catch (e) {
+	 document.getElementById("content").innerHTML = "<br><center><font color=\"red\">Error fetching page from this URL.</font></center>"; 
+        }
+        var xmlHttp = null; 
+       }
+
+    function rewriteLinks(text){
+    var find = /<a href="(\S{2,})">/ig;  //Any URL;
+
+    var arr = text.match(find);
+  
+    if (arr != null) {
+ 
+    for (i=0;i<arr.length; i++) {
+
+     if (arr[i].indexOf("?view") > -1) 
+     {
+       text = text.replace(arr[i], "<a href=\"#\" onclick=\"ajaxFunction\('" + stripTags(arr[i]) + "'\)\">"    );	
+      } 
+
+     }
+    }
+//    alert(text);
+    return text;    
+}
+
+
+  function stripTags(text){ 
+  var re= /<a href="(\S{2,})">/g; 
+  text = text.replace(re,"$1"); 
+  return text;
+  } 
+
+
+</script>
+
+<body>
+
+<div id="addrform"><font size="2" class="Addform"><b>Enter the URL to browse:</b></font>
+<input type="text" id="address" name="address" size="30" value="/portal/rest/maven2">&nbsp;<input type="button" value="Browse" onclick="ajaxFunction(document.getElementById('address').value + '?view=true&gadget=true');">
+</div>
+
+<div id="content" class="Content">
+</div>
+
+</body>
+	]]>
+	</Content>
+</Module> 

@@ -1,0 +1,559 @@
+/**
+ * Copyright (C) 2003-2008 eXo Platform SAS.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, see<http://www.gnu.org/licenses/>.
+ */
+
+package org.exoplatform.services.rest.impl;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
+
+import org.apache.commons.logging.Log;
+//import org.exoplatform.container.ExoContainer;
+//import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.rest.GenericContainerRequest;
+import org.exoplatform.services.rest.GenericContainerResponse;
+import org.exoplatform.services.rest.impl.header.HeaderHelper;
+import org.exoplatform.services.rest.impl.header.MediaTypeHelper;
+import org.exoplatform.services.rest.impl.resource.ResourceClass;
+import org.exoplatform.services.rest.impl.resource.ResourceDescriptorFactory;
+import org.exoplatform.services.rest.impl.resource.ResourceMethodMap;
+import org.exoplatform.services.rest.impl.resource.SubResourceLocatorMap;
+import org.exoplatform.services.rest.impl.resource.SubResourceMethodMap;
+import org.exoplatform.services.rest.impl.uri.UriPattern;
+import org.exoplatform.services.rest.method.MethodInvoker;
+import org.exoplatform.services.rest.resource.ResourceMethodDescriptor;
+import org.exoplatform.services.rest.resource.SubResourceLocatorDescriptor;
+import org.exoplatform.services.rest.resource.SubResourceMethodDescriptor;
+
+/**
+ * Lookup resource which can serve request.
+ * 
+ * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
+ * @version $Id: $
+ */
+public final class RequestDispatcher {
+
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger(RequestDispatcher.class.getName());
+  
+  /**
+   * See {@link ResourceBinder}.
+   */
+  private final ResourceBinder resourceBinder;
+
+//  /**
+//   * eXo container.
+//   */
+//  private final ExoContainer   exoContainer;
+
+  /**
+   * Constructs new instance of RequestDispatcher.
+   * 
+   * @param resourceBinder See {@link ResourceBinder}
+   * @param containerContext eXo container context
+   */
+  public RequestDispatcher(ResourceBinder resourceBinder/*, ExoContainerContext containerContext*/) {
+    this.resourceBinder = resourceBinder;
+//    this.exoContainer = containerContext.getContainer();
+  }
+
+  /**
+   * Dispatch {@link ContainerRequest} to resource which can serve request.
+   * 
+   * @param request See {@link GenericContainerRequest}
+   * @param response See {@link GenericContainerResponse}
+   */
+  public void dispatch(GenericContainerRequest request, GenericContainerResponse response) {
+    ApplicationContext context = ApplicationContext.getCurrent();
+    String requestPath = context.getPath(false);
+    List<String> parameterValues = context.getParameterValues();
+    
+    ResourceClass resourceClass = processResourceClass(requestPath, parameterValues);
+    if (resourceClass == null) {
+      if (LOG.isDebugEnabled())
+        LOG.debug("Root resource not found for " + requestPath);
+      
+      // Stop here, there is no matched root resource
+      throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
+    }
+
+    // Get instance of resource class from exo container. Possible to get
+    // new instance of class for each request. For getting new instance
+    // per request <multi-instance>true</multi-instance> tag should be
+    // used in configuration of resource component.
+//    Object resource = exoContainer.getComponentInstanceOfType(resourceClass.getResourceClass());
+    // TODO : Done for getting groovy script working as rest-services.
+    // Groovy does not present in exo-container.
+    Object resource = resourceClass.getResource();
+
+    // Take the tail of the request path, the tail will be requested path
+    // for lower resources, e. g. ResourceClass -> Sub-resource method/locator
+    String newRequestPath = getPathTail(parameterValues);
+    
+    // save the resource class URI in hierarchy
+    context.addMatchedURI(requestPath.substring(0, requestPath.lastIndexOf(newRequestPath)));
+
+    context.setParameterNames(resourceClass.getUriPattern().getParameterNames());
+
+    dispatch(request, response, context, resourceClass, resource, newRequestPath);
+  }
+  
+  /**
+   * Get last element from path parameters. This element will be used as request
+   * path for child resources.
+   * 
+   * @param parameterValues See {@link ApplicationContext#getParameterValues()}
+   * @return last element from given list or empty string if last element is
+   *         null
+   */
+  private static String getPathTail(List<String> parameterValues) {
+    int i = parameterValues.size() - 1;
+    return parameterValues.get(i) != null ? parameterValues.get(i) : "";
+  }
+
+  /**
+   * Process resource methods, sub-resource methods and sub-resource locators to
+   * find the best one for serve request.
+   * 
+   * @param request See {@link GenericContainerRequest}
+   * @param response See {@link GenericContainerResponse}
+   * @param context See {@link ApplicationContext}
+   * @param resourceClass the root resource class or resource class which was
+   *          created by previous sub-resource locator
+   * @param resource instance of resource class
+   * @param requestPath request path, it is relative path to the base URI or
+   *          other resource which was called before (one of sub-resource
+   *          locators)
+   */
+  private void dispatch(GenericContainerRequest request,
+                        GenericContainerResponse response,
+                        ApplicationContext context,
+                        ResourceClass resourceClass,
+                        Object resource,
+                        String requestPath) {
+
+    List<String> parameterValues = context.getParameterValues();
+    int len = parameterValues.size();
+
+    // resource method or sub-resource method or sub-resource locator
+    
+    if ((parameterValues.get(len - 1) == null || "/".equals(parameterValues.get(len - 1)))
+        && resourceClass.getResourceMethods().size() > 0) {
+      // resource method, then process HTTP method and consume/produce media types
+
+      List<ResourceMethodDescriptor> methods = new ArrayList<ResourceMethodDescriptor>();
+      boolean match = processResourceMethod(resourceClass.getResourceMethods(),
+                                            request,
+                                            response,
+                                            methods);
+      if (!match) {
+        if (LOG.isDebugEnabled())
+          LOG.debug("Not found resource method for method " + request.getMethod());
+        
+        return; // Error Response is preset
+      }
+      
+      invokeResourceMethod(methods.get(0), resource, context, request, response);
+      
+    } else { // sub-resource method/locator
+      List<SubResourceMethodDescriptor> methods = new ArrayList<SubResourceMethodDescriptor>();
+      // check sub-resource methods
+      boolean match = processSubResourceMethod(resourceClass.getSubResourceMethods(),
+                                               requestPath,
+                                               request,
+                                               response,
+                                               parameterValues,
+                                               methods);
+      // check sub-resource locators 
+      List<SubResourceLocatorDescriptor> locators = new ArrayList<SubResourceLocatorDescriptor>();
+      boolean hasAcceptableLocator = processSubResourceLocator(resourceClass.getSubResourceLocators(),
+                                                               requestPath,
+                                                               parameterValues,
+                                                               locators);
+      
+      // Sub-resource method or sub-resource locator should be found,
+      // otherwise error response with corresponding status.
+      // If sub-resource locator not found status must be Not Found (404).
+      // If sub-resource method not found then can be few statuses to
+      // return, in this case don't care about locators, just return status
+      // for sub-resource method. If no one method found then status will
+      // Not Found (404) anyway.
+      if (!match && !hasAcceptableLocator) {
+        if (LOG.isDebugEnabled())
+          LOG.debug("Not found sub-resource methods nor sub-resource locators for path "
+              + requestPath + " and method " + request.getMethod());
+        
+        return; // Error Response is preset
+      }
+        
+      // Sub-resource method, sub-resource locator or both acceptable.
+      // If both, sub-resource method and sub-resource then do next:
+      // Check number of characters and number of variables in URI pattern, if
+      // the same then sub-resource method has higher priority, otherwise
+      // sub-resource with 'higher' URI pattern selected.
+      if ((!hasAcceptableLocator && match)
+          || (hasAcceptableLocator && match && compareSubResources(methods.get(0), locators.get(0)) < 0)) {
+        // sub-resource method
+        invokeSubResourceMethod(requestPath, methods.get(0), resource, context, request, response);
+      } else if ((hasAcceptableLocator && !match)
+          || (hasAcceptableLocator && match && compareSubResources(methods.get(0), locators.get(0)) > 0)) {
+        // sub-resource locator
+        invokeSuResourceLocator(requestPath, locators.get(0), resource, context, request, response);
+      }
+    }
+
+  }
+
+  /**
+   * Invoke resource methods.
+   * 
+   * @param rmd See {@link ResourceMethodDescriptor}
+   * @param resource instance of resource class
+   * @param context See {@link ApplicationContext}
+   * @param request See {@link GenericContainerRequest}
+   * @param response See {@link GenericContainerResponse}
+   * @see ResourceMethodDescriptor
+   */
+  private void invokeResourceMethod(ResourceMethodDescriptor rmd,
+                                    Object resource,
+                                    ApplicationContext context,
+                                    GenericContainerRequest request,
+                                    GenericContainerResponse response) {
+    // save resource in hierarchy
+    context.addMatchedResource(resource);
+
+    Class<?> returnType = rmd.getResponseType();
+    MethodInvoker invoker = rmd.getMethodInvoker();
+    Object o = invoker.invokeMethod(resource, rmd, context);
+    processResponse(o, returnType, request, response, rmd.produces());
+  }
+  
+  /**
+   * Invoke sub-resource methods.
+   * 
+   * @param requestPath request path
+   * @param srmd See {@link SubResourceMethodDescriptor}
+   * @param resource instance of resource class
+   * @param context See {@link ApplicationContext}
+   * @param request See {@link GenericContainerRequest}
+   * @param response See {@link GenericContainerResponse}
+   * @see SubResourceMethodDescriptor
+   */
+  private void invokeSubResourceMethod(String requestPath,
+                                       SubResourceMethodDescriptor srmd,
+                                       Object resource,
+                                       ApplicationContext context,
+                                       GenericContainerRequest request,
+                                       GenericContainerResponse response) {
+    // save resource in hierarchy
+    context.addMatchedResource(resource);
+    // save the sub-resource method URI in hierarchy
+    context.addMatchedURI(requestPath);
+    // save parameters values, actually parameters was save before, now just
+    // map parameter's names to values
+    context.setParameterNames(srmd.getUriPattern().getParameterNames());
+
+    Class<?> returnType = srmd.getResponseType();
+    MethodInvoker invoker = srmd.getMethodInvoker();
+    Object o = invoker.invokeMethod(resource, srmd, context);
+    processResponse(o, returnType, request, response, srmd.produces());
+  }
+  
+  /**
+   * Invoke sub-resource locators.
+   * 
+   * @param requestPath request path
+   * @param srld See {@link SubResourceLocatorDescriptor}
+   * @param resource instance of resource class
+   * @param context See {@link ApplicationContext}
+   * @param request See {@link GenericContainerRequest}
+   * @param response See {@link GenericContainerResponse}
+   * @see SubResourceLocatorDescriptor
+   */
+  private void invokeSuResourceLocator(String requestPath,
+                                       SubResourceLocatorDescriptor srld,
+                                       Object resource,
+                                       ApplicationContext context,
+                                       GenericContainerRequest request,
+                                       GenericContainerResponse response) {
+    context.addMatchedResource(resource);
+    // take the tail of the request path, the tail will be new request path
+    // for lower resources
+    String newRequestPath = getPathTail(context.getParameterValues());
+    // save the resource class URI in hierarchy
+    context.addMatchedURI(requestPath.substring(0, requestPath.lastIndexOf(newRequestPath)));
+    // save parameters values, actually parameters was save before, now just
+    // map parameter's names to values
+    context.setParameterNames(srld.getUriPattern().getParameterNames());
+
+    // NOTE Locators can't accept entity
+    MethodInvoker invoker = srld.getMethodInvoker();
+    resource = invoker.invokeMethod(resource, srld, context);
+    ResourceClass resourceClass = new ResourceClass(ResourceDescriptorFactory.createAbstractResourceDescriptor(resource.getClass()),
+                                                    resource);
+    
+    // dispatch again newly created resource
+    dispatch(request, response, context, resourceClass, resource, newRequestPath);
+  }
+
+  /**
+   * Compare two sub-resources. One of it is {@link SubResourceMethodDescriptor}
+   * and other one id {@link SubResourceLocatorDescriptor}. First compare
+   * UriPattern, see {@link UriPattern#URIPATTERN_COMPARATOR}. NOTE URI
+   * comparator compare UriPattrens for descending sorting. So it it return
+   * negative integer then it minds SubResourceMethodDescriptor has higher
+   * priority by UriPattern comparison. If comparator return positive integer
+   * then SubResourceLocatorDescriptor has higher priority. And finally if zero
+   * was returned then UriPattern is equals, in this case
+   * SubResourceMethodDescriptor must be selected.
+   * 
+   * @param srmd See {@link SubResourceMethodDescriptor}
+   * @param srld See {@link SubResourceLocatorDescriptor}
+   * @return result of comparison sub-resources
+   */
+  private int compareSubResources(SubResourceMethodDescriptor srmd,
+                                  SubResourceLocatorDescriptor srld) {
+    int r = UriPattern.URIPATTERN_COMPARATOR.compare(srmd.getUriPattern(), srld.getUriPattern());
+    // NOTE If patterns are the same sub-resource method has priority
+    if (r == 0)
+      return -1;
+    return r;
+  }
+
+  /**
+   * Process result of invoked method, and set {@link Response} parameters
+   * dependent of returned object.
+   * 
+   * @param o result of invoked method
+   * @param returnType type of returned object
+   * @param request See {@link GenericContainerRequest}
+   * @param response See {@link GenericContainerResponse}
+   * @param produces list of method produces media types
+   * @see ResourceMethodDescriptor
+   * @see SubResourceMethodDescriptor
+   * @see SubResourceLocatorDescriptor
+   */
+  private static void processResponse(Object o,
+                                      Class<?> returnType,
+                                      GenericContainerRequest request,
+                                      GenericContainerResponse response,
+                                      List<MediaType> produces) {
+    // get most acceptable media type for response
+    MediaType contentType = request.getAcceptableMediaType(produces);
+    
+    if (returnType == void.class || o == null) {
+      response.setResponse(Response.noContent().build());
+
+    } else if (Response.class.isAssignableFrom(returnType)) {
+      Response r = (Response) o;
+      // If content-type is not set then add it
+      if (r.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE) == null && r.getEntity() != null)
+        r.getMetadata().putSingle(HttpHeaders.CONTENT_TYPE, contentType);
+
+      response.setResponse(r);
+
+    } else if (GenericEntity.class.isAssignableFrom(returnType)) {
+
+      response.setResponse(Response.ok(o, contentType).build());
+
+    } else {
+
+      response.setResponse(Response.ok(o, contentType).build());
+    }
+
+  }
+
+  /**
+   * @param path full request path, see {@link UriInfo#getPath()}.
+   * @param capturingValues the list for keeping template values. See
+   *          {@link UriInfo#getPathParameters()}
+   * @return {@link ResourceClass} or null
+   */
+  private ResourceClass processResourceClass(String path, List<String> capturingValues) {
+    for (ResourceClass rc : resourceBinder.getRootResources()) {
+      if (rc.getUriPattern().match(path, capturingValues)) {
+
+        // all times will at least 1
+        int len = capturingValues.size();
+
+        // If capturing group contains last element and this element is
+        // neither null nor '/' then ResourceClass must contains at least one
+        // sub-resource method or sub-resource locator.
+        if (capturingValues.get(len - 1) != null && !capturingValues.get(len - 1).equals("/")
+            && (rc.getSubResourceMethods().size() + rc.getSubResourceLocators().size()) == 0)
+          continue;
+
+        return rc;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Process resource methods.
+   * 
+   * @param rmm See {@link ResourceMethodMap}
+   * @param request See {@link GenericContainerRequest}
+   * @param response See {@link GenericContainerResponse}
+   * @param methods list for method resources
+   * @return true if at least one resource method found false otherwise
+   */
+  private static boolean processResourceMethod(ResourceMethodMap rmm,
+                                               GenericContainerRequest request,
+                                               GenericContainerResponse response,
+                                               List<ResourceMethodDescriptor> methods) {
+    List<ResourceMethodDescriptor> rmds = rmm.get(request.getMethod());
+    if (rmds == null) {
+      response.setResponse(Response.status(405)
+                                   .header("Allow", HeaderHelper.convertToString(rmm.getAllow()))
+                                   .build());
+      return false;
+    }
+    MediaType contentType = request.getMediaType();
+    if (contentType == null) {
+      methods.addAll(rmds);
+    } else {
+      for (ResourceMethodDescriptor rmd : rmds) {
+        if (MediaTypeHelper.isConsume(rmd.consumes(), contentType))
+          methods.add(rmd);
+      }
+    }
+
+    if (methods.isEmpty()) {
+      response.setResponse(Response.status(Response.Status.UNSUPPORTED_MEDIA_TYPE).build());
+      return false;
+    }
+
+    List<MediaType> acceptable = request.getAcceptableMediaTypes();
+    float previousQValue = 0.0F;
+    int n = 0, p = 0;
+    for (ListIterator<ResourceMethodDescriptor> i = methods.listIterator(); i.hasNext();) {
+      n = i.nextIndex();
+      ResourceMethodDescriptor rmd = i.next();
+      float qValue = MediaTypeHelper.processQuality(acceptable, rmd.produces());
+      if (qValue > previousQValue) {
+        previousQValue = qValue;
+        p = n; // position of the best resource at the moment
+      } else {
+        i.remove(); // qValue is less then previous one
+      }
+    }
+
+    if (!methods.isEmpty()) {
+      // remove all with lower q value
+      if (methods.size() > 1) {
+        n = 0;
+        for (Iterator<ResourceMethodDescriptor> i = methods.listIterator(); i.hasNext(); i.remove(), n++) {
+          i.next();
+          if (n == p)
+            break; // get index p in list then stop removing
+        }
+      }
+
+      return true;
+    }
+
+    response.setResponse(Response.status(Response.Status.NOT_ACCEPTABLE).build());
+    return false;
+  }
+
+  /**
+   * Process sub-resource methods.
+   * 
+   * @param srmm See {@link SubResourceLocatorMap}
+   * @param requestedPath part of requested path
+   * @param request See {@link GenericContainerRequest}
+   * @param response See {@link GenericContainerResponse}
+   * @param capturingValues the list for keeping template values. See
+   *          {@link UriInfo#getPathParameters()}
+   * @param methods list for method resources
+   * @return true if at least one sub-resource method found false otherwise
+   */
+  @SuppressWarnings("unchecked")
+  private static boolean processSubResourceMethod(SubResourceMethodMap srmm,
+                                              String requestedPath,
+                                              GenericContainerRequest request,
+                                              GenericContainerResponse response,
+                                              List<String> capturingValues,
+                                              List<SubResourceMethodDescriptor> methods) {
+    ResourceMethodMap rmm = null;
+    for (Map.Entry<UriPattern, ResourceMethodMap> e : srmm.entrySet()) {
+      if (e.getKey().match(requestedPath, capturingValues)) {
+        int len = capturingValues.size();
+        if (capturingValues.get(len - 1) != null && !"/".equals(capturingValues.get(len - 1)))
+          continue;
+
+        rmm = e.getValue();
+        break;
+      }
+    }
+
+    if (rmm == null) {
+      response.setResponse(Response.status(Status.NOT_FOUND).build());
+      return false;
+    }
+
+    List<ResourceMethodDescriptor> l = new ArrayList<ResourceMethodDescriptor>();
+    boolean match = processResourceMethod(rmm, request, response, l);
+
+    if (match) {
+      // for cast, Iterator contains SubResourceMethodDescriptor
+      Iterator i = l.iterator();
+      while (i.hasNext())
+        methods.add((SubResourceMethodDescriptor) i.next());
+    }
+    
+    return match;
+  }
+
+  /**
+   * Process sub-resource locators.
+   * 
+   * @param srlm See {@link SubResourceLocatorMap}
+   * @param requestedPath part of requested path
+   * @param capturingValues the list for keeping template values
+   * @param locators list for sub-resource locators
+   * @return true if at least one SubResourceLocatorDescriptor found false
+   *         otherwise
+   */
+  private static boolean processSubResourceLocator(SubResourceLocatorMap srlm,
+                                                   String requestedPath,
+                                                   List<String> capturingValues,
+                                                   List<SubResourceLocatorDescriptor> locators) {
+    for (Map.Entry<UriPattern, SubResourceLocatorDescriptor> e : srlm.entrySet()) {
+      if (e.getKey().match(requestedPath, capturingValues))
+        locators.add(e.getValue());
+    }
+
+    return !locators.isEmpty();
+  }
+
+}

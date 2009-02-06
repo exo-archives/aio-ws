@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee 
+	http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+  <display-name>portal</display-name>
+  <context-param>
+    <description>Login page name</description>
+    <param-name>login-page</param-name>
+    <param-value>login/jsp/login.jsp</param-value>
+  </context-param>
+  <!--
+  <filter>
+    <filter-name>PortalContainerInitializedFilter</filter-name>
+    <filter-class>org.exoplatform.frameworks.jcr.web.PortalContainerInitializedFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>PortalContainerInitializedFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  -->
+  <servlet>
+    <servlet-name>OAuthAuthorizationServlet</servlet-name>
+    <servlet-class>org.exoplatform.ws.security.oauth.http.OAuthAuthorizationServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>OAuthRequestTokenServlet</servlet-name>
+    <servlet-class>org.exoplatform.ws.security.oauth.http.OAuthRequestTokenServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>OAuthAccessTokenServlet</servlet-name>
+    <servlet-class>org.exoplatform.ws.security.oauth.http.OAuthAccessTokenServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>OAuthAuthorizationServlet</servlet-name>
+    <url-pattern>/authorize/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>OAuthRequestTokenServlet</servlet-name>
+    <url-pattern>/request_token/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>OAuthAccessTokenServlet</servlet-name>
+    <url-pattern>/access_token/*</url-pattern>
+  </servlet-mapping>
+</web-app>
