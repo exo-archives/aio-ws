@@ -20,10 +20,10 @@
     <module>rest/ext</module>
     <module>rest/ejb/connector2_1/modules/connector</module>
     <module>rest/ejb/connector2_1/modules/client</module>
-    <module>rest/ejb/connector2_1</module>
+    <!--module>rest/ejb/connector2_1</module-->
     <module>rest/ejb/connector3_0/modules/connector</module>
     <module>rest/ejb/connector3_0/modules/client</module>
-    <module>rest/ejb/connector3_0</module>
+    <!--module>rest/ejb/connector3_0</module-->
     <module>soap/jsr181</module>
     <module>security/oauth/consumer</module>
     <module>security/oauth/provider/service</module>
