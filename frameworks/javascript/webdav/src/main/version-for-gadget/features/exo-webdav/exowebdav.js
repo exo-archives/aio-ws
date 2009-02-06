@@ -444,12 +444,13 @@ Webdav.prototype.PUT = function(handler, path, options) {
 
   var options = {
     content: options.content || '',
-    content_type: options.content_type || 'text/plain; charset=UTF-8',
+    content_type: options.content_type || '',
     locktoken: options.locktoken || '',
     headers: options.additional_headers || {}            
   };
-
-  options.headers["Content-Type"] = options.content_type; 
+  if (options.content_type) {
+    options.headers["Content-Type"] = options.content_type;
+  } 
   if (options.locktoken) {
     options.headers['If'] = '(<' + options.locktoken + '>)';
   };
