@@ -486,8 +486,8 @@ var Base64 = {
  */
 Webdav.prototype.ExtensionMethod = function (handler, path, options) {
     if (typeof(options) == 'undefined' || ! options.method ) return;
-	if (typeof(options.body) == 'undefined') options.body = null;
-	
+  if (typeof(options.body) == 'undefined') options.body = null;
+  
     var options = {
             method: options.method,
             headers: options.headers || {},
@@ -563,13 +563,15 @@ Webdav.prototype.PUT = function(handler, path, options) {
 
     var options = {
             content: options.content || '',
-            content_type: options.content_type || 'text/plain; charset=UTF-8',
+            content_type: options.content_type || '',
             locktoken: options.locktoken || '',
             additional_headers: options.additional_headers || ''                         
         };
 
     var request = this.openRequest(handler, 'PUT', path || '', options.additional_headers);
-    request.setRequestHeader("Content-Type", options.content_type);    
+    if (options.content_type) {
+      request.setRequestHeader("Content-Type", options.content_type);
+    }    
     if (options.locktoken) {
         request.setRequestHeader('If', '(<' + options.locktoken + '>)');
     };
