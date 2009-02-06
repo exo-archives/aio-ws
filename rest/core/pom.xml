@@ -5,6 +5,7 @@
     <version>2.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
+  <groupId>org.exoplatform.ws</groupId>
   <artifactId>exo.ws.rest.core</artifactId>
   <packaging>jar</packaging>
   <version>2.0-SNAPSHOT</version>
