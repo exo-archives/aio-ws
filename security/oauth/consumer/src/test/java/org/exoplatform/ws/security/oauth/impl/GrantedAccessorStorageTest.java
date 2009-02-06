@@ -44,7 +44,7 @@ public class GrantedAccessorStorageTest extends TestCase {
 
   private OAuthConsumer          consumer;
 
-  private static final int       SIZE = 1000;
+  private static final int       SIZE = /*1000*/100;
 
   private File                   rootDir;
 
@@ -100,7 +100,7 @@ public class GrantedAccessorStorageTest extends TestCase {
 
   public void testConcurrent() throws Exception {
     long start = System.currentTimeMillis();
-    int threads = 100;
+    int threads = /*100*/10;
 
     CountDownLatch cdl = new CountDownLatch(threads);
     for (int i = 0; i < threads; i++)
