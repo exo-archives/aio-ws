@@ -19,20 +19,30 @@ package org.exoplatform.services.rest.impl.resource;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.CookieParam;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Encoded;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.MatrixParam;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.rest.impl.header.MediaTypeHelper;
 import org.exoplatform.services.rest.impl.method.DefaultMethodInvoker;
 import org.exoplatform.services.rest.impl.method.MethodParameter;
@@ -47,9 +57,11 @@ import org.exoplatform.services.rest.resource.SubResourceMethodDescriptor;
  * @version $Id: $
  */
 public final class ResourceDescriptorFactory {
-  
+
+  private static final Log log = ExoLogger.getLogger(ResourceDescriptorFactory.class);
+
   /**
-   * Constructor. 
+   * Constructor.
    */
   private ResourceDescriptorFactory() {
   }
@@ -64,6 +76,14 @@ public final class ResourceDescriptorFactory {
     AbstractResourceDescriptor resourceDescriptor = null;
     final Path pathAnnotation = resourceClass.getAnnotation(Path.class);
 
+    Method[] ms = resourceClass.getDeclaredMethods();
+    for (Method method : ms) {
+      if (!getJaxRSAnnotations(method).isEmpty() && !Modifier.isPublic(method.getModifiers())) {
+        log.warn("Non-public method annotated with JAX-RS annotation: " + resourceClass.getName()
+            + "." + method.getName());
+      }
+    }
+
     if (pathAnnotation != null) {
       PathValue path = new PathValue(pathAnnotation.value());
       resourceDescriptor = new AbstractResourceDescriptorImpl(path, resourceClass);
@@ -71,31 +91,45 @@ public final class ResourceDescriptorFactory {
       resourceDescriptor = new AbstractResourceDescriptorImpl(resourceClass);
     }
 
-    final boolean encoded = resourceClass.getAnnotation(Encoded.class) != null;
-    final Consumes consumesAnnotation = resourceClass.getAnnotation(Consumes.class);
-    final Produces producesAnnotation = resourceClass.getAnnotation(Produces.class);
+    boolean inheritAnnotations = needsAnnotationsInheritance(resourceClass);
+
+    final boolean encoded = !inheritAnnotations ? resourceClass.getAnnotation(Encoded.class) != null
+                                               : getInheritedAnnotation(Encoded.class,
+                                                                        resourceClass) != null;
+
+    final Consumes consumesAnnotation = !inheritAnnotations ? resourceClass.getAnnotation(Consumes.class)
+                                                           : (Consumes) getInheritedAnnotation(Consumes.class,
+                                                                                               resourceClass);
+
+    final Produces producesAnnotation = !inheritAnnotations ? resourceClass.getAnnotation(Produces.class)
+                                                           : (Produces) getInheritedAnnotation(Produces.class,
+                                                                                               resourceClass);
 
     List<MediaType> consumes = MediaTypeHelper.createConsumesList(consumesAnnotation);
     List<MediaType> produces = MediaTypeHelper.createProducesList(producesAnnotation);
 
     addResourceMethodDescriptor(resourceDescriptor,
-                                createMethodList(resourceClass.getMethods()),
+                                createMethodList(resourceClass, inheritAnnotations),
                                 consumes,
                                 produces,
-                                encoded);
+                                encoded,
+                                inheritAnnotations);
     addSubResourceMethodDescriptor(resourceDescriptor,
-                                   createMethodList(resourceClass.getMethods()),
+                                   createMethodList(resourceClass, inheritAnnotations),
                                    consumes,
                                    produces,
-                                   encoded);
+                                   encoded,
+                                   inheritAnnotations);
     // NOTE Not process @Produces and @Consumes annotations for sub-locators.
     // According to specification:
     // @Produces and @Consumes annotations MAY be applied to a resource method,
-    // a resource class or entity provider. Resource method MUST be annotated with
+    // a resource class or entity provider. Resource method MUST be annotated
+    // with
     // request method designator. Sub-locators has not this annotation.
     addSubResourceLocatordDescriptor(resourceDescriptor,
-                                     createMethodList(resourceClass.getMethods()),
-                                     encoded);
+                                     createMethodList(resourceClass, inheritAnnotations),
+                                     encoded,
+                                     inheritAnnotations);
 
     return resourceDescriptor;
   }
@@ -112,10 +146,11 @@ public final class ResourceDescriptorFactory {
    *          must be disable false otherwise. See {@link Encoded}
    */
   private static void addResourceMethodDescriptor(AbstractResourceDescriptor resourceDescriptor,
-                                                        List<Method> methods,
-                                                        List<MediaType> consumesFromParent,
-                                                        List<MediaType> producesFromParent,
-                                                        boolean encodedFromParent) {
+                                                  List<Method> methods,
+                                                  List<MediaType> consumesFromParent,
+                                                  List<MediaType> producesFromParent,
+                                                  boolean encodedFromParent,
+                                                  boolean inheritAnnotations) {
 
     // keep only method with annotation which has annotation @HttpMethod, e. g.
     // @GET, @POST, etc
@@ -124,10 +159,12 @@ public final class ResourceDescriptorFactory {
     removeWithAnnotaion(methods, Path.class);
 
     for (Method method : methods) {
+
       String httpMethod = getMetaAnnotations(method, HttpMethod.class).get(0).value();
       List<MediaType> consumes = resolveConsumesMediaType(method, consumesFromParent);
       List<MediaType> produces = resolveProducesMediaType(method, producesFromParent);
-      List<MethodParameter> methodParameters = createParametersList(method, encodedFromParent);
+      List<MethodParameter> methodParameters = createParametersList(method,
+                                                                    encodedFromParent);
       ResourceMethodDescriptor resMethodDescriptor = new ResourceMethodDescriptorImpl(method,
                                                                                       httpMethod,
                                                                                       methodParameters,
@@ -152,10 +189,11 @@ public final class ResourceDescriptorFactory {
    *          must be disable false otherwise. See {@link Encoded}
    */
   private static void addSubResourceMethodDescriptor(AbstractResourceDescriptor resourceDescriptor,
-                                                           List<Method> methods,
-                                                           List<MediaType> consumesFromParent,
-                                                           List<MediaType> producesFromParent,
-                                                           boolean encodedFromParent) {
+                                                     List<Method> methods,
+                                                     List<MediaType> consumesFromParent,
+                                                     List<MediaType> producesFromParent,
+                                                     boolean encodedFromParent,
+                                                     boolean inheritAnnotations) {
 
     // keep only method with annotation which has annotation @HttpMethod, e. g.
     // @GET, @POST, etc
@@ -164,10 +202,12 @@ public final class ResourceDescriptorFactory {
     retainWithAnnotation(methods, Path.class);
 
     for (Method method : methods) {
+
       String httpMethod = getMetaAnnotations(method, HttpMethod.class).get(0).value();
       List<MediaType> consumes = resolveConsumesMediaType(method, consumesFromParent);
       List<MediaType> produces = resolveProducesMediaType(method, producesFromParent);
-      List<MethodParameter> methodParameters = createParametersList(method, encodedFromParent);
+      List<MethodParameter> methodParameters = createParametersList(method,
+                                                                    encodedFromParent);
       Path p = method.getAnnotation(Path.class);
       PathValue pathValue = new PathValue(p.value());
       SubResourceMethodDescriptor subresMethodDescriptor = new SubResourceMethodDescriptorImpl(pathValue,
@@ -193,8 +233,9 @@ public final class ResourceDescriptorFactory {
    *          must be disable false otherwise. See {@link Encoded}
    */
   private static void addSubResourceLocatordDescriptor(AbstractResourceDescriptor resourceDescriptor,
-                                                             List<Method> methods,
-                                                             boolean encodedFromParent) {
+                                                       List<Method> methods,
+                                                       boolean encodedFromParent,
+                                                       boolean inheritAnnotations) {
 
     // keep only method with @Path annotation
     retainWithAnnotation(methods, Path.class);
@@ -203,7 +244,9 @@ public final class ResourceDescriptorFactory {
     removeWithMetaAnnotation(methods, HttpMethod.class);
 
     for (Method method : methods) {
-      List<MethodParameter> methodParameters = createParametersList(method, encodedFromParent);
+
+      List<MethodParameter> methodParameters = createParametersList(method,
+                                                                    encodedFromParent);
       Path p = method.getAnnotation(Path.class);
       PathValue pathValue = new PathValue(p.value());
       SubResourceLocatorDescriptor subresLocatorDescriptor = new SubResourceLocatorDescriptorImpl(pathValue,
@@ -221,10 +264,15 @@ public final class ResourceDescriptorFactory {
    * @param methods array of {@link Method}
    * @return list of {@link Method}
    */
-  private static List<Method> createMethodList(Method[] methods) {
-    List<Method> l = new ArrayList<Method>(methods.length);
-    for (Method m : methods)
-      l.add(m);
+  private static List<Method> createMethodList(Class<?> resourceClass, boolean inheritAnnotanions) {
+    List<Method> l = new ArrayList<Method>(resourceClass.getMethods().length);
+    for (Method m : resourceClass.getMethods())
+      if (inheritAnnotanions && getJaxRSAnnotations(m).isEmpty()
+          && (getAnnotatedMethod(m, resourceClass) != null)) {
+        l.add(getAnnotatedMethod(m, resourceClass));
+      } else {
+        l.add(m);
+      }
 
     return l;
   }
@@ -274,7 +322,8 @@ public final class ResourceDescriptorFactory {
     Annotation annotation = null;
     boolean encoded = false;
     for (Annotation a : annotations) {
-      // TODO check if few annotation at one parameter, e. g. PathParam and HeaderParam
+      // TODO check if few annotation at one parameter, e. g. PathParam and
+      // HeaderParam
       if (MethodParameterHelper.PARAMETER_ANNOTATIONS_MAP.containsKey(a.annotationType().getName())) {
         annotation = a;
       } else if (a.annotationType() == Encoded.class) {
@@ -436,6 +485,137 @@ public final class ResourceDescriptorFactory {
       if (!hasMetaAnnotation(m, annotation))
         i.remove();
     }
+  }
+
+  /**
+   * Check if the resource class is annotated with any JAX-RS annotation except
+   * 
+   * @Path. If retunrs false then resource can inherit JAX-RS annotations from
+   *        the superclass or an implemented interfaces.
+   * @param resourceClass
+   * @return
+   */
+  private static boolean needsAnnotationsInheritance(Class<?> resourceClass) {
+    if ((resourceClass.getDeclaredAnnotations().length == 0)
+        || (resourceClass.getDeclaredAnnotations().length == 1)
+        && (resourceClass.isAnnotationPresent(Path.class))) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Returns ArrayList including all JAX-RS annotations present on the method.
+   * 
+   * @param method
+   * @return
+   */
+  private static ArrayList<Annotation> getJaxRSAnnotations(Method method) {
+    ArrayList<Annotation> annotationsList = new ArrayList<Annotation>();
+
+    annotationsList.addAll(getMetaAnnotations(method, HttpMethod.class));
+
+    if (method.getAnnotation(Consumes.class) != null) {
+      annotationsList.add(method.getAnnotation(Consumes.class));
+    }
+
+    if (method.getAnnotation(Produces.class) != null) {
+      annotationsList.add(method.getAnnotation(Produces.class));
+    }
+
+    if (method.getAnnotation(PathParam.class) != null) {
+      annotationsList.add(method.getAnnotation(PathParam.class));
+    }
+
+    if (method.getAnnotation(QueryParam.class) != null) {
+      annotationsList.add(method.getAnnotation(QueryParam.class));
+    }
+
+    if (method.getAnnotation(FormParam.class) != null) {
+      annotationsList.add(method.getAnnotation(FormParam.class));
+    }
+
+    if (method.getAnnotation(MatrixParam.class) != null) {
+      annotationsList.add(method.getAnnotation(MatrixParam.class));
+    }
+
+    if (method.getAnnotation(CookieParam.class) != null) {
+      annotationsList.add(method.getAnnotation(CookieParam.class));
+    }
+
+    if (method.getAnnotation(HeaderParam.class) != null) {
+      annotationsList.add(method.getAnnotation(HeaderParam.class));
+    }
+
+    if (method.getAnnotation(Encoded.class) != null) {
+      annotationsList.add(method.getAnnotation(Encoded.class));
+    }
+
+    if (method.getAnnotation(DefaultValue.class) != null) {
+      annotationsList.add(method.getAnnotation(DefaultValue.class));
+    }
+
+    if (method.getAnnotation(Context.class) != null) {
+      annotationsList.add(method.getAnnotation(Context.class));
+    }
+    return annotationsList;
+  }
+
+  /**
+   * Returns specified inherited annotation from the superclass or an
+   * implemented interface.
+   * 
+   * @param annotation
+   * @param resourceClass
+   * @return
+   */
+  private static <T extends Annotation> Annotation getInheritedAnnotation(Class<T> annotation,
+                                                                          Class<?> resourceClass) {
+    Annotation anno = null;
+    anno = resourceClass.getSuperclass().getAnnotation(annotation);
+
+    if (anno == null) {
+      for (Class<?> interfase : resourceClass.getInterfaces()) {
+        anno = interfase.getAnnotation(annotation);
+        if (anno != null) {
+          return anno;
+        }
+      }
+    }
+    return anno;
+  }
+
+  /**
+   * Tries to get JAX-RS annotated method from the root resourse class's
+   * superclass or implemented interfaces.
+   * 
+   * @param method
+   * @param resourceClass
+   * @return
+   */
+  private static Method getAnnotatedMethod(Method method, Class<?> resourceClass) {
+    Method annotatedMethod = null;
+    Class<?> superClazz = resourceClass.getSuperclass();
+
+    try {
+      annotatedMethod = superClazz.getMethod(method.getName(), method.getParameterTypes());
+    } catch (NoSuchMethodException e) {
+      for (Class<?> interfase : resourceClass.getInterfaces()) {
+        try {
+
+          annotatedMethod = interfase.getDeclaredMethod(method.getName(),
+                                                        method.getParameterTypes());
+
+          Annotation[] ann = annotatedMethod.getAnnotations();
+          
+          return annotatedMethod;
+        } catch (NoSuchMethodException exc) {
+          return null;
+        }
+      }
+    }
+    return annotatedMethod;
   }
 
 }
