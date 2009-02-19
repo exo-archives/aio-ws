@@ -16,12 +16,9 @@
  */
 package org.exoplatform.services.rest.impl.method;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 import org.exoplatform.services.rest.AbstractResourceTest;
@@ -39,48 +36,52 @@ public class AnnotationInheritanceTest extends AbstractResourceTest {
 
     @GET
     @Produces(MediaType.TEXT_XML)
-    @Consumes(MediaType.TEXT_XML)
     String m0(String type);
 
   }
-
+  
   @Path("/a")
-  public static class Resource1 implements ResourceInterface {
-
-    public String m0(@HeaderParam(HttpHeaders.ACCEPT) String type) {
-      assertEquals(MediaType.TEXT_XML, type);
+  public class Resource1 implements ResourceInterface{
+    
+    public String m0(String type) {
       return "m0";
     }
-
+    
   }
-
+  
   @Path("/b")
-  public static class Resource2 implements ResourceInterface {
-
-    @GET
-    @Consumes(MediaType.APPLICATION_JSON)
-    public String m0(@HeaderParam(HttpHeaders.ACCEPT) String type) {
-//      assertEquals(MediaType.APPLICATION_JSON, type);
+  public class Resource2 implements ResourceInterface{
+    
+    @Produces(MediaType.APPLICATION_ATOM_XML)
+    public String m0(String type) {
       return "m0";
     }
+    
   }
+  
 
   public void testAnnotationsInheritance() throws Exception {
     Resource1 resource1 = new Resource1();
     Resource2 resource2 = new Resource2();
 
     registry(resource1);
-    registry(resource2);
 
-//    assertEquals(200, service("GET", "/a", "", null, null).getStatus());
-//    assertEquals("m0", service("GET", "/a", "", null, null).getEntity());
-//    assertEquals(MediaType.TEXT_XML, service("GET", "/a", "", null, null).getContentType());
-//    
-//    assertEquals(200, service("GET", "/b", "", null, null).getStatus());
-//    assertEquals("m0", service("GET", "/b", "", null, null).getEntity());
+    assertEquals(200, service("GET", "/a", "", null, null).getStatus());
+    assertEquals("m0", service("GET", "/a", "", null, null).getEntity());
+    assertEquals(MediaType.TEXT_XML_TYPE, service("GET", "/a", "", null, null).getContentType());
 
     unregistry(resource1);
-    unregistry(resource2);
+    
+    try {
+      registry(resource2);
+      unregistry(resource2);
+      fail("Must be IllegalArgumentException");
+    } catch (IllegalArgumentException e) {
+      // OK
+    } catch (Exception e) {
+      fail("Unhandled exception");
+    }
+    
 
   }
 
