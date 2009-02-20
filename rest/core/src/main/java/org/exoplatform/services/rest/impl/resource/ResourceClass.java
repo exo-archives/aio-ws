@@ -311,7 +311,7 @@ public class ResourceClass {
       else
         LOG.warn("Sub-resource locator " + srld.getParentResource().getResourceClass() + "#"
             + srld.getMethod().getName() + " ignored because resource method with the"
-            + " same consumes and produces type already exists");
+            + " same path already exists");
     }
   }
 

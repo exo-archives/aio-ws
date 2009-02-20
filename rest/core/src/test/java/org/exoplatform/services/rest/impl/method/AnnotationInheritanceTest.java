@@ -50,7 +50,7 @@ public class AnnotationInheritanceTest extends AbstractResourceTest {
   }
   
   @Path("/b")
-  public class Resource2 implements ResourceInterface{
+  public class Resource2 implements ResourceInterface {
     
     @Produces(MediaType.APPLICATION_ATOM_XML)
     public String m0(String type) {
@@ -72,16 +72,11 @@ public class AnnotationInheritanceTest extends AbstractResourceTest {
 
     unregistry(resource1);
     
-    try {
       registry(resource2);
+      assertEquals(200, service("GET", "/b", "", null, null).getStatus());
+      assertEquals("m0", service("GET", "/b", "", null, null).getEntity());
+      assertEquals(MediaType.APPLICATION_ATOM_XML_TYPE, service("GET", "/b", "", null, null).getContentType());
       unregistry(resource2);
-      fail("Must be IllegalArgumentException");
-    } catch (IllegalArgumentException e) {
-      // OK
-    } catch (Exception e) {
-      fail("Unhandled exception");
-    }
-    
 
   }
 
