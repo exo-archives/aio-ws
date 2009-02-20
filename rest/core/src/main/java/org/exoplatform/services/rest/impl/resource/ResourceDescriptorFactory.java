@@ -58,7 +58,7 @@ import org.exoplatform.services.rest.resource.SubResourceMethodDescriptor;
  */
 public final class ResourceDescriptorFactory {
 
-  private static final Log log = ExoLogger.getLogger(ResourceDescriptorFactory.class);
+  private static final Log LOG = ExoLogger.getLogger(ResourceDescriptorFactory.class);
 
   /**
    * Constructor.
@@ -79,7 +79,7 @@ public final class ResourceDescriptorFactory {
     Method[] ms = resourceClass.getDeclaredMethods();
     for (Method method : ms) {
       if (!getJaxRSAnnotations(method).isEmpty() && !Modifier.isPublic(method.getModifiers())) {
-        log.warn("Non-public method annotated with JAX-RS annotation: " + resourceClass.getName()
+        LOG.warn("Non-public method annotated with JAX-RS annotation: " + resourceClass.getName()
             + "." + method.getName());
       }
     }
