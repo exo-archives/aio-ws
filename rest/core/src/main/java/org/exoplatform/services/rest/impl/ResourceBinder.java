@@ -120,8 +120,8 @@ public final class ResourceBinder {
           return false;
         }
       }
-      rootResources.add(rc);
-      Collections.sort(rootResources, COMPARATOR);
+      getRootResources().add(rc);
+      Collections.sort(getRootResources(), COMPARATOR);
       LOG.info("Bind new resource " + rc.getUriPattern().getRegex() + " : " + rc.getResourceClass());
       return true;
     } 
@@ -163,7 +163,7 @@ public final class ResourceBinder {
    */
   @SuppressWarnings("unchecked")
   public synchronized boolean unbind(Class clazz) {
-    Iterator<ResourceClass> i = rootResources.iterator();
+    Iterator<ResourceClass> i = getRootResources().iterator();
 
     while (i.hasNext()) {
       ResourceClass rc = i.next();
@@ -181,7 +181,7 @@ public final class ResourceBinder {
    * Clear the list of ResourceContainer description.
    */
   public void clear() {
-    rootResources.clear();
+    getRootResources().clear();
   }
 
   /**

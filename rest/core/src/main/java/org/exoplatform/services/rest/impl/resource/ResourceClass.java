@@ -75,6 +75,8 @@ public class ResourceClass {
    */
   private final Object                     resource;
 
+  private final boolean                    singleton;
+
   /**
    * Constructor.
    * 
@@ -82,6 +84,8 @@ public class ResourceClass {
    */
   public ResourceClass(AbstractResourceDescriptor resourceDescriptor, Object resource) {
 
+    singleton = resource != null;
+    
     this.resource = resource;
 
     this.resourceDescriptor = resourceDescriptor;
@@ -108,6 +112,10 @@ public class ResourceClass {
 
     // Merge resource locator to URI pattern
     processSubResourceLocators(getSubResourceLocators());
+  }
+  
+  public ResourceClass(AbstractResourceDescriptor resourceDescriptor) {
+    this(resourceDescriptor, null);
   }
 
   /**

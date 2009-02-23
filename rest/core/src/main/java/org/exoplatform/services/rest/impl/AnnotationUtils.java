@@ -157,7 +157,19 @@ public final class AnnotationUtils {
     /**
      * Default value for method parameter.
      */
-    DEFAULT_VALUE
+    DEFAULT_VALUE,
+    /**
+     * Resource path.
+     */
+    PATH,
+    /**
+     * Media types which resource can consume.
+     */
+    CONSUMES,
+    /**
+     * Media types which resource can produce.
+     */
+    PRODUCES
   }
 
 }

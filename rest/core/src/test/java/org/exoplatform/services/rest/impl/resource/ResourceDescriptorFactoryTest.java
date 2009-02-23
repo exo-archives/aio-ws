@@ -133,5 +133,23 @@ public class ResourceDescriptorFactoryTest extends BaseTest {
       // this is resource method
     }
   }
+  
+  public void testNotPublicMethodAnnotated() {
+    System.setProperty("org.exoplatform.ws.develop", "true");
+    try {
+      ResourceDescriptorFactory.createAbstractResourceDescriptor(BadResource.class);
+      fail("Exception should be thrown");
+    } catch (RuntimeException e) {
+    } finally {
+      System.setProperty("org.exoplatform.ws.develop", "false");
+    }
+  }
+  
+  private static class BadResource {
+    @GET
+    void get() {
+      // not public method annotated
+    }
+  }
 
 }

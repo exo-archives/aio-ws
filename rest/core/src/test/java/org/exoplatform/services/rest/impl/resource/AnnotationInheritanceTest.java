@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.services.rest.impl.method;
+package org.exoplatform.services.rest.impl.resource;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -32,31 +32,24 @@ import org.exoplatform.services.rest.AbstractResourceTest;
  */
 public class AnnotationInheritanceTest extends AbstractResourceTest {
 
+  @Path("/a")
   public interface ResourceInterface {
-
     @GET
     @Produces(MediaType.TEXT_XML)
     String m0(String type);
-
   }
-  
-  @Path("/a")
-  public class Resource1 implements ResourceInterface{
-    
+
+  public class Resource1 implements ResourceInterface {
     public String m0(String type) {
       return "m0";
     }
-    
   }
-  
-  @Path("/b")
+
   public class Resource2 implements ResourceInterface {
-    
     @Produces(MediaType.APPLICATION_ATOM_XML)
     public String m0(String type) {
       return "m0";
     }
-    
   }
   
 
@@ -71,12 +64,13 @@ public class AnnotationInheritanceTest extends AbstractResourceTest {
     assertEquals(MediaType.TEXT_XML_TYPE, service("GET", "/a", "", null, null).getContentType());
 
     unregistry(resource1);
-    
-      registry(resource2);
-      assertEquals(200, service("GET", "/b", "", null, null).getStatus());
-      assertEquals("m0", service("GET", "/b", "", null, null).getEntity());
-      assertEquals(MediaType.APPLICATION_ATOM_XML_TYPE, service("GET", "/b", "", null, null).getContentType());
-      unregistry(resource2);
+
+    registry(resource2);
+    assertEquals(200, service("GET", "/a", "", null, null).getStatus());
+    assertEquals("m0", service("GET", "/a", "", null, null).getEntity());
+    assertEquals(MediaType.APPLICATION_ATOM_XML_TYPE,
+                 service("GET", "/a", "", null, null).getContentType());
+    unregistry(resource2);
 
   }
 

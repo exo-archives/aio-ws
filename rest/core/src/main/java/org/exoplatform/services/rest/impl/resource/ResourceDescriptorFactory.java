@@ -22,7 +22,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -48,9 +47,6 @@ import org.exoplatform.services.rest.impl.method.DefaultMethodInvoker;
 import org.exoplatform.services.rest.impl.method.MethodParameter;
 import org.exoplatform.services.rest.impl.method.MethodParameterHelper;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
-import org.exoplatform.services.rest.resource.ResourceMethodDescriptor;
-import org.exoplatform.services.rest.resource.SubResourceLocatorDescriptor;
-import org.exoplatform.services.rest.resource.SubResourceMethodDescriptor;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -58,7 +54,7 @@ import org.exoplatform.services.rest.resource.SubResourceMethodDescriptor;
  */
 public final class ResourceDescriptorFactory {
 
-  private static final Log LOG = ExoLogger.getLogger(ResourceDescriptorFactory.class);
+  private static final Log LOG = ExoLogger.getLogger(ResourceDescriptorFactory.class.getName());
 
   /**
    * Constructor.
@@ -73,32 +69,45 @@ public final class ResourceDescriptorFactory {
    * @return newly created AbstractResourceDescriptor
    */
   public static AbstractResourceDescriptor createAbstractResourceDescriptor(Class<?> resourceClass) {
-    final Path pathAnnotation = resourceClass.getAnnotation(Path.class);
 
-//    Method[] ms = resourceClass.getDeclaredMethods();
-//    for (Method method : ms) {
-//      if (!getJaxRSAnnotations(method).isEmpty() && !Modifier.isPublic(method.getModifiers())) {
-//        LOG.warn("Non-public method annotated with JAX-RS annotation: " + resourceClass.getName()
-//            + "." + method.getName());
-//      }
-//    }
+    for (Method method : resourceClass.getDeclaredMethods()) {
+      for (Annotation a : method.getAnnotations()) {
+        Class<?> ac = a.annotationType();
+        if (!Modifier.isPublic(method.getModifiers())
+            && (ac == CookieParam.class || ac == Consumes.class || ac == Context.class
+                || ac == DefaultValue.class || ac == Encoded.class || ac == FormParam.class
+                || ac == HeaderParam.class || ac == MatrixParam.class || ac == Path.class
+                || ac == PathParam.class || ac == Produces.class || ac == QueryParam.class || ac.getAnnotation(HttpMethod.class) != null)) {
 
+          if (Boolean.valueOf(System.getProperty("org.exoplatform.ws.develop")))
+            throw new RuntimeException("Non-public method is annotated with JAX-RS annotation: "
+                + resourceClass.getName() + "#" + method.getName());
+          else
+            LOG.warn("Non-public method is annotated with JAX-RS annotation: "
+                + resourceClass.getName() + "#" + method.getName());
+        }
+      }
+    }
+
+    final Path pathAnnotation = getClassAnnotation(resourceClass, Path.class);
     AbstractResourceDescriptor resourceDescriptor = null;
     if (pathAnnotation != null)
-      resourceDescriptor = new AbstractResourceDescriptorImpl(new PathValue(pathAnnotation.value()), resourceClass);
+      resourceDescriptor = new AbstractResourceDescriptorImpl(new PathValue(pathAnnotation.value()),
+                                                              resourceClass);
     else
       resourceDescriptor = new AbstractResourceDescriptorImpl(resourceClass);
-    
 
     final boolean encoded = resourceClass.getAnnotation(Encoded.class) != null;
     final Consumes consumesResource = resourceClass.getAnnotation(Consumes.class);
     final Produces producesResource = resourceClass.getAnnotation(Produces.class);
 
     for (Method method : createMethodList(resourceClass)) {
-      Path path = getAnnotation(method, resourceClass, Path.class, false);
-      HttpMethod httpMethod = getAnnotation(method, resourceClass, HttpMethod.class, true);
+      Path path = getMethodAnnotation(method, resourceClass, Path.class, false);
+      HttpMethod httpMethod = getMethodAnnotation(method, resourceClass, HttpMethod.class, true);
       if (path != null || httpMethod != null) {
-        List<MethodParameter> methodParameters = createParametersList(resourceClass, method, encoded);
+        List<MethodParameter> methodParameters = createParametersList(resourceClass,
+                                                                      method,
+                                                                      encoded);
         if (httpMethod != null) {
           List<MediaType> consumes = resolveConsumesMediaType(resourceClass,
                                                               method,
@@ -132,12 +141,16 @@ public final class ResourceDescriptorFactory {
         } else {
           if (path != null) {
             // sub-resource locator
-            
-            // NOTE Not process @Produces and @Consumes annotations for sub-locators.
+
+            // NOTE Not process @Produces and @Consumes annotations for
+            // sub-locators.
             // According to specification:
-            // @Produces and @Consumes annotations MAY be applied to a resource method,
-            // a resource class or entity provider. Resource method MUST be annotated
-            // with request method designator. Sub-locators has not this annotation.
+            // @Produces and @Consumes annotations MAY be applied to a resource
+            // method,
+            // a resource class or entity provider. Resource method MUST be
+            // annotated
+            // with request method designator. Sub-locators has not this
+            // annotation.
             resourceDescriptor.getSubResourceLocatorDescriptors()
                               .add(new SubResourceLocatorDescriptorImpl(new PathValue(path.value()),
                                                                         method,
@@ -151,7 +164,6 @@ public final class ResourceDescriptorFactory {
 
     return resourceDescriptor;
   }
-
 
   /**
    * Create list of methods.
@@ -168,8 +180,8 @@ public final class ResourceDescriptorFactory {
   }
 
   /**
-   * Create list of {@link MethodParameter} .
-   * FIXME
+   * Create list of {@link MethodParameter} . FIXME
+   * 
    * @param m See {@link Method}
    * @param encodedFromParent true if automatic decoding of parameter values
    *          must e disable false otherwise. See {@link Encoded}
@@ -237,8 +249,8 @@ public final class ResourceDescriptorFactory {
    * Check does method contains annotation {@link Produces}. If it has then
    * process it and create list of media types method can produce. If it has not
    * annotation then return media types from parent resource (from resource
-   * class).
-   * FIXME
+   * class). FIXME
+   * 
    * @param m See {@link Method}
    * @param producesFromParent media types from from resource class
    * @return media types actual method <i>m</i> which it can produce
@@ -246,7 +258,7 @@ public final class ResourceDescriptorFactory {
   private static List<MediaType> resolveProducesMediaType(Class<?> resourceClass,
                                                           Method method,
                                                           List<MediaType> producesFromParent) {
-    Produces p = getAnnotation(method, resourceClass, Produces.class, false);
+    Produces p = getMethodAnnotation(method, resourceClass, Produces.class, false);
     if (p != null)
       return MediaTypeHelper.createProducesList(p);
 
@@ -257,8 +269,8 @@ public final class ResourceDescriptorFactory {
    * Check does method contains annotation {@link Consumes}. If it has then
    * process it and create list of media types method can consume. If it has not
    * annotation then return media types from parent resource (from resource
-   * class).
-   * FIXME
+   * class). FIXME
+   * 
    * @param m See {@link Method}
    * @param consumesFromParent media types from from resource class
    * @return media types for method <i>m</i> which it can consume
@@ -266,7 +278,7 @@ public final class ResourceDescriptorFactory {
   private static List<MediaType> resolveConsumesMediaType(Class<?> resourceClass,
                                                           Method method,
                                                           List<MediaType> consumesFromParent) {
-    Consumes c = getAnnotation(method, resourceClass, Consumes.class, false);
+    Consumes c = getMethodAnnotation(method, resourceClass, Consumes.class, false);
     if (c != null)
       return MediaTypeHelper.createConsumesList(c);
 
@@ -300,10 +312,10 @@ public final class ResourceDescriptorFactory {
    * @param resourceClass
    * @return
    */
-  private static <T extends Annotation> T getAnnotation(Method method,
-                                                        Class<?> resourceClass,
-                                                        Class<T> annotationClass,
-                                                        boolean metaAnnotation) {
+  private static <T extends Annotation> T getMethodAnnotation(Method method,
+                                                              Class<?> resourceClass,
+                                                              Class<T> annotationClass,
+                                                              boolean metaAnnotation) {
 
     T annotation = null;
     if (metaAnnotation)
@@ -319,10 +331,10 @@ public final class ResourceDescriptorFactory {
         inhMethod = resourceClass.getSuperclass().getMethod(method.getName(),
                                                             method.getParameterTypes());
       } catch (NoSuchMethodException e) {
-        for (Class<?> interfase : resourceClass.getInterfaces()) {
+        for (Class<?> intf : resourceClass.getInterfaces()) {
           try {
 
-            Method tmp = interfase.getMethod(method.getName(), method.getParameterTypes());
+            Method tmp = intf.getMethod(method.getName(), method.getParameterTypes());
             if (inhMethod == null)
               inhMethod = tmp;
             else
@@ -341,6 +353,25 @@ public final class ResourceDescriptorFactory {
       }
     }
 
+    return annotation;
+  }
+  
+  private static <T extends Annotation> T getClassAnnotation(Class<?> resourceClass,
+                                                             Class<T> annotationClass) {
+    T annotation = resourceClass.getAnnotation(annotationClass);
+    if (annotation == null) {
+      annotation = resourceClass.getSuperclass().getAnnotation(annotationClass);
+      if (annotation == null) {
+        for (Class<?> intf : resourceClass.getInterfaces()) {
+          T tmp = intf.getAnnotation(annotationClass);
+          if (annotation == null)
+            annotation = tmp;
+          else
+            throw new RuntimeException("JAX-RS annotation on class " + resourceClass.getName()
+                + " is equivocality.");
+        }
+      }
+    }
     return annotation;
   }
 

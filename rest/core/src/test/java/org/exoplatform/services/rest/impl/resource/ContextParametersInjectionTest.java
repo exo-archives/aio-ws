@@ -15,7 +15,7 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.parameters;
+package org.exoplatform.services.rest.impl.resource;
 
 import java.util.List;
 

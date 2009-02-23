@@ -42,6 +42,8 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.exoplatform.container.component.ComponentPlugin;
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.services.rest.GenericContainerRequest;
 import org.exoplatform.services.rest.GenericContainerResponse;
 import org.exoplatform.services.rest.RequestFilter;
@@ -117,6 +119,11 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
    * Mutable application attributes.
    */
   private Map<String, Object> attributes;
+  
+  /**
+   * Should be built-in providers be loaded.
+   */
+  private boolean loadBuiltinProviders;
 
   /**
    * Constructs new instance of {@link RequestHandler}.
@@ -124,11 +131,16 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
    * @param dispatcher See {@link RequestDispatcher}
    * @param jaxbContexts See {@link JAXBContextResolver}
    */
-  public RequestHandlerImpl(RequestDispatcher dispatcher, JAXBContextResolver jaxbContexts) {
+  public RequestHandlerImpl(RequestDispatcher dispatcher, JAXBContextResolver jaxbContexts, InitParams params) {
     // Moved to ResourceBinder, it needs it first
     // // initialize RuntimeDelegate instance
     // RuntimeDelegate.setInstance(new RuntimeDelegateImpl());
 
+    ValueParam builtinVp = null;
+    if (params != null)
+      builtinVp = params.getValueParam("ws.rs.entity.provider.builtin");
+    loadBuiltinProviders = builtinVp == null || Boolean.valueOf(builtinVp.getValue().trim()); 
+    
     this.dispatcher = dispatcher;
     this.jaxbContexts = jaxbContexts;
 
@@ -392,27 +404,28 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
    * Startup initialization.
    */
   protected void init() {
-    // add prepared entity providers
-    addEntityProvider(new ByteEntityProvider());
-    addEntityProvider(new DataSourceEntityProvider());
-    addEntityProvider(new DOMSourceEntityProvider());
-    addEntityProvider(new FileEntityProvider());
-    addEntityProvider(new MultivaluedMapEntityProvider());
-    addEntityProvider(new MultipartFormDataEntityProvider());
-    addEntityProvider(new InputStreamEntityProvider());
-    addEntityProvider(new ReaderEntityProvider());
-    addEntityProvider(new SAXSourceEntityProvider());
-    addEntityProvider(new StreamSourceEntityProvider());
-    addEntityProvider(new StringEntityProvider());
-    addEntityProvider(new StreamOutputEntityProvider());
-    addEntityProvider(new JsonEntityProvider());
-    JAXBElementEntityProvider jep = new JAXBElementEntityProvider();
-    jep.setContexResolver(jaxbContexts);
-    addEntityProvider(jep);
-    JAXBObjectEntityProvider jop = new JAXBObjectEntityProvider();
-    jop.setContexResolver(jaxbContexts);
-    addEntityProvider(jop);
-    
+    if (loadBuiltinProviders) {
+      // add prepared entity providers
+      addEntityProvider(new ByteEntityProvider());
+      addEntityProvider(new DataSourceEntityProvider());
+      addEntityProvider(new DOMSourceEntityProvider());
+      addEntityProvider(new FileEntityProvider());
+      addEntityProvider(new MultivaluedMapEntityProvider());
+      addEntityProvider(new MultipartFormDataEntityProvider());
+      addEntityProvider(new InputStreamEntityProvider());
+      addEntityProvider(new ReaderEntityProvider());
+      addEntityProvider(new SAXSourceEntityProvider());
+      addEntityProvider(new StreamSourceEntityProvider());
+      addEntityProvider(new StringEntityProvider());
+      addEntityProvider(new StreamOutputEntityProvider());
+      addEntityProvider(new JsonEntityProvider());
+      JAXBElementEntityProvider jep = new JAXBElementEntityProvider();
+      jep.setContexResolver(jaxbContexts);
+      addEntityProvider(jep);
+      JAXBObjectEntityProvider jop = new JAXBObjectEntityProvider();
+      jop.setContexResolver(jaxbContexts);
+      addEntityProvider(jop);
+    }
   }
 
   /**
