@@ -23,6 +23,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Iterator;
 
+import javax.ws.rs.core.Application;
+import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.apache.commons.logging.Log;
@@ -202,9 +204,22 @@ public final class ResourceBinder {
    */
   @SuppressWarnings("unchecked")
   private void init(ExoContainer container) {
-    List<ResourceContainer> l = container.getComponentInstancesOfType(ResourceContainer.class);
-    for (ResourceContainer c : l)
-      bind(c);
+    List<Application> al = container.getComponentInstancesOfType(Application.class);
+    for (Application a : al) {
+      for (Object obj : a.getSingletons()) {
+        if (obj.getClass().getAnnotation(Provider.class) != null)
+          ; // provider
+        else
+          bind(obj);
+      }
+      for (Class<?> clazz : a.getClasses()) {
+        
+      }
+    }
+    
+    List<ResourceContainer> rcl = container.getComponentInstancesOfType(ResourceContainer.class);
+    for (ResourceContainer rc : rcl)
+      bind(rc);
   }
 
 }

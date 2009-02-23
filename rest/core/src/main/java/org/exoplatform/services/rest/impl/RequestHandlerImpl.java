@@ -41,9 +41,11 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
+import org.apache.commons.logging.Log;
 import org.exoplatform.container.component.ComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
+import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.rest.GenericContainerRequest;
 import org.exoplatform.services.rest.GenericContainerResponse;
 import org.exoplatform.services.rest.RequestFilter;
@@ -80,6 +82,8 @@ import org.picocontainer.Startable;
  */
 public final class RequestHandlerImpl implements RequestHandler, Startable {
 
+  private static final Log LOG = ExoLogger.getLogger(RequestHandlerImpl.class.getName());
+  
   /**
    * Read message body providers. Also see {@link EntityProviderMap}.
    */
