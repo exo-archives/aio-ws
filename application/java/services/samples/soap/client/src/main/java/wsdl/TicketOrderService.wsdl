@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="TicketOrderServiceService" targetNamespace="http://jsr181.soap.ws.services.exoplatform.org/" xmlns:tns="http://jsr181.soap.ws.services.exoplatform.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://jsr181.soap.ws.services.exoplatform.org/" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://jsr181.soap.ws.services.exoplatform.org/">
+    <xs:element name="confirmation" type="tns:confirmation"/>
+    <xs:element name="confirmationResponse" type="tns:confirmationResponse"/>
+    <xs:element name="getTicket" type="tns:getTicket"/>
+    <xs:element name="getTicketResponse" type="tns:getTicketResponse"/>
+    <xs:complexType name="getTicket">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+            <xs:element minOccurs="0" name="arg1" type="xs:string"/>
+            <xs:element minOccurs="0" name="arg2" type="xs:dateTime"/>
+            <xs:element minOccurs="0" name="arg3" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="getTicketResponse">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="return" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="confirmation">
+        <xs:sequence>
+            <xs:element name="arg0" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="confirmationResponse">
+        <xs:sequence/>
+    </xs:complexType>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="getTicket">
+    <wsdl:part name="parameters" element="tns:getTicket">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getTicketResponse">
+    <wsdl:part name="parameters" element="tns:getTicketResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="confirmationResponse">
+    <wsdl:part name="parameters" element="tns:confirmationResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="confirmation">
+    <wsdl:part name="parameters" element="tns:confirmation">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="TicketOrderService">
+    <wsdl:operation name="getTicket">
+      <wsdl:input name="getTicket" message="tns:getTicket">
+    </wsdl:input>
+      <wsdl:output name="getTicketResponse" message="tns:getTicketResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="confirmation">
+      <wsdl:input name="confirmation" message="tns:confirmation">
+    </wsdl:input>
+      <wsdl:output name="confirmationResponse" message="tns:confirmationResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="TicketOrderServiceServiceSoapBinding" type="tns:TicketOrderService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getTicket">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getTicket">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getTicketResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="confirmation">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="confirmation">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="confirmationResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="TicketOrderServiceService">
+    <wsdl:port name="TicketOrderServicePort" binding="tns:TicketOrderServiceServiceSoapBinding">
+      <soap:address location="http://localhost:8080/ws-examples/soap/services/TicketOrderService/TicketOrderServicePort?wsdl"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
