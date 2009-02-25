@@ -43,7 +43,7 @@
     </dependency>
   </dependencies>
   <properties>
-    <cxf.version>2.1.4</cxf.version>
+    <cxf.version>2.1.2</cxf.version>
   </properties>
   <build>
     <plugins>

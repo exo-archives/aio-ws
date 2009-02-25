@@ -34,12 +34,12 @@
     <dependency>
       <groupId>org.exoplatform.patches</groupId>
       <artifactId>exo-cxf-common-utilities</artifactId>
-      <version>2.1.4</version>
+      <version>2.1.2</version>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.patches</groupId>
       <artifactId>exo-cxf-rt-frontend-jaxws</artifactId>
-      <version>2.1.4</version>
+      <version>2.1.2</version>
     </dependency>
     <dependency>
       <groupId>xalan</groupId>
