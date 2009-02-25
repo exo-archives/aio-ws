@@ -60,11 +60,11 @@ public class MethodParameterHelper {
     m1.put(javax.ws.rs.MatrixParam.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.MATRIX_PARAM);
     m1.put(javax.ws.rs.PathParam.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.PATH_PARAM);
     m1.put(javax.ws.rs.QueryParam.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.QUERY_PARAM);
-    PARAMETER_ANNOTATIONS_MAP = Collections.unmodifiableMap(m1);
+    CONSTRUCTOR_PARAMETER_ANNOTATIONS_MAP = Collections.unmodifiableMap(m1);
     
     Map<String, AnnotationUtils.PARAMETER_ANNOTATIONS> m2 = new HashMap<String, AnnotationUtils.PARAMETER_ANNOTATIONS>(m1);
     m2.put(javax.ws.rs.FormParam.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.FORM_PARAM);
-    CONSTRUCTOR_PARAMETER_ANNOTATIONS_MAP = Collections.unmodifiableMap(m2);
+    PARAMETER_ANNOTATIONS_MAP = Collections.unmodifiableMap(m2);
   }
 
   /**

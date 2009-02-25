@@ -135,14 +135,10 @@ public class ResourceDescriptorFactoryTest extends BaseTest {
   }
   
   public void testNotPublicMethodAnnotated() {
-    System.setProperty("org.exoplatform.ws.develop", "true");
-    try {
-      ResourceDescriptorFactory.createAbstractResourceDescriptor(BadResource.class);
-      fail("Exception should be thrown");
-    } catch (RuntimeException e) {
-    } finally {
-      System.setProperty("org.exoplatform.ws.develop", "false");
-    }
+    // TODO Mechanism for checking log messages. There is some sections in
+    // JAX-RS specification that said 'should warn...'. Need control this
+    // messages in some way.
+    ResourceDescriptorFactory.createAbstractResourceDescriptor(BadResource.class);
   }
   
   private static class BadResource {
