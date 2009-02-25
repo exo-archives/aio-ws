@@ -24,7 +24,7 @@ import java.util.List;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.exoplatform.services.rest.impl.method.MethodParameter;
+import org.exoplatform.services.rest.method.MethodParameter;
 import org.exoplatform.services.rest.resource.ResourceDescriptor;
 import org.exoplatform.services.rest.resource.ResourceDescriptorVisitor;
 import org.exoplatform.services.rest.resource.ResourceMethodDescriptor;
@@ -78,7 +78,7 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
 
     if (ard.isRootResource() && ard.getPath().getPath().length() == 0)
       throw new IllegalArgumentException("Resource class " + ard.getResourceClass()
-          + " is root resource but path value is null or empty," + " see javax.ws.rs.Path#value()");
+          + " is root resource but path value empty, see javax.ws.rs.Path#value()");
 
   }
 
@@ -98,8 +98,8 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
    * produces object that will handle the request. {@inheritDoc}
    */
   public void visitSubResourceLocatorDescriptor(SubResourceLocatorDescriptor srld) {
-    if (srld.getPathValue().getPath() == null || srld.getPathValue().getPath().length() == 0)
-      throw new IllegalArgumentException("Path value is null or empty for method "
+    if (srld.getPathValue().getPath().length() == 0)
+      throw new IllegalArgumentException("Path value is empty for method "
           + srld.getMethod().getName() + " in resource class "
           + srld.getParentResource().getResourceClass() + ", see javax.ws.rs.Path#value()");
     checkMethodParameters(srld);

@@ -45,7 +45,7 @@ import org.exoplatform.services.rest.resource.GenericMethodResource;
  * @version $Id: $
  */
 public final class DefaultMethodInvoker implements MethodInvoker {
-  
+
   private static final Log LOG = ExoLogger.getLogger(DefaultMethodInvoker.class.getName());
 
   /**
@@ -61,7 +61,7 @@ public final class DefaultMethodInvoker implements MethodInvoker {
 
     Object[] p = new Object[genericMethodResource.getMethodParameters().size()];
     int i = 0;
-    for (MethodParameter mp : genericMethodResource.getMethodParameters()) {
+    for (org.exoplatform.services.rest.method.MethodParameter mp : genericMethodResource.getMethodParameters()) {
       Annotation a = mp.getAnnotation();
       if (a != null) {
         ParameterResolver<?> pr = ParameterResolverFactory.createParameterResolver(a);
@@ -129,14 +129,13 @@ public final class DefaultMethodInvoker implements MethodInvoker {
    * <p>
    * If errors occurs when process parameter with {@link PathParam},
    * {@link QueryParam} or {@link MatrixParam} then response with status Not
-   * Found (404) must be returned. If parameter annotated with {@link FormParam},
-   * {@link HeaderParam} or {@link CookieParam} the status Bad Request (400)
+   * Found (404) must be returned. If parameter annotated with {@link FormParam}, {@link HeaderParam} or {@link CookieParam} the status Bad Request (400)
    * must be returned.
    * 
    * @param mp method parameter
    * @return WebApplicationException with response with required status.
    */
-  private static WebApplicationException createException(MethodParameter mp) {
+  private static WebApplicationException createException(org.exoplatform.services.rest.method.MethodParameter mp) {
     Class<?> a = mp.getAnnotation().annotationType();
     if (a == MatrixParam.class || a == QueryParam.class || a == PathParam.class)
       return new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());

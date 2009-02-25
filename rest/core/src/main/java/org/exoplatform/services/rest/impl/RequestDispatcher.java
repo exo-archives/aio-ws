@@ -40,6 +40,7 @@ import org.exoplatform.services.rest.GenericContainerResponse;
 import org.exoplatform.services.rest.impl.header.HeaderHelper;
 import org.exoplatform.services.rest.impl.header.MediaTypeHelper;
 import org.exoplatform.services.rest.impl.resource.ResourceClass;
+import org.exoplatform.services.rest.impl.resource.SingletonResourceClass;
 import org.exoplatform.services.rest.impl.resource.ResourceDescriptorFactory;
 import org.exoplatform.services.rest.impl.resource.ResourceMethodMap;
 import org.exoplatform.services.rest.impl.resource.SubResourceLocatorMap;
@@ -95,8 +96,8 @@ public final class RequestDispatcher {
     String requestPath = context.getPath(false);
     List<String> parameterValues = context.getParameterValues();
     
-    ResourceClass resourceClass = processResourceClass(requestPath, parameterValues);
-    if (resourceClass == null) {
+    ResourceClass resourceFactory = processResource(requestPath, parameterValues);
+    if (resourceFactory == null) {
       if (LOG.isDebugEnabled())
         LOG.debug("Root resource not found for " + requestPath);
       
@@ -111,7 +112,7 @@ public final class RequestDispatcher {
 //    Object resource = exoContainer.getComponentInstanceOfType(resourceClass.getResourceClass());
     // TODO : Done for getting groovy script working as rest-services.
     // Groovy does not present in exo-container.
-    Object resource = resourceClass.getResource();
+    Object resource = resourceFactory.getResource(request, response);
 
     // Take the tail of the request path, the tail will be requested path
     // for lower resources, e. g. ResourceClass -> Sub-resource method/locator
@@ -120,9 +121,9 @@ public final class RequestDispatcher {
     // save the resource class URI in hierarchy
     context.addMatchedURI(requestPath.substring(0, requestPath.lastIndexOf(newRequestPath)));
 
-    context.setParameterNames(resourceClass.getUriPattern().getParameterNames());
+    context.setParameterNames(resourceFactory.getUriPattern().getParameterNames());
 
-    dispatch(request, response, context, resourceClass, resource, newRequestPath);
+    dispatch(request, response, context, resourceFactory, resource, newRequestPath);
   }
   
   /**
@@ -316,7 +317,7 @@ public final class RequestDispatcher {
     // NOTE Locators can't accept entity
     MethodInvoker invoker = srld.getMethodInvoker();
     resource = invoker.invokeMethod(resource, srld, context);
-    ResourceClass resourceClass = new ResourceClass(ResourceDescriptorFactory.createAbstractResourceDescriptor(resource.getClass()),
+    SingletonResourceClass resourceClass = new SingletonResourceClass(ResourceDescriptorFactory.createAbstractResourceDescriptor(resource.getClass()),
                                                     resource);
     
     // dispatch again newly created resource
@@ -394,9 +395,9 @@ public final class RequestDispatcher {
    * @param path full request path, see {@link UriInfo#getPath()}.
    * @param capturingValues the list for keeping template values. See
    *          {@link UriInfo#getPathParameters()}
-   * @return {@link ResourceClass} or null
+   * @return {@link SingletonResourceClass} or null
    */
-  private ResourceClass processResourceClass(String path, List<String> capturingValues) {
+  private ResourceClass processResource(String path, List<String> capturingValues) {
     for (ResourceClass rc : resourceBinder.getRootResources()) {
       if (rc.getUriPattern().match(path, capturingValues)) {
 

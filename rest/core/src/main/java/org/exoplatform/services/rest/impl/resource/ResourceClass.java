@@ -28,12 +28,14 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.rest.GenericContainerRequest;
+import org.exoplatform.services.rest.GenericContainerResponse;
 import org.exoplatform.services.rest.impl.header.MediaTypeHelper;
 import org.exoplatform.services.rest.impl.method.DefaultMethodInvoker;
-import org.exoplatform.services.rest.impl.method.MethodParameter;
 import org.exoplatform.services.rest.impl.method.OptionsRequestMethodInvoker;
 import org.exoplatform.services.rest.impl.uri.UriPattern;
 import org.exoplatform.services.rest.impl.uri.UriTemplateParser;
+import org.exoplatform.services.rest.method.MethodParameter;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
 import org.exoplatform.services.rest.resource.ResourceMethodDescriptor;
 import org.exoplatform.services.rest.resource.SubResourceLocatorDescriptor;
@@ -43,7 +45,7 @@ import org.exoplatform.services.rest.resource.SubResourceMethodDescriptor;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class ResourceClass {
+public abstract class ResourceClass {
 
   /**
    * Logger.
@@ -71,23 +73,11 @@ public class ResourceClass {
   private final SubResourceLocatorMap      subResourceLocatorMap;
 
   /**
-   * Resource object.
-   */
-  private final Object                     resource;
-
-  private final boolean                    singleton;
-
-  /**
    * Constructor.
    * 
    * @param resourceDescriptor See {@link AbstractResourceDescriptor}
    */
-  public ResourceClass(AbstractResourceDescriptor resourceDescriptor, Object resource) {
-
-    singleton = resource != null;
-    
-    this.resource = resource;
-
+  public ResourceClass(AbstractResourceDescriptor resourceDescriptor) {
     this.resourceDescriptor = resourceDescriptor;
 
     this.resourceMethodMap = new ResourceMethodMap();
@@ -113,18 +103,16 @@ public class ResourceClass {
     // Merge resource locator to URI pattern
     processSubResourceLocators(getSubResourceLocators());
   }
-  
-  public ResourceClass(AbstractResourceDescriptor resourceDescriptor) {
-    this(resourceDescriptor, null);
-  }
 
   /**
+   * @param request GenericContainerRequest
+   * @param response GenericContainerResponse
    * @return get resource object
    */
-  public Object getResource() {
-    return resource;
-  }
+  public abstract Object getResource(GenericContainerRequest request, GenericContainerResponse response);
 
+  // ---
+  
   /**
    * @return resource class
    * @see AbstractResourceDescriptor#getResourceClass()
@@ -190,7 +178,7 @@ public class ResourceClass {
    * 
    * @param resourceMethodMap ResourceMethodMap
    */
-  private void resolveHeadRequest(ResourceMethodMap resourceMethodMap) {
+  protected void resolveHeadRequest(ResourceMethodMap resourceMethodMap) {
 
     List<ResourceMethodDescriptor> g = resourceMethodMap.get(HttpMethod.GET);
     if (g == null || g.size() == 0)
@@ -223,7 +211,7 @@ public class ResourceClass {
    * 
    * @param resourceMethodMap ResourceMethodMap
    */
-  private void resolveOptionsRequest(ResourceMethodMap resourceMethodMap) {
+  protected void resolveOptionsRequest(ResourceMethodMap resourceMethodMap) {
     List<ResourceMethodDescriptor> o = resourceMethodMap.getList("OPTIONS");
     if (o.size() == 0) {
       List<MethodParameter> mps = Collections.emptyList();
@@ -251,7 +239,7 @@ public class ResourceClass {
    * 
    * @param subResourceMethodMap SubResourceMethodMap
    */
-  private void resolveHeadRequest(SubResourceMethodMap subResourceMethodMap) {
+  protected void resolveHeadRequest(SubResourceMethodMap subResourceMethodMap) {
     for (ResourceMethodMap rmm : subResourceMethodMap.values()) {
 
       List<ResourceMethodDescriptor> g = rmm.get(HttpMethod.GET);
@@ -287,7 +275,7 @@ public class ResourceClass {
    * @param rmm ResourceMethodMap
    * @see ResourceMethodDescriptor
    */
-  private void processResourceMethods(ResourceMethodMap rmm) {
+  protected void processResourceMethods(ResourceMethodMap rmm) {
     for (ResourceMethodDescriptor rmd : resourceDescriptor.getResourceMethodDescriptors()) {
       addResourceMethod(rmm, rmd);
     }
@@ -299,7 +287,7 @@ public class ResourceClass {
    * @param srmm SubResourceMethodMap
    * @see SubResourceMethodDescriptor
    */
-  private void processSubResourceMethods(SubResourceMethodMap srmm) {
+  protected void processSubResourceMethods(SubResourceMethodMap srmm) {
     for (SubResourceMethodDescriptor srmd : resourceDescriptor.getSubResourceMethodDescriptors()) {
       ResourceMethodMap rmm = srmm.getMethodMap(srmd.getUriPattern());
       addResourceMethod(rmm, srmd);
@@ -312,7 +300,7 @@ public class ResourceClass {
    * @param srlm SubResourceLocatorMap
    * @see SubResourceLocatorDescriptor
    */
-  private void processSubResourceLocators(SubResourceLocatorMap srlm) {
+  protected void processSubResourceLocators(SubResourceLocatorMap srlm) {
     for (SubResourceLocatorDescriptor srld : resourceDescriptor.getSubResourceLocatorDescriptors()) {
       if (!srlm.containsKey(srld.getUriPattern()))
         srlm.put(srld.getUriPattern(), srld);
@@ -334,7 +322,7 @@ public class ResourceClass {
    * @param rmm See {@link ResourceMethodMap}
    * @param rmd See {@link ResourceMethodDescriptor}
    */
-  private static void addResourceMethod(ResourceMethodMap rmm, ResourceMethodDescriptor rmd) {
+  protected void addResourceMethod(ResourceMethodMap rmm, ResourceMethodDescriptor rmd) {
     List<ResourceMethodDescriptor> r = rmm.getList(rmd.getHttpMethod());
     if (!containsMediaType(r, rmd))
       r.add(rmd);
@@ -353,8 +341,8 @@ public class ResourceClass {
    * @return true if Set already contains resource with the same media types
    *         false otherwise
    */
-  private static boolean containsMediaType(List<ResourceMethodDescriptor> rmds,
-                                           ResourceMethodDescriptor other) {
+  protected boolean containsMediaType(List<ResourceMethodDescriptor> rmds,
+                                      ResourceMethodDescriptor other) {
     for (ResourceMethodDescriptor rmd : rmds) {
       if (rmd.consumes().equals(other.consumes()) && rmd.produces().equals(other.produces()))
         return true;

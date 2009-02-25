@@ -42,7 +42,7 @@ public class ResourceClassTest extends BaseTest {
   public void testResourceMethod() {
     AbstractResourceDescriptor resourceDescriptor =
       ResourceDescriptorFactory.createAbstractResourceDescriptor(Resource1.class);
-    ResourceClass resourceClass = new ResourceClass(resourceDescriptor, new Resource1());
+    SingletonResourceClass resourceClass = new SingletonResourceClass(resourceDescriptor, new Resource1());
     assertNotNull(resourceClass.getUriPattern());
     
     assertEquals(0, resourceClass.getSubResourceMethods().size());
@@ -122,7 +122,7 @@ public class ResourceClassTest extends BaseTest {
   public void testSubResourceMethod() {
     AbstractResourceDescriptor resourceDescriptor =
       ResourceDescriptorFactory.createAbstractResourceDescriptor(Resource2.class);
-    ResourceClass resourceClass = new ResourceClass(resourceDescriptor, new Resource2());
+    SingletonResourceClass resourceClass = new SingletonResourceClass(resourceDescriptor, new Resource2());
     assertNotNull(resourceClass.getUriPattern());
     assertEquals(1, resourceClass.getResourceMethods().size());
     assertEquals(0, resourceClass.getSubResourceLocators().size());
@@ -186,7 +186,7 @@ public class ResourceClassTest extends BaseTest {
   public void testSubResourceLocator() {
     AbstractResourceDescriptor resourceDescriptor =
       ResourceDescriptorFactory.createAbstractResourceDescriptor(Resource3.class);
-    ResourceClass resourceClass = new ResourceClass(resourceDescriptor, new Resource3());
+    SingletonResourceClass resourceClass = new SingletonResourceClass(resourceDescriptor, new Resource3());
     assertNotNull(resourceClass.getUriPattern());
     assertEquals(1, resourceClass.getResourceMethods().size());
     assertEquals(0, resourceClass.getSubResourceMethods().size());

@@ -15,28 +15,38 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest.impl.method;
+package org.exoplatform.services.rest.impl.resource;
 
-import org.exoplatform.services.rest.impl.ApplicationContext;
+import org.exoplatform.services.rest.GenericContainerRequest;
+import org.exoplatform.services.rest.GenericContainerResponse;
+import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
- * @param <T> on of JAX-RS annotation that used for method parameters
  */
-public abstract class ParameterResolver<T> {
+public class SingletonResourceClass extends ResourceClass {
 
   /**
-   * Create object which will be passed in resource method or locator. Object is
-   * instance of {@link MethodParameterImpl#getParameterClass()}.
-   * 
-   * @param parameter See {@link MethodParameterImpl}
-   * @param context See {@link ApplicationContext}
-   * @return newly created instance of class
-   *         {@link MethodParameterImpl#getParameterClass()}
-   * @throws Exception if any errors occurs
+   * Resource object.
    */
-  public abstract Object resolve(org.exoplatform.services.rest.method.MethodParameter parameter,
-                                 ApplicationContext context) throws Exception;
+  private final Object                     resource;
+
+  /**
+   * Constructor.
+   * 
+   * @param resourceDescriptor See {@link AbstractResourceDescriptor}
+   */
+  public SingletonResourceClass(AbstractResourceDescriptor resourceDescriptor, Object resource) {
+    super(resourceDescriptor);
+    this.resource = resource;
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public Object getResource(GenericContainerRequest request, GenericContainerResponse response) {
+    return resource;
+  }
 
 }

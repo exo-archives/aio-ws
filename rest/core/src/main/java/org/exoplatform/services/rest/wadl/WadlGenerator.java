@@ -19,7 +19,7 @@ package org.exoplatform.services.rest.wadl;
 
 import javax.ws.rs.core.MediaType;
 
-import org.exoplatform.services.rest.impl.method.MethodParameter;
+import org.exoplatform.services.rest.method.MethodParameter;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
 import org.exoplatform.services.rest.resource.ResourceMethodDescriptor;
 import org.exoplatform.services.rest.wadl.research.Application;

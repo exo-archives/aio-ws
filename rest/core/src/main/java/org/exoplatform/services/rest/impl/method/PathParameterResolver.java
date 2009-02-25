@@ -44,7 +44,8 @@ public class PathParameterResolver extends ParameterResolver<PathParam> {
    * {@inheritDoc}
    */
   @Override
-  public Object resolve(MethodParameter parameter, ApplicationContext context) throws Exception {
+  public Object resolve(org.exoplatform.services.rest.method.MethodParameter parameter,
+                        ApplicationContext context) throws Exception {
     String param = this.pathParam.value();
     TypeProducer typeProducer = MethodParameterHelper.createTypeProducer(parameter.getParameterClass(),
                                                                          parameter.getParameterType());

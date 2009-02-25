@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.exoplatform.services.rest.impl.uri.UriPattern;
+import org.exoplatform.services.rest.method.ConstructorDescriptor;
 import org.exoplatform.services.rest.resource.ResourceDescriptorVisitor;
 import org.exoplatform.services.rest.resource.ResourceMethodDescriptor;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
@@ -70,6 +71,13 @@ public class AbstractResourceDescriptorImpl implements AbstractResourceDescripto
   private final List<ResourceMethodDescriptor>     resourceMethods;
 
   /**
+   * Resource class constructors.
+   * 
+   * @see {@link ConstructorDescriptor}
+   */
+  private final List<ConstructorDescriptor>        constructorDescriptors;
+
+  /**
    * Constructs new instance of AbstractResourceDescriptor with path (root
    * resource).
    * 
@@ -86,11 +94,14 @@ public class AbstractResourceDescriptorImpl implements AbstractResourceDescripto
     
     this.resourceClazz = resourceClazz;
 
+    this.constructorDescriptors = new ArrayList<ConstructorDescriptor>();
+
     this.subResourceMethods = new ArrayList<SubResourceMethodDescriptor>();
 
     this.subResourceLocators = new ArrayList<SubResourceLocatorDescriptor>();
 
     this.resourceMethods = new ArrayList<ResourceMethodDescriptor>();
+    
   }
 
   /**
@@ -136,6 +147,13 @@ public class AbstractResourceDescriptorImpl implements AbstractResourceDescripto
    */
   public Class<?> getResourceClass() {
     return resourceClazz;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public List<ConstructorDescriptor> getConstructorDescriptor() {
+    return constructorDescriptors;
   }
 
   /**

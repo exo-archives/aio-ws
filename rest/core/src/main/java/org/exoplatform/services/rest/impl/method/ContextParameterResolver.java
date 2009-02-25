@@ -41,7 +41,7 @@ public class ContextParameterResolver extends ParameterResolver<Context> {
    */
   private enum CONTEXT_PARAMS {
     /**
-     * @see HttpHeaders 
+     * @see HttpHeaders
      */
     HTTP_HEADERS,
     /**
@@ -57,34 +57,34 @@ public class ContextParameterResolver extends ParameterResolver<Context> {
      */
     URI_INFO
   }
-  
+
   /**
-   * Mapping from class name to member of {@link CONTEXT_PARAMS}. 
+   * Mapping from class name to member of {@link CONTEXT_PARAMS}.
    */
-  private static final Map<String, CONTEXT_PARAMS> CONTEXT_PARAMETERS_MAP =
-    new HashMap<String, CONTEXT_PARAMS>(4);
-  
+  private static final Map<String, CONTEXT_PARAMS> CONTEXT_PARAMETERS_MAP = new HashMap<String, CONTEXT_PARAMS>(4);
+
   static {
     CONTEXT_PARAMETERS_MAP.put(HttpHeaders.class.getName(), CONTEXT_PARAMS.HTTP_HEADERS);
     CONTEXT_PARAMETERS_MAP.put(SecurityContext.class.getName(), CONTEXT_PARAMS.SECURITY_CONTEXT);
     CONTEXT_PARAMETERS_MAP.put(Request.class.getName(), CONTEXT_PARAMS.REQUEST);
     CONTEXT_PARAMETERS_MAP.put(UriInfo.class.getName(), CONTEXT_PARAMS.URI_INFO);
   }
-  
+
   /**
    * @param contextParam {@link Context}
    */
   ContextParameterResolver(Context contextParam) {
     // @Context annotation has not value.
   }
-  
+
   /**
    * {@inheritDoc}
    */
   @Override
-  public Object resolve(MethodParameter parameter, ApplicationContext context) throws Exception {
+  public Object resolve(org.exoplatform.services.rest.method.MethodParameter parameter,
+                        ApplicationContext context) throws Exception {
     String className = parameter.getParameterClass().getName();
-    CONTEXT_PARAMS cp = CONTEXT_PARAMETERS_MAP.get(className); 
+    CONTEXT_PARAMS cp = CONTEXT_PARAMETERS_MAP.get(className);
     if (cp != null) {
       switch (cp) {
       case HTTP_HEADERS:

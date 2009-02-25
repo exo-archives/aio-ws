@@ -18,10 +18,12 @@
 package org.exoplatform.services.rest.impl.resource;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -43,9 +45,14 @@ import javax.ws.rs.core.MediaType;
 import org.apache.commons.logging.Log;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.rest.impl.header.MediaTypeHelper;
+import org.exoplatform.services.rest.impl.method.ConstructorDescriptorImpl;
+import org.exoplatform.services.rest.impl.method.ConstructorParameterImpl;
 import org.exoplatform.services.rest.impl.method.DefaultMethodInvoker;
-import org.exoplatform.services.rest.impl.method.MethodParameter;
 import org.exoplatform.services.rest.impl.method.MethodParameterHelper;
+import org.exoplatform.services.rest.impl.method.MethodParameterImpl;
+import org.exoplatform.services.rest.method.ConstructorDescriptor;
+import org.exoplatform.services.rest.method.ConstructorParameter;
+import org.exoplatform.services.rest.method.MethodParameter;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
 
 /**
@@ -61,7 +68,22 @@ public final class ResourceDescriptorFactory {
    */
   private ResourceDescriptorFactory() {
   }
-
+  
+  /**
+   * Compare two ConstructorDescriptor in number parameters order. 
+   */
+  private static final Comparator<ConstructorDescriptor> CONSTRUCTOR_COMPARATOR =
+    new Comparator<ConstructorDescriptor>() {
+      public int compare(ConstructorDescriptor o1, ConstructorDescriptor o2) {
+        int r = o2.getConstructorParameters().size() - o1.getConstructorParameters().size();
+        if (r == 0)
+          LOG.warn("Two constructors with the same number of parameter found "
+                   + o1.getConstructor().getName() + " and "
+                   + o2.getConstructor().getName());
+        return r;
+      }
+  };
+  
   /**
    * Create instance of {@link AbstractResourceDescriptor} from given class.
    * 
@@ -77,12 +99,9 @@ public final class ResourceDescriptorFactory {
             && (ac == CookieParam.class || ac == Consumes.class || ac == Context.class
                 || ac == DefaultValue.class || ac == Encoded.class || ac == FormParam.class
                 || ac == HeaderParam.class || ac == MatrixParam.class || ac == Path.class
-                || ac == PathParam.class || ac == Produces.class || ac == QueryParam.class || ac.getAnnotation(HttpMethod.class) != null)) {
+                || ac == PathParam.class || ac == Produces.class || ac == QueryParam.class
+                || ac.getAnnotation(HttpMethod.class) != null)) {
 
-          if (Boolean.valueOf(System.getProperty("org.exoplatform.ws.develop")))
-            throw new RuntimeException("Non-public method is annotated with JAX-RS annotation: "
-                + resourceClass.getName() + "#" + method.getName());
-          else
             LOG.warn("Non-public method is annotated with JAX-RS annotation: "
                 + resourceClass.getName() + "#" + method.getName());
         }
@@ -100,12 +119,22 @@ public final class ResourceDescriptorFactory {
     final boolean encoded = resourceClass.getAnnotation(Encoded.class) != null;
     final Consumes consumesResource = resourceClass.getAnnotation(Consumes.class);
     final Produces producesResource = resourceClass.getAnnotation(Produces.class);
+    
+    Constructor<?>[] constructors = resourceClass.getConstructors();
+    for (Constructor<?> constructor : constructors)
+      resourceDescriptor.getConstructorDescriptor().add(createConstructorDescriptors(constructor,
+                                                                                     encoded));
+
+    if (resourceDescriptor.getConstructorDescriptor().size() > 1)
+      java.util.Collections.sort(resourceDescriptor.getConstructorDescriptor(),
+                                 CONSTRUCTOR_COMPARATOR);
+
 
     for (Method method : createMethodList(resourceClass)) {
       Path path = getMethodAnnotation(method, resourceClass, Path.class, false);
       HttpMethod httpMethod = getMethodAnnotation(method, resourceClass, HttpMethod.class, true);
       if (path != null || httpMethod != null) {
-        List<MethodParameter> methodParameters = createParametersList(resourceClass,
+        List<MethodParameter> methodParameters = createMethodParametersList(resourceClass,
                                                                       method,
                                                                       encoded);
         if (httpMethod != null) {
@@ -146,11 +175,9 @@ public final class ResourceDescriptorFactory {
             // sub-locators.
             // According to specification:
             // @Produces and @Consumes annotations MAY be applied to a resource
-            // method,
-            // a resource class or entity provider. Resource method MUST be
-            // annotated
-            // with request method designator. Sub-locators has not this
-            // annotation.
+            // method, a resource class or entity provider. Resource method
+            // MUST be annotated with request method designator.
+            // Sub-locators has not this annotation.
             resourceDescriptor.getSubResourceLocatorDescriptors()
                               .add(new SubResourceLocatorDescriptorImpl(new PathValue(path.value()),
                                                                         method,
@@ -178,6 +205,26 @@ public final class ResourceDescriptorFactory {
       l.add(m);
     return l;
   }
+  
+  private static ConstructorDescriptor createConstructorDescriptors(Constructor<?> constructor,
+                                                                    boolean encodedFromParent) {
+    Class<?>[] parameterTypes = constructor.getParameterTypes();
+    
+    if (parameterTypes.length == 0)
+      return new ConstructorDescriptorImpl(constructor);
+    
+    Type[] parameterGenericTypes = constructor.getGenericParameterTypes();
+    Annotation[][] annotations = constructor.getParameterAnnotations();
+    List<ConstructorParameter> parameters = new ArrayList<ConstructorParameter>(parameterTypes.length);
+    for (int i = 0; i < parameterTypes.length; i++)
+      parameters.add(createConstructorParameter(parameterTypes[i],
+                                                parameterGenericTypes[i],
+                                                annotations[i],
+                                                encodedFromParent));
+    
+    return new ConstructorDescriptorImpl(constructor, parameters);
+  }
+    
 
   /**
    * Create list of {@link MethodParameter} . FIXME
@@ -187,11 +234,10 @@ public final class ResourceDescriptorFactory {
    *          must e disable false otherwise. See {@link Encoded}
    * @return list of {@link MethodParameter}
    */
-  @SuppressWarnings("unchecked")
-  private static List<MethodParameter> createParametersList(Class<?> resourceClass,
-                                                            Method m,
-                                                            boolean encodedFromParent) {
-    Class[] parameterClasses = m.getParameterTypes();
+  private static List<MethodParameter> createMethodParametersList(Class<?> resourceClass,
+                                                                  Method m,
+                                                                  boolean encodedFromParent) {
+    Class<?>[] parameterClasses = m.getParameterTypes();
     Type[] parameterGenTypes = m.getGenericParameterTypes();
     Annotation[][] annotations = m.getParameterAnnotations();
 
@@ -206,6 +252,27 @@ public final class ResourceDescriptorFactory {
     return l;
   }
 
+  private static ConstructorParameter createConstructorParameter(Class<?> clazz,
+                                                                 Type type,
+                                                                 Annotation[] annotations,
+                                                                 boolean encodedFromParent) {
+    String defaultValue = null;
+    Annotation annotation = null;
+    boolean encoded = false;
+    for (Annotation a : annotations) {
+      Class<?> ac = a.annotationType();
+      if (MethodParameterHelper.CONSTRUCTOR_PARAMETER_ANNOTATIONS_MAP.containsKey(ac.getName())) {
+        annotation = a;
+      } else if (ac == Encoded.class) {
+        encoded = true;
+      } else if (ac == DefaultValue.class) {
+        defaultValue = ((DefaultValue) a).value();
+      }
+    }
+    return new ConstructorParameterImpl(annotation, annotations, clazz, type, defaultValue, encoded
+        | encodedFromParent);
+  }
+
   /**
    * Create method parameter, see {@link MethodParameter} .
    * 
@@ -217,8 +284,7 @@ public final class ResourceDescriptorFactory {
    *          must e disable false otherwise. See {@link Encoded}
    * @return newly created method parameter
    */
-  @SuppressWarnings("unchecked")
-  private static MethodParameter createMethodParameter(Class parameterClass,
+  private static MethodParameter createMethodParameter(Class<?> parameterClass,
                                                        Type parameterGenType,
                                                        Annotation[] annotations,
                                                        boolean encodedFromParent) {
@@ -228,21 +294,22 @@ public final class ResourceDescriptorFactory {
     for (Annotation a : annotations) {
       // TODO check if few annotation at one parameter, e. g. PathParam and
       // HeaderParam
-      if (MethodParameterHelper.PARAMETER_ANNOTATIONS_MAP.containsKey(a.annotationType().getName())) {
+      Class<?> ac = a.annotationType();
+      if (MethodParameterHelper.PARAMETER_ANNOTATIONS_MAP.containsKey(ac.getName())) {
         annotation = a;
-      } else if (a.annotationType() == Encoded.class) {
+      } else if (ac == Encoded.class) {
         encoded = true;
-      } else if (a.annotationType() == DefaultValue.class) {
+      } else if (ac == DefaultValue.class) {
         defaultValue = ((DefaultValue) a).value();
       }
     }
 
-    return new MethodParameter(annotation,
-                               annotations,
-                               parameterClass,
-                               parameterGenType,
-                               defaultValue,
-                               encoded || encodedFromParent);
+    return new MethodParameterImpl(annotation,
+                                   annotations,
+                                   parameterClass,
+                                   parameterGenType,
+                                   defaultValue,
+                                   encoded || encodedFromParent);
   }
 
   /**

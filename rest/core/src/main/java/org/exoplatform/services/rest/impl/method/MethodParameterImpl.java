@@ -22,15 +22,14 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 import javax.ws.rs.DefaultValue;
-import javax.ws.rs.QueryParam;
 
 /**
- * Describe the method method's parameter.
+ * Describes the method's parameter.
  * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class MethodParameter {
+public class MethodParameterImpl implements org.exoplatform.services.rest.method.MethodParameter {
 
   /**
    * External annotations for parameter, external it mind some other then
@@ -76,7 +75,7 @@ public class MethodParameter {
    *          {@link DefaultValue}.
    * @param encoded true if parameter must not be decoded false otherwise
    */
-  public MethodParameter(Annotation annotation,
+  public MethodParameterImpl(Annotation annotation,
                          Annotation[] additional,
                          Class<?> clazz,
                          Type type,
@@ -91,46 +90,42 @@ public class MethodParameter {
   }
 
   /**
-   * @return addition annotation
+   * {@inheritDoc}
    */
   public Annotation[] getAnnotations() {
     return additional;
   }
 
   /**
-   * @return <i>main</i> annotation. It mind this annotation describe which
-   *         value will be used for initialize parameter, e. g.
-   *         {@link PathParam}, {@link QueryParam}, etc.
+   * {@inheritDoc}
    */
   public Annotation getAnnotation() {
     return annotation;
   }
 
   /**
-   * @return true if parameter must not be decoded false otherwise
+   * {@inheritDoc}
    */
   public boolean isEncoded() {
     return encoded;
   }
 
   /**
-   * @return default value for parameter
+   * {@inheritDoc}
    */
   public String getDefaultValue() {
     return defaultValue;
   }
 
   /**
-   * @return generic parameter type, can be null if parameter is not generic.
-   * @see Method#getGenericParameterTypes()
+   * {@inheritDoc}
    */
   public Type getParameterType() {
     return type;
   }
 
   /**
-   * @return parameter class.
-   * @see Method#getParameterTypes()
+   * {@inheritDoc}
    */
   public Class<?> getParameterClass() {
     return clazz;

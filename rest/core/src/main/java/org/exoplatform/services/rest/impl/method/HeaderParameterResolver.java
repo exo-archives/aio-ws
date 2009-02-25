@@ -32,19 +32,20 @@ public class HeaderParameterResolver extends ParameterResolver<HeaderParam> {
    * See {@link HeaderParam}.
    */
   private final HeaderParam headerParam;
-  
+
   /**
    * @param headerParam HeaderParam
    */
   HeaderParameterResolver(HeaderParam headerParam) {
     this.headerParam = headerParam;
   }
-  
+
   /**
    * {@inheritDoc}
    */
   @Override
-  public Object resolve(MethodParameter parameter, ApplicationContext context) throws Exception {
+  public Object resolve(org.exoplatform.services.rest.method.MethodParameter parameter,
+                        ApplicationContext context) throws Exception {
     String param = this.headerParam.value();
     TypeProducer typeProducer = MethodParameterHelper.createTypeProducer(parameter.getParameterClass(),
                                                                          parameter.getParameterType());

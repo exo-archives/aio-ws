@@ -31,8 +31,8 @@ import javax.ws.rs.core.MediaType;
 
 import org.exoplatform.services.rest.BaseTest;
 import org.exoplatform.services.rest.impl.header.MediaTypeHelper;
-import org.exoplatform.services.rest.impl.method.MethodParameter;
 import org.exoplatform.services.rest.impl.resource.ResourceDescriptorFactory;
+import org.exoplatform.services.rest.method.MethodParameter;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
 import org.exoplatform.services.rest.resource.ResourceMethodDescriptor;
 import org.exoplatform.services.rest.resource.SubResourceLocatorDescriptor;

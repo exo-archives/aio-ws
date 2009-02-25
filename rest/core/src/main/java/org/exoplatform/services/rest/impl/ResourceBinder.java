@@ -32,6 +32,7 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.rest.impl.resource.ResourceClass;
+import org.exoplatform.services.rest.impl.resource.SingletonResourceClass;
 import org.exoplatform.services.rest.impl.resource.ResourceDescriptorFactory;
 import org.exoplatform.services.rest.impl.resource.ResourceDescriptorValidator;
 import org.exoplatform.services.rest.impl.uri.UriPattern;
@@ -46,7 +47,7 @@ import org.exoplatform.services.rest.resource.SubResourceMethodDescriptor;
  * register/unregister resources via specified methods.
  *
  * @see AbstractResourceDescriptor
- * @see ResourceClass
+ * @see SingletonResourceClass
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
@@ -63,7 +64,7 @@ public final class ResourceBinder {
   private List<ResourceClass>                    rootResources = new ArrayList<ResourceClass>();
 
   /**
-   * Compare two {@link ResourceClass}.
+   * Compare two {@link SingletonResourceClass}.
    */
   private static final Comparator<ResourceClass> COMPARATOR = new Comparator<ResourceClass>() {
     /**
@@ -103,35 +104,31 @@ public final class ResourceBinder {
   public synchronized boolean bind(final Object resource) {
     AbstractResourceDescriptor ard = ResourceDescriptorFactory.createAbstractResourceDescriptor(resource.getClass());
 
-    validate(ard);
-
-    if (ard.isRootResource()) {
-
-      /*
-       * Some validation done here, see
-       * ResourceClass#processSubResourceLocators(SubResourceLocatorMap) and
-       * ResourceClass#addResourceMethod(ResourceMethodMap, ResourceMethodDescriptor)
-       */
-      ResourceClass rc = new ResourceClass(ard, resource);
-      
-      for (ResourceClass r : getRootResources()) {
-        if (r.getUriPattern().equals(rc.getUriPattern())) {
-          LOG.warn("Ignore resource container " + rc.getClass().getName() + " the same pattern "
-                   + rc.getUriPattern() + " already registered.");
-          
-          return false;
-        }
-      }
+    if (validate(ard)) {
+      SingletonResourceClass rc = new SingletonResourceClass(ard, resource);
       getRootResources().add(rc);
       Collections.sort(getRootResources(), COMPARATOR);
       LOG.info("Bind new resource " + rc.getUriPattern().getRegex() + " : " + rc.getResourceClass());
       return true;
-    } 
-    LOG.warn("Ignore resource container "
-        + ard.getResourceClass().getClass().getName()
-        + " it is not root resource. Path annotation javax.ws.rs.Path is not specified for this class.");
+    }
+    
     return false;
   }
+
+//  public synchronized boolean bind(final Class<?> resourceClass) {
+//    AbstractResourceDescriptor ard = ResourceDescriptorFactory.createAbstractResourceDescriptor(resourceClass);
+//
+//    if (validate(ard)) {
+//      ResourceClass rc = new ResourceClass(ard, );
+//      getRootResources().add(rc);
+//      Collections.sort(getRootResources(), COMPARATOR);
+//      LOG.info("Bind new resource " + rc.getUriPattern().getRegex() + " : " + rc.getResourceClass());
+//      return true;
+//    }
+//    
+//    return false;
+//  }
+  
 
   /**
    * Validate {@link AbstractResourceDescriptor}.
@@ -139,7 +136,7 @@ public final class ResourceBinder {
    * @param ard AbstractResourceDescriptor to be validated
    * @see ResourceDescriptorValidator
    */
-  private static void validate(AbstractResourceDescriptor ard) {
+  private boolean validate(AbstractResourceDescriptor ard) {
     ResourceDescriptorValidator rdv = new ResourceDescriptorValidator();
 
     // validate AbstractResourceDescriptor
@@ -156,6 +153,24 @@ public final class ResourceBinder {
     // validate each SubResourceLocatorDescriptor
     for (SubResourceLocatorDescriptor srld : ard.getSubResourceLocatorDescriptors())
       srld.accept(rdv);
+
+    if (!ard.isRootResource()) {
+      LOG.warn("Resource class "
+          + ard.getResourceClass().getClass().getName()
+          + " it is not root resource. Path annotation javax.ws.rs.Path is not specified for this class.");
+      
+      return false;
+    }
+
+    for (ResourceClass r : getRootResources())
+      if (r.getUriPattern().equals(ard.getUriPattern())) {
+        LOG.warn("Resource class " + ard.getResourceClass().getClass().getName()
+            + " can't be registered. Resource class " + r.getClass().getName()
+            + " with the same pattern " + r.getUriPattern() + " already registered.");
+        return false;
+      }
+    
+    return true;
   }
 
   /**
@@ -213,7 +228,10 @@ public final class ResourceBinder {
           bind(obj);
       }
       for (Class<?> clazz : a.getClasses()) {
-        
+//        if (obj.getClass().getAnnotation(Provider.class) != null)
+//          ; // provider
+//        else
+//          bind(obj);
       }
     }
     

@@ -39,24 +39,32 @@ import org.exoplatform.services.rest.method.TypeProducer;
 public class MethodParameterHelper {
 
   /**
-   * Mapping form JAX-RS annotations class names to members of
+   * Mapping for JAX-RS annotations (that can be used as method parameter
+   * annotations) class names to members of
    * {@link AnnotationUtils.PARAMETER_ANNOTATIONS}.
    */
   public static final Map<String, AnnotationUtils.PARAMETER_ANNOTATIONS> PARAMETER_ANNOTATIONS_MAP;
 
+  /**
+   * Mapping for JAX-RS annotations (that can be used as constructor parameter
+   * annotations) class names to members of
+   * {@link AnnotationUtils.PARAMETER_ANNOTATIONS}.
+   */
+  public static final Map<String, AnnotationUtils.PARAMETER_ANNOTATIONS> CONSTRUCTOR_PARAMETER_ANNOTATIONS_MAP;
+
   static {
-    Map<String, AnnotationUtils.PARAMETER_ANNOTATIONS> m = new HashMap<String, AnnotationUtils.PARAMETER_ANNOTATIONS>(7);
-    m.put(javax.ws.rs.CookieParam.class.getName(),
-          AnnotationUtils.PARAMETER_ANNOTATIONS.COOKIE_PARAM);
-    m.put(javax.ws.rs.core.Context.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.CONTEXT);
-    m.put(javax.ws.rs.FormParam.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.FORM_PARAM);
-    m.put(javax.ws.rs.HeaderParam.class.getName(),
-          AnnotationUtils.PARAMETER_ANNOTATIONS.HEADER_PARAM);
-    m.put(javax.ws.rs.MatrixParam.class.getName(),
-          AnnotationUtils.PARAMETER_ANNOTATIONS.MATRIX_PARAM);
-    m.put(javax.ws.rs.PathParam.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.PATH_PARAM);
-    m.put(javax.ws.rs.QueryParam.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.QUERY_PARAM);
-    PARAMETER_ANNOTATIONS_MAP = Collections.unmodifiableMap(m);
+    Map<String, AnnotationUtils.PARAMETER_ANNOTATIONS> m1 = new HashMap<String, AnnotationUtils.PARAMETER_ANNOTATIONS>(6);
+    m1.put(javax.ws.rs.CookieParam.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.COOKIE_PARAM);
+    m1.put(javax.ws.rs.core.Context.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.CONTEXT);
+    m1.put(javax.ws.rs.HeaderParam.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.HEADER_PARAM);
+    m1.put(javax.ws.rs.MatrixParam.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.MATRIX_PARAM);
+    m1.put(javax.ws.rs.PathParam.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.PATH_PARAM);
+    m1.put(javax.ws.rs.QueryParam.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.QUERY_PARAM);
+    PARAMETER_ANNOTATIONS_MAP = Collections.unmodifiableMap(m1);
+    
+    Map<String, AnnotationUtils.PARAMETER_ANNOTATIONS> m2 = new HashMap<String, AnnotationUtils.PARAMETER_ANNOTATIONS>(m1);
+    m2.put(javax.ws.rs.FormParam.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.FORM_PARAM);
+    CONSTRUCTOR_PARAMETER_ANNOTATIONS_MAP = Collections.unmodifiableMap(m2);
   }
 
   /**

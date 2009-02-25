@@ -22,8 +22,8 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
-import org.exoplatform.services.rest.impl.method.MethodParameter;
 import org.exoplatform.services.rest.method.MethodInvoker;
+import org.exoplatform.services.rest.method.MethodParameter;
 import org.exoplatform.services.rest.resource.ResourceDescriptorVisitor;
 import org.exoplatform.services.rest.resource.ResourceMethodDescriptor;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;

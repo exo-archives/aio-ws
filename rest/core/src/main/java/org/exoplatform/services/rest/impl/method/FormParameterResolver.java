@@ -57,7 +57,8 @@ public class FormParameterResolver extends ParameterResolver<FormParam> {
    */
   @SuppressWarnings("unchecked")
   @Override
-  public Object resolve(MethodParameter parameter, ApplicationContext context) throws Exception {
+  public Object resolve(org.exoplatform.services.rest.method.MethodParameter parameter,
+                        ApplicationContext context) throws Exception {
     String param = this.formParam.value();
     TypeProducer typeProducer = MethodParameterHelper.createTypeProducer(parameter.getParameterClass(),
                                                                          parameter.getParameterType());
@@ -72,13 +73,14 @@ public class FormParameterResolver extends ParameterResolver<FormParam> {
       throw new IllegalStateException("Can't find appropriate entity reader for entity type "
           + MultivaluedMap.class.getName() + " and content-type " + conetentType);
 
-    MultivaluedMap<String, String> form =
-      (MultivaluedMap<String, String>) reader.readFrom(MultivaluedMap.class,
-                                                       FORM_TYPE,
-                                                       null,
-                                                       conetentType,
-                                                       context.getHttpHeaders().getRequestHeaders(),
-                                                       context.getContainerRequest().getEntityStream());
+    MultivaluedMap<String, String> form = (MultivaluedMap<String, String>) reader.readFrom(MultivaluedMap.class,
+                                                                                           FORM_TYPE,
+                                                                                           null,
+                                                                                           conetentType,
+                                                                                           context.getHttpHeaders()
+                                                                                                  .getRequestHeaders(),
+                                                                                           context.getContainerRequest()
+                                                                                                  .getEntityStream());
     return typeProducer.createValue(param, form, parameter.getDefaultValue());
   }
 

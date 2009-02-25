@@ -27,12 +27,12 @@ import org.exoplatform.services.rest.impl.ApplicationContext;
  * @version $Id: $
  */
 public class CookieParameterResolver extends ParameterResolver<CookieParam> {
-  
+
   /**
    * See {@link CookieParam}.
    */
   private final CookieParam cookieParam;
-  
+
   /**
    * @param cookieParam CookieParam
    */
@@ -44,7 +44,8 @@ public class CookieParameterResolver extends ParameterResolver<CookieParam> {
    * {@inheritDoc}
    */
   @Override
-  public Object resolve(MethodParameter parameter, ApplicationContext context) throws Exception {
+  public Object resolve(org.exoplatform.services.rest.method.MethodParameter parameter,
+                        ApplicationContext context) throws Exception {
     String param = this.cookieParam.value();
     Object c = context.getHttpHeaders().getCookies().get(param);
     if (c != null)

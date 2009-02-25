@@ -20,8 +20,8 @@ package org.exoplatform.services.rest.resource;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.exoplatform.services.rest.impl.method.MethodParameter;
 import org.exoplatform.services.rest.method.MethodInvoker;
+import org.exoplatform.services.rest.method.MethodParameter;
 
 /**
  * Abstraction for method in resource, this essence is common for

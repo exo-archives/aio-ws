@@ -20,9 +20,9 @@ package org.exoplatform.services.rest.impl.resource;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.exoplatform.services.rest.impl.method.MethodParameter;
 import org.exoplatform.services.rest.impl.uri.UriPattern;
 import org.exoplatform.services.rest.method.MethodInvoker;
+import org.exoplatform.services.rest.method.MethodParameter;
 import org.exoplatform.services.rest.resource.ResourceDescriptorVisitor;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
 import org.exoplatform.services.rest.resource.SubResourceLocatorDescriptor;

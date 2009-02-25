@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.exoplatform.services.rest.impl.resource.PathValue;
 import org.exoplatform.services.rest.impl.uri.UriPattern;
+import org.exoplatform.services.rest.method.ConstructorDescriptor;
 
 /**
  * Describe Resource Class or Root Resource Class. Resource Class is any Java
@@ -51,6 +52,11 @@ public interface AbstractResourceDescriptor extends ResourceDescriptor {
    * @return {@link Class} of resource
    */
   Class<?> getResourceClass();
+  
+  /**
+   * @return collection class's constructor descriptor
+   */
+  List<ConstructorDescriptor> getConstructorDescriptor();
 
   /**
    * @return collection of {@link SubResourceMethodDescriptor}

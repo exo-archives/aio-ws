@@ -128,6 +128,8 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
    * Should be built-in providers be loaded.
    */
   private boolean loadBuiltinProviders;
+  
+  private final ResourceBinder binder;
 
   /**
    * Constructs new instance of {@link RequestHandler}.
@@ -135,7 +137,7 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
    * @param dispatcher See {@link RequestDispatcher}
    * @param jaxbContexts See {@link JAXBContextResolver}
    */
-  public RequestHandlerImpl(RequestDispatcher dispatcher, JAXBContextResolver jaxbContexts, InitParams params) {
+  public RequestHandlerImpl(RequestDispatcher dispatcher, ResourceBinder binder, JAXBContextResolver jaxbContexts, InitParams params) {
     // Moved to ResourceBinder, it needs it first
     // // initialize RuntimeDelegate instance
     // RuntimeDelegate.setInstance(new RuntimeDelegateImpl());
@@ -145,6 +147,7 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
       builtinVp = params.getValueParam("ws.rs.entity.provider.builtin");
     loadBuiltinProviders = builtinVp == null || Boolean.valueOf(builtinVp.getValue().trim()); 
     
+    this.binder = binder; 
     this.dispatcher = dispatcher;
     this.jaxbContexts = jaxbContexts;
 
@@ -430,6 +433,7 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
       jop.setContexResolver(jaxbContexts);
       addEntityProvider(jop);
     }
+    
   }
 
   /**
