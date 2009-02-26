@@ -49,4 +49,11 @@ public class SingletonResourceClass extends ResourceClass {
     return resource;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  public boolean isSingleton() {
+    return true;
+  }
+
 }

@@ -45,15 +45,14 @@ import javax.ws.rs.core.MediaType;
 import org.apache.commons.logging.Log;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.rest.impl.header.MediaTypeHelper;
-import org.exoplatform.services.rest.impl.method.ConstructorDescriptorImpl;
-import org.exoplatform.services.rest.impl.method.ConstructorParameterImpl;
 import org.exoplatform.services.rest.impl.method.DefaultMethodInvoker;
-import org.exoplatform.services.rest.impl.method.MethodParameterHelper;
+import org.exoplatform.services.rest.impl.method.ParameterHelper;
 import org.exoplatform.services.rest.impl.method.MethodParameterImpl;
-import org.exoplatform.services.rest.method.ConstructorDescriptor;
-import org.exoplatform.services.rest.method.ConstructorParameter;
 import org.exoplatform.services.rest.method.MethodParameter;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
+import org.exoplatform.services.rest.resource.ConstructorDescriptor;
+import org.exoplatform.services.rest.resource.ConstructorParameter;
+import org.exoplatform.services.rest.resource.Field;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -120,13 +119,17 @@ public final class ResourceDescriptorFactory {
     final Consumes consumesResource = resourceClass.getAnnotation(Consumes.class);
     final Produces producesResource = resourceClass.getAnnotation(Produces.class);
     
+    for (java.lang.reflect.Field jfield : resourceClass.getDeclaredFields())
+      resourceDescriptor.getFields().add(createField(jfield, encoded));
+    
     Constructor<?>[] constructors = resourceClass.getConstructors();
     for (Constructor<?> constructor : constructors)
-      resourceDescriptor.getConstructorDescriptor().add(createConstructorDescriptors(constructor,
+      resourceDescriptor.getConstructorDescriptors().add(createConstructorDescriptors(constructor,
                                                                                      encoded));
 
-    if (resourceDescriptor.getConstructorDescriptor().size() > 1)
-      java.util.Collections.sort(resourceDescriptor.getConstructorDescriptor(),
+    // Sort constructors in number parameters order 
+    if (resourceDescriptor.getConstructorDescriptors().size() > 1)
+      java.util.Collections.sort(resourceDescriptor.getConstructorDescriptors(),
                                  CONSTRUCTOR_COMPARATOR);
 
 
@@ -206,23 +209,71 @@ public final class ResourceDescriptorFactory {
     return l;
   }
   
+  /**
+   * Create resource class constructor descriptor.
+   * 
+   * @param constructor constructor
+   * @param encodedFromParent true if automatic decoding of parameter values
+   *          must be disable false otherwise. See {@link Encoded}
+   * @return ConstructorDescriptor
+   */
   private static ConstructorDescriptor createConstructorDescriptors(Constructor<?> constructor,
                                                                     boolean encodedFromParent) {
     Class<?>[] parameterTypes = constructor.getParameterTypes();
-    
-    if (parameterTypes.length == 0)
-      return new ConstructorDescriptorImpl(constructor);
-    
+
+    if (parameterTypes.length == 0) {
+      List<ConstructorParameter> l = java.util.Collections.emptyList();
+      return new ConstructorDescriptorImpl(constructor, l);
+    }
+
     Type[] parameterGenericTypes = constructor.getGenericParameterTypes();
     Annotation[][] annotations = constructor.getParameterAnnotations();
-    List<ConstructorParameter> parameters = new ArrayList<ConstructorParameter>(parameterTypes.length);
+    List<ConstructorParameter> l = new ArrayList<ConstructorParameter>(parameterTypes.length);
     for (int i = 0; i < parameterTypes.length; i++)
-      parameters.add(createConstructorParameter(parameterTypes[i],
-                                                parameterGenericTypes[i],
-                                                annotations[i],
-                                                encodedFromParent));
-    
-    return new ConstructorDescriptorImpl(constructor, parameters);
+      l.add(createConstructorParameter(parameterTypes[i],
+                                       parameterGenericTypes[i],
+                                       annotations[i],
+                                       encodedFromParent));
+
+    return new ConstructorDescriptorImpl(constructor, l);
+  }
+  
+  /**
+   * @param jfield {@link java.lang.reflect.Field}
+   * @param encodedFromParent true if automatic decoding of parameter values
+   *          must be disable false otherwise. See {@link Encoded}
+   * @return Field
+   */
+  private static Field createField(java.lang.reflect.Field jfield, boolean encodedFromParent) {
+    Annotation[] annotations = jfield.getDeclaredAnnotations();
+    Annotation annotation = null;
+    String defaultValue = null;
+    boolean encoded = jfield.getAnnotation(Encoded.class) != null;
+    for (Annotation a : annotations) {
+      Class<?> ac = a.annotationType();
+      if (ParameterHelper.FIELDS_ANNOTATIONS_MAP.containsKey(ac.getName())) {
+        if (annotation == null)
+          annotation = a;
+        else
+          throw new RuntimeException("JAX-RS annotations on one of fields are equivocality. "
+              + "Annotations: " + annotation.toString() + " and " + a.toString()
+              + " can't be applied to one field.");
+
+      } else if (ac == DefaultValue.class) {
+        defaultValue = ((DefaultValue) a).value();
+      } else {
+        if (ac != Encoded.class)
+          LOG.warn("Field " + jfield.toString()
+              + " contains unknown or not allowed JAX-RS annotation " + a.toString()
+              + ". It will be ignored.");
+      }
+    }
+    return new FieldImpl(annotation,
+                         annotations,
+                         jfield.getType(),
+                         jfield.getGenericType(),
+                         defaultValue,
+                         encoded || encodedFromParent);
   }
     
 
@@ -231,27 +282,40 @@ public final class ResourceDescriptorFactory {
    * 
    * @param m See {@link Method}
    * @param encodedFromParent true if automatic decoding of parameter values
-   *          must e disable false otherwise. See {@link Encoded}
+   *          must be disable false otherwise. See {@link Encoded}
    * @return list of {@link MethodParameter}
    */
   private static List<MethodParameter> createMethodParametersList(Class<?> resourceClass,
                                                                   Method m,
                                                                   boolean encodedFromParent) {
     Class<?>[] parameterClasses = m.getParameterTypes();
+    if (parameterClasses.length == 0)
+      return java.util.Collections.emptyList();
+    
     Type[] parameterGenTypes = m.getGenericParameterTypes();
     Annotation[][] annotations = m.getParameterAnnotations();
 
     List<MethodParameter> l = new ArrayList<MethodParameter>(parameterClasses.length);
-    for (int i = 0; i < parameterClasses.length; i++) {
+    for (int i = 0; i < parameterClasses.length; i++) 
       l.add(createMethodParameter(parameterClasses[i],
                                   parameterGenTypes[i],
                                   annotations[i],
                                   encodedFromParent || m.getAnnotation(Encoded.class) != null));
-    }
 
     return l;
   }
 
+  /**
+   * Create constructor parameter description, see {@link ConstructorParameter}.
+   * 
+   * @param clazz parameter's class
+   * @param type generic parameter type
+   * @param annotations all annotation for this parameter, see
+   * @param encodedFromParent encodedFromParent true if automatic decoding of
+   *          parameter values must e disable false otherwise. See
+   *          {@link Encoded}
+   * @return newly created constructor parameter descriptor
+   */
   private static ConstructorParameter createConstructorParameter(Class<?> clazz,
                                                                  Type type,
                                                                  Annotation[] annotations,
@@ -261,64 +325,75 @@ public final class ResourceDescriptorFactory {
     boolean encoded = false;
     for (Annotation a : annotations) {
       Class<?> ac = a.annotationType();
-      if (MethodParameterHelper.CONSTRUCTOR_PARAMETER_ANNOTATIONS_MAP.containsKey(ac.getName())) {
-        annotation = a;
+      if (ParameterHelper.CONSTRUCTOR_PARAMETER_ANNOTATIONS_MAP.containsKey(ac.getName())) {
+        if (annotation == null)
+          annotation = a;
+        else
+          throw new RuntimeException("JAX-RS annotations on one of constructor parameters are equivocality. "
+              + "Annotations: " + annotation.toString() + " and " + a.toString()
+              + " can't be applied to one parameter.");
       } else if (ac == Encoded.class) {
         encoded = true;
       } else if (ac == DefaultValue.class) {
         defaultValue = ((DefaultValue) a).value();
+      } else {
+        LOG.warn("Constructor parameter contains unknown or not valid JAX-RS annotation "
+            + a.toString() + ". It will be ignored.");
       }
     }
     return new ConstructorParameterImpl(annotation, annotations, clazz, type, defaultValue, encoded
-        | encodedFromParent);
+        || encodedFromParent);
   }
 
   /**
    * Create method parameter, see {@link MethodParameter} .
    * 
-   * @param parameterClass parameter's class
-   * @param parameterGenType generic parameter type
+   * @param clazz parameter's class
+   * @param type generic parameter type
    * @param annotations all annotation for this parameter, see
    *          {@link Method#getParameterAnnotations()}
    * @param encodedFromParent true if automatic decoding of parameter values
    *          must e disable false otherwise. See {@link Encoded}
    * @return newly created method parameter
    */
-  private static MethodParameter createMethodParameter(Class<?> parameterClass,
-                                                       Type parameterGenType,
+  private static MethodParameter createMethodParameter(Class<?> clazz,
+                                                       Type type,
                                                        Annotation[] annotations,
                                                        boolean encodedFromParent) {
     String defaultValue = null;
     Annotation annotation = null;
     boolean encoded = false;
     for (Annotation a : annotations) {
-      // TODO check if few annotation at one parameter, e. g. PathParam and
-      // HeaderParam
       Class<?> ac = a.annotationType();
-      if (MethodParameterHelper.PARAMETER_ANNOTATIONS_MAP.containsKey(ac.getName())) {
-        annotation = a;
+      if (ParameterHelper.PARAMETER_ANNOTATIONS_MAP.containsKey(ac.getName())) {
+        if (annotation == null)
+          annotation = a;
+        else
+          throw new RuntimeException("JAX-RS annotations on one of method parameters are equivocality. "
+              + "Annotations: " + annotation.toString() + " and " + a.toString()
+              + " can't be applied to one parameter.");
       } else if (ac == Encoded.class) {
         encoded = true;
       } else if (ac == DefaultValue.class) {
         defaultValue = ((DefaultValue) a).value();
+      } else {
+        LOG.warn("Method parameter contains unknown or not valid JAX-RS annotation " + a.toString()
+            + ". It will be ignored.");
       }
     }
 
-    return new MethodParameterImpl(annotation,
-                                   annotations,
-                                   parameterClass,
-                                   parameterGenType,
-                                   defaultValue,
-                                   encoded || encodedFromParent);
+    return new MethodParameterImpl(annotation, annotations, clazz, type, defaultValue, encoded
+        || encodedFromParent);
   }
 
   /**
    * Check does method contains annotation {@link Produces}. If it has then
    * process it and create list of media types method can produce. If it has not
    * annotation then return media types from parent resource (from resource
-   * class). FIXME
+   * class).
    * 
-   * @param m See {@link Method}
+   * @param resourceClass class that contains discovered method
+   * @param method See {@link Method}
    * @param producesFromParent media types from from resource class
    * @return media types actual method <i>m</i> which it can produce
    */
@@ -336,9 +411,10 @@ public final class ResourceDescriptorFactory {
    * Check does method contains annotation {@link Consumes}. If it has then
    * process it and create list of media types method can consume. If it has not
    * annotation then return media types from parent resource (from resource
-   * class). FIXME
+   * class).
    * 
-   * @param m See {@link Method}
+   * @param resourceClass class that contains discovered method
+   * @param method See {@link Method}
    * @param consumesFromParent media types from from resource class
    * @return media types for method <i>m</i> which it can consume
    */
@@ -372,12 +448,16 @@ public final class ResourceDescriptorFactory {
   }
 
   /**
-   * FIXME Tries to get JAX-RS annotated method from the root resource class's
+   * Tries to get JAX-RS annotation on method from the root resource class's
    * superclass or implemented interfaces.
    * 
-   * @param method
-   * @param resourceClass
-   * @return
+   * @param <T> annotation type
+   * @param method method for discovering
+   * @param resourceClass class that contains discovered method
+   * @param annotationClass annotation type what we are looking for
+   * @param metaAnnotation false if annotation should be on method and true in
+   *          method should contain annotations that has supplied annotation
+   * @return annotation from class or its ancestor or null if nothing found
    */
   private static <T extends Annotation> T getMethodAnnotation(Method method,
                                                               Class<?> resourceClass,
@@ -423,6 +503,15 @@ public final class ResourceDescriptorFactory {
     return annotation;
   }
   
+  /**
+   * Tries to get JAX-RS annotation from the root resource class's superclass or
+   * implemented interfaces.
+   * 
+   * @param <T> annotation type
+   * @param resourceClass class
+   * @param annotationClass annotation type what we are looking for
+   * @return annotation from class or its ancestor or null if nothing found
+   */
   private static <T extends Annotation> T getClassAnnotation(Class<?> resourceClass,
                                                              Class<T> annotationClass) {
     T annotation = resourceClass.getAnnotation(annotationClass);

@@ -54,10 +54,10 @@ public interface Parameter {
   String getDefaultValue();
 
   /**
-   * @return generic parameter type, can be null if parameter is not generic.
+   * @return generic parameter type
    * @see Method#getGenericParameterTypes()
    */
-  Type getParameterType();
+  Type getGenericType();
 
   /**
    * @return parameter class.

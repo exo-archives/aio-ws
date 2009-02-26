@@ -36,7 +36,7 @@ import org.exoplatform.services.rest.method.TypeProducer;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class MethodParameterHelper {
+public class ParameterHelper {
 
   /**
    * Mapping for JAX-RS annotations (that can be used as method parameter
@@ -51,6 +51,8 @@ public class MethodParameterHelper {
    * {@link AnnotationUtils.PARAMETER_ANNOTATIONS}.
    */
   public static final Map<String, AnnotationUtils.PARAMETER_ANNOTATIONS> CONSTRUCTOR_PARAMETER_ANNOTATIONS_MAP;
+  
+  public static final Map<String, AnnotationUtils.PARAMETER_ANNOTATIONS> FIELDS_ANNOTATIONS_MAP;
 
   static {
     Map<String, AnnotationUtils.PARAMETER_ANNOTATIONS> m1 = new HashMap<String, AnnotationUtils.PARAMETER_ANNOTATIONS>(6);
@@ -61,6 +63,7 @@ public class MethodParameterHelper {
     m1.put(javax.ws.rs.PathParam.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.PATH_PARAM);
     m1.put(javax.ws.rs.QueryParam.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.QUERY_PARAM);
     CONSTRUCTOR_PARAMETER_ANNOTATIONS_MAP = Collections.unmodifiableMap(m1);
+    FIELDS_ANNOTATIONS_MAP = Collections.unmodifiableMap(m1);
     
     Map<String, AnnotationUtils.PARAMETER_ANNOTATIONS> m2 = new HashMap<String, AnnotationUtils.PARAMETER_ANNOTATIONS>(m1);
     m2.put(javax.ws.rs.FormParam.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.FORM_PARAM);

@@ -44,7 +44,6 @@ public class PerRequestResourceClass extends ResourceClass {
   /**
    * {@inheritDoc}
    */
-  @Override
   public Object getResource(GenericContainerRequest request, GenericContainerResponse response) {
     try {
       return createObject(getResourceClass());
@@ -87,5 +86,12 @@ public class PerRequestResourceClass extends ResourceClass {
       return o2.getParameterTypes().length - o1.getParameterTypes().length;
     }
   };
+
+  /**
+   * {@inheritDoc}
+   */
+  public boolean isSingleton() {
+    return false;
+  }
 
 }

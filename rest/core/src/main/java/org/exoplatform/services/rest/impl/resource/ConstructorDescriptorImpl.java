@@ -15,19 +15,13 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest.impl.method;
+package org.exoplatform.services.rest.impl.resource;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Type;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.Encoded;
-
-import org.exoplatform.services.rest.method.ConstructorDescriptor;
-import org.exoplatform.services.rest.method.ConstructorParameter;
+import org.exoplatform.services.rest.resource.ConstructorDescriptor;
+import org.exoplatform.services.rest.resource.ConstructorParameter;
 import org.exoplatform.services.rest.resource.ResourceDescriptorVisitor;
 
 /**
@@ -36,20 +30,13 @@ import org.exoplatform.services.rest.resource.ResourceDescriptorVisitor;
  */
 public class ConstructorDescriptorImpl implements ConstructorDescriptor {
 
-  @SuppressWarnings("unchecked")
-  private final Constructor constructor;
-  
+  private final Constructor<?>             constructor;
+
   private final List<ConstructorParameter> parameters;
-  
-  @SuppressWarnings("unchecked")
-  public ConstructorDescriptorImpl(Constructor constructor, List<ConstructorParameter> parameters) {
+
+  public ConstructorDescriptorImpl(Constructor<?> constructor, List<ConstructorParameter> parameters) {
     this.constructor = constructor;
     this.parameters = parameters;
-  }
-  
-  @SuppressWarnings("unchecked")
-  public ConstructorDescriptorImpl(Constructor constructor) {
-    this(constructor, null);
   }
 
   /**
@@ -63,15 +50,15 @@ public class ConstructorDescriptorImpl implements ConstructorDescriptor {
    * {@inheritDoc}
    */
   public void accept(ResourceDescriptorVisitor visitor) {
-//    throw new UnsupportedOperationException("Not implemneted yet");
+    // Not used currently, override it if need some validation here.
+    throw new UnsupportedOperationException("Not implemented");
   }
 
   /**
    * {@inheritDoc}
    */
-  @SuppressWarnings("unchecked")
-  public Constructor getConstructor() {
+  public Constructor<?> getConstructor() {
     return constructor;
   }
-  
+
 }

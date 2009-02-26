@@ -47,8 +47,8 @@ public class PathParameterResolver extends ParameterResolver<PathParam> {
   public Object resolve(org.exoplatform.services.rest.method.MethodParameter parameter,
                         ApplicationContext context) throws Exception {
     String param = this.pathParam.value();
-    TypeProducer typeProducer = MethodParameterHelper.createTypeProducer(parameter.getParameterClass(),
-                                                                         parameter.getParameterType());
+    TypeProducer typeProducer = ParameterHelper.createTypeProducer(parameter.getParameterClass(),
+                                                                         parameter.getGenericType());
     return typeProducer.createValue(param,
                                     context.getPathParameters(!parameter.isEncoded()),
                                     parameter.getDefaultValue());

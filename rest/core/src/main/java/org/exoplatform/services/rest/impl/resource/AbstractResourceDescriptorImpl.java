@@ -21,7 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.exoplatform.services.rest.impl.uri.UriPattern;
-import org.exoplatform.services.rest.method.ConstructorDescriptor;
+import org.exoplatform.services.rest.resource.ConstructorDescriptor;
+import org.exoplatform.services.rest.resource.Field;
 import org.exoplatform.services.rest.resource.ResourceDescriptorVisitor;
 import org.exoplatform.services.rest.resource.ResourceMethodDescriptor;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
@@ -78,6 +79,11 @@ public class AbstractResourceDescriptorImpl implements AbstractResourceDescripto
   private final List<ConstructorDescriptor>        constructorDescriptors;
 
   /**
+   * Resource class fields.
+   */
+  private final List<Field>                        fields;
+
+  /**
    * Constructs new instance of AbstractResourceDescriptor with path (root
    * resource).
    * 
@@ -86,22 +92,24 @@ public class AbstractResourceDescriptorImpl implements AbstractResourceDescripto
    */
   public AbstractResourceDescriptorImpl(PathValue path, Class<?> resourceClazz) {
     this.path = path;
-    
-    if (path != null) 
+
+    if (path != null)
       uriPattern = new UriPattern(path.getPath());
     else
       uriPattern = null;
-    
+
     this.resourceClazz = resourceClazz;
 
     this.constructorDescriptors = new ArrayList<ConstructorDescriptor>();
+
+    this.fields = new ArrayList<Field>();
 
     this.subResourceMethods = new ArrayList<SubResourceMethodDescriptor>();
 
     this.subResourceLocators = new ArrayList<SubResourceLocatorDescriptor>();
 
     this.resourceMethods = new ArrayList<ResourceMethodDescriptor>();
-    
+
   }
 
   /**
@@ -127,7 +135,7 @@ public class AbstractResourceDescriptorImpl implements AbstractResourceDescripto
   public PathValue getPath() {
     return path;
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -152,8 +160,15 @@ public class AbstractResourceDescriptorImpl implements AbstractResourceDescripto
   /**
    * {@inheritDoc}
    */
-  public List<ConstructorDescriptor> getConstructorDescriptor() {
+  public List<ConstructorDescriptor> getConstructorDescriptors() {
     return constructorDescriptors;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public List<Field> getFields() {
+    return fields;
   }
 
   /**

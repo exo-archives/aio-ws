@@ -15,14 +15,28 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest.method;
+package org.exoplatform.services.rest.resource;
 
-import org.exoplatform.services.rest.Parameter;
+import java.lang.reflect.Constructor;
+import java.util.List;
+
 
 /**
+ * Abstraction of constructor descriptor.
+ * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public interface ConstructorParameter extends Parameter {
+public interface ConstructorDescriptor extends ResourceDescriptor {
+
+  /**
+   * @return constructor of class
+   */
+  Constructor<?> getConstructor();
+  
+  /**
+   * @return List of constructor parameters
+   */
+  List<ConstructorParameter> getConstructorParameters();
 
 }

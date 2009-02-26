@@ -34,6 +34,7 @@ import org.exoplatform.services.rest.impl.header.MediaTypeHelper;
 import org.exoplatform.services.rest.impl.resource.ResourceDescriptorFactory;
 import org.exoplatform.services.rest.method.MethodParameter;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
+import org.exoplatform.services.rest.resource.Field;
 import org.exoplatform.services.rest.resource.ResourceMethodDescriptor;
 import org.exoplatform.services.rest.resource.SubResourceLocatorDescriptor;
 import org.exoplatform.services.rest.resource.SubResourceMethodDescriptor;
@@ -110,9 +111,29 @@ public class ResourceDescriptorFactoryTest extends BaseTest {
     assertEquals(2, methodParameter.getAnnotations().length);
     assertEquals(PathParam.class, methodParameter.getAnnotations()[0].annotationType());
   }
+  
+  
+  public void testFields() {
+    AbstractResourceDescriptor resourceDescriptor = ResourceDescriptorFactory
+        .createAbstractResourceDescriptor(SampleResource.class);
+    List<Field> fields = resourceDescriptor.getFields();
+    assertEquals(1, fields.size());
+    Field f = fields.get(0);
+    assertEquals(String.class, f.getParameterClass());
+    assertEquals(String.class, f.getGenericType());
+    assertEquals("default", f.getDefaultValue());
+    assertEquals(PathParam.class, f.getAnnotation().annotationType());
+    assertEquals("b", ((PathParam) f.getAnnotation()).value());
+    assertTrue(f.isEncoded());
+  }
 
   @Path("/a/{b}/")
   private static class SampleResource {
+    
+    @DefaultValue("default")
+    @PathParam("b")
+    @Encoded
+    private String field1;
 
     @POST
     @Path("{c}")

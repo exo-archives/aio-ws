@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
-import org.exoplatform.services.rest.impl.method.MethodParameterHelper;
+import org.exoplatform.services.rest.impl.method.ParameterHelper;
 
 import junit.framework.TestCase;
 
@@ -36,73 +36,73 @@ public class MethodParameterHelperTest extends TestCase {
   public void testString() throws Exception {
     Method method = getClass().getMethod("m1", List.class, Set.class, SortedSet.class);
     Type[] types = method.getGenericParameterTypes(); 
-    assertEquals(String.class, MethodParameterHelper.getGenericType(types[0]));
-    assertEquals(String.class, MethodParameterHelper.getGenericType(types[1]));
-    assertEquals(String.class, MethodParameterHelper.getGenericType(types[2]));
+    assertEquals(String.class, ParameterHelper.getGenericType(types[0]));
+    assertEquals(String.class, ParameterHelper.getGenericType(types[1]));
+    assertEquals(String.class, ParameterHelper.getGenericType(types[2]));
   }
   
   public void testByte() throws Exception {
     Method method = getClass().getMethod("m2", List.class, Set.class, SortedSet.class);
     Type[] types = method.getGenericParameterTypes(); 
-    assertEquals(Byte.class, MethodParameterHelper.getGenericType(types[0]));
-    assertEquals(Byte.class, MethodParameterHelper.getGenericType(types[1]));
-    assertEquals(Byte.class, MethodParameterHelper.getGenericType(types[2]));
+    assertEquals(Byte.class, ParameterHelper.getGenericType(types[0]));
+    assertEquals(Byte.class, ParameterHelper.getGenericType(types[1]));
+    assertEquals(Byte.class, ParameterHelper.getGenericType(types[2]));
   }
 
   public void testShort() throws Exception {
     Method method = getClass().getMethod("m3", List.class, Set.class, SortedSet.class);
     Type[] types = method.getGenericParameterTypes(); 
-    assertEquals(Short.class, MethodParameterHelper.getGenericType(types[0]));
-    assertEquals(Short.class, MethodParameterHelper.getGenericType(types[1]));
-    assertEquals(Short.class, MethodParameterHelper.getGenericType(types[2]));
+    assertEquals(Short.class, ParameterHelper.getGenericType(types[0]));
+    assertEquals(Short.class, ParameterHelper.getGenericType(types[1]));
+    assertEquals(Short.class, ParameterHelper.getGenericType(types[2]));
   }
 
   public void testInteger() throws Exception {
     Method method = getClass().getMethod("m4", List.class, Set.class, SortedSet.class);
     Type[] types = method.getGenericParameterTypes(); 
-    assertEquals(Integer.class, MethodParameterHelper.getGenericType(types[0]));
-    assertEquals(Integer.class, MethodParameterHelper.getGenericType(types[1]));
-    assertEquals(Integer.class, MethodParameterHelper.getGenericType(types[2]));
+    assertEquals(Integer.class, ParameterHelper.getGenericType(types[0]));
+    assertEquals(Integer.class, ParameterHelper.getGenericType(types[1]));
+    assertEquals(Integer.class, ParameterHelper.getGenericType(types[2]));
   }
   
   public void testLong() throws Exception {
     Method method = getClass().getMethod("m5", List.class, Set.class, SortedSet.class);
     Type[] types = method.getGenericParameterTypes(); 
-    assertEquals(Long.class, MethodParameterHelper.getGenericType(types[0]));
-    assertEquals(Long.class, MethodParameterHelper.getGenericType(types[1]));
-    assertEquals(Long.class, MethodParameterHelper.getGenericType(types[2]));
+    assertEquals(Long.class, ParameterHelper.getGenericType(types[0]));
+    assertEquals(Long.class, ParameterHelper.getGenericType(types[1]));
+    assertEquals(Long.class, ParameterHelper.getGenericType(types[2]));
   }
 
   public void testFloat() throws Exception {
     Method method = getClass().getMethod("m6", List.class, Set.class, SortedSet.class);
     Type[] types = method.getGenericParameterTypes(); 
-    assertEquals(Float.class, MethodParameterHelper.getGenericType(types[0]));
-    assertEquals(Float.class, MethodParameterHelper.getGenericType(types[1]));
-    assertEquals(Float.class, MethodParameterHelper.getGenericType(types[2]));
+    assertEquals(Float.class, ParameterHelper.getGenericType(types[0]));
+    assertEquals(Float.class, ParameterHelper.getGenericType(types[1]));
+    assertEquals(Float.class, ParameterHelper.getGenericType(types[2]));
   }
 
   public void testDouble() throws Exception {
     Method method = getClass().getMethod("m7", List.class, Set.class, SortedSet.class);
     Type[] types = method.getGenericParameterTypes(); 
-    assertEquals(Double.class, MethodParameterHelper.getGenericType(types[0]));
-    assertEquals(Double.class, MethodParameterHelper.getGenericType(types[1]));
-    assertEquals(Double.class, MethodParameterHelper.getGenericType(types[2]));
+    assertEquals(Double.class, ParameterHelper.getGenericType(types[0]));
+    assertEquals(Double.class, ParameterHelper.getGenericType(types[1]));
+    assertEquals(Double.class, ParameterHelper.getGenericType(types[2]));
   }
 
   public void testBoolean() throws Exception {
     Method method = getClass().getMethod("m8", List.class, Set.class, SortedSet.class);
     Type[] types = method.getGenericParameterTypes(); 
-    assertEquals(Boolean.class, MethodParameterHelper.getGenericType(types[0]));
-    assertEquals(Boolean.class, MethodParameterHelper.getGenericType(types[1]));
-    assertEquals(Boolean.class, MethodParameterHelper.getGenericType(types[2]));
+    assertEquals(Boolean.class, ParameterHelper.getGenericType(types[0]));
+    assertEquals(Boolean.class, ParameterHelper.getGenericType(types[1]));
+    assertEquals(Boolean.class, ParameterHelper.getGenericType(types[2]));
   }
 
   public void testNull() throws Exception {
     Method method = getClass().getMethod("m9", List.class, Set.class, SortedSet.class);
     Type[] types = method.getGenericParameterTypes(); 
-    assertEquals(null, MethodParameterHelper.getGenericType(types[0]));
-    assertEquals(null, MethodParameterHelper.getGenericType(types[1]));
-    assertEquals(null, MethodParameterHelper.getGenericType(types[2]));
+    assertEquals(null, ParameterHelper.getGenericType(types[0]));
+    assertEquals(null, ParameterHelper.getGenericType(types[1]));
+    assertEquals(null, ParameterHelper.getGenericType(types[2]));
   }
 
   ////////////////////////////////

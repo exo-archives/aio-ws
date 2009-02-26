@@ -15,34 +15,29 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest.impl.method;
+package org.exoplatform.services.rest.impl.resource;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 
 import javax.ws.rs.DefaultValue;
 
-import org.exoplatform.services.rest.method.ConstructorParameter;
+import org.exoplatform.services.rest.resource.Field;
 
 /**
- * Describes constructor's parameter.
- * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class ConstructorParameterImpl implements ConstructorParameter {
+public class FieldImpl implements Field {
 
   /**
    * External annotations for parameter, external it mind some other then
-   * contains in
-   * {@link MethodParameterHelper#CONSTRUCTOR_PARAMETER_ANNOTATIONS_MAP}.
+   * contains in {@link ParameterHelper#FIELDS_ANNOTATIONS_MAP}.
    */
   private final Annotation[] additional;
 
   /**
-   * One of annotations from
-   * {@link MethodParameterHelper#CONSTRUCTOR_PARAMETER_ANNOTATIONS_MAP}.
+   * One of annotations from {@link ParameterHelper#FIELDS_ANNOTATIONS_MAP}.
    */
   private final Annotation   annotation;
 
@@ -68,21 +63,19 @@ public class ConstructorParameterImpl implements ConstructorParameter {
   private final boolean      encoded;
 
   /**
-   * Constructs new instance of MethodParameter.
-   * 
    * @param annotation see {@link #annotation}
    * @param additional see {@link #additional}
-   * @param clazz parameter class
-   * @param type generic parameter type, can be null if parameter is not generic
-   * @param defaultValue default value for parameter. See {@link DefaultValue}.
-   * @param encoded true if parameter must not be decoded false otherwise
+   * @param clazz field class
+   * @param type generic field type
+   * @param defaultValue default value for field. See {@link DefaultValue}.
+   * @param encoded true if field must not be decoded false otherwise
    */
-  public ConstructorParameterImpl(Annotation annotation,
-                                  Annotation[] additional,
-                                  Class<?> clazz,
-                                  Type type,
-                                  String defaultValue,
-                                  boolean encoded) {
+  public FieldImpl(Annotation annotation,
+                   Annotation[] additional,
+                   Class<?> clazz,
+                   Type type,
+                   String defaultValue,
+                   boolean encoded) {
     this.annotation = annotation;
     this.additional = additional;
     this.clazz = clazz;
@@ -122,7 +115,7 @@ public class ConstructorParameterImpl implements ConstructorParameter {
   /**
    * {@inheritDoc}
    */
-  public Type getParameterType() {
+  public Type getGenericType() {
     return type;
   }
 

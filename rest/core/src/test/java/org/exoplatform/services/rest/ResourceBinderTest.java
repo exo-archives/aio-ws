@@ -65,7 +65,7 @@ public class ResourceBinderTest extends BaseTest {
   }
   
   @Path("/a/b/{c}")
-  private static class Resource {
+  public static class Resource {
     
     @GET
     @Produces("text/html")

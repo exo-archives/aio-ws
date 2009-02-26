@@ -84,7 +84,7 @@ public final class DefaultMethodInvoker implements MethodInvoker {
 
           MessageBodyReader entityReader = context.getRequestHandler()
                                                   .getMessageBodyReader(mp.getParameterClass(),
-                                                                        mp.getParameterType(),
+                                                                        mp.getGenericType(),
                                                                         mp.getAnnotations(),
                                                                         contentType);
           if (entityReader == null) {
@@ -96,7 +96,7 @@ public final class DefaultMethodInvoker implements MethodInvoker {
 
           try {
             p[i++] = entityReader.readFrom(mp.getParameterClass(),
-                                           mp.getParameterType(),
+                                           mp.getGenericType(),
                                            mp.getAnnotations(),
                                            contentType,
                                            headers,

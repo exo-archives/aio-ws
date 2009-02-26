@@ -18,9 +18,10 @@
 package org.exoplatform.services.rest.resource;
 
 /**
- * Can be used for validation next four resource descriptors
- * {@link AbstractResourceDescriptor}, {@link ResourceMethodDescriptor},
- * {@link SubResourceMethodDescriptor}, {@link SubResourceLocatorDescriptor} .
+ * Can be used for validation next resource descriptors
+ * {@link ConstructorDescriptor}, {@link AbstractResourceDescriptor},
+ * {@link ResourceMethodDescriptor}, {@link SubResourceMethodDescriptor},
+ * {@link SubResourceLocatorDescriptor} .
  * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
@@ -36,8 +37,8 @@ public interface ResourceDescriptorVisitor {
 
   /**
    * @param rmd See {@link ResourceMethodDescriptor}
-   * @throws IllegalArgumentException if ResourceMethodDescriptor has not
-   *           valid structure
+   * @throws IllegalArgumentException if ResourceMethodDescriptor has not valid
+   *           structure
    */
   void visitResourceMethodDescriptor(ResourceMethodDescriptor rmd) throws IllegalArgumentException;
 
@@ -49,8 +50,7 @@ public interface ResourceDescriptorVisitor {
   void visitSubResourceMethodDescriptor(SubResourceMethodDescriptor srmd) throws IllegalArgumentException;
 
   /**
-   * @param srld See
-   *          {@link SubResourceLocatorDescriptor}
+   * @param srld See {@link SubResourceLocatorDescriptor}
    * @throws IllegalArgumentException if SubResourceLocatorDescriptor has not
    *           valid structure
    */

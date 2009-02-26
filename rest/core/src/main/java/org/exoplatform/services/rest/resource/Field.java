@@ -15,12 +15,16 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest;
+package org.exoplatform.services.rest.resource;
+
+import org.exoplatform.services.rest.Parameter;
 
 /**
+ * Object field.
+ * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public interface Field {
+public interface Field extends Parameter {
 
 }

@@ -15,41 +15,45 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest.impl.method;
+package org.exoplatform.services.rest.impl.resource;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 
 import javax.ws.rs.DefaultValue;
 
+import org.exoplatform.services.rest.impl.method.ParameterHelper;
+import org.exoplatform.services.rest.resource.ConstructorParameter;
+
 /**
- * Describes the method's parameter.
+ * Describes constructor's parameter.
  * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class MethodParameterImpl implements org.exoplatform.services.rest.method.MethodParameter {
+public class ConstructorParameterImpl implements ConstructorParameter {
 
   /**
    * External annotations for parameter, external it mind some other then
-   * contains in {@link ParameterHelper#PARAMETER_ANNOTATIONS_MAP}.
+   * contains in
+   * {@link ParameterHelper#CONSTRUCTOR_PARAMETER_ANNOTATIONS_MAP}.
    */
   private final Annotation[] additional;
 
   /**
    * One of annotations from
-   * {@link ParameterHelper#PARAMETER_ANNOTATIONS_MAP}.
+   * {@link ParameterHelper#CONSTRUCTOR_PARAMETER_ANNOTATIONS_MAP}.
    */
   private final Annotation   annotation;
 
   /**
-   * Parameter type. See {@link Method#getGenericParameterTypes()} .
+   * Parameter type. See {@link Constructor#getGenericParameterTypes()} .
    */
   private final Type         type;
 
   /**
-   * Parameter class. See {@link Method#getParameterTypes()}
+   * Parameter class. See {@link Constructor#getParameterTypes()}
    */
   private final Class<?>     clazz;
 
@@ -71,29 +75,21 @@ public class MethodParameterImpl implements org.exoplatform.services.rest.method
    * @param additional see {@link #additional}
    * @param clazz parameter class
    * @param type generic parameter type
-   * @param defaultValue default value for parameter. See
-   *          {@link DefaultValue}.
+   * @param defaultValue default value for parameter. See {@link DefaultValue}.
    * @param encoded true if parameter must not be decoded false otherwise
    */
-  public MethodParameterImpl(Annotation annotation,
-                         Annotation[] additional,
-                         Class<?> clazz,
-                         Type type,
-                         String defaultValue,
-                         boolean encoded) {
+  public ConstructorParameterImpl(Annotation annotation,
+                                  Annotation[] additional,
+                                  Class<?> clazz,
+                                  Type type,
+                                  String defaultValue,
+                                  boolean encoded) {
     this.annotation = annotation;
     this.additional = additional;
     this.clazz = clazz;
     this.type = type;
     this.defaultValue = defaultValue;
     this.encoded = encoded;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public Annotation[] getAnnotations() {
-    return additional;
   }
 
   /**
@@ -106,8 +102,8 @@ public class MethodParameterImpl implements org.exoplatform.services.rest.method
   /**
    * {@inheritDoc}
    */
-  public boolean isEncoded() {
-    return encoded;
+  public Annotation[] getAnnotations() {
+    return additional;
   }
 
   /**
@@ -120,6 +116,13 @@ public class MethodParameterImpl implements org.exoplatform.services.rest.method
   /**
    * {@inheritDoc}
    */
+  public Class<?> getParameterClass() {
+    return clazz;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   public Type getGenericType() {
     return type;
   }
@@ -127,8 +130,8 @@ public class MethodParameterImpl implements org.exoplatform.services.rest.method
   /**
    * {@inheritDoc}
    */
-  public Class<?> getParameterClass() {
-    return clazz;
+  public boolean isEncoded() {
+    return encoded;
   }
 
 }

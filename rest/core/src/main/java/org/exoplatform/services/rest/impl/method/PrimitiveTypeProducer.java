@@ -106,7 +106,7 @@ public final class PrimitiveTypeProducer extends BaseTypeProducer {
      * return name of primitive type. See #PRIMITIVE_TYPES_MAP.
      */
     Class<?> c = PRIMITIVE_TYPES_MAP.get(clazz.getName());
-    Method method = MethodParameterHelper.getStringValueOfMethod(c);
+    Method method = ParameterHelper.getStringValueOfMethod(c);
 
     // invoke valueOf method for creation object
     return method.invoke(null, value);

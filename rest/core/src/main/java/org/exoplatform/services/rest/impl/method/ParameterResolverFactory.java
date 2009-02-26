@@ -48,7 +48,7 @@ public final class ParameterResolverFactory {
   @SuppressWarnings("unchecked")
   public static ParameterResolver createParameterResolver(Annotation annotation) {
     String className = annotation.annotationType().getName();
-    switch (MethodParameterHelper.PARAMETER_ANNOTATIONS_MAP.get(className)) {
+    switch (ParameterHelper.PARAMETER_ANNOTATIONS_MAP.get(className)) {
     case COOKIE_PARAM:
       return new CookieParameterResolver((CookieParam) annotation);
     case CONTEXT:

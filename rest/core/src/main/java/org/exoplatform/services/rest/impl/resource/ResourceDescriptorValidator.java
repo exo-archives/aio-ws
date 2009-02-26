@@ -70,6 +70,10 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
    * {@inheritDoc}
    */
   public void visitAbstractResourceDescriptor(AbstractResourceDescriptor ard) {
+    if (ard.getConstructorDescriptors().size() == 0 && ard.isRootResource())
+      throw new IllegalArgumentException("Not found accepted constructors in resource class "
+          + ard.getResourceClass().getName());
+      
     if (ard.getResourceMethodDescriptors().size() == 0
         && ard.getSubResourceMethodDescriptors().size() == 0
         && ard.getSubResourceLocatorDescriptors().size() == 0)
@@ -137,7 +141,7 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
         if (!entity) {
           entity = true;
           if (form) // form already met then check type of entity
-            checkFormParam(mp.getParameterClass(), mp.getParameterType());
+            checkFormParam(mp.getParameterClass(), mp.getGenericType());
         } else 
           throw new IllegalArgumentException("Wrong or absent annotation at parameter with index " + i
               + " at " + rmd.getParentResource().getResourceClass() + "#"
@@ -147,7 +151,7 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
         if (mp.getAnnotation().annotationType() == FormParam.class) {
           form = true;
           if (entity) // entity already met then check type of entity
-            checkFormParam(mp.getParameterClass(), mp.getParameterType());
+            checkFormParam(mp.getParameterClass(), mp.getGenericType());
         }
       }
     }

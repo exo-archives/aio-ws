@@ -47,8 +47,8 @@ public class QueryParameterResolver extends ParameterResolver<QueryParam> {
   public Object resolve(org.exoplatform.services.rest.method.MethodParameter parameter,
                         ApplicationContext context) throws Exception {
     String param = this.queryParam.value();
-    TypeProducer typeProducer = MethodParameterHelper.createTypeProducer(parameter.getParameterClass(),
-                                                                         parameter.getParameterType());
+    TypeProducer typeProducer = ParameterHelper.createTypeProducer(parameter.getParameterClass(),
+                                                                         parameter.getGenericType());
     return typeProducer.createValue(param,
                                     context.getQueryParameters(!parameter.isEncoded()),
                                     parameter.getDefaultValue());

@@ -60,8 +60,8 @@ public class FormParameterResolver extends ParameterResolver<FormParam> {
   public Object resolve(org.exoplatform.services.rest.method.MethodParameter parameter,
                         ApplicationContext context) throws Exception {
     String param = this.formParam.value();
-    TypeProducer typeProducer = MethodParameterHelper.createTypeProducer(parameter.getParameterClass(),
-                                                                         parameter.getParameterType());
+    TypeProducer typeProducer = ParameterHelper.createTypeProducer(parameter.getParameterClass(),
+                                                                         parameter.getGenericType());
 
     MediaType conetentType = context.getHttpHeaders().getMediaType();
     MessageBodyReader reader = context.getRequestHandler()

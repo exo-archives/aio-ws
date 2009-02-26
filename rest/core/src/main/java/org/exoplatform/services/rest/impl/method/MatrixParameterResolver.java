@@ -50,8 +50,8 @@ public class MatrixParameterResolver extends ParameterResolver<MatrixParam> {
   public Object resolve(org.exoplatform.services.rest.method.MethodParameter parameter,
                         ApplicationContext context) throws Exception {
     String param = matrixParam.value();
-    TypeProducer typeProducer = MethodParameterHelper.createTypeProducer(parameter.getParameterClass(),
-                                                                         parameter.getParameterType());
+    TypeProducer typeProducer = ParameterHelper.createTypeProducer(parameter.getParameterClass(),
+                                                                         parameter.getGenericType());
     List<PathSegment> pathSegments = context.getUriInfo().getPathSegments(!parameter.isEncoded());
 
     PathSegment pathSegment = pathSegments.get(pathSegments.size() - 1);

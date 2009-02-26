@@ -71,7 +71,7 @@ public abstract class ResourceClass {
    * See {@link SubResourceLocatorMap}.
    */
   private final SubResourceLocatorMap      subResourceLocatorMap;
-
+  
   /**
    * Constructor.
    * 
@@ -109,7 +109,14 @@ public abstract class ResourceClass {
    * @param response GenericContainerResponse
    * @return get resource object
    */
-  public abstract Object getResource(GenericContainerRequest request, GenericContainerResponse response);
+  public abstract Object getResource(GenericContainerRequest request,
+                                     GenericContainerResponse response);
+  
+  /**
+   * @return true if resource is singleton and false if resource should created
+   *         per request
+   */
+  public abstract boolean isSingleton();
 
   // ---
   
