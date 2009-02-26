@@ -203,7 +203,7 @@ public class HierarchicalProperty {
    */
   public String getStringName() {
     String str = "";
-    if (name.getPrefix() != null)
+    if (name.getPrefix() != null && name.getPrefix().length()>0)
       str += name.getPrefix() + ":";
     return str += name.getLocalPart();
   }
