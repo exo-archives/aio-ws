@@ -19,6 +19,7 @@ package org.exoplatform.services.rest.impl.resource;
 
 import org.exoplatform.services.rest.GenericContainerRequest;
 import org.exoplatform.services.rest.GenericContainerResponse;
+import org.exoplatform.services.rest.impl.ApplicationContext;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
 
 /**
@@ -45,7 +46,7 @@ public class SingletonResourceClass extends ResourceClass {
   /**
    * {@inheritDoc}
    */
-  public Object getResource(GenericContainerRequest request, GenericContainerResponse response) {
+  public Object getResource(ApplicationContext context) {
     return resource;
   }
 

@@ -133,5 +133,18 @@ public class ConstructorParameterImpl implements ConstructorParameter {
   public boolean isEncoded() {
     return encoded;
   }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString() {
+    StringBuffer sb = new StringBuffer("ConstructorParameter [ ");
+    sb.append("annotation: " + getAnnotation())
+      .append("; type: " + getParameterClass())
+      .append("; generic-type : " + getGenericType())
+      .append("; encoded: " + isEncoded());
+    return sb.toString();
+  }
 
 }

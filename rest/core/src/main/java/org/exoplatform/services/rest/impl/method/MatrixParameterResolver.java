@@ -47,7 +47,7 @@ public class MatrixParameterResolver extends ParameterResolver<MatrixParam> {
    * {@inheritDoc}
    */
   @Override
-  public Object resolve(org.exoplatform.services.rest.method.MethodParameter parameter,
+  public Object resolve(org.exoplatform.services.rest.Parameter parameter,
                         ApplicationContext context) throws Exception {
     String param = matrixParam.value();
     TypeProducer typeProducer = ParameterHelper.createTypeProducer(parameter.getParameterClass(),

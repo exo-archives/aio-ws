@@ -53,15 +53,15 @@ public final class DefaultMethodInvoker implements MethodInvoker {
    */
   @SuppressWarnings("unchecked")
   public Object invokeMethod(Object resource,
-                             GenericMethodResource genericMethodResource,
+                             GenericMethodResource methodResource,
                              ApplicationContext context) {
 
     for (MethodInvokerFilter f : context.getRequestHandler().getInvokerFilters())
-      f.accept(genericMethodResource);
+      f.accept(methodResource);
 
-    Object[] p = new Object[genericMethodResource.getMethodParameters().size()];
+    Object[] p = new Object[methodResource.getMethodParameters().size()];
     int i = 0;
-    for (org.exoplatform.services.rest.method.MethodParameter mp : genericMethodResource.getMethodParameters()) {
+    for (org.exoplatform.services.rest.method.MethodParameter mp : methodResource.getMethodParameters()) {
       Annotation a = mp.getAnnotation();
       if (a != null) {
         ParameterResolver<?> pr = ParameterResolverFactory.createParameterResolver(a);
@@ -111,7 +111,7 @@ public final class DefaultMethodInvoker implements MethodInvoker {
 
     }
     try {
-      return genericMethodResource.getMethod().invoke(resource, p);
+      return methodResource.getMethod().invoke(resource, p);
     } catch (Exception e) {
       if (LOG.isDebugEnabled())
         e.printStackTrace();

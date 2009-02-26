@@ -36,7 +36,7 @@ public abstract class ParameterResolver<T> {
    *         {@link MethodParameterImpl#getParameterClass()}
    * @throws Exception if any errors occurs
    */
-  public abstract Object resolve(org.exoplatform.services.rest.method.MethodParameter parameter,
+  public abstract Object resolve(org.exoplatform.services.rest.Parameter parameter,
                                  ApplicationContext context) throws Exception;
 
 }

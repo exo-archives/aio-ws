@@ -27,6 +27,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.exoplatform.services.rest.BaseTest;
@@ -34,6 +35,8 @@ import org.exoplatform.services.rest.impl.header.MediaTypeHelper;
 import org.exoplatform.services.rest.impl.resource.ResourceDescriptorFactory;
 import org.exoplatform.services.rest.method.MethodParameter;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
+import org.exoplatform.services.rest.resource.ConstructorDescriptor;
+import org.exoplatform.services.rest.resource.ConstructorParameter;
 import org.exoplatform.services.rest.resource.Field;
 import org.exoplatform.services.rest.resource.ResourceMethodDescriptor;
 import org.exoplatform.services.rest.resource.SubResourceLocatorDescriptor;
@@ -126,14 +129,45 @@ public class ResourceDescriptorFactoryTest extends BaseTest {
     assertEquals("b", ((PathParam) f.getAnnotation()).value());
     assertTrue(f.isEncoded());
   }
+  
+  public void testConstructors() {
+    AbstractResourceDescriptor resourceDescriptor = ResourceDescriptorFactory
+        .createAbstractResourceDescriptor(SampleResource.class);
+    assertEquals(3, resourceDescriptor.getConstructorDescriptors().size());
+    List<ConstructorDescriptor> c = resourceDescriptor.getConstructorDescriptors();
+    assertEquals(2, c.get(0).getConstructorParameters().size());
+    assertEquals(1, c.get(1).getConstructorParameters().size());
+    assertEquals(0, c.get(2).getConstructorParameters().size());
+    
+    assertFalse(c.get(0).getConstructorParameters().get(0).isEncoded());
+    assertTrue(c.get(0).getConstructorParameters().get(1).isEncoded());
+    assertEquals(QueryParam.class, c.get(0).getConstructorParameters().get(0).getAnnotation().annotationType());
+    assertEquals(PathParam.class, c.get(0).getConstructorParameters().get(1).getAnnotation().annotationType());
+    assertEquals("test", ((QueryParam)c.get(0).getConstructorParameters().get(0).getAnnotation()).value());
+    assertEquals("b", ((PathParam) c.get(0).getConstructorParameters().get(1).getAnnotation()).value());
+
+    assertFalse(c.get(1).getConstructorParameters().get(0).isEncoded());
+    assertEquals(PathParam.class, c.get(1).getConstructorParameters().get(0).getAnnotation().annotationType());
+    assertEquals("b", ((PathParam) c.get(1).getConstructorParameters().get(0).getAnnotation()).value());
+  }
 
   @Path("/a/{b}/")
-  private static class SampleResource {
+  public static class SampleResource {
     
     @DefaultValue("default")
     @PathParam("b")
     @Encoded
     private String field1;
+    
+
+    public SampleResource(@PathParam("b") String str) {
+    }
+
+    public SampleResource() {
+    }
+
+    public SampleResource(@QueryParam("test") int i, @Encoded @PathParam("b") String str) {
+    }
 
     @POST
     @Path("{c}")

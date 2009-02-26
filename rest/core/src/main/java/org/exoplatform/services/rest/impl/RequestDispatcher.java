@@ -112,7 +112,7 @@ public final class RequestDispatcher {
 //    Object resource = exoContainer.getComponentInstanceOfType(resourceClass.getResourceClass());
     // TODO : Done for getting groovy script working as rest-services.
     // Groovy does not present in exo-container.
-    Object resource = resourceFactory.getResource(request, response);
+    Object resource = resourceFactory.getResource(context);
 
     // Take the tail of the request path, the tail will be requested path
     // for lower resources, e. g. ResourceClass -> Sub-resource method/locator

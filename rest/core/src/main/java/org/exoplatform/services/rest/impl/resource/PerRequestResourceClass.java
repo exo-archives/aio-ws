@@ -17,6 +17,7 @@
 
 package org.exoplatform.services.rest.impl.resource;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,17 +26,26 @@ import java.util.List;
 
 import javax.ws.rs.WebApplicationException;
 
+import org.apache.commons.logging.Log;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.rest.GenericContainerRequest;
 import org.exoplatform.services.rest.GenericContainerResponse;
+import org.exoplatform.services.rest.impl.ApplicationContext;
+import org.exoplatform.services.rest.impl.method.ParameterResolver;
+import org.exoplatform.services.rest.impl.method.ParameterResolverFactory;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
+import org.exoplatform.services.rest.resource.ConstructorDescriptor;
+import org.exoplatform.services.rest.resource.ConstructorParameter;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 public class PerRequestResourceClass extends ResourceClass {
+  
+  private static final Log LOG = ExoLogger.getLogger(PerRequestResourceClass.class.getName());
 
   public PerRequestResourceClass(AbstractResourceDescriptor resourceDescriptor) {
     super(resourceDescriptor);
@@ -44,48 +54,62 @@ public class PerRequestResourceClass extends ResourceClass {
   /**
    * {@inheritDoc}
    */
-  public Object getResource(GenericContainerRequest request, GenericContainerResponse response) {
-    try {
-      return createObject(getResourceClass());
-    } catch (Exception e) {
-      throw new WebApplicationException(e);
-    }
-  }
-
-  private Object createObject(Class<?> clazz) throws Exception {
-
-    ExoContainer container = ExoContainerContext.getCurrentContainer();
-
-    Constructor<?>[] constructors = clazz.getConstructors();
-
-    Arrays.sort(constructors, COMPARATOR);
-
-    for (Constructor<?> c : constructors) {
-      Class<?>[] parameterTypes = c.getParameterTypes();
-      if (parameterTypes.length == 0)
-        return c.newInstance();
-
-      List<Object> parameters = new ArrayList<Object>(parameterTypes.length);
-
-      for (Class<?> parameterType : parameterTypes) {
-        Object param = container.getComponentInstanceOfType(parameterType);
-        if (param == null)
-          break;
-        parameters.add(param);
+  public Object getResource(ApplicationContext context) {
+//    try {
+      for (ConstructorDescriptor constrDescr : resourceDescriptor.getConstructorDescriptors()) {
+        Object[] p = new Object[resourceDescriptor.getConstructorDescriptors().size()];
+        int i = 0;
+        for (ConstructorParameter cp : constrDescr.getConstructorParameters()) {
+          Annotation a = cp.getAnnotation();
+          if (a != null) {
+            ParameterResolver<?> pr = ParameterResolverFactory.createParameterResolver(a);
+            try {
+              p[i++] = pr.resolve(cp, context);
+            } catch (Exception e) {
+              LOG.warn("Exception occurs when create constructor parameter " + cp.toString());
+              // Ignore exception here, maybe can create with less number of parameters 
+              break;
+            }
+          } else {
+            
+          }
+        }
       }
-      
-      if (parameters.size() == parameterTypes.length)
-        return c.newInstance(parameters.toArray(new Object[parameters.size()]));
-    }
-    
+//      return createObject(getResourceClass());
+//    } catch (Exception e) {
+//      throw new WebApplicationException(e);
+//    }
     return null;
   }
 
-  private static final Comparator<Constructor<?>> COMPARATOR = new Comparator<Constructor<?>>() {
-    public int compare(Constructor<?> o1, Constructor<?> o2) {
-      return o2.getParameterTypes().length - o1.getParameterTypes().length;
-    }
-  };
+//  private Object createObject(Class<?> clazz) throws Exception {
+//
+//    ExoContainer container = ExoContainerContext.getCurrentContainer();
+//
+//    Constructor<?>[] constructors = clazz.getConstructors();
+//
+//    Arrays.sort(constructors, COMPARATOR);
+//
+//    for (Constructor<?> c : constructors) {
+//      Class<?>[] parameterTypes = c.getParameterTypes();
+//      if (parameterTypes.length == 0)
+//        return c.newInstance();
+//
+//      List<Object> parameters = new ArrayList<Object>(parameterTypes.length);
+//
+//      for (Class<?> parameterType : parameterTypes) {
+//        Object param = container.getComponentInstanceOfType(parameterType);
+//        if (param == null)
+//          break;
+//        parameters.add(param);
+//      }
+//      
+//      if (parameters.size() == parameterTypes.length)
+//        return c.newInstance(parameters.toArray(new Object[parameters.size()]));
+//    }
+//    
+//    return null;
+//  }
 
   /**
    * {@inheritDoc}

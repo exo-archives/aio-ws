@@ -44,7 +44,7 @@ public class HeaderParameterResolver extends ParameterResolver<HeaderParam> {
    * {@inheritDoc}
    */
   @Override
-  public Object resolve(org.exoplatform.services.rest.method.MethodParameter parameter,
+  public Object resolve(org.exoplatform.services.rest.Parameter parameter,
                         ApplicationContext context) throws Exception {
     String param = this.headerParam.value();
     TypeProducer typeProducer = ParameterHelper.createTypeProducer(parameter.getParameterClass(),

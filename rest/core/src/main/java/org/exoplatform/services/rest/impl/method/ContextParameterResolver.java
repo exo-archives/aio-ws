@@ -81,7 +81,7 @@ public class ContextParameterResolver extends ParameterResolver<Context> {
    * {@inheritDoc}
    */
   @Override
-  public Object resolve(org.exoplatform.services.rest.method.MethodParameter parameter,
+  public Object resolve(org.exoplatform.services.rest.Parameter parameter,
                         ApplicationContext context) throws Exception {
     String className = parameter.getParameterClass().getName();
     CONTEXT_PARAMS cp = CONTEXT_PARAMETERS_MAP.get(className);

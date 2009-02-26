@@ -30,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.rest.GenericContainerRequest;
 import org.exoplatform.services.rest.GenericContainerResponse;
+import org.exoplatform.services.rest.impl.ApplicationContext;
 import org.exoplatform.services.rest.impl.header.MediaTypeHelper;
 import org.exoplatform.services.rest.impl.method.DefaultMethodInvoker;
 import org.exoplatform.services.rest.impl.method.OptionsRequestMethodInvoker;
@@ -55,22 +56,22 @@ public abstract class ResourceClass {
   /**
    * See {@link AbstractResourceDescriptor}.
    */
-  private final AbstractResourceDescriptor resourceDescriptor;
+  protected final AbstractResourceDescriptor resourceDescriptor;
 
   /**
    * See {@link ResourceMethodMap}.
    */
-  private final ResourceMethodMap          resourceMethodMap;
+  protected final ResourceMethodMap          resourceMethodMap;
 
   /**
    * See {@link SubResourceMethodMap}.
    */
-  private final SubResourceMethodMap       subResourceMethodMap;
+  protected final SubResourceMethodMap       subResourceMethodMap;
 
   /**
    * See {@link SubResourceLocatorMap}.
    */
-  private final SubResourceLocatorMap      subResourceLocatorMap;
+  protected final SubResourceLocatorMap      subResourceLocatorMap;
   
   /**
    * Constructor.
@@ -105,12 +106,9 @@ public abstract class ResourceClass {
   }
 
   /**
-   * @param request GenericContainerRequest
-   * @param response GenericContainerResponse
    * @return get resource object
    */
-  public abstract Object getResource(GenericContainerRequest request,
-                                     GenericContainerResponse response);
+  public abstract Object getResource(ApplicationContext context);
   
   /**
    * @return true if resource is singleton and false if resource should created
