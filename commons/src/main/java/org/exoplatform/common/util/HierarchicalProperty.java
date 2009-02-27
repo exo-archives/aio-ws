@@ -182,6 +182,16 @@ public class HierarchicalProperty {
   public void setAttribute(String attributeName, String attributeValue) {
     attributes.put(attributeName, attributeValue);
   }
+  
+  /**
+   * sets the attribute
+   * 
+   * @param attributeName
+   * @param attributeValue
+   */
+  public void setAttribute(QName attributeName, String attributeValue) {
+    attributes.put(makeStringFromQName(attributeName), attributeValue);
+  }
 
   /**
    * @param attributeName
@@ -202,9 +212,13 @@ public class HierarchicalProperty {
    * @return name as string prefix:localPart
    */
   public String getStringName() {
+    return makeStringFromQName(name);
+  }
+  
+  private String makeStringFromQName(QName qname) {
     String str = "";
-    if (name.getPrefix() != null && name.getPrefix().length()>0)
-      str += name.getPrefix() + ":";
-    return str += name.getLocalPart();
+    if (qname.getPrefix() != null && qname.getPrefix().length()>0)
+      str += qname.getPrefix() + ":";
+    return str + qname.getLocalPart();
   }
 }
