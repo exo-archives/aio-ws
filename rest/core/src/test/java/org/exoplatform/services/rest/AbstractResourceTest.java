@@ -53,6 +53,10 @@ public abstract class AbstractResourceTest extends BaseTest {
 
   }
 
+  public void registry(Class<?> resource) throws Exception {
+    binder.bind(resource);
+  }
+
   public ContainerResponse service(String method,
                                    String requestURI,
                                    String baseURI,

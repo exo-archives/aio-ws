@@ -22,7 +22,7 @@ import java.util.List;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.core.PathSegment;
 
-import org.exoplatform.services.rest.impl.ApplicationContext;
+import org.exoplatform.services.rest.ApplicationContext;
 import org.exoplatform.services.rest.method.TypeProducer;
 
 /**

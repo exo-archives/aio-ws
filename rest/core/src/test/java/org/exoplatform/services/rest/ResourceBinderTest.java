@@ -19,10 +19,13 @@ package org.exoplatform.services.rest;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 
 import org.exoplatform.services.rest.impl.ResourceBinder;
-import org.exoplatform.services.rest.impl.resource.ResourceClass;
+import org.exoplatform.services.rest.impl.resource.ResourceFactory;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -43,10 +46,9 @@ public class ResourceBinderTest extends BaseTest {
   }
   
   public void testBind() {
-    Resource r = new Resource();
-    binder.bind(r);
+    binder.bind(Resource.class);
     assertEquals(1, binder.getRootResources().size());
-    ResourceClass rc = binder.getRootResources().iterator().next();
+    ResourceFactory rc = binder.getRootResources().iterator().next();
     
     // two resource methods because method annotated 'GET' and 'HEAD' added automatically.
     assertEquals(3, rc.getResourceMethods().size());
@@ -59,13 +61,22 @@ public class ResourceBinderTest extends BaseTest {
   }
   
   public void testUnbind() {
-    binder.bind(new Resource());
+    binder.bind(Resource.class);
     binder.unbind(Resource.class);
     assertEquals(0, binder.getRootResources().size());
   }
   
   @Path("/a/b/{c}")
   public static class Resource {
+
+    @PathParam("c")
+    private String pathsegm;
+    
+    public Resource() {
+    }
+    
+    public Resource(@Context UriInfo uriInfo) {
+    }
     
     @GET
     @Produces("text/html")

@@ -32,21 +32,21 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.logging.Log;
-//import org.exoplatform.container.ExoContainer;
-//import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.rest.ApplicationContext;
 import org.exoplatform.services.rest.GenericContainerRequest;
 import org.exoplatform.services.rest.GenericContainerResponse;
 import org.exoplatform.services.rest.impl.header.HeaderHelper;
 import org.exoplatform.services.rest.impl.header.MediaTypeHelper;
-import org.exoplatform.services.rest.impl.resource.ResourceClass;
-import org.exoplatform.services.rest.impl.resource.SingletonResourceClass;
-import org.exoplatform.services.rest.impl.resource.ResourceDescriptorFactory;
+import org.exoplatform.services.rest.impl.resource.AbstractResourceDescriptorImpl;
+import org.exoplatform.services.rest.impl.resource.ResourceFactory;
+import org.exoplatform.services.rest.impl.resource.SingletonResourceFactory;
 import org.exoplatform.services.rest.impl.resource.ResourceMethodMap;
 import org.exoplatform.services.rest.impl.resource.SubResourceLocatorMap;
 import org.exoplatform.services.rest.impl.resource.SubResourceMethodMap;
 import org.exoplatform.services.rest.impl.uri.UriPattern;
 import org.exoplatform.services.rest.method.MethodInvoker;
+import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
 import org.exoplatform.services.rest.resource.ResourceMethodDescriptor;
 import org.exoplatform.services.rest.resource.SubResourceLocatorDescriptor;
 import org.exoplatform.services.rest.resource.SubResourceMethodDescriptor;
@@ -92,11 +92,11 @@ public final class RequestDispatcher {
    * @param response See {@link GenericContainerResponse}
    */
   public void dispatch(GenericContainerRequest request, GenericContainerResponse response) {
-    ApplicationContext context = ApplicationContext.getCurrent();
+    ApplicationContext context = ApplicationContextImpl.getCurrent();
     String requestPath = context.getPath(false);
     List<String> parameterValues = context.getParameterValues();
     
-    ResourceClass resourceFactory = processResource(requestPath, parameterValues);
+    ResourceFactory resourceFactory = processResource(requestPath, parameterValues);
     if (resourceFactory == null) {
       if (LOG.isDebugEnabled())
         LOG.debug("Root resource not found for " + requestPath);
@@ -104,15 +104,6 @@ public final class RequestDispatcher {
       // Stop here, there is no matched root resource
       throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
     }
-
-    // Get instance of resource class from exo container. Possible to get
-    // new instance of class for each request. For getting new instance
-    // per request <multi-instance>true</multi-instance> tag should be
-    // used in configuration of resource component.
-//    Object resource = exoContainer.getComponentInstanceOfType(resourceClass.getResourceClass());
-    // TODO : Done for getting groovy script working as rest-services.
-    // Groovy does not present in exo-container.
-    Object resource = resourceFactory.getResource(context);
 
     // Take the tail of the request path, the tail will be requested path
     // for lower resources, e. g. ResourceClass -> Sub-resource method/locator
@@ -123,6 +114,9 @@ public final class RequestDispatcher {
 
     context.setParameterNames(resourceFactory.getUriPattern().getParameterNames());
 
+    // may thrown WebApplicationException
+    Object resource = resourceFactory.getResource(context);
+
     dispatch(request, response, context, resourceFactory, resource, newRequestPath);
   }
   
@@ -130,7 +124,7 @@ public final class RequestDispatcher {
    * Get last element from path parameters. This element will be used as request
    * path for child resources.
    * 
-   * @param parameterValues See {@link ApplicationContext#getParameterValues()}
+   * @param parameterValues See {@link ApplicationContextImpl#getParameterValues()}
    * @return last element from given list or empty string if last element is
    *         null
    */
@@ -145,7 +139,7 @@ public final class RequestDispatcher {
    * 
    * @param request See {@link GenericContainerRequest}
    * @param response See {@link GenericContainerResponse}
-   * @param context See {@link ApplicationContext}
+   * @param context See {@link ApplicationContextImpl}
    * @param resourceClass the root resource class or resource class which was
    *          created by previous sub-resource locator
    * @param resource instance of resource class
@@ -156,7 +150,7 @@ public final class RequestDispatcher {
   private void dispatch(GenericContainerRequest request,
                         GenericContainerResponse response,
                         ApplicationContext context,
-                        ResourceClass resourceClass,
+                        ResourceFactory resourceClass,
                         Object resource,
                         String requestPath) {
 
@@ -237,7 +231,7 @@ public final class RequestDispatcher {
    * 
    * @param rmd See {@link ResourceMethodDescriptor}
    * @param resource instance of resource class
-   * @param context See {@link ApplicationContext}
+   * @param context See {@link ApplicationContextImpl}
    * @param request See {@link GenericContainerRequest}
    * @param response See {@link GenericContainerResponse}
    * @see ResourceMethodDescriptor
@@ -262,7 +256,7 @@ public final class RequestDispatcher {
    * @param requestPath request path
    * @param srmd See {@link SubResourceMethodDescriptor}
    * @param resource instance of resource class
-   * @param context See {@link ApplicationContext}
+   * @param context See {@link ApplicationContextImpl}
    * @param request See {@link GenericContainerRequest}
    * @param response See {@link GenericContainerResponse}
    * @see SubResourceMethodDescriptor
@@ -293,7 +287,7 @@ public final class RequestDispatcher {
    * @param requestPath request path
    * @param srld See {@link SubResourceLocatorDescriptor}
    * @param resource instance of resource class
-   * @param context See {@link ApplicationContext}
+   * @param context See {@link ApplicationContextImpl}
    * @param request See {@link GenericContainerRequest}
    * @param response See {@link GenericContainerResponse}
    * @see SubResourceLocatorDescriptor
@@ -317,11 +311,12 @@ public final class RequestDispatcher {
     // NOTE Locators can't accept entity
     MethodInvoker invoker = srld.getMethodInvoker();
     resource = invoker.invokeMethod(resource, srld, context);
-    SingletonResourceClass resourceClass = new SingletonResourceClass(ResourceDescriptorFactory.createAbstractResourceDescriptor(resource.getClass()),
-                                                    resource);
+
+    AbstractResourceDescriptor descriptor = new AbstractResourceDescriptorImpl(resource.getClass());
+    SingletonResourceFactory locResource = new SingletonResourceFactory(descriptor, resource);
     
     // dispatch again newly created resource
-    dispatch(request, response, context, resourceClass, resource, newRequestPath);
+    dispatch(request, response, context, locResource, resource, newRequestPath);
   }
 
   /**
@@ -395,10 +390,10 @@ public final class RequestDispatcher {
    * @param path full request path, see {@link UriInfo#getPath()}.
    * @param capturingValues the list for keeping template values. See
    *          {@link UriInfo#getPathParameters()}
-   * @return {@link SingletonResourceClass} or null
+   * @return {@link SingletonResourceFactory} or null
    */
-  private ResourceClass processResource(String path, List<String> capturingValues) {
-    for (ResourceClass rc : resourceBinder.getRootResources()) {
+  private ResourceFactory processResource(String path, List<String> capturingValues) {
+    for (ResourceFactory rc : resourceBinder.getRootResources()) {
       if (rc.getUriPattern().match(path, capturingValues)) {
 
         // all times will at least 1

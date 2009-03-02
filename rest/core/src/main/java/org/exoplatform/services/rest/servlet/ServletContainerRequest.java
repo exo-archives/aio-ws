@@ -20,7 +20,6 @@ package org.exoplatform.services.rest.servlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.Enumeration;
 

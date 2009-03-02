@@ -17,36 +17,13 @@
 
 package org.exoplatform.services.rest;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
-import org.exoplatform.services.rest.method.MethodInvokerFilter;
 
 /**
+ * Constructor parameter.
+ * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public interface RequestHandler {//extends EntityProviderResolver {
-
-  /**
-   * Handle the HTTP request by dispatching request to appropriate resource. If
-   * no one appropriate resource found then error response will be produced.
-   * 
-   * @param request HTTP request
-   * @param response HTTP response
-   * @throws IOException if any i/o error occurs
-   */
-  void handleRequest(GenericContainerRequest request, GenericContainerResponse response) throws IOException;
-
-//  /**
-//   * @return collection on method invoking filters
-//   */
-//  List<MethodInvokerFilter> getInvokerFilters();
-//
-//  /**
-//   * @return mutable application attributes
-//   */
-//  Map<String, Object> getAttributes();
+public interface ConstructorParameter extends Parameter {
 
 }

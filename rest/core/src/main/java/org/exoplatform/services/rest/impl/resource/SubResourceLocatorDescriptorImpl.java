@@ -73,11 +73,11 @@ public class SubResourceLocatorDescriptorImpl implements SubResourceLocatorDescr
    * @param parentResource parent resource for this method
    * @param invoker method invoker
    */
-  public SubResourceLocatorDescriptorImpl(PathValue path,
-                                          Method method,
-                                          List<MethodParameter> parameters,
-                                          AbstractResourceDescriptor parentResource,
-                                          MethodInvoker invoker) {
+  SubResourceLocatorDescriptorImpl(PathValue path,
+                                   Method method,
+                                   List<MethodParameter> parameters,
+                                   AbstractResourceDescriptor parentResource,
+                                   MethodInvoker invoker) {
     this.path = path;
     this.uriPattern = new UriPattern(path.getPath());
     this.method = method;

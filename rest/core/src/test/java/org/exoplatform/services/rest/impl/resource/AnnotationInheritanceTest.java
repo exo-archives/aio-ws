@@ -32,19 +32,20 @@ import org.exoplatform.services.rest.AbstractResourceTest;
  */
 public class AnnotationInheritanceTest extends AbstractResourceTest {
 
-  @Path("/a")
   public interface ResourceInterface {
     @GET
     @Produces(MediaType.TEXT_XML)
     String m0(String type);
   }
 
+  @Path("/a")
   public class Resource1 implements ResourceInterface {
     public String m0(String type) {
       return "m0";
     }
   }
 
+  @Path("/a")
   public class Resource2 implements ResourceInterface {
     @Produces(MediaType.APPLICATION_ATOM_XML)
     public String m0(String type) {

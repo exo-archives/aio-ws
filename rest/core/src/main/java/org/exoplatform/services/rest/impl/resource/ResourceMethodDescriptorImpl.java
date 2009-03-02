@@ -83,13 +83,13 @@ public class ResourceMethodDescriptorImpl implements ResourceMethodDescriptor {
    * @param produces list of media types which this method can produce
    * @param invoker method invoker
    */
-  public ResourceMethodDescriptorImpl(Method method,
-                                      String httpMethod,
-                                      List<MethodParameter> parameters,
-                                      AbstractResourceDescriptor parentResource,
-                                      List<MediaType> consumes,
-                                      List<MediaType> produces,
-                                      MethodInvoker invoker) {
+  ResourceMethodDescriptorImpl(Method method,
+                               String httpMethod,
+                               List<MethodParameter> parameters,
+                               AbstractResourceDescriptor parentResource,
+                               List<MediaType> consumes,
+                               List<MediaType> produces,
+                               MethodInvoker invoker) {
     this.method = method;
     this.httpMethod = httpMethod;
     this.parameters = parameters;

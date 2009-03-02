@@ -41,13 +41,13 @@ import org.exoplatform.services.rest.resource.SubResourceMethodDescriptor;
 public class ResourceDescriptorValidatorTest extends BaseTest {
 
   public void testAbstractResourceDescriptorValidator() {
-    AbstractResourceDescriptor resource = ResourceDescriptorFactory.createAbstractResourceDescriptor(Resource1.class);
+    AbstractResourceDescriptor resource = createResourceDescriptor(Resource1.class);
     try {
       resource.accept(new ResourceDescriptorValidator());
       fail("Exception should be here");
     } catch (IllegalArgumentException e) {
     }
-    resource = ResourceDescriptorFactory.createAbstractResourceDescriptor(Resource2.class);
+    resource = createResourceDescriptor(Resource2.class);
     try {
       resource.accept(new ResourceDescriptorValidator());
       fail("Exception should be here");
@@ -57,7 +57,7 @@ public class ResourceDescriptorValidatorTest extends BaseTest {
   
   
   public void testResourceMethodDescriptorValidator() {
-    AbstractResourceDescriptor resource = ResourceDescriptorFactory.createAbstractResourceDescriptor(Resource3.class);
+    AbstractResourceDescriptor resource = createResourceDescriptor(Resource3.class);
     List<ResourceMethodDescriptor> l = resource.getResourceMethodDescriptors();
     ResourceDescriptorValidator validator = new ResourceDescriptorValidator();
     for (ResourceMethodDescriptor rmd : l) {
@@ -75,7 +75,7 @@ public class ResourceDescriptorValidatorTest extends BaseTest {
   }
   
   public void testSubResourceMethodDescriptorValidator() {
-    AbstractResourceDescriptor resource = ResourceDescriptorFactory.createAbstractResourceDescriptor(Resource4.class);
+    AbstractResourceDescriptor resource = createResourceDescriptor(Resource4.class);
     List<SubResourceMethodDescriptor> l = resource.getSubResourceMethodDescriptors();
     
     ResourceDescriptorValidator validator = new ResourceDescriptorValidator();
@@ -94,7 +94,7 @@ public class ResourceDescriptorValidatorTest extends BaseTest {
   }
 
   public void testSubResourceLocatorDescriptorValidator() {
-    AbstractResourceDescriptor resource = ResourceDescriptorFactory.createAbstractResourceDescriptor(Resource5.class);
+    AbstractResourceDescriptor resource = createResourceDescriptor(Resource5.class);
     List<SubResourceLocatorDescriptor> l = resource.getSubResourceLocatorDescriptors();
     ResourceDescriptorValidator validator = new ResourceDescriptorValidator();
     for (SubResourceLocatorDescriptor rmd : l) {

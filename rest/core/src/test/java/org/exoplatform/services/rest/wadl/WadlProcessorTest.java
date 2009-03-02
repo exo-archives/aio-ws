@@ -47,7 +47,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
 import org.exoplatform.services.rest.BaseTest;
-import org.exoplatform.services.rest.impl.resource.ResourceDescriptorFactory;
+import org.exoplatform.services.rest.impl.resource.AbstractResourceDescriptorImpl;
+import org.exoplatform.services.rest.impl.resource.PathValue;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
 import org.exoplatform.services.rest.wadl.research.Application;
 import org.w3c.dom.Document;
@@ -109,7 +110,9 @@ public class WadlProcessorTest extends BaseTest {
   }
 
   public void testBaseWadlGenerator() throws Exception {
-    AbstractResourceDescriptor ard = ResourceDescriptorFactory.createAbstractResourceDescriptor(Resource1.class);
+    
+    PathValue path = new PathValue(Resource1.class.getAnnotation(Path.class).value());
+    AbstractResourceDescriptor ard = new AbstractResourceDescriptorImpl(path, Resource1.class);
     WadlProcessor wadlProcessor = new WadlProcessor();
     Application app = wadlProcessor.process(ard, new URI("http://localhost:8080/ws/rs"));
     

@@ -17,7 +17,7 @@
 
 package org.exoplatform.services.rest.method;
 
-import org.exoplatform.services.rest.impl.ApplicationContext;
+import org.exoplatform.services.rest.ApplicationContext;
 import org.exoplatform.services.rest.resource.GenericMethodResource;
 
 /**
@@ -34,7 +34,7 @@ public interface MethodInvoker {
    * 
    * @param resource object that contains method
    * @param genericMethodResource See {@link GenericMethodResource}
-   * @param context See {@link ApplicationContext}
+   * @param context See {@link ApplicationContextImpl}
    * @return result of method invoking
    */
   Object invokeMethod(Object resource,

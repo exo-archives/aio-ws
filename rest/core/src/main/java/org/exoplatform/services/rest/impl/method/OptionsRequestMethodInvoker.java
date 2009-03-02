@@ -19,10 +19,9 @@ package org.exoplatform.services.rest.impl.method;
 
 import javax.ws.rs.core.Response;
 
-import org.exoplatform.services.rest.impl.ApplicationContext;
+import org.exoplatform.services.rest.ApplicationContext;
 import org.exoplatform.services.rest.impl.header.MediaTypeHelper;
 import org.exoplatform.services.rest.method.MethodInvoker;
-//import org.exoplatform.services.rest.method.MethodInvokerFilter;
 import org.exoplatform.services.rest.resource.GenericMethodResource;
 import org.exoplatform.services.rest.wadl.WadlProcessor;
 import org.exoplatform.services.rest.wadl.research.Application;

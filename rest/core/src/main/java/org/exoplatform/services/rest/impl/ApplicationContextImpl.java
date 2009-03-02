@@ -31,19 +31,17 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.exoplatform.services.rest.ApplicationContext;
 import org.exoplatform.services.rest.GenericContainerRequest;
 import org.exoplatform.services.rest.GenericContainerResponse;
 import org.exoplatform.services.rest.RequestHandler;
 import org.exoplatform.services.rest.impl.uri.UriComponent;
 
 /**
- * Provides access to ContainerRequest, ContainerResponse and request URI
- * information.
- * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class ApplicationContext implements UriInfo {
+public class ApplicationContextImpl implements ApplicationContext {
 
   /**
    * {@link ThreadLocal} ApplicationContext.
@@ -69,22 +67,22 @@ public class ApplicationContext implements UriInfo {
   /**
    * Values of template parameters.
    */
-  private List<String>        parameterValues    = new ArrayList<String>();
+  private List<String>               parameterValues    = new ArrayList<String>();
 
   /**
    * List of matched resources.
    */
-  private List<Object>        matchedResources   = new ArrayList<Object>();
+  private List<Object>               matchedResources   = new ArrayList<Object>();
 
   /**
    * List of not decoded matched URIs.
    */
-  private List<String>        encodedMatchedURIs = new ArrayList<String>();
+  private List<String>               encodedMatchedURIs = new ArrayList<String>();
 
   /**
    * List of decoded matched URIs.
    */
-  private List<String>        matchedURIs        = new ArrayList<String>();
+  private List<String>               matchedURIs        = new ArrayList<String>();
 
   /**
    * See {@link GenericContainerRequest}.
@@ -99,7 +97,7 @@ public class ApplicationContext implements UriInfo {
   /**
    * See {@link RequestHandler}.
    */
-  protected RequestHandler    requestHandler;
+  protected RequestHandler           requestHandler;
 
   /**
    * Mutable runtime attributes.
@@ -109,34 +107,23 @@ public class ApplicationContext implements UriInfo {
   /**
    * Constructs new instance of ApplicationContext.
    * 
-   * @param requestHandler See {@link RequestHandler}
    * @param request See {@link GenricContainerRequest}
    * @param response See {@link GenericContainerResponse}
    */
-  public ApplicationContext(RequestHandler requestHandler,
-                            GenericContainerRequest request,
-                            GenericContainerResponse response) {
-    this.requestHandler = requestHandler;
+  public ApplicationContextImpl(GenericContainerRequest request, GenericContainerResponse response) {
     this.request = request;
     this.response = response;
   }
 
   /**
-   * Should be used to pass template values in context by using returned list in
-   * matching to @see
-   * {@link org.exoplatform.services.rest.impl.uri.UriPattern#match(String, List)}
-   * . List will be cleared during matching.
-   * 
-   * @return the list for template values
+   * {@inheritDoc}
    */
   public List<String> getParameterValues() {
     return parameterValues;
   }
 
   /**
-   * Pass in context list of path template parameters @see {@link UriPattern}.
-   * 
-   * @param parameterNames list of templates parameters
+   * {@inheritDoc}
    */
   public void setParameterNames(List<String> parameterNames) {
     if (encodedPathParameters == null)
@@ -148,30 +135,14 @@ public class ApplicationContext implements UriInfo {
   }
 
   /**
-   * Add ancestor resource, according to JSR-311:
-   * <p>
-   * Entries are ordered according in reverse request URI matching order, with
-   * the root resource last.
-   * </p>
-   * So add each new resource at the begin of list.
-   * 
-   * @param resource the resource e. g. resource class, sub-resource method or
-   *          sub-resource locator.
+   * {@inheritDoc}
    */
   public void addMatchedResource(Object resource) {
     matchedResources.add(0, resource);
   }
 
   /**
-   * Add ancestor resource, according to JSR-311:
-   * <p>
-   * Entries are ordered in reverse request URI matching order, with the root
-   * resource URI last.
-   * </p>
-   * So add each new URI at the begin of list.
-   * 
-   * @param uri the partial part of that matched to resource class, sub-resource
-   *          method or sub-resource locator.
+   * {@inheritDoc}
    */
   public void addMatchedURI(String uri) {
     encodedMatchedURIs.add(0, uri);
@@ -179,56 +150,56 @@ public class ApplicationContext implements UriInfo {
   }
 
   /**
-   * @return get mutable runtime attributes
+   * {@inheritDoc}
    */
   public Map<String, Object> getAttributes() {
     return attributes == null ? attributes = new HashMap<String, Object>() : attributes;
   }
 
   /**
-   * @return See {@link Request}
+   * {@inheritDoc}
    */
   public Request getRequest() {
     return request;
   }
 
   /**
-   * @return See {@link HttpHeaders}
+   * {@inheritDoc}
    */
   public HttpHeaders getHttpHeaders() {
     return request;
   }
 
   /**
-   * @return See {@link SecurityContext}
+   * {@inheritDoc}
    */
   public SecurityContext getSecurityContext() {
     return request;
   }
 
   /**
-   * @return See {@link GenericContainerRequest}
+   * {@inheritDoc}
    */
   public GenericContainerRequest getContainerRequest() {
     return request;
   }
 
   /**
-   * @return See {@link RequestHandler}
+   * {@inheritDoc}
    */
   public RequestHandler getRequestHandler() {
     return requestHandler;
   }
 
   /**
-   * @return See {@link UriInfo}
+   * {@inheritDoc}
    */
   public UriInfo getUriInfo() {
     return this;
   }
 
   /**
-   * @return See {@link GenericContainerResponse}
+   * {@inheritDoc}
    */
   public GenericContainerResponse getContainerResponse() {
     return response;

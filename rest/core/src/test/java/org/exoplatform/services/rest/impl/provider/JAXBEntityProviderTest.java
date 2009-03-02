@@ -29,6 +29,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.RuntimeDelegate;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
@@ -36,11 +37,11 @@ import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
 import org.exoplatform.services.rest.BaseTest;
-import org.exoplatform.services.rest.RequestHandler;
 import org.exoplatform.services.rest.generated.Book;
 import org.exoplatform.services.rest.generated.MemberPrice;
 import org.exoplatform.services.rest.generated.Price;
 import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
+import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -50,15 +51,17 @@ public class JAXBEntityProviderTest extends BaseTest {
 
   private byte[]  data;
 
-  private RequestHandler requestHandler;
+//  private RequestHandler requestHandler;
 
   private MediaType      mediaType;
+
+private RuntimeDelegateImpl rd;
 
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    requestHandler = (RequestHandler) container.getComponentInstanceOfType(RequestHandler.class);
-    assertNotNull(requestHandler);
+//    requestHandler = (RequestHandler) container.getComponentInstanceOfType(RequestHandler.class);
+//    assertNotNull(requestHandler);
     mediaType = new MediaType("application", "xml");
     data = ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
       + "<book send-by-post=\"true\">"
@@ -66,6 +69,7 @@ public class JAXBEntityProviderTest extends BaseTest {
       + "<author>Brett McLaughlin</author>" + "<price>34.95</price>"
       + "<member-price currency=\"US\">26.56</member-price>"
       + "</book>").getBytes("UTF-8");
+    rd = (RuntimeDelegateImpl)RuntimeDelegate.getInstance();
   }
 
   public static JAXBElement<Book> m(JAXBElement<Book> je) {
@@ -78,7 +82,7 @@ public class JAXBEntityProviderTest extends BaseTest {
     assertNotNull(m);
     Class<?> type = m.getParameterTypes()[0];
     Type genericType = m.getGenericParameterTypes()[0];
-    MessageBodyReader reader = requestHandler.getMessageBodyReader(type,
+    MessageBodyReader reader = /*requestHandler*/rd.getMessageBodyReader(type,
                                                                    genericType,
                                                                    null,
                                                                    mediaType);
@@ -102,7 +106,7 @@ public class JAXBEntityProviderTest extends BaseTest {
     assertNotNull(m);
     Class<?> returnType = m.getReturnType();
     Type genericReturnType = m.getGenericReturnType();
-    MessageBodyWriter writer = requestHandler.getMessageBodyWriter(returnType,
+    MessageBodyWriter writer = /*requestHandler*/rd.getMessageBodyWriter(returnType,
                                                                    genericReturnType,
                                                                    null,
                                                                    mediaType);
@@ -123,7 +127,7 @@ public class JAXBEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testReadJAXBObject() throws Exception {
-    MessageBodyReader prov = requestHandler.getMessageBodyReader(Book.class, null, null, mediaType);
+    MessageBodyReader prov = /*requestHandler*/rd.getMessageBodyReader(Book.class, null, null, mediaType);
     assertNotNull(prov);
     assertTrue(prov.isReadable(Book.class, Book.class, null, mediaType));
     MultivaluedMap<String, String> h = new MultivaluedMapImpl();
@@ -139,7 +143,7 @@ public class JAXBEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testWriteJAXBObject() throws Exception {
-    MessageBodyWriter writer = requestHandler.getMessageBodyWriter(Book.class,
+    MessageBodyWriter writer = /*requestHandler*/rd.getMessageBodyWriter(Book.class,
                                                                    null,
                                                                    null,
                                                                    mediaType);

@@ -82,11 +82,6 @@ public final class HeaderHelper {
    */
   private static final List<AcceptToken>                   ACCEPT_ALL_TOKENS        = Collections.singletonList(new AcceptToken("*"));
 
-  /**
-   * See {@link RuntimeDelegate}.
-   */
-  private static RuntimeDelegate                           rd;
-  
   //
   
   /**
@@ -472,9 +467,7 @@ public final class HeaderHelper {
    */
   @SuppressWarnings("unchecked")
   public static String getHeaderAsString(Object o) {
-    if (rd == null)
-      rd = RuntimeDelegate.getInstance();
-    HeaderDelegate hd = rd.createHeaderDelegate(o.getClass()); 
+    HeaderDelegate hd = RuntimeDelegate.getInstance().createHeaderDelegate(o.getClass()); 
     return hd.toString(o);
   }
   

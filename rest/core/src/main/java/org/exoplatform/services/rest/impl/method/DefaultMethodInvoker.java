@@ -20,10 +20,8 @@ package org.exoplatform.services.rest.impl.method;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
@@ -35,9 +33,10 @@ import javax.ws.rs.ext.MessageBodyReader;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.rest.impl.ApplicationContext;
+import org.exoplatform.services.rest.ApplicationContext;
+import org.exoplatform.services.rest.impl.ApplicationException;
+import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 import org.exoplatform.services.rest.method.MethodInvoker;
-import org.exoplatform.services.rest.method.MethodInvokerFilter;
 import org.exoplatform.services.rest.resource.GenericMethodResource;
 
 /**
@@ -56,8 +55,8 @@ public final class DefaultMethodInvoker implements MethodInvoker {
                              GenericMethodResource methodResource,
                              ApplicationContext context) {
 
-    for (MethodInvokerFilter f : context.getRequestHandler().getInvokerFilters())
-      f.accept(methodResource);
+//TODO    for (MethodInvokerFilter f : context.getRequestHandler().getInvokerFilters())
+//      f.accept(methodResource);
 
     Object[] p = new Object[methodResource.getMethodParameters().size()];
     int i = 0;
@@ -68,10 +67,18 @@ public final class DefaultMethodInvoker implements MethodInvoker {
         try {
           p[i++] = pr.resolve(mp, context);
         } catch (Exception e) {
+          
           if (LOG.isDebugEnabled())
             e.printStackTrace();
-          throw createException(mp);
+          
+          Class<?> ac = a.annotationType();
+          if (ac == MatrixParam.class || ac == QueryParam.class || ac == PathParam.class)
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
+
+          throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).build());
+          
         }
+        
       } else {
 
         InputStream entityStream = context.getContainerRequest().getEntityStream();
@@ -82,19 +89,21 @@ public final class DefaultMethodInvoker implements MethodInvoker {
           MultivaluedMap<String, String> headers = context.getContainerRequest()
                                                           .getRequestHeaders();
 
-          MessageBodyReader entityReader = context.getRequestHandler()
-                                                  .getMessageBodyReader(mp.getParameterClass(),
-                                                                        mp.getGenericType(),
-                                                                        mp.getAnnotations(),
-                                                                        contentType);
+          MessageBodyReader entityReader = RuntimeDelegateImpl.getInstance()
+                                                              .getMessageBodyReader(mp.getParameterClass(),
+                                                                                    mp.getGenericType(),
+                                                                                    mp.getAnnotations(),
+                                                                                    contentType);
           if (entityReader == null) {
             if (LOG.isDebugEnabled())
               LOG.warn("Unsupported media type. ");
+            
             throw new WebApplicationException(Response.status(Response.Status.UNSUPPORTED_MEDIA_TYPE)
                                                       .build());
           }
 
           try {
+            
             p[i++] = entityReader.readFrom(mp.getParameterClass(),
                                            mp.getGenericType(),
                                            mp.getAnnotations(),
@@ -102,9 +111,12 @@ public final class DefaultMethodInvoker implements MethodInvoker {
                                            headers,
                                            entityStream);
           } catch (IOException e) {
+            
             if (LOG.isDebugEnabled())
               e.printStackTrace();
+            
             throw new WebApplicationException(e);
+            
           }
         }
       }
@@ -112,36 +124,23 @@ public final class DefaultMethodInvoker implements MethodInvoker {
     }
     try {
       return methodResource.getMethod().invoke(resource, p);
-    } catch (Exception e) {
+    } catch (IllegalArgumentException argExc) {
+      // should not be thrown
+      throw new ApplicationException(argExc.getCause());
+    } catch (IllegalAccessException accessExc) {
+      // should not be thrown
+      throw new ApplicationException(accessExc.getCause());
+    } catch (InvocationTargetException invExc) {
       if (LOG.isDebugEnabled())
-        e.printStackTrace();
-      throw new WebApplicationException(e);
-    } catch (Throwable thr) {
-      if (LOG.isDebugEnabled())
-        thr.printStackTrace();
-      throw new WebApplicationException(thr);
+        invExc.printStackTrace();
+      // get cause of exception that method produces
+      Throwable cause = invExc.getCause();
+      // if WebApplicationException than it may contain response
+      if (WebApplicationException.class == cause.getClass())
+        throw (WebApplicationException) invExc.getCause();
+
+      throw new ApplicationException(cause);
     }
-  }
-
-  /**
-   * Constructs error response, dependent that parameter can't be processed
-   * correctly and passed in method. JSR-311 says:
-   * <p>
-   * If errors occurs when process parameter with {@link PathParam},
-   * {@link QueryParam} or {@link MatrixParam} then response with status Not
-   * Found (404) must be returned. If parameter annotated with {@link FormParam}, {@link HeaderParam} or {@link CookieParam} the status Bad Request (400)
-   * must be returned.
-   * 
-   * @param mp method parameter
-   * @return WebApplicationException with response with required status.
-   */
-  private static WebApplicationException createException(org.exoplatform.services.rest.method.MethodParameter mp) {
-    Class<?> a = mp.getAnnotation().annotationType();
-    if (a == MatrixParam.class || a == QueryParam.class || a == PathParam.class)
-      return new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
-
-    return new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).build());
-
   }
 
 }

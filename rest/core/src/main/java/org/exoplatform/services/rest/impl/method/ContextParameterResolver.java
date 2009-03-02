@@ -26,7 +26,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
-import org.exoplatform.services.rest.impl.ApplicationContext;
+import org.exoplatform.services.rest.ApplicationContext;
 import org.exoplatform.services.rest.impl.EnvironmentContext;
 
 /**

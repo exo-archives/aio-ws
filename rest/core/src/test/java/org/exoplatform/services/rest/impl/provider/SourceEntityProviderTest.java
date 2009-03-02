@@ -25,6 +25,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.RuntimeDelegate;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -33,8 +34,8 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.exoplatform.services.rest.BaseTest;
-import org.exoplatform.services.rest.RequestHandler;
 import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
+import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -49,19 +50,22 @@ public class SourceEntityProviderTest extends BaseTest {
 
   private MediaType           mediaType;
 
-  private RequestHandler      requestHandler;
+  private RuntimeDelegateImpl rd;
+
+//  private RequestHandler      requestHandler;
 
   public void setUp() throws Exception {
     super.setUp();
-    requestHandler = (RequestHandler) container.getComponentInstanceOfType(RequestHandler.class);
-    assertNotNull(requestHandler);
+//    requestHandler = (RequestHandler) container.getComponentInstanceOfType(RequestHandler.class);
+//    assertNotNull(requestHandler);
     mediaType = new MediaType("application", "xml");
     data = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root><message>to be or not to be</message></root>".getBytes("UTF-8");
+    rd = (RuntimeDelegateImpl)RuntimeDelegate.getInstance();
   }
 
   @SuppressWarnings("unchecked")
   public void testReadStreamSourceEntityProvider() throws Exception {
-    MessageBodyReader reader = requestHandler.getMessageBodyReader(StreamSource.class,
+    MessageBodyReader reader = /*requestHandler*/rd.getMessageBodyReader(StreamSource.class,
                                                                    null,
                                                                    null,
                                                                    mediaType);
@@ -83,7 +87,7 @@ public class SourceEntityProviderTest extends BaseTest {
   @SuppressWarnings("unchecked")
   public void testWriteStreamSourceEntityProvider() throws Exception {
     StreamSource src = new StreamSource(new ByteArrayInputStream(data));
-    MessageBodyWriter writer = requestHandler.getMessageBodyWriter(StreamSource.class,
+    MessageBodyWriter writer = /*requestHandler*/rd.getMessageBodyWriter(StreamSource.class,
                                                                    null,
                                                                    null,
                                                                    mediaType);
@@ -96,7 +100,7 @@ public class SourceEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testReadSAXSourceEntityProvider() throws Exception {
-    MessageBodyReader reader = requestHandler.getMessageBodyReader(SAXSource.class,
+    MessageBodyReader reader = /*requestHandler*/rd.getMessageBodyReader(SAXSource.class,
                                                                    null,
                                                                    null,
                                                                    mediaType);
@@ -118,7 +122,7 @@ public class SourceEntityProviderTest extends BaseTest {
   @SuppressWarnings("unchecked")
   public void testWriteSAXSourceEntityProvider() throws Exception {
     SAXSource src = new SAXSource(new InputSource(new ByteArrayInputStream(data)));
-    MessageBodyWriter writer = requestHandler.getMessageBodyWriter(SAXSource.class,
+    MessageBodyWriter writer = /*requestHandler*/rd.getMessageBodyWriter(SAXSource.class,
                                                                    null,
                                                                    null,
                                                                    mediaType);
@@ -131,7 +135,7 @@ public class SourceEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testReadDOMSourceEntityProvider() throws Exception {
-    MessageBodyReader reader = requestHandler.getMessageBodyReader(DOMSource.class,
+    MessageBodyReader reader = /*requestHandler*/rd.getMessageBodyReader(DOMSource.class,
                                                                    null,
                                                                    null,
                                                                    mediaType);
@@ -156,7 +160,7 @@ public class SourceEntityProviderTest extends BaseTest {
     Document d = DocumentBuilderFactory.newInstance()
                                        .newDocumentBuilder()
                                        .parse(new ByteArrayInputStream(data));
-    MessageBodyWriter writer = requestHandler.getMessageBodyWriter(DOMSource.class,
+    MessageBodyWriter writer = /*requestHandler*/rd.getMessageBodyWriter(DOMSource.class,
                                                                    null,
                                                                    null,
                                                                    mediaType);

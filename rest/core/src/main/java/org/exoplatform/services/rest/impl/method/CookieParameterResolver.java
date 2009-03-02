@@ -20,7 +20,7 @@ package org.exoplatform.services.rest.impl.method;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.core.Cookie;
 
-import org.exoplatform.services.rest.impl.ApplicationContext;
+import org.exoplatform.services.rest.ApplicationContext;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>

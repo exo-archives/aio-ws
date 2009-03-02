@@ -17,44 +17,33 @@
 
 package org.exoplatform.services.rest.impl.resource;
 
-import org.exoplatform.services.rest.GenericContainerRequest;
-import org.exoplatform.services.rest.GenericContainerResponse;
-import org.exoplatform.services.rest.impl.ApplicationContext;
+import org.exoplatform.services.rest.ApplicationContext;
+import org.exoplatform.services.rest.ConstructorInjector;
+import org.exoplatform.services.rest.FieldInjector;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class SingletonResourceClass extends ResourceClass {
+public class PerRequestResourceFactory extends ResourceFactory {
 
-  /**
-   * Resource object.
-   */
-  private final Object                     resource;
-
-  /**
-   * Constructor.
-   * 
-   * @param resourceDescriptor See {@link AbstractResourceDescriptor}
-   */
-  public SingletonResourceClass(AbstractResourceDescriptor resourceDescriptor, Object resource) {
+  public PerRequestResourceFactory(AbstractResourceDescriptor resourceDescriptor) {
     super(resourceDescriptor);
-    this.resource = resource;
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public Object getResource(ApplicationContext context) {
-    return resource;
-  }
+    ConstructorInjector inj = resourceDescriptor.getConstructorInjectors().get(0);
+    Object resource = inj.createInstance(context);
 
-  /**
-   * {@inheritDoc}
-   */
-  public boolean isSingleton() {
-    return true;
+    for (FieldInjector field : resourceDescriptor.getFieldInjectors()) {
+      field.inject(resource, context);
+    }
+
+    return resource;
   }
 
 }

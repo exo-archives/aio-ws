@@ -15,16 +15,31 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest.resource;
+package org.exoplatform.services.rest;
 
-import org.exoplatform.services.rest.Parameter;
+import java.lang.reflect.Field;
+
 
 /**
- * Constructor parameter.
+ * Object field.
  * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public interface ConstructorParameter extends Parameter {
+public interface FieldInjector extends Parameter {
+
+  /**
+   * @return field name
+   */
+  String getName();
+
+  /**
+   * Set Object {@link Field} using ApplicationContext for resolve actual field
+   * value.
+   * 
+   * @param resource root resource or provider
+   * @param context ApplicationContext
+   */
+  void inject(Object resource, ApplicationContext context);
 
 }

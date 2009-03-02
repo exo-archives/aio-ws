@@ -29,10 +29,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.exoplatform.services.rest.BaseTest;
-import org.exoplatform.services.rest.RequestHandler;
 import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
+import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -43,23 +44,26 @@ public class StringEntityProviderTest extends BaseTest {
   // 
   private static final String TEST_CYR = "\u041f\u0440\u0438\u0432\u0456\u0442";
 
-  private RequestHandler requestHandler;
+//  private RequestHandler requestHandler;
   
   private MediaType mediaType;
 
+  private RuntimeDelegateImpl rd;
+
   public void setUp() throws Exception {
     super.setUp();
-    requestHandler = (RequestHandler) container.getComponentInstanceOfType(RequestHandler.class);
-    assertNotNull(requestHandler);
+//    requestHandler = (RequestHandler) container.getComponentInstanceOfType(RequestHandler.class);
+//    assertNotNull(requestHandler);
     Map<String, String> p = new HashMap<String, String>(1);
     p.put("charset", "windows-1251");
     mediaType = new MediaType("text", "plain", p);
+    rd = (RuntimeDelegateImpl)RuntimeDelegate.getInstance();
   }
   
   @SuppressWarnings("unchecked")
   public void testRead() throws IOException {
 
-    MessageBodyReader reader =  requestHandler.getMessageBodyReader(String.class, null, null, mediaType);
+    MessageBodyReader reader =  /*requestHandler*/rd.getMessageBodyReader(String.class, null, null, mediaType);
     byte[] data = TEST_CYR.getBytes("windows-1251");
     MultivaluedMap<String, String> h = new MultivaluedMapImpl();
     h.putSingle(HttpHeaders.CONTENT_LENGTH, "" + data.length);
@@ -79,7 +83,7 @@ public class StringEntityProviderTest extends BaseTest {
   
   @SuppressWarnings("unchecked")
   public void testWrite() throws IOException {
-    MessageBodyWriter writer = requestHandler.getMessageBodyWriter(String.class, null, null, mediaType);
+    MessageBodyWriter writer = /*requestHandler*/rd.getMessageBodyWriter(String.class, null, null, mediaType);
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     writer.writeTo(TEST_CYR, String.class, String.class, null, mediaType, null, out);
     String res = out.toString("windows-1251");

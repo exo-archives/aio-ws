@@ -34,7 +34,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.exoplatform.services.rest.impl.ApplicationContext;
+import org.exoplatform.services.rest.ApplicationContext;
+import org.exoplatform.services.rest.impl.ApplicationContextImpl;
 import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
 import org.exoplatform.services.rest.provider.EntityProvider;
 
@@ -77,7 +78,7 @@ public class MultivaluedMapEntityProvider implements EntityProvider<MultivaluedM
                                                  MediaType mediaType,
                                                  MultivaluedMap<String, String> httpHeaders,
                                                  InputStream entityStream) throws IOException {
-    ApplicationContext context = ApplicationContext.getCurrent();
+    ApplicationContext context = ApplicationContextImpl.getCurrent();
     Object o = context.getAttributes().get("org.exoplatform.ws.rest.entity.form");
     if (o != null)
       return (MultivaluedMap<String, String>) o;

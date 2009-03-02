@@ -19,7 +19,7 @@ package org.exoplatform.services.rest.impl.method;
 
 import javax.ws.rs.QueryParam;
 
-import org.exoplatform.services.rest.impl.ApplicationContext;
+import org.exoplatform.services.rest.ApplicationContext;
 import org.exoplatform.services.rest.method.TypeProducer;
 
 /**

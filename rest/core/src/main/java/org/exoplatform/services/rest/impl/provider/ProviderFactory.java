@@ -15,28 +15,40 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest.resource;
+package org.exoplatform.services.rest.impl.provider;
 
-import java.lang.reflect.Constructor;
 import java.util.List;
 
+import javax.ws.rs.core.MediaType;
+
+import org.exoplatform.services.rest.ApplicationContext;
+import org.exoplatform.services.rest.provider.ProviderDescriptor;
 
 /**
- * Abstraction of constructor descriptor.
- * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public interface ConstructorDescriptor extends ResourceDescriptor {
-
-  /**
-   * @return constructor of class
-   */
-  Constructor<?> getConstructor();
+public abstract class ProviderFactory {
   
-  /**
-   * @return List of constructor parameters
-   */
-  List<ConstructorParameter> getConstructorParameters();
+  protected final ProviderDescriptor providerDescriptor;
+  
+  public ProviderFactory(ProviderDescriptor providerDescriptor) {
+    this.providerDescriptor = providerDescriptor;
+  }
+  
+  public abstract Object getProvider(ApplicationContext context);
+  
+  //
+  
+  public Class<?> getProviderClass() {
+    return providerDescriptor.getProviderClass();
+  }
+  
+  public List<MediaType> consumes() {
+    return providerDescriptor.consumes();
+  }
 
+  public List<MediaType> produces() {
+    return providerDescriptor.produces();
+  }
 }

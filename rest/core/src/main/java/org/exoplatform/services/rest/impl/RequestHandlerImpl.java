@@ -20,26 +20,19 @@ package org.exoplatform.services.rest.impl;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.ExceptionMapper;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.container.component.ComponentPlugin;
@@ -51,13 +44,11 @@ import org.exoplatform.services.rest.GenericContainerResponse;
 import org.exoplatform.services.rest.RequestFilter;
 import org.exoplatform.services.rest.RequestHandler;
 import org.exoplatform.services.rest.ResponseFilter;
-import org.exoplatform.services.rest.impl.header.MediaTypeHelper;
 import org.exoplatform.services.rest.impl.method.MethodInvokerFilterComponentPlugin;
 import org.exoplatform.services.rest.impl.provider.ByteEntityProvider;
 import org.exoplatform.services.rest.impl.provider.DOMSourceEntityProvider;
 import org.exoplatform.services.rest.impl.provider.DataSourceEntityProvider;
 import org.exoplatform.services.rest.impl.provider.EntityProviderComponentPlugin;
-import org.exoplatform.services.rest.impl.provider.EntityProviderMap;
 import org.exoplatform.services.rest.impl.provider.FileEntityProvider;
 import org.exoplatform.services.rest.impl.provider.InputStreamEntityProvider;
 import org.exoplatform.services.rest.impl.provider.JAXBContextResolver;
@@ -87,12 +78,12 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
   /**
    * Read message body providers. Also see {@link EntityProviderMap}.
    */
-  private final EntityProviderMap    readProviderMap;
+//  private final EntityProviderMap    readProviderMap;
 
   /**
    * Read message body writer. Also see {@link EntityProviderMap}.
    */
-  private final EntityProviderMap    writeProviderMap;
+//  private final EntityProviderMap    writeProviderMap;
 
   /**
    * See {@link RequestDispatcher}.
@@ -122,14 +113,14 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
   /**
    * Mutable application attributes.
    */
-  private Map<String, Object> attributes;
+//  private Map<String, Object> attributes;
   
   /**
    * Should be built-in providers be loaded.
    */
   private boolean loadBuiltinProviders;
   
-  private final ResourceBinder binder;
+  private RuntimeDelegateImpl rd;
 
   /**
    * Constructs new instance of {@link RequestHandler}.
@@ -137,22 +128,16 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
    * @param dispatcher See {@link RequestDispatcher}
    * @param jaxbContexts See {@link JAXBContextResolver}
    */
-  public RequestHandlerImpl(RequestDispatcher dispatcher, ResourceBinder binder, JAXBContextResolver jaxbContexts, InitParams params) {
-    // Moved to ResourceBinder, it needs it first
-    // // initialize RuntimeDelegate instance
-    // RuntimeDelegate.setInstance(new RuntimeDelegateImpl());
+  public RequestHandlerImpl(RequestDispatcher dispatcher, JAXBContextResolver jaxbContexts, InitParams params) {
 
     ValueParam builtinVp = null;
     if (params != null)
       builtinVp = params.getValueParam("ws.rs.entity.provider.builtin");
     loadBuiltinProviders = builtinVp == null || Boolean.valueOf(builtinVp.getValue().trim()); 
     
-    this.binder = binder; 
     this.dispatcher = dispatcher;
     this.jaxbContexts = jaxbContexts;
 
-    this.readProviderMap = new EntityProviderMap();
-    this.writeProviderMap = new EntityProviderMap();
     this.invokerFilters = new ArrayList<MethodInvokerFilter>();
     this.requestFilters = new FilterMap<UriPattern, RequestFilter>();
     this.responseFilters = new FilterMap<UriPattern, ResponseFilter>();
@@ -175,11 +160,11 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
       }
     }
 
-    ApplicationContext context = new ApplicationContext(this, request, response);
-    ApplicationContext.setCurrent(context);
+    ApplicationContextImpl context = new ApplicationContextImpl(/*this, */request, response);
+    ApplicationContextImpl.setCurrent(context);
     try {
       dispatcher.dispatch(request, response);
-    } catch (WebApplicationException e) {
+    } catch (Exception e) {
       processError(e, response);
     }
 
@@ -198,7 +183,7 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
       throw new IOException();
     } finally {
       // reset application context
-      ApplicationContext.setCurrent(null);
+      ApplicationContextImpl.setCurrent(null);
     }
   }
 
@@ -214,24 +199,43 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
   /**
    * Process errors, create message about occurs errors if needs, etc.
    * 
-   * @param e See {@link WebApplicationException}
+   * @param e See exception
    * @param response See {@link GenericContainerResponse}
    */
-  private static void processError(WebApplicationException e, GenericContainerResponse response) {
-    Response r = e.getResponse();
-    if (r.getStatus() < 500) {
-      // be silent, should be some of 4xx status
-      response.setResponse(r);
+  @SuppressWarnings("unchecked")
+  private static void processError(Exception e, GenericContainerResponse response) {
+    if (e instanceof WebApplicationException) {
+
+      Response r = ((WebApplicationException) e).getResponse();
+      if (r.getStatus() < 500) {
+        // be silent, should be some of 4xx status
+        response.setResponse(r);
+      } else {
+        if (LOG.isDebugEnabled())
+          e.printStackTrace();
+
+        if (r.getEntity() == null) // add stack trace as message body
+          r = Response.status(r.getStatus())
+                      .entity(new ErrorStreaming(e))
+                      .type(MediaType.TEXT_PLAIN)
+                      .build();
+
+        response.setResponse(r);
+      }
+    } else if (e instanceof ApplicationException) {
+      Class cause = e.getCause().getClass();
+      ExceptionMapper excmap = RuntimeDelegateImpl.getInstance().getExceptionMapper(cause);
+      while (cause != null && excmap == null) {
+        excmap = RuntimeDelegateImpl.getInstance().getExceptionMapper(cause);
+        if (excmap == null)
+          cause = cause.getSuperclass();
+      }
+      if (excmap != null)
+        response.setResponse(excmap.toResponse(e.getCause()));
+      else
+        throw new UnhandledException(e.getCause());
     } else {
-      e.printStackTrace();
-
-      if (r.getEntity() == null) // add stack trace as message body
-        r = Response.status(r.getStatus())
-                    .entity(new ErrorStreaming(e))
-                    .type(MediaType.TEXT_PLAIN)
-                    .build();
-
-      response.setResponse(r);
+      throw new UnhandledException(e.getCause());
     }
   }
 
@@ -263,141 +267,6 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
 
   }
 
-  // EntityProviderResolver
-
-  /**
-   * {@inheritDoc}
-   */
-  public void addEntityProvider(EntityProvider<?> provider) {
-    final Consumes consumesAnnotation = provider.getClass().getAnnotation(Consumes.class);
-    final Produces producesAnnotation = provider.getClass().getAnnotation(Produces.class);
-    List<MediaType> consumes = MediaTypeHelper.createConsumesList(consumesAnnotation);
-    List<MediaType> produces = MediaTypeHelper.createProducesList(producesAnnotation);
-
-    synchronized (readProviderMap) {
-      for (MediaType mime : consumes)
-        readProviderMap.getList(mime).add(provider);
-    }
-
-    synchronized (writeProviderMap) {
-      for (MediaType mime : produces)
-        writeProviderMap.getList(mime).add(provider);
-    }
-
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public MessageBodyWriter<?> getMessageBodyWriter(Class<?> type,
-                                                   Type genericType,
-                                                   Annotation[] annotations,
-                                                   MediaType contentType) {
-    if (contentType == null)
-      return getMessageBodyWriter0(type, genericType, annotations, MediaTypeHelper.DEFAULT_TYPE);
-
-    MessageBodyWriter<?> writer = getMessageBodyWriter0(type, genericType, annotations, contentType);
-    if (writer == null)
-      writer = getMessageBodyWriter0(type,
-                                     genericType,
-                                     annotations,
-                                     new MediaType(contentType.getType(),
-                                                   MediaType.MEDIA_TYPE_WILDCARD));
-    if (writer == null)
-      writer = getMessageBodyWriter0(type, genericType, annotations, MediaTypeHelper.DEFAULT_TYPE);
-    return writer;
-  }
-  
-  /**
-   * Looking for message body writer according to supplied entity class, entity
-   * generic type, annotations and content type.
-   * 
-   * @param type entity type
-   * @param genericType entity generic type
-   * @param annotations annotations
-   * @param contentType content type in which entity should be represented
-   * @return message body writer or null if no one was found.
-   */
-  private MessageBodyWriter<?> getMessageBodyWriter0(Class<?> type,
-                                                    Type genericType,
-                                                    Annotation[] annotations,
-                                                    MediaType contentType) {
-    for (EntityProvider<?> e : writeProviderMap.getList(contentType)) {
-      if (e.isWriteable(type, genericType, annotations, contentType))
-        return e;
-    }
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public MessageBodyReader<?> getMessageBodyReader(Class<?> type,
-                                                   Type genericType,
-                                                   Annotation[] annotations,
-                                                   MediaType contentType) {
-    if (contentType == null)
-      return getMessageBodyReader0(type, genericType, annotations, MediaTypeHelper.DEFAULT_TYPE);
-
-    MessageBodyReader<?> reader = getMessageBodyReader0(type, genericType, annotations, contentType);
-    if (reader == null)
-      reader = getMessageBodyReader0(type,
-                                     genericType,
-                                     annotations,
-                                     new MediaType(contentType.getType(), "*"));
-    if (reader == null)
-      reader = getMessageBodyReader0(type, genericType, annotations, MediaTypeHelper.DEFAULT_TYPE);
-
-    return reader;
-  }
-
-  /**
-   * Looking for message body reader according to supplied entity class, entity
-   * generic type, annotations and content type.
-   * 
-   * @param type entity type
-   * @param genericType entity generic type
-   * @param annotations annotations
-   * @param contentType entity content type
-   * @return message body reader or null if no one was found.
-   */
-  private MessageBodyReader<?> getMessageBodyReader0(Class<?> type,
-                                                    Type genericType,
-                                                    Annotation[] annotations,
-                                                    MediaType contentType) {
-    for (EntityProvider<?> e : readProviderMap.getList(contentType)) {
-      if (e.isReadable(type, genericType, annotations, contentType))
-        return e;
-    }
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public List<MediaType> getAcceptableWriterMediaTypes(Class<?> type,
-                                                       Type genericType,
-                                                       Annotation[] annotations) {
-    List<MediaType> l = new ArrayList<MediaType>();
-    for (Map.Entry<MediaType, List<EntityProvider<?>>> e : writeProviderMap.entrySet()) {
-      MediaType m = e.getKey();
-      for (EntityProvider<?> p : e.getValue())
-        // pass content type as null, it minds all media types
-        if (p.isWriteable(type, genericType, annotations, null))
-          l.add(m);
-    }
-
-    Collections.sort(l, MediaTypeHelper.MEDIA_TYPE_COMPARATOR);
-    return l;
-  }
-  
-  /**
-   * {@inheritDoc}
-   */
-  public Map<String, Object> getAttributes() {
-    return attributes == null ? attributes = new HashMap<String, Object>() : attributes;
-  }
-
   // Startable
 
   /**
@@ -408,32 +277,41 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
   }
   
   /**
+   * {@inheritDoc}
+   */
+  public void stop() {
+  }
+
+  //
+  
+  /**
    * Startup initialization.
    */
   protected void init() {
+    rd = RuntimeDelegateImpl.getInstance();
+    
     if (loadBuiltinProviders) {
       // add prepared entity providers
-      addEntityProvider(new ByteEntityProvider());
-      addEntityProvider(new DataSourceEntityProvider());
-      addEntityProvider(new DOMSourceEntityProvider());
-      addEntityProvider(new FileEntityProvider());
-      addEntityProvider(new MultivaluedMapEntityProvider());
-      addEntityProvider(new MultipartFormDataEntityProvider());
-      addEntityProvider(new InputStreamEntityProvider());
-      addEntityProvider(new ReaderEntityProvider());
-      addEntityProvider(new SAXSourceEntityProvider());
-      addEntityProvider(new StreamSourceEntityProvider());
-      addEntityProvider(new StringEntityProvider());
-      addEntityProvider(new StreamOutputEntityProvider());
-      addEntityProvider(new JsonEntityProvider());
+      rd.addProviderInstance(new ByteEntityProvider());
+      rd.addProviderInstance(new DataSourceEntityProvider());
+      rd.addProviderInstance(new DOMSourceEntityProvider());
+      rd.addProviderInstance(new FileEntityProvider());
+      rd.addProviderInstance(new MultivaluedMapEntityProvider());
+      rd.addProviderInstance(new MultipartFormDataEntityProvider());
+      rd.addProviderInstance(new InputStreamEntityProvider());
+      rd.addProviderInstance(new ReaderEntityProvider());
+      rd.addProviderInstance(new SAXSourceEntityProvider());
+      rd.addProviderInstance(new StreamSourceEntityProvider());
+      rd.addProviderInstance(new StringEntityProvider());
+      rd.addProviderInstance(new StreamOutputEntityProvider());
+      rd.addProviderInstance(new JsonEntityProvider());
       JAXBElementEntityProvider jep = new JAXBElementEntityProvider();
       jep.setContexResolver(jaxbContexts);
-      addEntityProvider(jep);
+      rd.addProviderInstance(jep);
       JAXBObjectEntityProvider jop = new JAXBObjectEntityProvider();
       jop.setContexResolver(jaxbContexts);
-      addEntityProvider(jop);
+      rd.addProviderInstance(jop);
     }
-    
   }
 
   /**
@@ -449,7 +327,7 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
       // add external entity providers
       List<EntityProvider<?>> eps = ((EntityProviderComponentPlugin) plugin).getEntityProviders();
       for (EntityProvider<?> ep : eps)
-        addEntityProvider(ep);
+        rd.addProviderInstance(ep);
     } else if (RequestFilterComponentPlugin.class.isAssignableFrom(plugin.getClass())) {
       List<RequestFilter> filters = ((RequestFilterComponentPlugin) plugin).getFilters();
       for (RequestFilter filter : filters)
@@ -481,12 +359,6 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
     responseFilters.getList(uriPattern).add(filter);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  public void stop() {
-  }
-  
   private static class FilterMap<T, V> extends HashMap<T, List<V>> {
 
     /**

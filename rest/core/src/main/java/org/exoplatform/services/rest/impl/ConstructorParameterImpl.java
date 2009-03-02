@@ -15,29 +15,31 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest.impl.resource;
+package org.exoplatform.services.rest.impl;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 
 import javax.ws.rs.DefaultValue;
 
-import org.exoplatform.services.rest.resource.Field;
+import org.exoplatform.services.rest.ConstructorParameter;
 
 /**
+ * Describes constructor's parameter.
+ * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class FieldImpl implements Field {
+public class ConstructorParameterImpl implements ConstructorParameter {
 
   /**
-   * External annotations for parameter, external it mind some other then
-   * contains in {@link ParameterHelper#FIELDS_ANNOTATIONS_MAP}.
+   * All annotations including JAX-RS annotation.  
    */
   private final Annotation[] additional;
 
   /**
-   * One of annotations from {@link ParameterHelper#FIELDS_ANNOTATIONS_MAP}.
+   * One of JAX-RS annotations.
    */
   private final Annotation   annotation;
 
@@ -63,19 +65,21 @@ public class FieldImpl implements Field {
   private final boolean      encoded;
 
   /**
+   * Constructs new instance of MethodParameter.
+   * 
    * @param annotation see {@link #annotation}
    * @param additional see {@link #additional}
-   * @param clazz field class
-   * @param type generic field type
-   * @param defaultValue default value for field. See {@link DefaultValue}.
-   * @param encoded true if field must not be decoded false otherwise
+   * @param clazz parameter class
+   * @param type generic parameter type
+   * @param defaultValue default value for parameter. See {@link DefaultValue}.
+   * @param encoded true if parameter must not be decoded false otherwise
    */
-  public FieldImpl(Annotation annotation,
-                   Annotation[] additional,
-                   Class<?> clazz,
-                   Type type,
-                   String defaultValue,
-                   boolean encoded) {
+  public ConstructorParameterImpl(Annotation annotation,
+                                  Annotation[] additional,
+                                  Class<?> clazz,
+                                  Type type,
+                                  String defaultValue,
+                                  boolean encoded) {
     this.annotation = annotation;
     this.additional = additional;
     this.clazz = clazz;
@@ -124,6 +128,21 @@ public class FieldImpl implements Field {
    */
   public boolean isEncoded() {
     return encoded;
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString() {
+    StringBuffer sb = new StringBuffer("[ ConstructorParameter: ");
+    sb.append("annotation: " + getAnnotation())
+      .append("; type: " + getParameterClass())
+      .append("; generic-type : " + getGenericType())
+      .append("; default-value: " + getDefaultValue())
+      .append("; encoded: " + isEncoded())
+      .append(" ]");
+    return sb.toString();
   }
 
 }

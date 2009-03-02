@@ -17,8 +17,17 @@
 
 package org.exoplatform.services.rest;
 
+import java.lang.reflect.Constructor;
+import java.util.Collections;
+
+import javax.ws.rs.Path;
 
 import org.exoplatform.container.StandaloneContainer;
+import org.exoplatform.services.rest.impl.ConstructorInjectorImpl;
+import org.exoplatform.services.rest.impl.FieldInjectorImpl;
+import org.exoplatform.services.rest.impl.resource.AbstractResourceDescriptorImpl;
+import org.exoplatform.services.rest.impl.resource.PathValue;
+import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
 
 import junit.framework.TestCase;
 
@@ -35,4 +44,16 @@ public abstract class BaseTest extends TestCase {
     container = StandaloneContainer.getInstance();
   }
 
+  protected AbstractResourceDescriptor createResourceDescriptor(Class<?> clazz) {
+    PathValue path = new PathValue(clazz.getAnnotation(Path.class).value());
+    AbstractResourceDescriptor descriptor = new AbstractResourceDescriptorImpl(path, clazz);
+    for (Constructor<?> constr : clazz.getConstructors())
+      descriptor.getConstructorInjectors().add(new ConstructorInjectorImpl(clazz, constr));
+    Collections.sort(descriptor.getConstructorInjectors(),
+                     ConstructorInjectorImpl.CONSTRUCTOR_COMPARATOR);
+    for (java.lang.reflect.Field jfield : clazz.getDeclaredFields()) {
+      descriptor.getFieldInjectors().add(new FieldInjectorImpl(clazz, jfield));
+    }
+    return descriptor;
+  }
 }

@@ -20,8 +20,12 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
 
 import org.exoplatform.services.rest.AbstractResourceTest;
+import org.exoplatform.services.rest.impl.ContainerResponse;
+import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
+import org.exoplatform.services.rest.impl.UnhandledException;
 
 /**
  * Created by The eXo Platform SAS. <br/>
@@ -74,10 +78,48 @@ public class MethodExceptionTest extends AbstractResourceTest {
 
     assertEquals(500, service("GET", "/a/0", "", null, null).getStatus());
     assertEquals(500, service("GET", "/a/1", "", null, null).getStatus());
-
-    assertEquals(500, service("GET", "/a/2", "", null, null).getStatus());
-
+    try {
+      assertEquals(500, service("GET", "/a/2", "", null, null).getStatus());
+      fail();
+    } catch (UnhandledException e) {
+    }
     unregistry(resource);
+  }
+
+  public static class DummyExceptionMapper implements ExceptionMapper<IllegalArgumentException> {
+    public Response toResponse(IllegalArgumentException exception) {
+      return Response.status(400).entity("IllegalArgumentException was thrown").build();
+    }
+  }
+
+  @Path("/")
+  public static class Resource2 {
+    @GET
+    @Path("a")
+    public void m0() {
+      throw new IllegalArgumentException();
+    }
+
+    @GET
+    @Path("b")
+    public void m1() {
+      throw new WebApplicationException();
+    }
+  }
+
+  public void testExceptionMapper() throws Exception {
+    RuntimeDelegateImpl.getInstance().addExceptionMapperInstance(new DummyExceptionMapper());
+    Resource2 resource = new Resource2();
+    try {
+      registry(resource);
+      ContainerResponse response = service("GET", "/a", "", null, null);
+      assertEquals(400 ,response.getStatus());
+      assertEquals("IllegalArgumentException was thrown" ,response.getEntity());
+      response = service("GET", "/b", "", null, null);
+      assertEquals(500 ,response.getStatus());
+    } finally {
+      unregistry(resource);
+    }
   }
 
 }

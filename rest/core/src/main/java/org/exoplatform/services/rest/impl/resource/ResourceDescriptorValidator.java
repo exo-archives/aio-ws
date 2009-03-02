@@ -53,7 +53,8 @@ import org.exoplatform.services.rest.resource.SubResourceMethodDescriptor;
  * <li>Check does any two resource methods has the same consume and produce
  * media type. This will be done later in binding cycle</li>
  * <li>Check does any two sub-resource methods has the same consume and produce
- * media type and HTTP request method designation. This will be done later in binding cycle</li>
+ * media type and HTTP request method designation. This will be done later in
+ * binding cycle</li>
  * <li>Check does two sub-resource locators has the same UriPattern</li>
  * <p>
  * 
@@ -70,10 +71,6 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
    * {@inheritDoc}
    */
   public void visitAbstractResourceDescriptor(AbstractResourceDescriptor ard) {
-    if (ard.getConstructorDescriptors().size() == 0 && ard.isRootResource())
-      throw new IllegalArgumentException("Not found accepted constructors in resource class "
-          + ard.getResourceClass().getName());
-      
     if (ard.getResourceMethodDescriptors().size() == 0
         && ard.getSubResourceMethodDescriptors().size() == 0
         && ard.getSubResourceLocatorDescriptors().size() == 0)
@@ -142,11 +139,11 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
           entity = true;
           if (form) // form already met then check type of entity
             checkFormParam(mp.getParameterClass(), mp.getGenericType());
-        } else 
-          throw new IllegalArgumentException("Wrong or absent annotation at parameter with index " + i
-              + " at " + rmd.getParentResource().getResourceClass() + "#"
+        } else
+          throw new IllegalArgumentException("Wrong or absent annotation at parameter with index "
+              + i + " at " + rmd.getParentResource().getResourceClass() + "#"
               + rmd.getMethod().getName());
-        
+
       } else {
         if (mp.getAnnotation().annotationType() == FormParam.class) {
           form = true;
@@ -190,7 +187,7 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
   private static void checkFormParam(Class clazz, Type type) {
     if (MultivaluedMap.class != clazz || !checkGenericType(type))
       throw new IllegalArgumentException("If a any method parameter is annotated with FormParam then type"
-          + " of entity parameter MUST be MultivalueMap<String, String> or FormEntity");          
+          + " of entity parameter MUST be MultivalueMap<String, String> or FormEntity");
   }
 
   /**
@@ -212,7 +209,7 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
               && (String.class == (Class<?>) genericTypes[1]);
 
         } catch (ClassCastException e) {
-          throw new RuntimeException("Unsupported type");
+          return false;
         }
       }
     }

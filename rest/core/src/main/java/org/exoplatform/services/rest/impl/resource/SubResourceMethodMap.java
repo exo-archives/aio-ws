@@ -40,7 +40,7 @@ public class SubResourceMethodMap extends TreeMap<UriPattern, ResourceMethodMap>
    * Constructs new instance of SubResourceMethodMap with
    * comparator, see{@link UriPattern#URIPATTERN_COMPARATOR}.
    */
-  public SubResourceMethodMap() {
+  SubResourceMethodMap() {
     super(UriPattern.URIPATTERN_COMPARATOR);
   }
 

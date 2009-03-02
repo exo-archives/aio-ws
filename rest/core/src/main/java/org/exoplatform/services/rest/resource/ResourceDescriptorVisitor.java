@@ -17,9 +17,11 @@
 
 package org.exoplatform.services.rest.resource;
 
+import org.exoplatform.services.rest.ConstructorInjector;
+
 /**
  * Can be used for validation next resource descriptors
- * {@link ConstructorDescriptor}, {@link AbstractResourceDescriptor},
+ * {@link ConstructorInjector}, {@link AbstractResourceDescriptor},
  * {@link ResourceMethodDescriptor}, {@link SubResourceMethodDescriptor},
  * {@link SubResourceLocatorDescriptor} .
  * 

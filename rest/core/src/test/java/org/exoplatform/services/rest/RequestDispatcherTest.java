@@ -18,9 +18,12 @@
 package org.exoplatform.services.rest;
 
 import javax.ws.rs.Encoded;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -113,11 +116,6 @@ public class RequestDispatcherTest extends AbstractResourceTest {
       return d;
     }
 
-    @POST
-    @Path("3/тест/{d}")
-    public String m4(@PathParam("d")String d) {
-      return d;
-    }
   }
 
   public void testResource2() throws Exception {
@@ -129,4 +127,75 @@ public class RequestDispatcherTest extends AbstractResourceTest {
     assertEquals("%23x%20y", service("POST", "/2/a/b%20/c/%23x%20y", "", null, null).getEntity());
     unregistry(r2);
   }
+  
+  @Path("/a/b/{c}/{d}")
+  public static class Resource3 {
+    
+    @Context
+    private UriInfo uriInfo;
+    private String c;
+    private String d;
+    
+    public Resource3(@PathParam("c") String c) {
+      this.c = c;
+    }
+
+    public Resource3(@PathParam("c") String c, @PathParam("d") String d) {
+      this.c = c;
+      this.d = d;
+    }
+    
+    @GET
+    @Path("m0")
+    public String m0() {
+      return uriInfo.getRequestUri().toString();
+    }
+
+    @GET
+    @Path("m1")
+    public String m1() {
+      return c;
+    }
+
+    @GET
+    @Path("m2")
+    public String m2() {
+      return d;
+    }
+  }
+
+  public void testResourceConstructorAndFields() throws Exception {
+    registry(Resource3.class);
+    assertEquals("/a/b/c/d/m0", service("GET", "/a/b/c/d/m0", "", null, null).getEntity());
+    assertEquals("c", service("GET", "/a/b/c/d/m1", "", null, null).getEntity());
+    assertEquals("d", service("GET", "/a/b/c/d/m2", "", null, null).getEntity());
+    unregistry(Resource3.class);
+  }
+  
+  public static class Failure {
+    // not member of exo-container
+  }
+
+  @Path("/_a/b/{c}/{d}")
+  public static class ResourceFail {
+    
+    public ResourceFail(Failure failure, @PathParam("c") String c, @PathParam("d") String d) {
+    }
+    
+    @GET
+    @Path("m0")
+    public String m0() {
+      return "m0";
+    }
+  }  
+  
+  public void testResourceConstructorFail() throws Exception {
+    registry(ResourceFail.class);
+    GenericContainerResponse resp = service("GET", "/_a/b/c/d/m0", "", null, null);
+    String entity = (String) resp.getEntity();
+    assertTrue(entity.startsWith("Can't instantiate resource "));
+    assertEquals(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), resp.getStatus());
+    unregistry(ResourceFail.class);
+  }
+  
 }

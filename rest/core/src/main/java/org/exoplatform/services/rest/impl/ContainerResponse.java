@@ -32,6 +32,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.rest.ApplicationContext;
 import org.exoplatform.services.rest.ContainerResponseWriter;
 import org.exoplatform.services.rest.GenericContainerResponse;
 
@@ -147,18 +148,16 @@ public class ContainerResponse implements GenericContainerResponse {
       responseWriter.writeHeaders(this);
       return;
     }
-    // NOTE currently not support annotation at entity.
-    // Pass null instead array of annotations in methods:
-    // RequestHandler#getAcceptableWriterMediaTypes(Class<?>, Type, null)
-    // RequestHandler#getMessageBodyWriter(Class<?>, Type, null, MediaType);
 
-    ApplicationContext context = ApplicationContext.getCurrent();
+    ApplicationContext context = ApplicationContextImpl.getCurrent();
     MediaType contentType = getContentType();
 
     // if content-type is still not preset try determine it
     if (contentType == null) {
-      List<MediaType> l = context.getRequestHandler()
-                                 .getAcceptableWriterMediaTypes(entity.getClass(), entityType, null);
+      List<MediaType> l = RuntimeDelegateImpl.getInstance()
+                                             .getAcceptableWriterMediaTypes(entity.getClass(),
+                                                                            entityType,
+                                                                            null);
       contentType = context.getContainerRequest().getAcceptableMediaType(l);
       if (contentType == null || contentType.isWildcardType() || contentType.isWildcardSubtype())
         contentType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
@@ -166,7 +165,7 @@ public class ContainerResponse implements GenericContainerResponse {
       this.contentType = contentType;
       getHttpHeaders().putSingle(HttpHeaders.CONTENT_TYPE, contentType);
     }
-    MessageBodyWriter entityWriter = context.getRequestHandler()
+    MessageBodyWriter entityWriter = RuntimeDelegateImpl.getInstance()//context.getRequestHandler()
                                             .getMessageBodyWriter(entity.getClass(),
                                                                   entityType,
                                                                   null,

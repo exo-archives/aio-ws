@@ -44,8 +44,8 @@ public class AcceptMediaType extends MediaType implements QualityValue {
   /**
    * See {@link RuntimeDelegate#createHeaderDelegate(Class)}.
    */
-  private static final HeaderDelegate<AcceptMediaType> DELEGATE = RuntimeDelegate.getInstance()
-                                                                                 .createHeaderDelegate(AcceptMediaType.class);
+  private static final HeaderDelegate<AcceptMediaType> DELEGATE =
+      RuntimeDelegate.getInstance().createHeaderDelegate(AcceptMediaType.class);
 
   /**
    * Creates a new instance of AcceptedMediaType by parsing the supplied string.

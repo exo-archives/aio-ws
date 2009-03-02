@@ -37,12 +37,11 @@ import org.exoplatform.services.rest.resource.SubResourceLocatorDescriptor;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class ResourceClassTest extends BaseTest {
+public class ResourceFactoryTest extends BaseTest {
 
   public void testResourceMethod() {
-    AbstractResourceDescriptor resourceDescriptor =
-      ResourceDescriptorFactory.createAbstractResourceDescriptor(Resource1.class);
-    SingletonResourceClass resourceClass = new SingletonResourceClass(resourceDescriptor, new Resource1());
+    AbstractResourceDescriptor resource = createResourceDescriptor(Resource1.class);
+    SingletonResourceFactory resourceClass = new SingletonResourceFactory(resource, new Resource1());
     assertNotNull(resourceClass.getUriPattern());
     
     assertEquals(0, resourceClass.getSubResourceMethods().size());
@@ -83,7 +82,7 @@ public class ResourceClassTest extends BaseTest {
   }
 
   @Path("/a/{b}/")
-  private static class Resource1 {
+  public static class Resource1 {
 
     // -------------------
     // one of this should be ignored
@@ -120,9 +119,8 @@ public class ResourceClassTest extends BaseTest {
   }
   
   public void testSubResourceMethod() {
-    AbstractResourceDescriptor resourceDescriptor =
-      ResourceDescriptorFactory.createAbstractResourceDescriptor(Resource2.class);
-    SingletonResourceClass resourceClass = new SingletonResourceClass(resourceDescriptor, new Resource2());
+    AbstractResourceDescriptor resourceDescriptor = createResourceDescriptor(Resource2.class);
+    SingletonResourceFactory resourceClass = new SingletonResourceFactory(resourceDescriptor, new Resource2());
     assertNotNull(resourceClass.getUriPattern());
     assertEquals(1, resourceClass.getResourceMethods().size());
     assertEquals(0, resourceClass.getSubResourceLocators().size());
@@ -150,7 +148,7 @@ public class ResourceClassTest extends BaseTest {
   }
 
   @Path("/a/{b}/")
-  private static class Resource2 {
+  public static class Resource2 {
 
     @GET
     @Path("c")
@@ -184,9 +182,8 @@ public class ResourceClassTest extends BaseTest {
   }
 
   public void testSubResourceLocator() {
-    AbstractResourceDescriptor resourceDescriptor =
-      ResourceDescriptorFactory.createAbstractResourceDescriptor(Resource3.class);
-    SingletonResourceClass resourceClass = new SingletonResourceClass(resourceDescriptor, new Resource3());
+    AbstractResourceDescriptor resourceDescriptor = createResourceDescriptor(Resource3.class);
+    SingletonResourceFactory resourceClass = new SingletonResourceFactory(resourceDescriptor, new Resource3());
     assertNotNull(resourceClass.getUriPattern());
     assertEquals(1, resourceClass.getResourceMethods().size());
     assertEquals(0, resourceClass.getSubResourceMethods().size());
@@ -206,7 +203,7 @@ public class ResourceClassTest extends BaseTest {
   }
 
   @Path("/a/{b}/")
-  private static class Resource3 {
+  public static class Resource3 {
 
     @Path("d/")
     public void m2() {

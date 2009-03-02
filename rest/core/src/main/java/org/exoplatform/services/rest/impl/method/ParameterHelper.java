@@ -17,19 +17,25 @@
 
 package org.exoplatform.services.rest.impl.method;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
-import org.exoplatform.services.rest.impl.AnnotationUtils;
+import javax.ws.rs.CookieParam;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.MatrixParam;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+
 import org.exoplatform.services.rest.method.TypeProducer;
 
 /**
@@ -38,36 +44,32 @@ import org.exoplatform.services.rest.method.TypeProducer;
  */
 public class ParameterHelper {
 
-  /**
-   * Mapping for JAX-RS annotations (that can be used as method parameter
-   * annotations) class names to members of
-   * {@link AnnotationUtils.PARAMETER_ANNOTATIONS}.
-   */
-  public static final Map<String, AnnotationUtils.PARAMETER_ANNOTATIONS> PARAMETER_ANNOTATIONS_MAP;
+  public static final List<String> PROVIDER_FIELDS_PARAMETER_ANNOTATIONS;
 
-  /**
-   * Mapping for JAX-RS annotations (that can be used as constructor parameter
-   * annotations) class names to members of
-   * {@link AnnotationUtils.PARAMETER_ANNOTATIONS}.
-   */
-  public static final Map<String, AnnotationUtils.PARAMETER_ANNOTATIONS> CONSTRUCTOR_PARAMETER_ANNOTATIONS_MAP;
-  
-  public static final Map<String, AnnotationUtils.PARAMETER_ANNOTATIONS> FIELDS_ANNOTATIONS_MAP;
+  public static final List<String> PROVIDER_CONSTRUCTOR_PARAMETER_ANNOTATIONS;
+
+  public static final List<String> RESOURCE_FIELDS_PARAMETER_ANNOTATIONS;
+
+  public static final List<String> RESOURCE_CONSTRUCTOR_PARAMETER_ANNOTATIONS;
+
+  public static final List<String> RESOURCE_METHOD_PARAMETER_ANNOTATIONS;
 
   static {
-    Map<String, AnnotationUtils.PARAMETER_ANNOTATIONS> m1 = new HashMap<String, AnnotationUtils.PARAMETER_ANNOTATIONS>(6);
-    m1.put(javax.ws.rs.CookieParam.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.COOKIE_PARAM);
-    m1.put(javax.ws.rs.core.Context.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.CONTEXT);
-    m1.put(javax.ws.rs.HeaderParam.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.HEADER_PARAM);
-    m1.put(javax.ws.rs.MatrixParam.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.MATRIX_PARAM);
-    m1.put(javax.ws.rs.PathParam.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.PATH_PARAM);
-    m1.put(javax.ws.rs.QueryParam.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.QUERY_PARAM);
-    CONSTRUCTOR_PARAMETER_ANNOTATIONS_MAP = Collections.unmodifiableMap(m1);
-    FIELDS_ANNOTATIONS_MAP = Collections.unmodifiableMap(m1);
-    
-    Map<String, AnnotationUtils.PARAMETER_ANNOTATIONS> m2 = new HashMap<String, AnnotationUtils.PARAMETER_ANNOTATIONS>(m1);
-    m2.put(javax.ws.rs.FormParam.class.getName(), AnnotationUtils.PARAMETER_ANNOTATIONS.FORM_PARAM);
-    PARAMETER_ANNOTATIONS_MAP = Collections.unmodifiableMap(m2);
+    PROVIDER_FIELDS_PARAMETER_ANNOTATIONS = Collections.singletonList(Context.class.getName());
+    PROVIDER_CONSTRUCTOR_PARAMETER_ANNOTATIONS = Collections.singletonList(Context.class.getName());
+    List<String> tmp1 = new ArrayList<String>(6);
+    tmp1.add(CookieParam.class.getName());
+    tmp1.add(Context.class.getName());
+    tmp1.add(HeaderParam.class.getName());
+    tmp1.add(MatrixParam.class.getName());
+    tmp1.add(PathParam.class.getName());
+    tmp1.add(QueryParam.class.getName());
+    RESOURCE_FIELDS_PARAMETER_ANNOTATIONS = Collections.unmodifiableList(tmp1);
+    RESOURCE_CONSTRUCTOR_PARAMETER_ANNOTATIONS = Collections.unmodifiableList(tmp1);
+
+    List<String> tmp2 = new ArrayList<String>(tmp1);
+    tmp2.add(javax.ws.rs.FormParam.class.getName());
+    RESOURCE_METHOD_PARAMETER_ANNOTATIONS = Collections.unmodifiableList(tmp2);
   }
 
   /**
@@ -153,19 +155,19 @@ public class ParameterHelper {
    * 
    * @param parameterClass the parameter class
    * @param parameterType the parameter type
-   * @param parameterAnnotation parameter annotation
+   * @param annotation parameter annotation
    * @return true it parameter is valid, false otherwise
-   * @see AnnotationUtils.PARAMETER_ANNOTATIONS
    */
+  // TODO remove this method
   boolean isValidAnnotatedParameter(Class<?> parameterClass,
                                     Type parameterType,
-                                    AnnotationUtils.PARAMETER_ANNOTATIONS parameterAnnotation) {
+                                    Annotation annotation) {
     if (parameterClass == List.class || parameterClass == Set.class
         || parameterClass == SortedSet.class) {
 
       // PathParam cann't be used on collection
-      if (parameterAnnotation == AnnotationUtils.PARAMETER_ANNOTATIONS.PATH_PARAM)
-        return false;
+      // if (annotation.annotationType() == PathParam.class)
+      // return false;
 
       Class<?> clazz = getGenericType(parameterType);
 

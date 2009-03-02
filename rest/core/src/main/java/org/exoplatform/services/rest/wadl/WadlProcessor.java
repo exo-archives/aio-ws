@@ -25,7 +25,7 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
-import org.exoplatform.services.rest.impl.resource.ResourceDescriptorFactory;
+import org.exoplatform.services.rest.impl.resource.AbstractResourceDescriptorImpl;
 import org.exoplatform.services.rest.method.MethodParameter;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
 import org.exoplatform.services.rest.resource.ResourceMethodDescriptor;
@@ -173,8 +173,8 @@ public final class WadlProcessor {
   private void processSubResourceLocators(org.exoplatform.services.rest.wadl.research.Resource wadlResource,
                                           AbstractResourceDescriptor resourceDescriptor) {
     for (SubResourceLocatorDescriptor srld : resourceDescriptor.getSubResourceLocatorDescriptors()) {
-      AbstractResourceDescriptor subResourceDescriptor = ResourceDescriptorFactory.createAbstractResourceDescriptor(srld.getMethod()
-                                                                                                                        .getReturnType());
+      AbstractResourceDescriptor subResourceDescriptor = new AbstractResourceDescriptorImpl(srld.getMethod()
+                                                                                                .getReturnType());
       org.exoplatform.services.rest.wadl.research.Resource wadlSubResource = processResource(subResourceDescriptor);
       wadlSubResource.setPath(srld.getPathValue().getPath());
       wadlResource.getMethodOrResource().add(wadlSubResource);

@@ -47,26 +47,21 @@ public final class ParameterResolverFactory {
    */
   @SuppressWarnings("unchecked")
   public static ParameterResolver createParameterResolver(Annotation annotation) {
-    String className = annotation.annotationType().getName();
-    switch (ParameterHelper.PARAMETER_ANNOTATIONS_MAP.get(className)) {
-    case COOKIE_PARAM:
+    Class clazz = annotation.annotationType();
+    if (clazz == CookieParam.class)
       return new CookieParameterResolver((CookieParam) annotation);
-    case CONTEXT:
+    if (clazz == Context.class)
       return new ContextParameterResolver((Context) annotation);
-    case FORM_PARAM:
+    if (clazz == FormParam.class)
       return new FormParameterResolver((FormParam) annotation);
-    case HEADER_PARAM:
+    if (clazz == HeaderParam.class)
       return new HeaderParameterResolver((HeaderParam) annotation);
-    case MATRIX_PARAM:
+    if (clazz == MatrixParam.class)
       return new MatrixParameterResolver((MatrixParam) annotation);
-    case PATH_PARAM:
+    if (clazz == PathParam.class)
       return new PathParameterResolver((PathParam) annotation);
-    case QUERY_PARAM:
+    if (clazz == QueryParam.class)
       return new QueryParameterResolver((QueryParam) annotation);
-    default:
-      // nothing to do, null will be returned
-      break;
-    }
 
     return null;
   }

@@ -25,8 +25,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 
-import org.exoplatform.services.rest.impl.ApplicationContext;
+import org.exoplatform.services.rest.ApplicationContext;
 import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
+import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 import org.exoplatform.services.rest.method.TypeProducer;
 
 /**
@@ -64,11 +65,11 @@ public class FormParameterResolver extends ParameterResolver<FormParam> {
                                                                          parameter.getGenericType());
 
     MediaType conetentType = context.getHttpHeaders().getMediaType();
-    MessageBodyReader reader = context.getRequestHandler()
-                                      .getMessageBodyReader(MultivaluedMap.class,
-                                                            FORM_TYPE,
-                                                            null,
-                                                            conetentType);
+    MessageBodyReader reader = RuntimeDelegateImpl.getInstance()
+                                                  .getMessageBodyReader(MultivaluedMap.class,
+                                                                        FORM_TYPE,
+                                                                        null,
+                                                                        conetentType);
     if (reader == null)
       throw new IllegalStateException("Can't find appropriate entity reader for entity type "
           + MultivaluedMap.class.getName() + " and content-type " + conetentType);

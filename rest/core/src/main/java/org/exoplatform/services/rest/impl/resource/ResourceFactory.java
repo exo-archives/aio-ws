@@ -28,9 +28,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.rest.GenericContainerRequest;
-import org.exoplatform.services.rest.GenericContainerResponse;
-import org.exoplatform.services.rest.impl.ApplicationContext;
+import org.exoplatform.services.rest.ApplicationContext;
 import org.exoplatform.services.rest.impl.header.MediaTypeHelper;
 import org.exoplatform.services.rest.impl.method.DefaultMethodInvoker;
 import org.exoplatform.services.rest.impl.method.OptionsRequestMethodInvoker;
@@ -46,12 +44,12 @@ import org.exoplatform.services.rest.resource.SubResourceMethodDescriptor;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public abstract class ResourceClass {
+public abstract class ResourceFactory {
 
   /**
    * Logger.
    */
-  private static final Log                 LOG = ExoLogger.getLogger(ResourceClass.class.getName());
+  private static final Log                   LOG = ExoLogger.getLogger(ResourceFactory.class.getName());
 
   /**
    * See {@link AbstractResourceDescriptor}.
@@ -78,7 +76,7 @@ public abstract class ResourceClass {
    * 
    * @param resourceDescriptor See {@link AbstractResourceDescriptor}
    */
-  public ResourceClass(AbstractResourceDescriptor resourceDescriptor) {
+  public ResourceFactory(AbstractResourceDescriptor resourceDescriptor) {
     this.resourceDescriptor = resourceDescriptor;
 
     this.resourceMethodMap = new ResourceMethodMap();
@@ -110,13 +108,7 @@ public abstract class ResourceClass {
    */
   public abstract Object getResource(ApplicationContext context);
   
-  /**
-   * @return true if resource is singleton and false if resource should created
-   *         per request
-   */
-  public abstract boolean isSingleton();
-
-  // ---
+  //
   
   /**
    * @return resource class

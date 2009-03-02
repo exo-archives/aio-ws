@@ -95,14 +95,14 @@ public class SubResourceMethodDescriptorImpl implements SubResourceMethodDescrip
    * @param produces list of media types which this method can produce
    * @param invoker method invoker
    */
-  public SubResourceMethodDescriptorImpl(PathValue path,
-                                         Method method,
-                                         String httpMethod,
-                                         List<MethodParameter> parameters,
-                                         AbstractResourceDescriptor parentResource,
-                                         List<MediaType> consumes,
-                                         List<MediaType> produces,
-                                         MethodInvoker invoker) {
+  SubResourceMethodDescriptorImpl(PathValue path,
+                                  Method method,
+                                  String httpMethod,
+                                  List<MethodParameter> parameters,
+                                  AbstractResourceDescriptor parentResource,
+                                  List<MediaType> consumes,
+                                  List<MediaType> produces,
+                                  MethodInvoker invoker) {
     this.path = path;
     this.uriPattern = new UriPattern(path.getPath());
     this.method = method;

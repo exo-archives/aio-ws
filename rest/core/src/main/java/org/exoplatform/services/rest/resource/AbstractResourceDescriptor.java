@@ -19,12 +19,14 @@ package org.exoplatform.services.rest.resource;
 
 import java.util.List;
 
+import org.exoplatform.services.rest.ConstructorInjector;
+import org.exoplatform.services.rest.FieldInjector;
 import org.exoplatform.services.rest.impl.resource.PathValue;
 import org.exoplatform.services.rest.impl.uri.UriPattern;
 
 /**
  * Describe Resource Class or Root Resource Class. Resource Class is any Java
- * class that uses JAX-RS annotations to impement corresponding Web resource.
+ * class that uses JAX-RS annotations to implement corresponding Web resource.
  * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
@@ -40,7 +42,7 @@ public interface AbstractResourceDescriptor extends ResourceDescriptor {
    * @return See {@link UriPattern}
    */
   UriPattern getUriPattern();
-
+  
   /**
    * @return true if resource is root resource false otherwise. Root resource is
    *         class which has own {@link javax.ws.rs.Path} annotation
@@ -53,14 +55,14 @@ public interface AbstractResourceDescriptor extends ResourceDescriptor {
   Class<?> getResourceClass();
   
   /**
-   * @return collection class's constructor descriptor
+   * @return collection class's constructor
    */
-  List<ConstructorDescriptor> getConstructorDescriptors();
+  List<ConstructorInjector> getConstructorInjectors();
   
   /**
    * @return collection class's fields
    */
-  List<Field> getFields();
+  List<FieldInjector> getFieldInjectors();
 
   /**
    * @return collection of {@link SubResourceMethodDescriptor}

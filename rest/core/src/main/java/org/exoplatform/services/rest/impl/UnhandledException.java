@@ -15,16 +15,24 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest.resource;
-
-import org.exoplatform.services.rest.Parameter;
+package org.exoplatform.services.rest.impl;
 
 /**
- * Object field.
- * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public interface Field extends Parameter {
+public class UnhandledException extends RuntimeException {
 
+  /**
+   * Serial Version UID.
+   */
+  private static final long serialVersionUID = -1454662279257930428L;
+
+  public UnhandledException(String s, Throwable throwable) {
+    super(s, throwable);
+  }
+
+  public UnhandledException(Throwable throwable) {
+    super(throwable);
+  }
 }

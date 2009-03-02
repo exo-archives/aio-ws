@@ -17,7 +17,7 @@
 
 package org.exoplatform.services.rest.impl.method;
 
-import org.exoplatform.services.rest.impl.ApplicationContext;
+import org.exoplatform.services.rest.ApplicationContext;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -30,7 +30,7 @@ public abstract class ParameterResolver<T> {
    * Create object which will be passed in resource method or locator. Object is
    * instance of {@link MethodParameterImpl#getParameterClass()}.
    * 
-   * @param parameter See {@link MethodParameterImpl}
+   * @param parameter See {@link Parameter}
    * @param context See {@link ApplicationContext}
    * @return newly created instance of class
    *         {@link MethodParameterImpl#getParameterClass()}

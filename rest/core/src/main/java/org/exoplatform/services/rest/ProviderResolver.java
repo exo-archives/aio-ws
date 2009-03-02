@@ -22,8 +22,11 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Providers;
 
 import org.exoplatform.services.rest.provider.EntityProvider;
 
@@ -31,15 +34,42 @@ import org.exoplatform.services.rest.provider.EntityProvider;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public interface EntityProviderResolver {
+public interface ProviderResolver extends Providers {
+
+  <T> void addEntityProvider(Class<EntityProvider<T>> provider);
 
   /**
    * Add new {@link EntityProvider}.
    * 
    * @param provider See {@link EntityProvider}
    */
-  void addEntityProvider(EntityProvider<?> provider);
+  <T> void addEntityProviderInstance(EntityProvider<T> provider);
+  
+  
+  <T extends Throwable> void addExceptionMapper(Class<ExceptionMapper<T>> providerClass);
+  
+  void addExceptionMapperInstance(ExceptionMapper<Throwable> provider);
+  
+  
+  <T> void addContextResolver(Class<ContextResolver<T>> providerClass);
+  
+  <T> void addContextResolverInstance(ContextResolver<T> provider);
+  
+  
+  <T> void addMessageBodyReader(Class<MessageBodyReader<T>> providerClass);
 
+  <T> void addMessageBodyReaderInstance(MessageBodyReader<T> provider);
+  
+
+  <T> void addMessageBodyWriter(Class<MessageBodyWriter<T>> providerClass);
+
+  <T> void addMessageBodywriterInstance(MessageBodyWriter<T> provider);
+  
+
+  void addProvider(Class<?> providerClass);
+  
+  void addProviderInstance(Object provider);
+  
   /**
    * Get all media type which can be reflected to Java types.
    * 
@@ -52,32 +82,4 @@ public interface EntityProviderResolver {
   List<MediaType> getAcceptableWriterMediaTypes(Class<?> type,
                                                 Type genericType,
                                                 Annotation[] annotations);
-  /**
-   * Get {@link MessageBodyReader}.
-   * 
-   * @param type the entity type
-   * @param genericType the generic entity type
-   * @param annotations class annotations
-   * @param contentType entity content type
-   * @return message body reader or null if no one appropriate writer found
-   */
-  MessageBodyReader<?> getMessageBodyReader(Class<?> type,
-                                            Type genericType,
-                                            Annotation[] annotations,
-                                            MediaType contentType);
-
-  /**
-   * Get {@link MessageBodyWriter}.
-   * 
-   * @param type the entity type
-   * @param genericType the generic entity type
-   * @param annotations class annotations
-   * @param contentType entity content type
-   * @return message body writer or null if no one appropriate writer found
-   */
-  MessageBodyWriter<?> getMessageBodyWriter(Class<?> type,
-                                            Type genericType,
-                                            Annotation[] annotations,
-                                            MediaType contentType);
-
 }
