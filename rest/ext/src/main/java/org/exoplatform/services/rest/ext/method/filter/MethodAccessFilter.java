@@ -26,7 +26,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-import org.exoplatform.services.rest.impl.ApplicationContext;
+import org.exoplatform.services.rest.impl.ApplicationContextImpl;
 import org.exoplatform.services.rest.method.MethodInvokerFilter;
 import org.exoplatform.services.rest.resource.GenericMethodResource;
 
@@ -65,7 +65,7 @@ public class MethodAccessFilter implements MethodInvokerFilter {
       }
       if (ac == RolesAllowed.class) {
 
-        SecurityContext context = ApplicationContext.getCurrent().getSecurityContext();
+        SecurityContext context = ApplicationContextImpl.getCurrent().getSecurityContext();
         for (String role : getAllowedRoles(a))
           if (context.isUserInRole(role))
             return;
