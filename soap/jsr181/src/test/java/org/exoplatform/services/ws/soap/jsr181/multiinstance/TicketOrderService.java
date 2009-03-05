@@ -21,6 +21,7 @@ import java.util.Date;
 import javax.jws.WebService;
 
 import org.exoplatform.services.ws.AbstractMultiWebService;
+import org.exoplatform.services.ws.AbstractSingletonWebService;
 
 /**
  * Created by The eXo Platform SAS .

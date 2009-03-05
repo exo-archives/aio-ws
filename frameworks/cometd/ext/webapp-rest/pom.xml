@@ -2,9 +2,8 @@
   <parent>
     <groupId>org.exoplatform.ws</groupId>
     <artifactId>config</artifactId>
-    <version>1.3.1</version>
+    <version>1.3.2</version>
   </parent>
-
   <modelVersion>4.0.0</modelVersion>
   <artifactId>exo.ws.frameworks.cometd.ext.webapp.rest</artifactId>
   <version>${org.exoplatform.ws.version}</version>
@@ -12,7 +11,6 @@
   <name>Cometd External REST WebApp (use for test only)</name>
   <url>http://www.exoplatform.org</url>
   <description>ext REST web application for test</description>
-
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.ws</groupId>
@@ -21,24 +19,22 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
-
   <build>
-  <finalName>rest</finalName>
+    <finalName>rest</finalName>
     <plugins>
       <plugin>
-           <artifactId>maven-war-plugin</artifactId>
-           <configuration>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
              <!-- This is broken in maven-war-plugin 2.0, works in 2.0.1 -->
-             <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
-             <archive>
-               <manifest>
-                 <addClasspath>false</addClasspath>
-                 <classpathPrefix>lib/</classpathPrefix>
-               </manifest>
-             </archive>
-           </configuration>
+          <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
+          <archive>
+            <manifest>
+              <addClasspath>false</addClasspath>
+              <classpathPrefix>lib/</classpathPrefix>
+            </manifest>
+          </archive>
+        </configuration>
       </plugin>
     </plugins>
   </build>
-
 </project>

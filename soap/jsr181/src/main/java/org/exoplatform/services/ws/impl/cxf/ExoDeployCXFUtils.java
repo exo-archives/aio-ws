@@ -21,17 +21,26 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.util.Arrays;
 
+import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 
 import org.apache.commons.logging.Log;
+import org.apache.cxf.binding.soap.SoapFault;
+import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.endpoint.ServerImpl;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.JAXWSMethodInvoker;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.BeanInvoker;
 import org.apache.cxf.service.invoker.Factory;
@@ -46,38 +55,42 @@ import org.exoplatform.services.log.ExoLogger;
  *         Zavizionov</a>
  * @version $Id: $ Sep 29, 2008
  */
-public class CXFUtils {
+public class ExoDeployCXFUtils {
 
   /**
    * Logger.
    */
-  private static Log log = ExoLogger.getLogger(CXFUtils.class);
+  private static Log LOG = ExoLogger.getLogger(ExoDeployCXFUtils.class);
 
   /**
    * Check connection at the <code>address</code> and print.
    * 
    * @param address url of a service
+   * @param doprintwsdl TODO
    * @throws java.net.ConnectException
    * @throws Exception
    */
-  public static void checkConnectionAndPrint(String address) throws java.net.ConnectException,
-                                                            Exception {
-    if (log.isDebugEnabled())
-      log.debug("Check service at the address = " + address);
+  public static void checkConnectionAndPrint(String address, boolean doprintwsdl) throws java.net.ConnectException,
+                                                                                 Exception {
+    if (LOG.isDebugEnabled())
+      LOG.debug("Check service at the address = " + address);
 
     URL url = new URL(address + "?wsdl");
-    InputStream inputStream = url.openStream();
-    Reader isr = new InputStreamReader(inputStream);
-    Reader in = new BufferedReader(isr);
-    int c;
-    if (log.isDebugEnabled()) {
-      System.out.println(">>> CXFUtils.checkConnection() = \n");
-      System.out.println(">>> ========================================== ");
-      while ((c = in.read()) != -1) {
-        System.out.print((char) c);
+    if (doprintwsdl) {
+      InputStream inputStream = url.openStream();
+      Reader isr = new InputStreamReader(inputStream);
+      Reader in = new BufferedReader(isr);
+      int c;
+      if (LOG.isDebugEnabled()) {
+        System.out.println(">>> CXFUtils.checkConnection() = \n");
+        System.out.println(">>> ========================================== ");
+        while ((c = in.read()) != -1) {
+          System.out.print((char) c);
+        }
+        in.close();
+        System.out.println("\n>>> ========================================== ");
       }
-      in.close();
-      System.out.println("\n>>> ========================================== ");
+      inputStream.close();
     }
   }
 
@@ -88,8 +101,8 @@ public class CXFUtils {
    * @param object
    */
   public static Server complexDeployService(String address, Object object) {
-    if (log.isDebugEnabled())
-      log.debug("Starting Service: object = " + object + " at the address = " + address);
+    if (LOG.isDebugEnabled())
+      LOG.debug("Starting Service: object = " + object + " at the address = " + address);
 
     JaxWsServerFactoryBean serverFactory = new JaxWsServerFactoryBean();
 //serverFactory.setBindingFactory(new HttpBindingInfoFactoryBean());
@@ -98,15 +111,18 @@ public class CXFUtils {
     serverFactory.setAddress(address);
     serverFactory.setBus(CXFBusFactory.getDefaultBus());
     Server server = serverFactory.create();
-    serverFactory.getServiceFactory()
-                 .getService()
-                 .getInInterceptors()
-                 .add(new LoggingInInterceptor());
-    serverFactory.getServiceFactory()
-                 .getService()
-                 .getOutInterceptors()
-                 .add(new LoggingOutInterceptor());
+    if (LOG.isDebugEnabled()) {
+      serverFactory.getServiceFactory()
+                   .getService()
+                   .getInInterceptors()
+                   .add(new LoggingInInterceptor());
+      serverFactory.getServiceFactory()
+                   .getService()
+                   .getOutInterceptors()
+                   .add(new LoggingOutInterceptor());
+    }
     Service service = server.getEndpoint().getService();
+
     service.setInvoker(new BeanInvoker(object));
     server.start();
     return server;
@@ -119,31 +135,35 @@ public class CXFUtils {
    * @param object
    */
   public static Server complexDeployServiceMultiInstance(String address,
-                                                       Object object,
-                                                       Integer poolSize) {
-    if (log.isDebugEnabled())
-      log.debug("Starting Service: object = " + object + " at the address = " + address + " with pool size is '" + poolSize + "'");
+                                                         Object object,
+                                                         Integer poolSize) {
+    if (LOG.isDebugEnabled())
+      LOG.debug("Starting Service: object = " + object + " at the address = " + address
+          + " with pool size is '" + poolSize + "'");
 
     Factory factory = new PerRequestFactory(object.getClass());
-//    If the purpose is to make sure a single request enters the instance at a time
-//    (not thread safe), you can do: 
-    factory = new PooledFactory(factory, poolSize != null ? poolSize.intValue() : 4);
-    JAXWSMethodInvoker invoker = new JAXWSMethodInvoker(factory);
+
     JaxWsServerFactoryBean serverFactory = new JaxWsServerFactoryBean();
 //serverFactory.setBindingFactory(new HttpBindingInfoFactoryBean());
     serverFactory.getServiceFactory().setDataBinding(new JAXBDataBinding());
     serverFactory.setServiceClass(object.getClass());
     serverFactory.setAddress(address);
+    //  If the purpose is to make sure a single request enters the instance at a time
+    //  (not thread safe), you can do: 
+    factory = new PooledFactory(factory, poolSize != null ? poolSize.intValue() : 4);
+    JAXWSMethodInvoker invoker = new JAXWSMethodInvoker(factory);
     serverFactory.setInvoker(invoker);
     Server server = serverFactory.create();
-    serverFactory.getServiceFactory()
-                 .getService()
-                 .getInInterceptors()
-                 .add(new LoggingInInterceptor());
-    serverFactory.getServiceFactory()
-                 .getService()
-                 .getOutInterceptors()
-                 .add(new LoggingOutInterceptor());
+    if (LOG.isDebugEnabled()) {
+      serverFactory.getServiceFactory()
+                   .getService()
+                   .getInInterceptors()
+                   .add(new LoggingInInterceptor());
+      serverFactory.getServiceFactory()
+                   .getService()
+                   .getOutInterceptors()
+                   .add(new LoggingOutInterceptor());
+    }
     Service service = server.getEndpoint().getService();
     service.setInvoker(new BeanInvoker(object));
     server.start();
@@ -157,11 +177,21 @@ public class CXFUtils {
    * @param object
    */
   public static Endpoint simpleDeployService(String address, Object object) {
-    if (log.isDebugEnabled())
-      log.debug("Starting Service: object = " + object + " at the address = " + address);
-    Endpoint endpoint = Endpoint.publish(address, object);  
+
+    if (LOG.isDebugEnabled())
+      LOG.debug("Starting Service: object = " + object + " at the address = " + address);
+    Endpoint endpoint = Endpoint.publish(address, object);
+
+    if (LOG.isDebugEnabled()) {
+      org.apache.cxf.jaxws.EndpointImpl endpointImpl = (org.apache.cxf.jaxws.EndpointImpl) endpoint;
+      ServerImpl server = endpointImpl.getServer();
+      server.getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
+      server.getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
+//    server.getEndpoint().getOutFaultInterceptors().add(new FaultThrowingInterceptor());
+    }
+
     if (endpoint.isPublished())
-      log.info("The WebService '" + address + "' has been published!");
+      LOG.info("The webservice '" + address + "' has been published SUCCESSFUL!");
     return endpoint;
   }
 

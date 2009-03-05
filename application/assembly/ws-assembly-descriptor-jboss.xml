@@ -19,6 +19,18 @@
       <outputDirectory>/</outputDirectory>
 
       <excludes>
+        <exclude>org.apache.geronimo.specs:geronimo-annotation_1.0_spec</exclude>
+        <exclude>org.apache.geronimo.specs:geronimo-stax-api_1.0_spec</exclude>
+        <exclude>org.apache.geronimo.specs:geronimo-servlet_2.5_spec</exclude>
+        <exclude>org.apache.geronimo.specs:geronimo-activation_1.1_spec</exclude>
+        <exclude>org.apache.geronimo.specs:geronimo-javamail_1.4_spec</exclude>
+        <exclude>org.apache.xmlbeans:xmlbeans</exclude>
+        <exclude>org.mortbay.jetty:servlet-api-2.5</exclude>
+        <exclude>xdoclet:xdoclet</exclude>
+        <exclude>xdoclet:xdoclet-xdoclet-module</exclude>
+        <exclude>xdoclet:xdoclet-hibernate-module</exclude>
+        <exclude>javax.faces:jsf-api</exclude>
+
         <exclude>org.springframework:spring</exclude>
         <exclude>javax.servlet:servlet-api</exclude>
         <exclude>javax.ejb:ejb</exclude>

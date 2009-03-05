@@ -50,6 +50,7 @@ public class WebServiceLoaderTest extends BaseTest {
    * 
    * @throws Exception
    */
+  @SuppressWarnings("unchecked")
   public void testWebServiceLoader() throws Exception {
     System.out.println(">>> WebServiceLoaderTest.testWebServiceLoader()");
     try {
@@ -82,9 +83,10 @@ public class WebServiceLoaderTest extends BaseTest {
   /**
    * Loading bus with no config.
    * 
-   * @param servletConfig ServletConfig
+   * @param servletConfig
+   * @throws ServletException
    */
-  private void loadBusNoConfig(ServletConfig servletConfig) /*throws ServletException*/ {
+  private void loadBusNoConfig(ServletConfig servletConfig) throws ServletException {
     if (bus == null) {
       bus = BusFactory.newInstance().createBus();
     }
@@ -115,8 +117,8 @@ public class WebServiceLoaderTest extends BaseTest {
   /**
    * Registering transport.
    * 
-   * @param factory DestinationFactory
-   * @param namespace namespace
+   * @param factory
+   * @param namespace
    */
   private void registerTransport(DestinationFactory factory, String namespace) {
     bus.getExtension(DestinationFactoryManager.class)
@@ -126,7 +128,7 @@ public class WebServiceLoaderTest extends BaseTest {
   /**
    * Create servlet transport factory.
    * 
-   * @return DestinationFactory
+   * @return
    */
   protected DestinationFactory createServletTransportFactory() {
     if (servletTransportFactory == null) {

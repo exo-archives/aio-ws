@@ -18,6 +18,8 @@
 package org.exoplatform.services.ws.impl.cxf;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.jws.WebService;
@@ -83,24 +85,26 @@ public class WebServiceLoader {
 
     // Deploy Single services
     singleservices = (List<AbstractSingletonWebService>) container.getComponentInstancesOfType(AbstractSingletonWebService.class);
+    Collections.sort(singleservices, COMPARATOR);
     if (LOG.isDebugEnabled())
       LOG.debug("WebServiceLoader.init() singleservices = " + singleservices);
     for (AbstractSingletonWebService implementor : singleservices) {
       String address = getAddress(implementor);
       if (address != null) {
-        CXFUtils.simpleDeployService(address, implementor);
+        ExoDeployCXFUtils.simpleDeployService(address, implementor);
         LOG.info("New singleton WebService '" + address + "' registered.");
       }
     }
 
     // Deploy Multi services
     multiservices = (List<AbstractMultiWebService>) container.getComponentInstancesOfType(AbstractMultiWebService.class);
+    Collections.sort(multiservices, COMPARATOR);
     if (LOG.isDebugEnabled())
       LOG.debug("WebServiceLoader.init() multiservices = " + multiservices);
     for (AbstractMultiWebService implementor : multiservices) {
       String address = getAddress(implementor);
       if (address != null) {
-        CXFUtils.complexDeployServiceMultiInstance(address, implementor, null);
+        ExoDeployCXFUtils.complexDeployServiceMultiInstance(address, implementor, null);
         LOG.info("New multi-instance WebService '" + address + "' registered.");
       }
     }
@@ -108,25 +112,25 @@ public class WebServiceLoader {
     // Deploy Custom services
     if (LOG.isDebugEnabled())
       LOG.debug("WebServiceLoader.init() customservices = " + jcs);
+    Collections.sort(jcs, COMPARATOR);
     for (Class<?> implementor : jcs) {
       try {
         Object implem = implementor.newInstance();
         String address = getAddress(implem);
         if (address != null) {
-          CXFUtils.simpleDeployService(address, implem);
+          ExoDeployCXFUtils.simpleDeployService(address, implem);
           LOG.info("New custom WebService '" + address + "' registered.");
         }
       } catch (Exception e) {
-        LOG.error("Error at implementor.newInstance()",e);
+        LOG.error("Error at implementor.newInstance()", e);
       }
     }
   }
 
   /**
-   * Extract address from {@link WebService} annotation.
-   * 
-   * @param implementor service
-   * @return address
+   * Get service address with WebService annotation for implementor.
+   * @param implementor
+   * @return
    */
   private String getAddress(Object implementor) {
     String address = "/" + implementor.getClass().getAnnotation(WebService.class).portName();//name();//portName();//serviceName();
@@ -138,11 +142,23 @@ public class WebServiceLoader {
   }
 
   /**
-   * @param plugin component plugin
+   * Add plugin component for deploy service.
+   * @param plugin
    */
   public void addPlugin(BaseComponentPlugin plugin) {
     if (plugin instanceof WebServiceLoaderPlugin)
       jcs.addAll(((WebServiceLoaderPlugin) plugin).getJcs());
   }
+  
+  /**
+   * Comparator for deploy order.
+   */
+  private static final Comparator<Object> COMPARATOR = new Comparator<Object>() {
 
+    public int compare(Object o1, Object o2) {
+      return o1.getClass().getName().compareTo(o2.getClass().getName());
+    }
+    
+  };
+  
 }
