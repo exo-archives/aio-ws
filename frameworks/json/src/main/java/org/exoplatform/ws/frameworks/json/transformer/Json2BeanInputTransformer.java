@@ -19,6 +19,8 @@ package org.exoplatform.ws.frameworks.json.transformer;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 import org.exoplatform.services.rest.transformer.InputEntityTransformer;
 import org.exoplatform.ws.frameworks.json.JsonHandler;
@@ -47,7 +49,8 @@ public class Json2BeanInputTransformer extends InputEntityTransformer {
     JsonParser jsonParser = new JsonParserImpl();
     try {
       JsonHandler jsonHandler = new JsonDefaultHandler();
-      jsonParser.parse(entityDataStream, jsonHandler);
+      Reader reader = new InputStreamReader(entityDataStream, "UTF-8");
+      jsonParser.parse(reader, jsonHandler);
       JsonValue jsonValue = jsonHandler.getJsonObject();
       targetObject = new BeanBuilder().createObject(this.getType(), jsonValue);
     } catch (JsonException e) {
@@ -57,9 +60,6 @@ public class Json2BeanInputTransformer extends InputEntityTransformer {
       e.printStackTrace();
       throw new IOException("JSON to JavaBean conversion exception");
     }
-
     return targetObject;
-
   }
-
 }
