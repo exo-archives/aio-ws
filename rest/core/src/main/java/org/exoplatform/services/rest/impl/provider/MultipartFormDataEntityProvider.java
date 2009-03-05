@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.Provider;
 
 import org.apache.commons.fileupload.DefaultFileItemFactory;
 import org.apache.commons.fileupload.FileItem;
@@ -46,6 +47,7 @@ import org.exoplatform.services.rest.provider.EntityProvider;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
+@Provider
 @Consumes( { "multipart/*" })
 public class MultipartFormDataEntityProvider implements EntityProvider<Iterator<FileItem>> {
 

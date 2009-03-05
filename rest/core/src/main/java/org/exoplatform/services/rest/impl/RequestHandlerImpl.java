@@ -22,17 +22,16 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.container.component.ComponentPlugin;
@@ -73,54 +72,30 @@ import org.picocontainer.Startable;
  */
 public final class RequestHandlerImpl implements RequestHandler, Startable {
 
-  private static final Log LOG = ExoLogger.getLogger(RequestHandlerImpl.class.getName());
-  
   /**
-   * Read message body providers. Also see {@link EntityProviderMap}.
+   * Logger.
    */
-//  private final EntityProviderMap    readProviderMap;
-
-  /**
-   * Read message body writer. Also see {@link EntityProviderMap}.
-   */
-//  private final EntityProviderMap    writeProviderMap;
+  private static final Log          LOG = ExoLogger.getLogger(RequestHandlerImpl.class.getName());
 
   /**
    * See {@link RequestDispatcher}.
    */
-  private final RequestDispatcher    dispatcher;
-
-  /**
-   * Method invoking filters.
-   */
-  private final List<MethodInvokerFilter> invokerFilters;
+  private final RequestDispatcher   dispatcher;
 
   /**
    * See {@link JAXBContextResolver}.
    */
-  private final JAXBContextResolver  jaxbContexts;
+  private final JAXBContextResolver jaxbContexts;
 
-  /**
-   * Request filters, see {@link RequestFilter}.
-   */
-  private final FilterMap<UriPattern, RequestFilter> requestFilters;
-
-  /**
-   * Response filters, see {@link ResponseFilter}.
-   */
-  private final FilterMap<UriPattern, ResponseFilter> responseFilters;
-
-  /**
-   * Mutable application attributes.
-   */
-//  private Map<String, Object> attributes;
-  
   /**
    * Should be built-in providers be loaded.
    */
-  private boolean loadBuiltinProviders;
-  
-  private RuntimeDelegateImpl rd;
+  private boolean                   loadBuiltinProviders;
+
+  /**
+   * See {@link RuntimeDelegateImpl}, {@link RuntimeDelegate}.
+   */
+  private RuntimeDelegateImpl       rd;
 
   /**
    * Constructs new instance of {@link RequestHandler}.
@@ -128,19 +103,18 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
    * @param dispatcher See {@link RequestDispatcher}
    * @param jaxbContexts See {@link JAXBContextResolver}
    */
-  public RequestHandlerImpl(RequestDispatcher dispatcher, JAXBContextResolver jaxbContexts, InitParams params) {
+  public RequestHandlerImpl(RequestDispatcher dispatcher,
+                            JAXBContextResolver jaxbContexts,
+                            InitParams params) {
 
     ValueParam builtinVp = null;
     if (params != null)
       builtinVp = params.getValueParam("ws.rs.entity.provider.builtin");
-    loadBuiltinProviders = builtinVp == null || Boolean.valueOf(builtinVp.getValue().trim()); 
-    
+    loadBuiltinProviders = builtinVp == null || Boolean.valueOf(builtinVp.getValue().trim());
+
     this.dispatcher = dispatcher;
     this.jaxbContexts = jaxbContexts;
 
-    this.invokerFilters = new ArrayList<MethodInvokerFilter>();
-    this.requestFilters = new FilterMap<UriPattern, RequestFilter>();
-    this.responseFilters = new FilterMap<UriPattern, ResponseFilter>();
   }
 
   // RequestHandler
@@ -148,54 +122,47 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
   /**
    * {@inheritDoc}
    */
-  public void handleRequest(GenericContainerRequest request, GenericContainerResponse response) throws IOException {
-    URI uri = UriBuilder.fromUri(request.getRequestUri()).replaceQuery(null).fragment(null).build();
-    String path = uri.getRawPath().substring(request.getBaseUri().getRawPath().length());
-    List<String> t = new ArrayList<String>();
-
-    for (Entry<UriPattern, List<RequestFilter>> e : requestFilters.entrySet()) {
-      if (e.getKey().match(path, t)) {
-        for (RequestFilter f : e.getValue())
-          f.doFilter(request);
-      }
-    }
-
-    ApplicationContextImpl context = new ApplicationContextImpl(/*this, */request, response);
-    ApplicationContextImpl.setCurrent(context);
+  public void handleRequest(GenericContainerRequest request, GenericContainerResponse response) throws Exception {
     try {
-      dispatcher.dispatch(request, response);
-    } catch (Exception e) {
-      processError(e, response);
-    }
+      URI uri = UriBuilder.fromUri(request.getRequestUri())
+                          .replaceQuery(null)
+                          .fragment(null)
+                          .build();
+      String path = uri.getRawPath().substring(request.getBaseUri().getRawPath().length());
+      List<String> t = new ArrayList<String>();
 
-    // NOTE error response can be processed by filter also
-    for (Entry<UriPattern, List<ResponseFilter>> e : responseFilters.entrySet()) {
-      if (e.getKey().match(path, t)) {
-        for (ResponseFilter f : e.getValue())
-          f.doFilter(response);
+      for (Entry<UriPattern, List<RequestFilter>> e : rd.getRequestFilters().entrySet()) {
+        if (e.getKey().match(path, t)) {
+          for (RequestFilter f : e.getValue())
+            f.doFilter(request);
+        }
       }
-    }
 
-    try {
+      ApplicationContextImpl context = new ApplicationContextImpl(request, response);
+      ApplicationContextImpl.setCurrent(context);
+      try {
+        dispatcher.dispatch(request, response);
+      } catch (Exception e) {
+        processError(e, response);
+      }
+
+      // NOTE error response can be processed by filter also
+      for (Entry<UriPattern, List<ResponseFilter>> e : rd.getResponseFilters().entrySet()) {
+        if (e.getKey().match(path, t)) {
+          for (ResponseFilter f : e.getValue())
+            f.doFilter(response);
+        }
+      }
+
       response.writeResponse();
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw new IOException();
     } finally {
       // reset application context
       ApplicationContextImpl.setCurrent(null);
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  public List<MethodInvokerFilter> getInvokerFilters() {
-    return invokerFilters;
-  }
-
   //
-  
+
   /**
    * Process errors, create message about occurs errors if needs, etc.
    * 
@@ -235,7 +202,7 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
       else
         throw new UnhandledException(e.getCause());
     } else {
-      throw new UnhandledException(e.getCause());
+      throw new UnhandledException(e);
     }
   }
 
@@ -275,7 +242,7 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
   public void start() {
     init();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -283,13 +250,13 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
   }
 
   //
-  
+
   /**
    * Startup initialization.
    */
   protected void init() {
     rd = RuntimeDelegateImpl.getInstance();
-    
+
     if (loadBuiltinProviders) {
       // add prepared entity providers
       rd.addProviderInstance(new ByteEntityProvider());
@@ -322,7 +289,8 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
   public void addPlugin(ComponentPlugin plugin) {
     if (MethodInvokerFilterComponentPlugin.class.isAssignableFrom(plugin.getClass())) {
       // add method invoker filter
-      invokerFilters.addAll(((MethodInvokerFilterComponentPlugin) plugin).getFilters());
+      for (MethodInvokerFilter filter : ((MethodInvokerFilterComponentPlugin) plugin).getFilters())
+        rd.addMethodInvokerFilter(filter);
     } else if (EntityProviderComponentPlugin.class.isAssignableFrom(plugin.getClass())) {
       // add external entity providers
       List<EntityProvider<?>> eps = ((EntityProviderComponentPlugin) plugin).getEntityProviders();
@@ -331,55 +299,12 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
     } else if (RequestFilterComponentPlugin.class.isAssignableFrom(plugin.getClass())) {
       List<RequestFilter> filters = ((RequestFilterComponentPlugin) plugin).getFilters();
       for (RequestFilter filter : filters)
-        addRequestFilter(filter);
+        rd.addRequestFilter(filter);
     } else if (ResponseFilterComponentPlugin.class.isAssignableFrom(plugin.getClass())) {
       List<ResponseFilter> filters = ((ResponseFilterComponentPlugin) plugin).getFilters();
-      for (ResponseFilter filter: filters)
-        addResponseFilter(filter);
+      for (ResponseFilter filter : filters)
+        rd.addResponseFilter(filter);
     }
-  }
-  
-  /**
-   * @param filter See {@link RequestFilter}
-   */
-  private void addRequestFilter(RequestFilter filter) {
-    final Path pathAnnotation = filter.getClass().getAnnotation(Path.class);
-    String path = pathAnnotation == null ? "/" : pathAnnotation.value();
-    UriPattern uriPattern = new UriPattern(path);
-    requestFilters.getList(uriPattern).add(filter);
-  }
-
-  /**
-   * @param filter See {@link ResponseFilter}
-   */
-  private void addResponseFilter(ResponseFilter filter) {
-    final Path pathAnnotation = filter.getClass().getAnnotation(Path.class);
-    String path = pathAnnotation == null ? "/" : pathAnnotation.value();
-    UriPattern uriPattern = new UriPattern(path);
-    responseFilters.getList(uriPattern).add(filter);
-  }
-
-  private static class FilterMap<T, V> extends HashMap<T, List<V>> {
-
-    /**
-     * Generated by Eclipse.
-     */
-    private static final long serialVersionUID = 8248982446381545144L;
-
-    /**
-     * @param uriPattern the key
-     * @return List of Object mapped to specified <tt>uriPattern</tt>. Method
-     *         never return null, empty List instead.
-     */
-    public List<V> getList(T uriPattern) {
-      List<V> l = get(uriPattern);
-      if (l == null) {
-        l = new ArrayList<V>();
-        put(uriPattern, l);
-      }
-      return l;
-    }
-
   }
 
 }

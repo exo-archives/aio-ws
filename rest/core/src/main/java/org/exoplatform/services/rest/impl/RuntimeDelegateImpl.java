@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.ws.rs.Path;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Cookie;
@@ -47,6 +48,8 @@ import javax.ws.rs.ext.RuntimeDelegate;
 import org.apache.commons.logging.Log;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.rest.ProviderResolver;
+import org.exoplatform.services.rest.RequestFilter;
+import org.exoplatform.services.rest.ResponseFilter;
 import org.exoplatform.services.rest.impl.header.AcceptLanguage;
 import org.exoplatform.services.rest.impl.header.AcceptLanguageHeaderDelegate;
 import org.exoplatform.services.rest.impl.header.AcceptMediaType;
@@ -61,14 +64,18 @@ import org.exoplatform.services.rest.impl.header.MediaTypeHelper;
 import org.exoplatform.services.rest.impl.header.NewCookieHeaderDelegate;
 import org.exoplatform.services.rest.impl.header.StringHeaderDelegate;
 import org.exoplatform.services.rest.impl.header.URIHeaderDelegate;
-import org.exoplatform.services.rest.impl.provider.EntityProviderMap;
 import org.exoplatform.services.rest.impl.provider.PerRequestProviderFactory;
 import org.exoplatform.services.rest.impl.provider.ProviderDescriptorImpl;
 import org.exoplatform.services.rest.impl.provider.ProviderFactory;
 import org.exoplatform.services.rest.impl.provider.SingletonProviderFactory;
 import org.exoplatform.services.rest.impl.uri.UriBuilderImpl;
+import org.exoplatform.services.rest.impl.uri.UriPattern;
+import org.exoplatform.services.rest.method.MethodInvokerFilter;
 import org.exoplatform.services.rest.provider.EntityProvider;
 import org.exoplatform.services.rest.provider.ProviderDescriptor;
+import org.exoplatform.services.rest.util.EntityProviderMap;
+import org.exoplatform.services.rest.util.FilterMap;
+import org.exoplatform.services.rest.util.MediaTypeMap;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -110,22 +117,37 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
   /**
    * Read message body providers. Also see {@link EntityProviderMap}.
    */
-  private final EntityProviderMap<ProviderFactory>                writeProviders   = new EntityProviderMap<ProviderFactory>();
+  private final EntityProviderMap                                writeProviders   = new EntityProviderMap();
 
   /**
    * Read message body providers. Also see {@link EntityProviderMap}.
    */
-  private final EntityProviderMap<ProviderFactory>                readProviders    = new EntityProviderMap<ProviderFactory>();
+  private final EntityProviderMap                                readProviders    = new EntityProviderMap();
 
   /**
    * Exception mappers, see {@link ExceptionMapper}.
    */
-  private final Map<Class<? extends Throwable>, ProviderFactory>  exceptionMappers = new HashMap<Class<? extends Throwable>, ProviderFactory>();
+  private final Map<Class<? extends Throwable>, ProviderFactory> exceptionMappers = new HashMap<Class<? extends Throwable>, ProviderFactory>();
 
   /**
    * Context resolvers.
    */
-  private final Map<Class<?>, EntityProviderMap<ProviderFactory>> contextResolvers = new HashMap<Class<?>, EntityProviderMap<ProviderFactory>>();
+  private final Map<Class<?>, MediaTypeMap<ProviderFactory>>     contextResolvers = new HashMap<Class<?>, MediaTypeMap<ProviderFactory>>();
+
+  /**
+   * Request filters, see {@link RequestFilter}.
+   */
+  private final FilterMap<RequestFilter>                         requestFilters   = new FilterMap<RequestFilter>();
+
+  /**
+   * Response filters, see {@link ResponseFilter}.
+   */
+  private final FilterMap<ResponseFilter>                        responseFilters  = new FilterMap<ResponseFilter>();
+
+  /**
+   * Method invoking filters.
+   */
+  private final List<MethodInvokerFilter>                        invokerFilters   = new ArrayList<MethodInvokerFilter>();
 
   /**
    * Should be used only once for initialize.
@@ -265,6 +287,13 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
   }
 
   /**
+   * @param filter see {@link MethodInvokerFilter}
+   */
+  public void addMethodInvokerFilter(MethodInvokerFilter filter) {
+    invokerFilters.add(filter);
+  }
+
+  /**
    * {@inheritDoc}
    */
   public void addProvider(Class<?> providerClass) {
@@ -290,6 +319,11 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
     }
   }
 
+  /**
+   * Add {@link ProviderFactory}.
+   * 
+   * @param factory ProviderFactory
+   */
   @SuppressWarnings("unchecked")
   private void addProvider(ProviderFactory factory) {
     if (MessageBodyReader.class.isAssignableFrom(factory.getProviderClass())) {
@@ -324,13 +358,13 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
             Type[] ta = p.getActualTypeArguments();
             try {
               Class<?> clazz = (Class<?>) ta[0];
-              EntityProviderMap<ProviderFactory> pm = contextResolvers.get(clazz);
+              MediaTypeMap<ProviderFactory> pm = contextResolvers.get(clazz);
               if (pm == null) {
-                pm = new EntityProviderMap<ProviderFactory>();
+                pm = new MediaTypeMap<ProviderFactory>();
                 contextResolvers.put(clazz, pm);
               }
               for (MediaType mime : factory.produces())
-                pm.getList(mime).add(factory);
+                pm.put(mime, factory);
             } catch (ClassCastException e) {
               throw new RuntimeException();
             }
@@ -338,6 +372,27 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
         }
       }
     }
+  }
+
+  /**
+   * @param filter See {@link ResponseFilter}
+   */
+  public void addResponseFilter(ResponseFilter filter) {
+    final Path pathAnnotation = filter.getClass().getAnnotation(Path.class);
+    String path = pathAnnotation == null ? "/" : pathAnnotation.value();
+    UriPattern uriPattern = new UriPattern(path);
+    responseFilters.getList(uriPattern).add(filter);
+
+  }
+
+  /**
+   * @param filter See {@link RequestFilter}
+   */
+  public void addRequestFilter(RequestFilter filter) {
+    final Path pathAnnotation = filter.getClass().getAnnotation(Path.class);
+    String path = pathAnnotation == null ? "/" : pathAnnotation.value();
+    UriPattern uriPattern = new UriPattern(path);
+    requestFilters.getList(uriPattern).add(filter);
   }
 
   /**
@@ -407,7 +462,7 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
    * {@inheritDoc}
    */
   public <T> ContextResolver<T> getContextResolver(Class<T> contextType, MediaType mediaType) {
-    EntityProviderMap<ProviderFactory> pm = contextResolvers.get(contextType);
+    MediaTypeMap<ProviderFactory> pm = contextResolvers.get(contextType);
     ContextResolver<T> resolver = null;
     if (pm != null) {
       if (mediaType == null)
@@ -424,12 +479,12 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
   }
 
   @SuppressWarnings("unchecked")
-  private <T> ContextResolver<T> getContextResolver(EntityProviderMap<ProviderFactory> pm,
-                                                     Class<T> contextType,
-                                                     MediaType mediaType) {
-    for (Map.Entry<MediaType, List<ProviderFactory>> e : pm.entrySet()) {
+  private <T> ContextResolver<T> getContextResolver(MediaTypeMap<ProviderFactory> pm,
+                                                    Class<T> contextType,
+                                                    MediaType mediaType) {
+    for (Map.Entry<MediaType, ProviderFactory> e : pm.entrySet()) {
       if (mediaType.isCompatible(e.getKey())) {
-        return (ContextResolver<T>) e.getValue().get(0).getProvider(ApplicationContextImpl.getCurrent());
+        return (ContextResolver<T>) e.getValue().getProvider(ApplicationContextImpl.getCurrent());
       }
     }
     return null;
@@ -535,6 +590,27 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
         return writer;
     }
     return null;
+  }
+
+  /**
+   * @return method invocation filters
+   */
+  public List<MethodInvokerFilter> getMethodInvokerFilters() {
+    return invokerFilters;
+  }
+
+  /**
+   * @return request filters
+   */
+  public FilterMap<RequestFilter> getRequestFilters() {
+    return requestFilters;
+  }
+
+  /**
+   * @return response filters
+   */
+  public FilterMap<ResponseFilter> getResponseFilters() {
+    return responseFilters;
   }
 
 }

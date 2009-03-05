@@ -15,24 +15,22 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest;
+package org.exoplatform.services.rest.util;
 
-import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public interface RequestHandler {//extends EntityProviderResolver {
+public interface NotNullValueMultivaluedMap<K, V> extends Map<K, List<V>> {
 
   /**
-   * Handle the HTTP request by dispatching request to appropriate resource. If
-   * no one appropriate resource found then error response will be produced.
-   * 
-   * @param request HTTP request
-   * @param response HTTP response
-   * @throws IOException if any i/o error occurs
+   * @param key key
+   * @return never null even any value not found in the map, return empty list
+   *         instead
    */
-  void handleRequest(GenericContainerRequest request, GenericContainerResponse response) throws Exception;
+  List<V> getList(K key);
 
 }

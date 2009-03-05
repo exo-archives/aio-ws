@@ -29,6 +29,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -44,6 +45,7 @@ import org.exoplatform.services.rest.provider.EntityProvider;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
+@Provider
 @Consumes({ MediaType.APPLICATION_XML, MediaType.TEXT_XML, MediaType.APPLICATION_XHTML_XML })
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML, MediaType.APPLICATION_XHTML_XML })
 public class JAXBElementEntityProvider implements EntityProvider<JAXBElement<?>> {
@@ -57,6 +59,7 @@ public class JAXBElementEntityProvider implements EntityProvider<JAXBElement<?>>
    * See {@link JAXBContextResolver}.
    */
   private ContextResolver<JAXBContext> jaxbContextResolver;
+  
 
   /**
    * This method should be called before using method
@@ -94,6 +97,7 @@ public class JAXBElementEntityProvider implements EntityProvider<JAXBElement<?>>
     ParameterizedType t = (ParameterizedType) genericType;
     Class<?> c = (Class<?>) t.getActualTypeArguments()[0];
     try {
+//      JAXBContext jaxbContext = (JAXBContext) RuntimeDelegateImpl.getInstance().getContextResolver(c, mediaType).getContext(c);
       return jaxbContextResolver.getContext(c)
                                 .createUnmarshaller()
                                 .unmarshal(new StreamSource(entityStream), c);

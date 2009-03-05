@@ -25,9 +25,11 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.Providers;
 
 import org.exoplatform.services.rest.ApplicationContext;
 import org.exoplatform.services.rest.impl.EnvironmentContext;
+import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -55,7 +57,11 @@ public class ContextParameterResolver extends ParameterResolver<Context> {
     /**
      * @see UriInfo
      */
-    URI_INFO
+    URI_INFO,
+    /**
+     * @see Providers
+     */
+    PROVIDERS
   }
 
   /**
@@ -68,6 +74,7 @@ public class ContextParameterResolver extends ParameterResolver<Context> {
     CONTEXT_PARAMETERS_MAP.put(SecurityContext.class.getName(), CONTEXT_PARAMS.SECURITY_CONTEXT);
     CONTEXT_PARAMETERS_MAP.put(Request.class.getName(), CONTEXT_PARAMS.REQUEST);
     CONTEXT_PARAMETERS_MAP.put(UriInfo.class.getName(), CONTEXT_PARAMS.URI_INFO);
+    CONTEXT_PARAMETERS_MAP.put(Providers.class.getName(), CONTEXT_PARAMS.PROVIDERS);
   }
 
   /**
@@ -95,6 +102,8 @@ public class ContextParameterResolver extends ParameterResolver<Context> {
         return context.getRequest();
       case URI_INFO:
         return context.getUriInfo();
+      case PROVIDERS:
+        return RuntimeDelegateImpl.getInstance();
       }
     }
     // For servlet container environment context contains HttpServletRequest,

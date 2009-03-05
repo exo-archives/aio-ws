@@ -90,13 +90,16 @@ public class RestServlet extends HttpServlet implements Connector {
     env.put(ServletConfig.class, config);
     env.put(ServletContext.class, context);
 
-    EnvironmentContext.setCurrent(env);
-
-    ServletContainerRequest request = new ServletContainerRequest(httpRequest);
-    ContainerResponse response = new ContainerResponse(new ServletContainerResponseWriter(httpResponse));
-    requestHandler.handleRequest(request, response);
-
-    EnvironmentContext.setCurrent(null);
+    try {
+      EnvironmentContext.setCurrent(env);
+      ServletContainerRequest request = new ServletContainerRequest(httpRequest);
+      ContainerResponse response = new ContainerResponse(new ServletContainerResponseWriter(httpResponse));
+      requestHandler.handleRequest(request, response);
+    } catch (Exception e) {
+      throw new ServletException(e);
+    } finally {
+      EnvironmentContext.setCurrent(null);
+    }
   }
 
   /**

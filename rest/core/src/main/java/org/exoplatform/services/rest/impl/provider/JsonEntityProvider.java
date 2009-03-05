@@ -27,6 +27,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.Provider;
 
 import org.exoplatform.services.rest.provider.EntityProvider;
 import org.exoplatform.ws.frameworks.json.JsonHandler;
@@ -44,14 +45,15 @@ import org.exoplatform.ws.frameworks.json.value.JsonValue;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
+@Provider
 @Consumes({ MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
 public class JsonEntityProvider implements EntityProvider<Object> {
   
   // It is common task for #isReadable() and #isWriteable
   // TODO Not sure it is required but ...
-  // Investigation about checking can be type e write as JSON (useful JSON).
-  // Probably should e better added this checking in JSON framework.
+  // Investigation about checking can type be write as JSON (useful JSON).
+  // Probably should be better added this checking in JSON framework.
   // Or probably enough check only content type 'application/json'
   // and if this content type set trust it and try parse/write
 

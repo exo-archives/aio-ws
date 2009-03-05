@@ -30,6 +30,7 @@ import java.nio.charset.Charset;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.Provider;
 
 import org.exoplatform.services.rest.provider.EntityProvider;
 
@@ -37,6 +38,7 @@ import org.exoplatform.services.rest.provider.EntityProvider;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
+@Provider
 public class ReaderEntityProvider implements EntityProvider<Reader> {
 
   /**

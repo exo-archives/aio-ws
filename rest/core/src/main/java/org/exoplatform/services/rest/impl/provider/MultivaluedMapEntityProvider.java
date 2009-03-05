@@ -33,6 +33,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.Provider;
 
 import org.exoplatform.services.rest.ApplicationContext;
 import org.exoplatform.services.rest.impl.ApplicationContextImpl;
@@ -43,6 +44,7 @@ import org.exoplatform.services.rest.provider.EntityProvider;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
+@Provider
 @Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
 @Produces({ MediaType.APPLICATION_FORM_URLENCODED })
 public class MultivaluedMapEntityProvider implements EntityProvider<MultivaluedMap<String, String>> {

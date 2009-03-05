@@ -53,8 +53,9 @@ public abstract class AbstractResourceTest extends BaseTest {
 
   }
 
-  public void registry(Class<?> resource) throws Exception {
-    binder.bind(resource);
+  public void registry(Class<?> resourceClass) throws Exception {
+    container.registerComponentImplementation(resourceClass.getName(), resourceClass);
+    binder.bind(resourceClass);
   }
 
   public ContainerResponse service(String method,
@@ -93,6 +94,11 @@ public abstract class AbstractResourceTest extends BaseTest {
   public void unregistry(Object resource) {
     binder.unbind(resource.getClass());
     container.unregisterComponentByInstance(resource);
+  }
+
+  public void unregistry(Class<?> resourceClass) {
+    binder.unbind(resourceClass);
+    container.unregisterComponent(resourceClass.getName());
   }
 
 }

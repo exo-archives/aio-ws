@@ -25,8 +25,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
-import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.Providers;
 
 import org.exoplatform.services.rest.AbstractResourceTest;
 import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
@@ -40,38 +40,150 @@ public class ContextParametersInjectionTest extends AbstractResourceTest {
 
   @Path("/a/b")
   public static class Resource1 {
-    
+
     @GET
-    @Path("0")
+    @Path("c")
     public String m0(@Context UriInfo uriInfo) {
       return uriInfo.getRequestUri().toString();
     }
-    
+
     @GET
-    @Path("1")
+    @Path("d")
     public String m1(@Context HttpHeaders headers) {
       List<String> l = headers.getRequestHeader("Accept");
       return HeaderHelper.convertToString(l);
     }
 
     @GET
-    @Path("2")
+    @Path("e")
     public String m2(@Context Request request) {
       return request.getMethod();
     }
 
     @GET
-    @Path("3")
-    public String m3(@Context SecurityContext securityContext) {
-      return "securityContext";
+    @Path("f")
+    public void m3(@Context Providers providers) {
+      assertNotNull(providers);
     }
+
   }
-  
-  public void testContextInjection() throws Exception {
+
+  public void testMethodContextInjection() throws Exception {
     Resource1 r1 = new Resource1();
     registry(r1);
-    assertEquals("http://localhost/test/a/b/0", service("GET",
-                                                        "http://localhost/test/a/b/0",
+    injectionTest();
+    unregistry(r1);
+  }
+  
+  //--------------------
+
+  @Path("/a/b")
+  public static class Resource2 {
+
+    @Context
+    private UriInfo     uriInfo;
+
+    @Context
+    private HttpHeaders headers;
+
+    @Context
+    private Request     request;
+
+    @Context
+    private Providers   providers;
+
+    @GET
+    @Path("c")
+    public String m0() {
+      return uriInfo.getRequestUri().toString();
+    }
+
+    @GET
+    @Path("d")
+    public String m1() {
+      List<String> l = headers.getRequestHeader("Accept");
+      return HeaderHelper.convertToString(l);
+    }
+
+    @GET
+    @Path("e")
+    public String m2() {
+      return request.getMethod();
+    }
+
+    @GET
+    @Path("g")
+    public void m4() {
+      assertNotNull(providers);
+    }
+  }
+
+  public void testFieldInjection() throws Exception {
+    registry(Resource2.class);
+    injectionTest();
+    unregistry(Resource2.class);
+  }
+
+  //--------------------
+
+  @Path("/a/b")
+  public static class Resource3 {
+
+    private UriInfo     uriInfo;
+
+    private HttpHeaders headers;
+
+    private Request     request;
+
+    private Providers   providers;
+
+    public Resource3(@Context UriInfo uriInfo,
+                     @Context HttpHeaders headers,
+                     @Context Request request,
+                     @Context Providers providers) {
+      this.uriInfo = uriInfo;
+      this.headers = headers;
+      this.request = request;
+      this.providers = providers;
+    }
+
+    @GET
+    @Path("c")
+    public String m0() {
+      return uriInfo.getRequestUri().toString();
+    }
+
+    @GET
+    @Path("d")
+    public String m1() {
+      List<String> l = headers.getRequestHeader("Accept");
+      return HeaderHelper.convertToString(l);
+    }
+
+    @GET
+    @Path("e")
+    public String m2() {
+      return request.getMethod();
+    }
+
+    @GET
+    @Path("g")
+    public void m4() {
+      assertNotNull(providers);
+    }
+  }
+
+  public void testConstructorInjection() throws Exception {
+    registry(Resource3.class);
+    injectionTest();
+    unregistry(Resource3.class);
+  }
+
+  //
+  
+  private void injectionTest() throws Exception {
+    assertEquals("http://localhost/test/a/b/c", service("GET",
+                                                        "http://localhost/test/a/b/c",
                                                         "http://localhost/test",
                                                         null,
                                                         null).getEntity());
@@ -79,21 +191,16 @@ public class ContextParametersInjectionTest extends AbstractResourceTest {
     h.add("Accept", "text/xml");
     h.add("Accept", "text/plain;q=0.7");
     assertEquals("text/xml,text/plain;q=0.7", service("GET",
-                                                      "http://localhost/test/a/b/1",
+                                                      "http://localhost/test/a/b/d",
                                                       "http://localhost/test",
                                                       h,
                                                       null).getEntity());
     assertEquals("GET", service("GET",
-                                "http://localhost/test/a/b/2",
+                                "http://localhost/test/a/b/e",
                                 "http://localhost/test",
                                 null,
                                 null).getEntity());
-    assertEquals("securityContext", service("GET",
-                                            "http://localhost/test/a/b/3",
-                                            "http://localhost/test",
-                                            null,
-                                            null).getEntity());
-    unregistry(r1);
+    service("GET", "http://localhost/test/a/b/f", "http://localhost/test", null, null).getEntity();
   }
 
 }

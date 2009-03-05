@@ -37,6 +37,7 @@ import org.exoplatform.services.rest.ApplicationContext;
 import org.exoplatform.services.rest.impl.ApplicationException;
 import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 import org.exoplatform.services.rest.method.MethodInvoker;
+import org.exoplatform.services.rest.method.MethodInvokerFilter;
 import org.exoplatform.services.rest.resource.GenericMethodResource;
 
 /**
@@ -55,8 +56,8 @@ public final class DefaultMethodInvoker implements MethodInvoker {
                              GenericMethodResource methodResource,
                              ApplicationContext context) {
 
-//TODO    for (MethodInvokerFilter f : context.getRequestHandler().getInvokerFilters())
-//      f.accept(methodResource);
+    for (MethodInvokerFilter f : RuntimeDelegateImpl.getInstance().getMethodInvokerFilters())
+      f.accept(methodResource);
 
     Object[] p = new Object[methodResource.getMethodParameters().size()];
     int i = 0;
@@ -115,7 +116,7 @@ public final class DefaultMethodInvoker implements MethodInvoker {
             if (LOG.isDebugEnabled())
               e.printStackTrace();
             
-            throw new WebApplicationException(e);
+            throw new ApplicationException(e);
             
           }
         }
@@ -126,10 +127,10 @@ public final class DefaultMethodInvoker implements MethodInvoker {
       return methodResource.getMethod().invoke(resource, p);
     } catch (IllegalArgumentException argExc) {
       // should not be thrown
-      throw new ApplicationException(argExc.getCause());
+      throw new ApplicationException(argExc);
     } catch (IllegalAccessException accessExc) {
       // should not be thrown
-      throw new ApplicationException(accessExc.getCause());
+      throw new ApplicationException(accessExc);
     } catch (InvocationTargetException invExc) {
       if (LOG.isDebugEnabled())
         invExc.printStackTrace();
