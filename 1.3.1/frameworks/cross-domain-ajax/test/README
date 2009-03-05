@@ -1,0 +1,26 @@
+NOTE It works at IE6, IE7, Firefox 2.x.
+
+For runing test you need tomcat servlet-container and apache web-server,
+other configuration can be used but URL must be changed.
+1. At tomcat servlet container create web-applicattion 'cross-domain-ajax'
+   tomcat/
+     webapps/
+       ...
+       cross-domain-ajax/
+         server/
+         
+   then copy file '../src/server/server.html' to folder 'server' at newly created 
+   web-application. Finaly that file must be accessible via URL 
+   http://localhost:8080/cross-domain-ajax/server/server.html. Then copy file
+   './test.txt' 'server', it must be accessible via
+   http://localhost:8080/cross-domain-ajax/server/test.txt
+
+2. At root directory of apache web-server create folowing directory structure:
+   cross-domain-ajax/
+     client/
+   Copy '../src/client/client.html', '../src/client/xda.js' and './index.html'
+   to directory at 'cross-domain-ajax/client' at  apache web-server.
+   
+3. In browser type http://localhost/cross-domain-ajax/client/ and push button
+   "test cross-domain" you must see content of file test.txt which situated 
+   at tomcat servlet-container. 
