@@ -107,6 +107,7 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
                             JAXBContextResolver jaxbContexts,
                             InitParams params) {
 
+    rd = RuntimeDelegateImpl.getInstance();
     ValueParam builtinVp = null;
     if (params != null)
       builtinVp = params.getValueParam("ws.rs.entity.provider.builtin");
@@ -255,8 +256,6 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
    * Startup initialization.
    */
   protected void init() {
-    rd = RuntimeDelegateImpl.getInstance();
-
     if (loadBuiltinProviders) {
       // add prepared entity providers
       rd.addProviderInstance(new ByteEntityProvider());
