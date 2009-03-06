@@ -47,7 +47,7 @@ public final class UriNormalizationFilter implements RequestFilter {
    */
   private static URI normalize(URI uri) {
     String oldPath = uri.getRawPath();
-    String normalizedPath = removeDotSegments(oldPath.toLowerCase());
+    String normalizedPath = removeDotSegments(oldPath);
     if (normalizedPath.equals(oldPath)) {
       // nothing to do, URI was normalized
       return uri;

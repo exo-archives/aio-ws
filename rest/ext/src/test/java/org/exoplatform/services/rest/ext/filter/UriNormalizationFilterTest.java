@@ -36,7 +36,7 @@ public class UriNormalizationFilterTest extends TestCase {
       "http://localhost:8080/servlet/./1//2/3/./../../4",
       "http://localhost:8080/servlet/1//2/3/./../../4",
       "http://localhost:8080/servlet/1//2./3/./../4",
-      "http://localhost:8080/servlEt/1//.2/3/./../4",
+      "http://localhost:8080/servlet/1//.2/3/./../4",
       "http://localhost:8080/servlet/1..//.2/3/./../4",
       "http://localhost:8080/servlet/./1//2/3/./../../4", 
       "http://localhost:8080/servlet/.",
