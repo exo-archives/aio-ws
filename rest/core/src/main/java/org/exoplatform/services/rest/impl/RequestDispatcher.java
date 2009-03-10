@@ -69,20 +69,14 @@ public final class RequestDispatcher {
    */
   private final ResourceBinder resourceBinder;
 
-//  /**
-//   * eXo container.
-//   */
-//  private final ExoContainer   exoContainer;
-
   /**
    * Constructs new instance of RequestDispatcher.
    * 
    * @param resourceBinder See {@link ResourceBinder}
    * @param containerContext eXo container context
    */
-  public RequestDispatcher(ResourceBinder resourceBinder/*, ExoContainerContext containerContext*/) {
+  public RequestDispatcher(ResourceBinder resourceBinder) {
     this.resourceBinder = resourceBinder;
-//    this.exoContainer = containerContext.getContainer();
   }
 
   /**

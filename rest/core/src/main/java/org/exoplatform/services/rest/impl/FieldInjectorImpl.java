@@ -50,7 +50,7 @@ public class FieldInjectorImpl implements FieldInjector {
   /**
    * All annotations including JAX-RS annotation.
    */
-  private final Annotation[] additional;
+  private final Annotation[] annotations;
 
   /**
    * JAX-RS annotation.
@@ -86,7 +86,7 @@ public class FieldInjectorImpl implements FieldInjector {
   public FieldInjectorImpl(Class<?> resourceClass, java.lang.reflect.Field jfield) {
 
     this.name = jfield.getName();
-    this.additional = jfield.getDeclaredAnnotations();
+    this.annotations = jfield.getDeclaredAnnotations();
     this.clazz = jfield.getType();
     this.type = jfield.getGenericType();
 
@@ -102,7 +102,7 @@ public class FieldInjectorImpl implements FieldInjector {
     else
       allowedAnnotation = ParameterHelper.RESOURCE_CONSTRUCTOR_PARAMETER_ANNOTATIONS;
 
-    for (Annotation a : additional) {
+    for (Annotation a : annotations) {
       Class<?> ac = a.annotationType();
 
       if (allowedAnnotation.contains(ac.getName())) {
@@ -146,7 +146,7 @@ public class FieldInjectorImpl implements FieldInjector {
    * {@inheritDoc}
    */
   public Annotation[] getAnnotations() {
-    return additional;
+    return annotations;
   }
 
   /**
@@ -177,8 +177,6 @@ public class FieldInjectorImpl implements FieldInjector {
     return encoded;
   }
 
-  // Field
-
   /**
    * {@inheritDoc}
    */
@@ -199,7 +197,8 @@ public class FieldInjectorImpl implements FieldInjector {
           jfield.setAccessible(true);
 
         jfield.set(resource, pr.resolve(this, context));
-      } catch (Exception e) {
+      } catch (Throwable e) {
+        
         if (LOG.isDebugEnabled())
           e.printStackTrace();
 

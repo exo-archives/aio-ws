@@ -28,6 +28,7 @@ import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
@@ -36,9 +37,9 @@ import org.apache.commons.fileupload.DefaultFileItemFactory;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUpload;
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.logging.Log;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.rest.impl.EnvironmentContext;
+import org.exoplatform.services.rest.ApplicationContext;
+import org.exoplatform.services.rest.RequestHandler;
+import org.exoplatform.services.rest.impl.ApplicationContextImpl;
 import org.exoplatform.services.rest.provider.EntityProvider;
 
 /**
@@ -51,64 +52,8 @@ import org.exoplatform.services.rest.provider.EntityProvider;
 @Consumes( { "multipart/*" })
 public class MultipartFormDataEntityProvider implements EntityProvider<Iterator<FileItem>> {
 
-  /**
-   * Logger.
-   */
-  private static final Log    LOG            = ExoLogger.getLogger(MultipartFormDataEntityProvider.class.getName());
-
-  /**
-   * Default folder for temporary files.
-   */
-  private static final String DEFAULT_FOLDER = "ws.rs.upload";
-
-  /**
-   * Folder for temporary files.
-   */
-  private static String       uploadFolder;
-
-  private final File          repo;
-
-  /**
-   * @see #setUploadFolder(String).
-   */
-  private static Object       lock           = new Object();
-
-  /**
-   * @param folder temporary storage for uploaded files
-   * @exception IllegalStateException if folder already set
-   */
-  public static void setUploadFolder(String folder) {
-    synchronized (lock) {
-      if (uploadFolder != null)
-        throw new IllegalStateException("Upload folder already defined");
-      uploadFolder = folder;
-    }
-  }
-
-  public MultipartFormDataEntityProvider() {
-    if (uploadFolder == null)
-      uploadFolder = System.getProperty("java.io.tmpdir") + File.separator + DEFAULT_FOLDER;
-    repo = new File(uploadFolder);
-    if (!repo.exists())
-      repo.mkdir();
-
-    registerShutdownHook();
-  }
-
-  /**
-   * Register Shutdown Hook for cleaning temporary files.
-   */
-  private void registerShutdownHook() {
-    Runtime.getRuntime().addShutdownHook(new Thread() {
-      public void run() {
-        File[] files = repo.listFiles();
-        for (File file : files) {
-          if (file.exists())
-            file.delete();
-        }
-      }
-    });
-  }
+  @Context
+  private HttpServletRequest httpRequest;
 
   /**
    * {@inheritDoc}
@@ -143,26 +88,14 @@ public class MultipartFormDataEntityProvider implements EntityProvider<Iterator<
                                      MediaType mediaType,
                                      MultivaluedMap<String, String> httpHeaders,
                                      InputStream entityStream) throws IOException {
-    /*
-     * Try to get HttpServletRequest from environment context. Don't read data
-     * from supplied input stream but pass full HttpServletRequest to file
-     * uploder.
-     */
     try {
-      EnvironmentContext envctx = EnvironmentContext.getCurrent();
-      if (envctx == null) {
-        LOG.warn("EnvironmentContext is not set.");
-        return null;
-      }
-      if (envctx.get(HttpServletRequest.class) == null) {
-        LOG.warn("HttpServletRequest is not set in current environment context.");
-        return null;
-      }
+      ApplicationContext context = ApplicationContextImpl.getCurrent();
+      int bufferSize = (Integer) context.getAttributes().get(RequestHandler.WS_RS_BUFFER_SIZE);
+      File repo = (File) context.getAttributes().get(RequestHandler.WS_RS_TMP_DIR);
 
-      DefaultFileItemFactory factory = new DefaultFileItemFactory(IOHelper.getMaxBufferSize(), repo);
+      DefaultFileItemFactory factory = new DefaultFileItemFactory(bufferSize, repo);
       FileUpload upload = new FileUpload(factory);
-      return upload.parseRequest((HttpServletRequest) envctx.get(HttpServletRequest.class))
-                   .iterator();
+      return upload.parseRequest(httpRequest).iterator();
     } catch (FileUploadException e) {
       throw new IOException("Can't process multipart data item " + e);
     }
@@ -202,5 +135,5 @@ public class MultipartFormDataEntityProvider implements EntityProvider<Iterator<
                       OutputStream entityStream) throws IOException {
     throw new UnsupportedOperationException();
   }
-
+  
 }

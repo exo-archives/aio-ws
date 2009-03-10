@@ -22,6 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 
 import javax.ws.rs.DefaultValue;
@@ -56,17 +57,23 @@ public class ConstructorInjectorImpl implements ConstructorInjector {
   private static final Log                            LOG                    = ExoLogger.getLogger(ConstructorInjectorImpl.class.getName());
 
   /**
-   * Compare two ConstructorDescriptor in number parameters order. 
+   * Compare two ConstructorDescriptor in number parameters order.
    */
-  public static final Comparator<ConstructorInjector> CONSTRUCTOR_COMPARATOR =  new Comparator<ConstructorInjector>() {
-    public int compare(ConstructorInjector o1, ConstructorInjector o2) {
-      int r = o2.getParameters().size() - o1.getParameters().size();
-      if (r == 0)
-        LOG.warn("Two constructors with the same number of parameter found "
-                 + o1 + " and " + o2);
-      return r;
-    }
-  };
+  public static final Comparator<ConstructorInjector> CONSTRUCTOR_COMPARATOR = new Comparator<ConstructorInjector>() {
+                                                                               public int compare(ConstructorInjector o1,
+                                                                                                  ConstructorInjector o2) {
+                                                                                 int r = o2.getParameters()
+                                                                                           .size()
+                                                                                     - o1.getParameters()
+                                                                                         .size();
+                                                                                 if (r == 0)
+                                                                                   LOG.warn("Two constructors with the same number of parameter found "
+                                                                                       + o1
+                                                                                       + " and "
+                                                                                       + o2);
+                                                                                 return r;
+                                                                               }
+                                                                             };
 
   /**
    * Constructor.
@@ -79,7 +86,7 @@ public class ConstructorInjectorImpl implements ConstructorInjector {
   private final List<ConstructorParameter>            parameters;
 
   /**
-   * Resource class. 
+   * Resource class.
    */
   private final Class<?>                              resourceClass;
 
@@ -96,7 +103,7 @@ public class ConstructorInjectorImpl implements ConstructorInjector {
     if (paramTypes.length == 0) {
 
       parameters = java.util.Collections.emptyList();
-      
+
     } else {
 
       Type[] getParamTypes = constructor.getGenericParameterTypes();
@@ -155,12 +162,12 @@ public class ConstructorInjectorImpl implements ConstructorInjector {
 
         params.add(cp);
       }
-      
+
       parameters = java.util.Collections.unmodifiableList(params);
     }
 
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -189,7 +196,7 @@ public class ConstructorInjectorImpl implements ConstructorInjector {
         try {
           p[i] = pr.resolve(cp, context);
         } catch (Exception e) {
-          
+
           if (LOG.isDebugEnabled())
             e.printStackTrace();
 
@@ -219,16 +226,30 @@ public class ConstructorInjectorImpl implements ConstructorInjector {
     }
 
     try {
-      
       return constructor.newInstance(p);
-      
-    } catch (Exception e) {
+    } catch (IllegalArgumentException argExc) {
+      // should not be thrown, arguments already checked
+      throw new ApplicationException(argExc);
+    } catch (InstantiationException instExc) {
+      // should not be thrown
+      throw new ApplicationException(instExc);
+    } catch (IllegalAccessException accessExc) {
+      // should not be thrown
+      throw new ApplicationException(accessExc);
+    } catch (InvocationTargetException invExc) {
+      // constructor may produce exceptions
       if (LOG.isDebugEnabled())
-        e.printStackTrace();
+        invExc.printStackTrace();
+      // get cause of exception that method produces
+      Throwable cause = invExc.getCause();
+      // if WebApplicationException than it may contain response
+      if (WebApplicationException.class == cause.getClass())
+        throw (WebApplicationException) cause;
 
-      throw new WebApplicationException(e);
+      throw new ApplicationException(cause);
+    } catch (Throwable thr) {
+      throw new ApplicationException(thr);
     }
-
   }
 
   /**

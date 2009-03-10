@@ -45,13 +45,13 @@ public class ResourceDescriptorValidatorTest extends BaseTest {
     try {
       resource.accept(new ResourceDescriptorValidator());
       fail("Exception should be here");
-    } catch (IllegalArgumentException e) {
+    } catch (RuntimeException e) {
     }
     resource = createResourceDescriptor(Resource2.class);
     try {
       resource.accept(new ResourceDescriptorValidator());
       fail("Exception should be here");
-    } catch (IllegalArgumentException e) {
+    } catch (RuntimeException e) {
     }
   }
   
@@ -68,7 +68,7 @@ public class ResourceDescriptorValidatorTest extends BaseTest {
         try {
           rmd.accept(validator);
           fail("Exception should be here");
-        } catch (IllegalArgumentException e) {
+        } catch (RuntimeException e) {
         }
       }
     }
@@ -87,7 +87,7 @@ public class ResourceDescriptorValidatorTest extends BaseTest {
         try {
           srmd.accept(validator);
           fail("Exception should be here");
-        } catch (IllegalArgumentException e) {
+        } catch (RuntimeException e) {
         }
       }
     }
@@ -105,7 +105,7 @@ public class ResourceDescriptorValidatorTest extends BaseTest {
         try {
           rmd.accept(validator);
           fail("Exception should be here");
-        } catch (IllegalArgumentException e) {
+        } catch (RuntimeException e) {
         }
       }
     }

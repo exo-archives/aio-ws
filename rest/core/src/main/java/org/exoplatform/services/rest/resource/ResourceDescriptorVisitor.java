@@ -17,13 +17,10 @@
 
 package org.exoplatform.services.rest.resource;
 
-import org.exoplatform.services.rest.ConstructorInjector;
-
 /**
  * Can be used for validation next resource descriptors
- * {@link ConstructorInjector}, {@link AbstractResourceDescriptor},
- * {@link ResourceMethodDescriptor}, {@link SubResourceMethodDescriptor},
- * {@link SubResourceLocatorDescriptor} .
+ * {@link AbstractResourceDescriptor}, {@link ResourceMethodDescriptor},
+ * {@link SubResourceMethodDescriptor}, {@link SubResourceLocatorDescriptor} .
  * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
@@ -32,30 +29,22 @@ public interface ResourceDescriptorVisitor {
 
   /**
    * @param ard See {@link AbstractResourceDescriptor}
-   * @throws IllegalArgumentException if AbstractResourceDescriptor has not
-   *           valid structure
    */
-  void visitAbstractResourceDescriptor(AbstractResourceDescriptor ard) throws IllegalArgumentException;
+  void visitAbstractResourceDescriptor(AbstractResourceDescriptor ard);
 
   /**
    * @param rmd See {@link ResourceMethodDescriptor}
-   * @throws IllegalArgumentException if ResourceMethodDescriptor has not valid
-   *           structure
    */
-  void visitResourceMethodDescriptor(ResourceMethodDescriptor rmd) throws IllegalArgumentException;
+  void visitResourceMethodDescriptor(ResourceMethodDescriptor rmd);
 
   /**
    * @param srmd See {@link SubResourceMethodDescriptor}
-   * @throws IllegalArgumentException if SubResourceMethodDescriptor has not
-   *           valid structure
    */
-  void visitSubResourceMethodDescriptor(SubResourceMethodDescriptor srmd) throws IllegalArgumentException;
+  void visitSubResourceMethodDescriptor(SubResourceMethodDescriptor srmd);
 
   /**
    * @param srld See {@link SubResourceLocatorDescriptor}
-   * @throws IllegalArgumentException if SubResourceLocatorDescriptor has not
-   *           valid structure
    */
-  void visitSubResourceLocatorDescriptor(SubResourceLocatorDescriptor srld) throws IllegalArgumentException;
+  void visitSubResourceLocatorDescriptor(SubResourceLocatorDescriptor srld);
 
 }

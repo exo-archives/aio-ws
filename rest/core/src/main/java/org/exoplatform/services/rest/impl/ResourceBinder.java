@@ -86,6 +86,11 @@ public final class ResourceBinder {
       return UriPattern.URIPATTERN_COMPARATOR.compare(o1.getUriPattern(), o2.getUriPattern());
     }
   };
+  
+  /**
+   * Validator.
+   */
+  private  ResourceDescriptorValidator rdv = new ResourceDescriptorValidator();
 
   /**
    * @param containerContext eXo container context
@@ -105,7 +110,8 @@ public final class ResourceBinder {
    * registered.
    * 
    * @param resource candidate to be root resource
-   * @return true if resource was bound false otherwise
+   * @return true if resource was bound and false if resource was not bound
+   *         cause it is not root resource
    */
   public synchronized boolean bind(final Object resource) {
     Class<?> resourceClass = resource.getClass();
@@ -120,13 +126,8 @@ public final class ResourceBinder {
       return false;
     }
 
-    try {
-      validate(descriptor);
-    } catch (Exception e) {
-      LOG.error("Can not add new resource ", e);
-      return false;
-    }
-    
+    validate(descriptor);
+   
     ResourceFactory rc = new SingletonResourceFactory(descriptor, resource);
     getRootResources().add(rc);
     Collections.sort(getRootResources(), COMPARATOR);
@@ -136,7 +137,8 @@ public final class ResourceBinder {
 
   /**
    * @param resourceClass class of candidate to be root resource
-   * @return true if resource was bound false otherwise
+   * @return true if resource was bound and false if resource was not bound
+   *         cause it is not root resource
    */
   public synchronized boolean bind(final Class<?> resourceClass) {
     final Path path = resourceClass.getAnnotation(Path.class);
@@ -174,12 +176,7 @@ public final class ResourceBinder {
       descriptor.getFieldInjectors().add(new FieldInjectorImpl(resourceClass, jfield));
     }
 
-    try {
-      validate(descriptor);
-    } catch (Exception e) {
-      LOG.error("Can not add new resource ", e);
-      return false;
-    }
+    validate(descriptor);
 
     ResourceFactory rc = new PerRequestResourceFactory(descriptor);
     getRootResources().add(rc);
@@ -196,7 +193,6 @@ public final class ResourceBinder {
    * @see ResourceDescriptorValidator
    */
   private void validate(AbstractResourceDescriptor ard) {
-    ResourceDescriptorValidator rdv = new ResourceDescriptorValidator();
 
     // validate AbstractResourceDescriptor
     ard.accept(rdv);

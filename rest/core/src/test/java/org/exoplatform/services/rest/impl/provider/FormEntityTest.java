@@ -17,26 +17,12 @@
 
 package org.exoplatform.services.rest.impl.provider;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -45,8 +31,6 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.fileupload.FileItem;
 import org.exoplatform.services.rest.AbstractResourceTest;
-import org.exoplatform.services.rest.impl.EnvironmentContext;
-import org.exoplatform.services.rest.impl.InputHeadersMap;
 import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
 
 /**
@@ -90,7 +74,7 @@ public class FormEntityTest extends AbstractResourceTest {
   }
 
   // Multipart form-data
-  
+
   @Path("/")
   public static class Resource2 {
 
@@ -106,8 +90,8 @@ public class FormEntityTest extends AbstractResourceTest {
       private String  name;
 
       private String  fieldName;
-      
-      private String string;
+
+      private String  string;
 
       public FileItemTester(String contentType,
                             boolean isFormField,
@@ -136,14 +120,14 @@ public class FormEntityTest extends AbstractResourceTest {
       public String getName() {
         return name;
       }
-      
+
       public String getString() {
         return string;
       }
     }
-    
+
     private Iterator<FileItemTester> pattern;
-    
+
     /**
      * Initialize <tt>pattern</tt>.
      */
@@ -154,7 +138,7 @@ public class FormEntityTest extends AbstractResourceTest {
       l.add(new FileItemTester(null, true, "field", null, "to be or not to be"));
       pattern = l.iterator();
     }
-    
+
     @POST
     @Consumes("multipart/*")
     public void m9(Iterator<FileItem> iter) throws Exception {
@@ -186,283 +170,17 @@ public class FormEntityTest extends AbstractResourceTest {
     PrintWriter w = new PrintWriter(out);
     w.write("--abcdef\r\n"
         + "Content-Disposition: form-data; name=\"xml-file\"; filename=\"foo.xml\"\r\n"
-        + "Content-Type: text/xml\r\n"
-        + "\r\n"
-        + XML_DATA
-        + "\r\n"
-        + "--abcdef\r\n"
+        + "Content-Type: text/xml\r\n" + "\r\n" + XML_DATA + "\r\n" + "--abcdef\r\n"
         + "Content-Disposition: form-data; name=\"json-file\"; filename=\"foo.json\"\r\n"
-        + "Content-Type: application/json\r\n"
-        + "\r\n"
-        + JSON_DATA
-        + "\r\n"
-        + "--abcdef\r\n"
-        + "Content-Disposition: form-data; name=\"field\"\r\n"
-        + "\r\n"
-        + "to be or not to be"
-        + "\r\n"
-        + "--abcdef--\r\n");
+        + "Content-Type: application/json\r\n" + "\r\n" + JSON_DATA + "\r\n" + "--abcdef\r\n"
+        + "Content-Disposition: form-data; name=\"field\"\r\n" + "\r\n" + "to be or not to be"
+        + "\r\n" + "--abcdef--\r\n");
     w.flush();
     h.putSingle("content-type", "multipart/form-data; boundary=abcdef");
-    
-    EnvironmentContext envctx = new EnvironmentContext();
+
     byte[] data = out.toByteArray();
-    HttpServletRequest httpRequest = new DummyHttpServeltRequest(new ByteArrayInputStream(data), data.length, "POST", new InputHeadersMap(h));
-    envctx.put(HttpServletRequest.class, httpRequest);
-    EnvironmentContext.setCurrent(envctx);
-    
     assertEquals(204, service("POST", "/", "", h, data).getStatus());
     unregistry(r2);
   }
   
-  private static class DummyHttpServeltRequest implements HttpServletRequest {
-
-    private String                         method;
-
-    private int                            length;
-
-    private InputStream                    data;
-
-    private MultivaluedMap<String, String> headers;
-    
-    public DummyHttpServeltRequest(InputStream data, int length, String method, MultivaluedMap<String, String> headers) {
-      this.data = data;
-      this.length = length;
-      this.method = method;
-      this.headers = headers;
-    }
-
-    public String getAuthType() {
-      return null;
-    }
-
-    public String getContextPath() {
-      return "test";
-    }
-
-    public Cookie[] getCookies() {
-      return null;
-    }
-
-    public long getDateHeader(String arg0) {
-      return 0;
-    }
-
-    public String getHeader(String arg0) {
-      return headers.getFirst(arg0);
-    }
-
-    public Enumeration getHeaderNames() {
-      return new EnumerationImpl(headers.keySet().iterator());
-    }
-
-    public Enumeration getHeaders(String arg0) {
-      return new EnumerationImpl(headers.get(arg0).iterator());
-    }
-
-    public int getIntHeader(String arg0) {
-      return 0;
-    }
-
-    public String getMethod() {
-      return method;
-    }
-
-    public String getPathInfo() {
-      return null;
-    }
-
-    public String getPathTranslated() {
-      return null;
-    }
-
-    public String getQueryString() {
-      return null;
-    }
-
-    public String getRemoteUser() {
-      return null;
-    }
-
-    public String getRequestURI() {
-      return null;
-    }
-
-    public StringBuffer getRequestURL() {
-      return null;
-    }
-
-    public String getRequestedSessionId() {
-      return null;
-    }
-
-    public String getServletPath() {
-      return null;
-    }
-
-    public HttpSession getSession() {
-      return null;
-    }
-
-    public HttpSession getSession(boolean arg0) {
-      return null;
-    }
-
-    public Principal getUserPrincipal() {
-      return null;
-    }
-
-    public boolean isRequestedSessionIdFromCookie() {
-      return false;
-    }
-
-    public boolean isRequestedSessionIdFromURL() {
-      return false;
-    }
-
-    public boolean isRequestedSessionIdFromUrl() {
-      return false;
-    }
-
-    public boolean isRequestedSessionIdValid() {
-      return false;
-    }
-
-    public boolean isUserInRole(String arg0) {
-      return false;
-    }
-
-    public Object getAttribute(String arg0) {
-      return null;
-    }
-
-    public Enumeration getAttributeNames() {
-      return null;
-    }
-
-    public String getCharacterEncoding() {
-      return null;
-    }
-
-    public int getContentLength() {
-      return length;
-    }
-
-    public String getContentType() {
-      return headers.getFirst("content-type");
-    }
-
-    public ServletInputStream getInputStream() throws IOException {
-      return new DummyServletInputStream(data);
-    }
-
-    public Locale getLocale() {
-      return null;
-    }
-
-    public Enumeration getLocales() {
-      return null;
-    }
-
-    public String getParameter(String arg0) {
-      return null;
-    }
-
-    public Map getParameterMap() {
-      return null;
-    }
-
-    public Enumeration getParameterNames() {
-      return null;
-    }
-
-    public String[] getParameterValues(String arg0) {
-      return null;
-    }
-
-    public String getProtocol() {
-      return null;
-    }
-
-    public BufferedReader getReader() throws IOException {
-      return null;
-    }
-
-    public String getRealPath(String arg0) {
-      return null;
-    }
-
-    public String getRemoteAddr() {
-      return null;
-    }
-
-    public String getRemoteHost() {
-      return null;
-    }
-
-    public RequestDispatcher getRequestDispatcher(String arg0) {
-      return null;
-    }
-
-    public String getScheme() {
-      return null;
-    }
-
-    public String getServerName() {
-      return null;
-    }
-
-    public int getServerPort() {
-      return 0;
-    }
-
-    public boolean isSecure() {
-      return false;
-    }
-
-    public void removeAttribute(String arg0) {
-    }
-
-    public void setAttribute(String arg0, Object arg1) {
-    }
-
-    public void setCharacterEncoding(String arg0) throws UnsupportedEncodingException {
-    }
-    
-  }
-  
-  private static class EnumerationImpl implements Enumeration {
-    
-    private final Iterator iter;
-    
-    public EnumerationImpl(Iterator iter) {
-      this.iter = iter;
-    }
-
-    public boolean hasMoreElements() {
-      return iter.hasNext();
-    }
-
-    public Object nextElement() {
-      return iter.next();
-    }
-  }
-  
-  private static class DummyServletInputStream extends ServletInputStream {
-
-    
-    private final InputStream data;
-
-    public DummyServletInputStream(InputStream data) {
-      this.data = data;
-    }
-    
-    @Override
-    public int read() throws IOException {
-      return data.read();
-    }
-    
-  }
-
-
 }

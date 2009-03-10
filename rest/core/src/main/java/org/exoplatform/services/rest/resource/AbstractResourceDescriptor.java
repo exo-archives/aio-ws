@@ -37,12 +37,12 @@ public interface AbstractResourceDescriptor extends ResourceDescriptor {
    * @return See {@link PathValue}
    */
   PathValue getPath();
-  
+
   /**
    * @return See {@link UriPattern}
    */
   UriPattern getUriPattern();
-  
+
   /**
    * @return true if resource is root resource false otherwise. Root resource is
    *         class which has own {@link javax.ws.rs.Path} annotation
@@ -53,14 +53,16 @@ public interface AbstractResourceDescriptor extends ResourceDescriptor {
    * @return {@link Class} of resource
    */
   Class<?> getResourceClass();
-  
+
   /**
-   * @return collection class's constructor
+   * @return collection class's constructor empty collection should be returned
+   *         for singleton resources
    */
   List<ConstructorInjector> getConstructorInjectors();
-  
+
   /**
-   * @return collection class's fields
+   * @return collection class's fields, empty collection should be returned for
+   *         singleton resources
    */
   List<FieldInjector> getFieldInjectors();
 

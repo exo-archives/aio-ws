@@ -148,7 +148,7 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
    * Method invoking filters.
    */
   private final List<MethodInvokerFilter>                        invokerFilters   = new ArrayList<MethodInvokerFilter>();
-
+  
   /**
    * Should be used only once for initialize.
    * 
@@ -158,6 +158,52 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
   public RuntimeDelegateImpl() {
   }
 
+  // RuntimeDelegate
+  
+  /**
+   * End Points is not supported. {@inheritDoc}
+   */
+  @Override
+  public <T> T createEndpoint(Application applicationConfig, Class<T> type) {
+    throw new UnsupportedOperationException("End Points is not supported");
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> HeaderDelegate<T> createHeaderDelegate(Class<T> type) {
+    // TODO mechanism for use external HeaderDelegate
+    return (HeaderDelegate<T>) HDS.get(type);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ResponseBuilder createResponseBuilder() {
+    return new ResponseImpl.ResponseBuilderImpl();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public UriBuilder createUriBuilder() {
+    return new UriBuilderImpl();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public VariantListBuilder createVariantListBuilder() {
+    return new VariantListBuilderImpl();
+  }
+
+  // ProviderResolver
+  
   /**
    * {@inheritDoc}
    */
@@ -366,7 +412,7 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
               for (MediaType mime : factory.produces())
                 pm.put(mime, factory);
             } catch (ClassCastException e) {
-              throw new RuntimeException();
+              throw new RuntimeException("ContextResolver parameterized by incorrect type " + ta[0]);
             }
           }
         }
@@ -396,48 +442,6 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
   }
 
   /**
-   * End Points is not supported. {@inheritDoc}
-   */
-  @Override
-  public <T> T createEndpoint(Application applicationConfig, Class<T> type) {
-    throw new UnsupportedOperationException("End Points is not supported");
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T> HeaderDelegate<T> createHeaderDelegate(Class<T> type) {
-    // TODO mechanism for use external HeaderDelegate
-    return (HeaderDelegate<T>) HDS.get(type);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public ResponseBuilder createResponseBuilder() {
-    return new ResponseImpl.ResponseBuilderImpl();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public UriBuilder createUriBuilder() {
-    return new UriBuilderImpl();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public VariantListBuilder createVariantListBuilder() {
-    return new VariantListBuilderImpl();
-  }
-
-  /**
    * {@inheritDoc}
    */
   @SuppressWarnings("unchecked")
@@ -457,7 +461,7 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
     Collections.sort(l, MediaTypeHelper.MEDIA_TYPE_COMPARATOR);
     return l;
   }
-
+  
   /**
    * {@inheritDoc}
    */
@@ -466,22 +470,22 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
     ContextResolver<T> resolver = null;
     if (pm != null) {
       if (mediaType == null)
-        return getContextResolver(pm, contextType, MediaTypeHelper.DEFAULT_TYPE);
+        return getContextResolverInt(pm, contextType, MediaTypeHelper.DEFAULT_TYPE);
 
-      resolver = getContextResolver(pm, contextType, mediaType);
+      resolver = getContextResolverInt(pm, contextType, mediaType);
       if (resolver == null)
-        resolver = getContextResolver(pm, contextType, new MediaType(mediaType.getType(),
+        resolver = getContextResolverInt(pm, contextType, new MediaType(mediaType.getType(),
                                                                      MediaType.MEDIA_TYPE_WILDCARD));
       if (resolver == null)
-        resolver = getContextResolver(pm, contextType, MediaTypeHelper.DEFAULT_TYPE);
+        resolver = getContextResolverInt(pm, contextType, MediaTypeHelper.DEFAULT_TYPE);
     }
     return resolver;
   }
 
   @SuppressWarnings("unchecked")
-  private <T> ContextResolver<T> getContextResolver(MediaTypeMap<ProviderFactory> pm,
-                                                    Class<T> contextType,
-                                                    MediaType mediaType) {
+  private <T> ContextResolver<T> getContextResolverInt(MediaTypeMap<ProviderFactory> pm,
+                                                       Class<T> contextType,
+                                                       MediaType mediaType) {
     for (Map.Entry<MediaType, ProviderFactory> e : pm.entrySet()) {
       if (mediaType.isCompatible(e.getKey())) {
         return (ContextResolver<T>) e.getValue().getProvider(ApplicationContextImpl.getCurrent());
@@ -509,17 +513,17 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
                                                        Annotation[] annotations,
                                                        MediaType mediaType) {
     if (mediaType == null)
-      return getMessageBodyReader0(type, genericType, annotations, MediaTypeHelper.DEFAULT_TYPE);
+      return getMessageBodyReaderInt(type, genericType, annotations, MediaTypeHelper.DEFAULT_TYPE);
 
-    MessageBodyReader<T> reader = getMessageBodyReader0(type, genericType, annotations, mediaType);
+    MessageBodyReader<T> reader = getMessageBodyReaderInt(type, genericType, annotations, mediaType);
     if (reader == null)
-      reader = getMessageBodyReader0(type,
+      reader = getMessageBodyReaderInt(type,
                                      genericType,
                                      annotations,
                                      new MediaType(mediaType.getType(),
                                                    MediaType.MEDIA_TYPE_WILDCARD));
     if (reader == null)
-      reader = getMessageBodyReader0(type, genericType, annotations, MediaTypeHelper.DEFAULT_TYPE);
+      reader = getMessageBodyReaderInt(type, genericType, annotations, MediaTypeHelper.DEFAULT_TYPE);
 
     return reader;
   }
@@ -535,10 +539,10 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
    * @return message body reader or null if no one was found.
    */
   @SuppressWarnings("unchecked")
-  private <T> MessageBodyReader<T> getMessageBodyReader0(Class<T> type,
-                                                         Type genericType,
-                                                         Annotation[] annotations,
-                                                         MediaType mediaType) {
+  private <T> MessageBodyReader<T> getMessageBodyReaderInt(Class<T> type,
+                                                           Type genericType,
+                                                           Annotation[] annotations,
+                                                           MediaType mediaType) {
     for (ProviderFactory pf : readProviders.getList(mediaType)) {
       MessageBodyReader reader = (MessageBodyReader) pf.getProvider(ApplicationContextImpl.getCurrent());
       if (reader.isReadable(type, genericType, annotations, mediaType))
@@ -555,17 +559,17 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
                                                        Annotation[] annotations,
                                                        MediaType mediaType) {
     if (mediaType == null)
-      return getMessageBodyWriter0(type, genericType, annotations, MediaTypeHelper.DEFAULT_TYPE);
+      return getMessageBodyWriterInt(type, genericType, annotations, MediaTypeHelper.DEFAULT_TYPE);
 
-    MessageBodyWriter<T> writer = getMessageBodyWriter0(type, genericType, annotations, mediaType);
+    MessageBodyWriter<T> writer = getMessageBodyWriterInt(type, genericType, annotations, mediaType);
     if (writer == null)
-      writer = getMessageBodyWriter0(type,
+      writer = getMessageBodyWriterInt(type,
                                      genericType,
                                      annotations,
                                      new MediaType(mediaType.getType(),
                                                    MediaType.MEDIA_TYPE_WILDCARD));
     if (writer == null)
-      writer = getMessageBodyWriter0(type, genericType, annotations, MediaTypeHelper.DEFAULT_TYPE);
+      writer = getMessageBodyWriterInt(type, genericType, annotations, MediaTypeHelper.DEFAULT_TYPE);
     return writer;
   }
 
@@ -580,10 +584,10 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
    * @return message body writer or null if no one was found.
    */
   @SuppressWarnings("unchecked")
-  private <T> MessageBodyWriter<T> getMessageBodyWriter0(Class<T> type,
-                                                         Type genericType,
-                                                         Annotation[] annotations,
-                                                         MediaType mediaType) {
+  private <T> MessageBodyWriter<T> getMessageBodyWriterInt(Class<T> type,
+                                                           Type genericType,
+                                                           Annotation[] annotations,
+                                                           MediaType mediaType) {
     for (ProviderFactory pf : writeProviders.getList(mediaType)) {
       MessageBodyWriter writer = (MessageBodyWriter) pf.getProvider(ApplicationContextImpl.getCurrent());
       if (writer.isWriteable(type, genericType, annotations, mediaType))

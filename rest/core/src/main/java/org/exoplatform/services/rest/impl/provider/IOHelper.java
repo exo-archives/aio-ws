@@ -32,49 +32,17 @@ import java.nio.charset.Charset;
  */
 public final class IOHelper {
 
-  /**
-   * Buffer size.
-   */
-  private static final int DEFAULT_MAX_BUFFER_SIZE = 204800;
-
-  private static int       bufferSize              = -1;
+  static final String      DEFAULT_CHARSET_NAME    = "UTF-8";
 
   /**
    * If character set was not specified then this will be used.
    */
-  static final Charset     DEFAULT_CHARSET         = Charset.forName("UTF-8");
-
-  private static Object    lock                    = new Object();
-
+  static final Charset     DEFAULT_CHARSET         = Charset.forName(DEFAULT_CHARSET_NAME);
+  
   /**
    * Constructor.
    */
   private IOHelper() {
-  }
-
-  /**
-   * Set item size below which items will be retained in memory and above which
-   * they will be stored as a file.
-   * 
-   * @param size max buffer size
-   * @exception IllegalStateException if buffer size already defined
-   */
-  public static void setMaxBufferSize(int size) {
-    synchronized (lock) {
-      if (bufferSize >= 0)
-        throw new IllegalStateException("Buffer size already defined. ");
-      bufferSize = size;
-    }
-  }
-
-  /**
-   * @return max buffer size
-   * @see #setMaxBufferSize(int)
-   */
-  static int getMaxBufferSize() {
-    if (bufferSize < 0)
-      bufferSize = DEFAULT_MAX_BUFFER_SIZE;
-    return bufferSize;
   }
 
   /**

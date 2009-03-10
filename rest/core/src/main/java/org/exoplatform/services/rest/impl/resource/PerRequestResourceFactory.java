@@ -37,9 +37,11 @@ public class PerRequestResourceFactory extends ResourceFactory {
    */
   public Object getResource(ApplicationContext context) {
     ConstructorInjector inj = resourceDescriptor.getConstructorInjectors().get(0);
+    // may thrown WebApplicationException or ApplicationException
     Object resource = inj.createInstance(context);
 
     for (FieldInjector field : resourceDescriptor.getFieldInjectors()) {
+      // may thrown WebApplicationException or ApplicationException
       field.inject(resource, context);
     }
 

@@ -20,14 +20,17 @@ package org.exoplatform.services.rest;
 import java.io.ByteArrayInputStream;
 import java.net.URI;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.exoplatform.services.rest.impl.ContainerRequest;
 import org.exoplatform.services.rest.impl.ContainerResponse;
+import org.exoplatform.services.rest.impl.EnvironmentContext;
 import org.exoplatform.services.rest.impl.InputHeadersMap;
 import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
 import org.exoplatform.services.rest.impl.RequestHandlerImpl;
 import org.exoplatform.services.rest.impl.ResourceBinder;
+import org.exoplatform.services.rest.servlet.mock.MockHttpServletRequest;
 import org.exoplatform.services.rest.tools.DummyContainerResponseWriter;
 
 /**
@@ -72,6 +75,13 @@ public abstract class AbstractResourceTest extends BaseTest {
     if (data != null)
       in = new ByteArrayInputStream(data);
 
+    EnvironmentContext envctx = new EnvironmentContext();
+    HttpServletRequest httpRequest = new MockHttpServletRequest(in,
+                                                                in != null ? in.available() : 0,
+                                                                method,
+                                                                new InputHeadersMap(headers));
+    envctx.put(HttpServletRequest.class, httpRequest);
+    EnvironmentContext.setCurrent(envctx);
     ContainerRequest request = new ContainerRequest(method,
                                                     new URI(requestURI),
                                                     new URI(baseURI),

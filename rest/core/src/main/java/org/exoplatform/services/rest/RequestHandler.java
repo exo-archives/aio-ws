@@ -17,13 +17,17 @@
 
 package org.exoplatform.services.rest;
 
-import java.io.IOException;
-
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public interface RequestHandler {//extends EntityProviderResolver {
+public interface RequestHandler {
+
+  public static final String WS_RS_TMP_DIR               = "ws.rs.tmpdir";
+
+  public static final String WS_RS_BUFFER_SIZE           = "ws.rs.buffersize";
+
+  public static final String WS_RS_USE_BUILTIN_PROVIDERS = "ws.rs.provider.builtin";
 
   /**
    * Handle the HTTP request by dispatching request to appropriate resource. If
@@ -31,7 +35,7 @@ public interface RequestHandler {//extends EntityProviderResolver {
    * 
    * @param request HTTP request
    * @param response HTTP response
-   * @throws IOException if any i/o error occurs
+   * @throws Exception if any error occurs
    */
   void handleRequest(GenericContainerRequest request, GenericContainerResponse response) throws Exception;
 

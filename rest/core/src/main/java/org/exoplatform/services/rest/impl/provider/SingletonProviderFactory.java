@@ -30,14 +30,14 @@ public class SingletonProviderFactory extends ProviderFactory {
    * Provider object.
    */
   protected final Object provider;
-  
+
   /**
    * @param providerDescriptor See {@link ProviderDescriptor}
    * @param provider provider instance
    */
   public SingletonProviderFactory(ProviderDescriptor providerDescriptor, Object provider) {
     super(providerDescriptor);
-    this.provider=provider;
+    this.provider = provider;
   }
 
   /**

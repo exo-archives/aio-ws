@@ -163,7 +163,7 @@ public final class ServletContainerRequest extends ContainerRequest {
     try {
       return servletRequest.getInputStream();
     } catch (IOException e) {
-      throw new IllegalArgumentException(e);
+      throw new RuntimeException(e);
     }
   }
 

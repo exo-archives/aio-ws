@@ -138,7 +138,7 @@ public final class DefaultMethodInvoker implements MethodInvoker {
       Throwable cause = invExc.getCause();
       // if WebApplicationException than it may contain response
       if (WebApplicationException.class == cause.getClass())
-        throw (WebApplicationException) invExc.getCause();
+        throw (WebApplicationException) cause;
 
       throw new ApplicationException(cause);
     }

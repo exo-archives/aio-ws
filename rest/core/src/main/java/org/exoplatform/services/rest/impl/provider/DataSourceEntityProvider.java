@@ -33,6 +33,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 
+import org.exoplatform.services.rest.ApplicationContext;
+import org.exoplatform.services.rest.RequestHandler;
+import org.exoplatform.services.rest.impl.ApplicationContextImpl;
 import org.exoplatform.services.rest.provider.EntityProvider;
 
 /**
@@ -121,12 +124,14 @@ public class DataSourceEntityProvider implements EntityProvider<DataSource> {
     boolean overflow = false;
     byte[] buffer = new byte[8192];
 
-    ByteArrayOutputStream bout = new ByteArrayOutputStream(IOHelper.getMaxBufferSize());
+    ApplicationContext context = ApplicationContextImpl.getCurrent();
+    int bufferSize = (Integer) context.getAttributes().get(RequestHandler.WS_RS_BUFFER_SIZE);
+    ByteArrayOutputStream bout = new ByteArrayOutputStream(bufferSize);
 
     int bytes = -1;
     while ((bytes = entityStream.read(buffer)) != -1) {
       bout.write(buffer, 0, bytes);
-      if (bout.size() > IOHelper.getMaxBufferSize()) {
+      if (bout.size() > bufferSize) {
         overflow = true;
         break;
       }
@@ -137,7 +142,7 @@ public class DataSourceEntityProvider implements EntityProvider<DataSource> {
       return new ByteArrayDataSource(bout.toByteArray(), mimeType);
 
     // large data, use file
-    final File file = File.createTempFile("ws_rs", "tmp");
+    final File file = File.createTempFile("datasource", "tmp");
     OutputStream fout = new FileOutputStream(file);
 
     // copy data from byte array in file

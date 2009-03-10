@@ -196,7 +196,7 @@ public final class HeaderHelper {
           if (col < 0)
             return new AcceptToken(token);
           
-          Map<String, String> param = new HeaderParameterParser().parse/*Parameters*/(part);
+          Map<String, String> param = new HeaderParameterParser().parse(part);
           if (param.containsKey(QualityValue.QVALUE))
             return new AcceptToken(token, parseQualityValue(param.get(QualityValue.QVALUE)));
           
@@ -443,7 +443,7 @@ public final class HeaderHelper {
       // ignore all ParseException now 
     }
     // no one format was found 
-    throw new IllegalArgumentException("Not found appropriated adte format for " + header);
+    throw new IllegalArgumentException("Not found appropriated date format for " + header);
   }
   
   //

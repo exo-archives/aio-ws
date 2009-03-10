@@ -180,7 +180,7 @@ public final class UriComponent {
   public static String encode(String str, int component, boolean containsUriParams) {
     if (str == null)
       throw new IllegalArgumentException();
-    return encoding0(str, component, containsUriParams, false);
+    return encodingInt(str, component, containsUriParams, false);
   }
   
   /**
@@ -220,7 +220,7 @@ public final class UriComponent {
   public static String recognizeEncode(String str, int component, boolean containsUriParams) {
     if (str == null) 
       throw new IllegalArgumentException();
-    return encoding0(str, component, containsUriParams, true);
+    return encodingInt(str, component, containsUriParams, true);
   }
   
   /**
@@ -230,10 +230,10 @@ public final class UriComponent {
    * @param recognizeEncoded must check string to avoid double encoding
    * @return valid string
    */
-  private static String encoding0(String str,
-                                  int component,
-                                  boolean containsUriParams,
-                                  boolean recognizeEncoded) {
+  private static String encodingInt(String str,
+                                    int component,
+                                    boolean containsUriParams,
+                                    boolean recognizeEncoded) {
     StringBuffer sb = null;
     int l = str.length();
     for (int i = 0; i < l; i++) {
@@ -246,13 +246,13 @@ public final class UriComponent {
             sb.append(ch).append(str.charAt(++i)).append(str.charAt(++i));
 
         } else {
-          
+
           if (sb == null) {
             sb = new StringBuffer();
             sb.append(str.substring(0, i));
           }
           addPercentEncoded(ch, sb); // in fact add '%25'
-          
+
         }
       } else if (ch < 128 && !needEncode(ch, component)) {
 

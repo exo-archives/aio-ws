@@ -17,12 +17,15 @@
 
 package org.exoplatform.services.rest.impl;
 
-import java.io.IOException;
+import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.ws.rs.WebApplicationException;
@@ -75,7 +78,7 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
   /**
    * Logger.
    */
-  private static final Log          LOG = ExoLogger.getLogger(RequestHandlerImpl.class.getName());
+  private static final Log          LOG                   = ExoLogger.getLogger(RequestHandlerImpl.class.getName());
 
   /**
    * See {@link RequestDispatcher}.
@@ -88,30 +91,44 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
   private final JAXBContextResolver jaxbContexts;
 
   /**
-   * Should be built-in providers be loaded.
-   */
-  private boolean                   loadBuiltinProviders;
-
-  /**
    * See {@link RuntimeDelegateImpl}, {@link RuntimeDelegate}.
    */
   private RuntimeDelegateImpl       rd;
+
+  /**
+   * Application properties.
+   */
+  private final Map<String, Object> applicationProperties = new HashMap<String, Object>();
 
   /**
    * Constructs new instance of {@link RequestHandler}.
    * 
    * @param dispatcher See {@link RequestDispatcher}
    * @param jaxbContexts See {@link JAXBContextResolver}
+   * @param params init parameters
    */
+  @SuppressWarnings("unchecked")
   public RequestHandlerImpl(RequestDispatcher dispatcher,
                             JAXBContextResolver jaxbContexts,
                             InitParams params) {
 
     rd = RuntimeDelegateImpl.getInstance();
-    ValueParam builtinVp = null;
-    if (params != null)
-      builtinVp = params.getValueParam("ws.rs.entity.provider.builtin");
-    loadBuiltinProviders = builtinVp == null || Boolean.valueOf(builtinVp.getValue().trim());
+
+    if (params != null) {
+      for (Iterator<ValueParam> i = params.getValueParamIterator(); i.hasNext();) {
+        ValueParam vp = i.next();
+        String name = vp.getName();
+        String value = vp.getValue();
+        if (name.equals(WS_RS_BUFFER_SIZE))
+          applicationProperties.put(name, Integer.parseInt(value));
+        else if (name.equals(WS_RS_USE_BUILTIN_PROVIDERS))
+          applicationProperties.put(name, Boolean.valueOf(value));
+        else if (name.equals(WS_RS_TMP_DIR))
+          applicationProperties.put(name, new File(value));
+        else
+          applicationProperties.put(name, value);
+      }
+    }
 
     this.dispatcher = dispatcher;
     this.jaxbContexts = jaxbContexts;
@@ -140,14 +157,15 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
       }
 
       ApplicationContextImpl context = new ApplicationContextImpl(request, response);
+      context.getAttributes().putAll(applicationProperties);
       ApplicationContextImpl.setCurrent(context);
       try {
         dispatcher.dispatch(request, response);
       } catch (Exception e) {
         processError(e, response);
+        return;
       }
 
-      // NOTE error response can be processed by filter also
       for (Entry<UriPattern, List<ResponseFilter>> e : rd.getResponseFilters().entrySet()) {
         if (e.getKey().match(path, t)) {
           for (ResponseFilter f : e.getValue())
@@ -174,21 +192,34 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
   private static void processError(Exception e, GenericContainerResponse response) {
     if (e instanceof WebApplicationException) {
 
-      Response r = ((WebApplicationException) e).getResponse();
-      if (r.getStatus() < 500) {
-        // be silent, should be some of 4xx status
-        response.setResponse(r);
+      Response errorResponse = ((WebApplicationException) e).getResponse();
+      ExceptionMapper excmap = RuntimeDelegateImpl.getInstance()
+                                                  .getExceptionMapper(WebApplicationException.class);
+
+      // should be some of 4xx status
+      if (errorResponse.getStatus() < 500) {
+        if (errorResponse.getEntity() == null) {
+          if (excmap != null) {
+            errorResponse = excmap.toResponse(e);
+          }
+        }
+        response.setResponse(errorResponse);
       } else {
         if (LOG.isDebugEnabled())
           e.printStackTrace();
 
-        if (r.getEntity() == null) // add stack trace as message body
-          r = Response.status(r.getStatus())
-                      .entity(new ErrorStreaming(e))
-                      .type(MediaType.TEXT_PLAIN)
-                      .build();
-
-        response.setResponse(r);
+        if (errorResponse.getEntity() == null) {
+          if (excmap != null) {
+            errorResponse = excmap.toResponse(e);
+          } else {
+            // add stack trace as message body
+            errorResponse = Response.status(errorResponse.getStatus())
+                                    .entity(new ErrorStreaming(e))
+                                    .type(MediaType.TEXT_PLAIN)
+                                    .build();
+          }
+        }
+        response.setResponse(errorResponse);
       }
     } else if (e instanceof ApplicationException) {
       Class cause = e.getCause().getClass();
@@ -198,10 +229,11 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
         if (excmap == null)
           cause = cause.getSuperclass();
       }
-      if (excmap != null)
+      if (excmap != null) {
         response.setResponse(excmap.toResponse(e.getCause()));
-      else
+      } else {
         throw new UnhandledException(e.getCause());
+      }
     } else {
       throw new UnhandledException(e);
     }
@@ -256,14 +288,48 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
    * Startup initialization.
    */
   protected void init() {
-    if (loadBuiltinProviders) {
+    // Directory for temporary files
+    final File tmpDir;
+    if (applicationProperties.containsKey(WS_RS_TMP_DIR))
+      tmpDir = (File) applicationProperties.get(WS_RS_TMP_DIR);
+    else {
+      tmpDir = new File(System.getProperty("java.io.tmpdir") + File.separator + "ws_jaxrs");
+      applicationProperties.put(WS_RS_TMP_DIR, tmpDir);
+    }
+
+    if (!tmpDir.exists())
+      tmpDir.mkdirs();
+
+    // Register Shutdown Hook for cleaning temporary files.
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      public void run() {
+        File[] files = tmpDir.listFiles();
+        for (File file : files) {
+          if (file.exists())
+            file.delete();
+        }
+      }
+    });
+
+    Integer bufferSize = (Integer) applicationProperties.get(WS_RS_BUFFER_SIZE);
+    if (bufferSize == null) {
+      bufferSize = 204800;
+      applicationProperties.put(WS_RS_BUFFER_SIZE, bufferSize);
+    }
+
+    Boolean builtin = (Boolean) applicationProperties.get(WS_RS_USE_BUILTIN_PROVIDERS);
+    if (builtin == null) {
+      builtin = true;
+      applicationProperties.put(WS_RS_USE_BUILTIN_PROVIDERS, builtin);
+    }
+
+    if (builtin) {
       // add prepared entity providers
       rd.addProviderInstance(new ByteEntityProvider());
       rd.addProviderInstance(new DataSourceEntityProvider());
       rd.addProviderInstance(new DOMSourceEntityProvider());
       rd.addProviderInstance(new FileEntityProvider());
       rd.addProviderInstance(new MultivaluedMapEntityProvider());
-      rd.addProviderInstance(new MultipartFormDataEntityProvider());
       rd.addProviderInstance(new InputStreamEntityProvider());
       rd.addProviderInstance(new ReaderEntityProvider());
       rd.addProviderInstance(new SAXSourceEntityProvider());
@@ -271,12 +337,16 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
       rd.addProviderInstance(new StringEntityProvider());
       rd.addProviderInstance(new StreamOutputEntityProvider());
       rd.addProviderInstance(new JsonEntityProvider());
+      
       JAXBElementEntityProvider jep = new JAXBElementEntityProvider();
       jep.setContexResolver(jaxbContexts);
       rd.addProviderInstance(jep);
       JAXBObjectEntityProvider jop = new JAXBObjectEntityProvider();
       jop.setContexResolver(jaxbContexts);
       rd.addProviderInstance(jop);
+
+      // per-request mode , HttpServletRequest should be injected in provider
+      rd.addProvider(MultipartFormDataEntityProvider.class);
     }
   }
 

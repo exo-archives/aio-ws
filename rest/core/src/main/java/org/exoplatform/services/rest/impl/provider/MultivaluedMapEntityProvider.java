@@ -81,7 +81,7 @@ public class MultivaluedMapEntityProvider implements EntityProvider<MultivaluedM
                                                  MultivaluedMap<String, String> httpHeaders,
                                                  InputStream entityStream) throws IOException {
     ApplicationContext context = ApplicationContextImpl.getCurrent();
-    Object o = context.getAttributes().get("org.exoplatform.ws.rest.entity.form");
+    Object o = context.getAttributes().get("org.exoplatform.ws.rs.entity.form");
     if (o != null)
       return (MultivaluedMap<String, String>) o;
 
@@ -100,7 +100,7 @@ public class MultivaluedMapEntityProvider implements EntityProvider<MultivaluedM
       // keep the last part
       addPair(sb.toString(), form);
 
-      context.getAttributes().put("org.exoplatform.ws.rest.entity.form", form);
+      context.getAttributes().put("org.exoplatform.ws.rs.entity.form", form);
 
       return form;
     } catch (UnsupportedEncodingException e) {

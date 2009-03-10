@@ -307,15 +307,6 @@ public class ApplicationContextImpl implements ApplicationContext {
   /**
    * {@inheritDoc}
    */
-  public String getConnegExtension() {
-    // This method and preprocessing process at all, except normalization URI is
-    // not presents in newer releases of JSR-311.
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
   public String getPath() {
     return getPath(true);
   }

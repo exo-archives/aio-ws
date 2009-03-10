@@ -204,7 +204,7 @@ public class ContainerRequest implements GenericContainerRequest {
     this.entityStream = entityStream;
 
     // reset form data, it should be recreated
-    ApplicationContextImpl.getCurrent().getAttributes().remove("org.exoplatform.ws.rest.entity.form");
+    ApplicationContextImpl.getCurrent().getAttributes().remove("org.exoplatform.ws.rs.entity.form");
   }
 
   /**

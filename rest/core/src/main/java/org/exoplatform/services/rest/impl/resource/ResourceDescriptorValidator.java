@@ -73,13 +73,17 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
   public void visitAbstractResourceDescriptor(AbstractResourceDescriptor ard) {
     if (ard.getResourceMethodDescriptors().size() == 0
         && ard.getSubResourceMethodDescriptors().size() == 0
-        && ard.getSubResourceLocatorDescriptors().size() == 0)
-      throw new IllegalArgumentException("Not found any resource methods, sub-resource methods"
-          + " or sub-resource locators in " + ard.getResourceClass().getName());
+        && ard.getSubResourceLocatorDescriptors().size() == 0) {
+      String msg = "Not found any resource methods, sub-resource methods"
+          + " or sub-resource locators in " + ard.getResourceClass().getName();
+      throw new RuntimeException(msg);
+    }
 
-    if (ard.isRootResource() && ard.getPath().getPath().length() == 0)
-      throw new IllegalArgumentException("Resource class " + ard.getResourceClass()
-          + " is root resource but path value empty, see javax.ws.rs.Path#value()");
+    if (ard.isRootResource() && ard.getPath().getPath().length() == 0) {
+      String msg = "Resource class " + ard.getResourceClass()
+          + " is root resource but path value empty, see javax.ws.rs.Path#value()";
+      throw new RuntimeException(msg);
+    }
 
   }
 
@@ -99,10 +103,12 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
    * produces object that will handle the request. {@inheritDoc}
    */
   public void visitSubResourceLocatorDescriptor(SubResourceLocatorDescriptor srld) {
-    if (srld.getPathValue().getPath().length() == 0)
-      throw new IllegalArgumentException("Path value is empty for method "
-          + srld.getMethod().getName() + " in resource class "
-          + srld.getParentResource().getResourceClass() + ", see javax.ws.rs.Path#value()");
+    if (srld.getPathValue().getPath().length() == 0) {
+      String msg = "Path value is empty for method " + srld.getMethod().getName()
+          + " in resource class " + srld.getParentResource().getResourceClass()
+          + ", see javax.ws.rs.Path#value()";
+      throw new RuntimeException(msg);
+    }
     checkMethodParameters(srld);
   }
 
@@ -112,10 +118,12 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
    * This method can process the request directly. {@inheritDoc}
    */
   public void visitSubResourceMethodDescriptor(SubResourceMethodDescriptor srmd) {
-    if (srmd.getPathValue().getPath().length() == 0)
-      throw new IllegalArgumentException("Path value is null or empty for method "
-          + srmd.getMethod().getName() + " in resource class "
-          + srmd.getParentResource().getResourceClass() + ", see javax.ws.rs.Path#value()");
+    if (srmd.getPathValue().getPath().length() == 0) {
+      String msg = "Path value is null or empty for method " + srmd.getMethod().getName()
+          + " in resource class " + srmd.getParentResource().getResourceClass()
+          + ", see javax.ws.rs.Path#value()";
+      throw new RuntimeException(msg);
+    }
     checkMethodParameters(srmd);
   }
 
@@ -139,10 +147,11 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
           entity = true;
           if (form) // form already met then check type of entity
             checkFormParam(mp.getParameterClass(), mp.getGenericType());
-        } else
-          throw new IllegalArgumentException("Wrong or absent annotation at parameter with index "
-              + i + " at " + rmd.getParentResource().getResourceClass() + "#"
-              + rmd.getMethod().getName());
+        } else {
+          String msg = "Wrong or absent annotation at parameter with index " + i + " at "
+              + rmd.getParentResource().getResourceClass() + "#" + rmd.getMethod().getName();
+          throw new RuntimeException(msg);
+        }
 
       } else {
         if (mp.getAnnotation().annotationType() == FormParam.class) {
@@ -169,9 +178,9 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
       MethodParameter mp = l.get(i);
       if (mp.getAnnotation() == null) {
         // not allowed to have not annotated parameters in resource locator
-        throw new IllegalArgumentException("Wrong or absent annotation at parameter with index "
-            + i + " at " + srld.getParentResource().getResourceClass() + "#"
-            + srld.getMethod().getName());
+        String msg = "Wrong or absent annotation at parameter with index " + i + " at "
+            + srld.getParentResource().getResourceClass() + "#" + srld.getMethod().getName();
+        throw new RuntimeException(msg);
       }
     }
   }
@@ -185,9 +194,11 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
    */
   @SuppressWarnings("unchecked")
   private static void checkFormParam(Class clazz, Type type) {
-    if (MultivaluedMap.class != clazz || !checkGenericType(type))
-      throw new IllegalArgumentException("If a any method parameter is annotated with FormParam then type"
-          + " of entity parameter MUST be MultivalueMap<String, String> or FormEntity");
+    if (MultivaluedMap.class != clazz || !checkGenericType(type)) {
+      String msg = "If a any method parameter is annotated with FormParam then type"
+          + " of entity parameter MUST be MultivalueMap<String, String> or FormEntity";
+      throw new RuntimeException(msg);
+    }
   }
 
   /**
