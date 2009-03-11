@@ -16,6 +16,8 @@
   <modules>
     <module>commons</module>
     <module>rest/core</module>
+    <module>rest/ejb/connector2_1</module>
+    <module>rest/ejb/connector3_0</module>
     <module>frameworks/json</module>
     <module>frameworks/servlet</module>
     <module>soap/jsr181</module>
