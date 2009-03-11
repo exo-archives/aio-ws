@@ -102,6 +102,7 @@ public class JsonGeneratorImpl implements JsonGenerator {
    * @return JsonValue.
    * @throws JsonException if any errors occurs.
    */
+  @SuppressWarnings("unchecked")
   protected JsonValue createJsonValue(Object object) throws JsonException {
     Types t = JsonUtils.getType(object);
     switch (t) {

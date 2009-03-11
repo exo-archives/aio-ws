@@ -17,6 +17,7 @@
 
 package org.exoplatform.ws.frameworks.json.impl;
 
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,120 +33,121 @@ public final class JsonUtils {
    */
   private JsonUtils() {
   }
-  
+
+  static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
+
   /**
    * Known types.
    */
   public enum Types {
-    
+
     /**
-     * Byte. 
+     * Byte.
      */
     BYTE,
-    
+
     /**
-     * Short. 
+     * Short.
      */
     SHORT,
-    
+
     /**
-     * Integer. 
+     * Integer.
      */
     INT,
-    
+
     /**
-     * Long. 
+     * Long.
      */
     LONG,
-    
+
     /**
-     * Float. 
+     * Float.
      */
     FLOAT,
-    
+
     /**
      * Double.
      */
     DOUBLE,
-    
+
     /**
      * Boolean.
      */
     BOOLEAN,
-    
+
     /**
      * Char.
      */
     CHAR,
-    
+
     /**
      * String.
      */
     STRING,
-    
+
     /**
      * Corresponding to null value.
      */
     NULL,
 
-    
     /**
-     * Array of Bytes. 
+     * Array of Bytes.
      */
     ARRAY_BYTE,
-    
+
     /**
-     * Array of Shorts. 
+     * Array of Shorts.
      */
     ARRAY_SHORT,
 
     /**
-     * Array of Integers. 
+     * Array of Integers.
      */
     ARRAY_INT,
-    
+
     /**
-     * Array of Longs. 
+     * Array of Longs.
      */
     ARRAY_LONG,
-    
+
     /**
-     * Array of Floats. 
+     * Array of Floats.
      */
     ARRAY_FLOAT,
-    
+
     /**
-     * Array of Doubles. 
+     * Array of Doubles.
      */
     ARRAY_DOUBLE,
-    
+
     /**
-     * Array of Booleans. 
+     * Array of Booleans.
      */
     ARRAY_BOOLEAN,
-    
+
     /**
-     * Array of Chars. 
+     * Array of Chars.
      */
     ARRAY_CHAR,
-    
+
     /**
-     * Array of Strings. 
+     * Array of Strings.
      */
     ARRAY_STRING,
-    
+
     /**
-     * Array of Java Objects (beans). 
+     * Array of Java Objects (beans).
      */
     ARRAY_OBJECT,
-    
+
     /**
-     * Collection. 
+     * Collection.
      */
     COLLECTION,
-    
+
     /**
-     * Map. 
+     * Map.
      */
     MAP
   }
@@ -155,20 +157,20 @@ public final class JsonUtils {
    */
   public enum JsonToken {
     /**
-     * JSON object, "key":{value1, ... } . 
+     * JSON object, "key":{value1, ... } .
      */
     object,
-    
+
     /**
      * JSON array "key":[value1, ... ] .
      */
     array,
-    
+
     /**
      * Key.
      */
     key,
-    
+
     /**
      * Value.
      */
@@ -225,6 +227,7 @@ public final class JsonUtils {
 
   /**
    * Transform Java String to JSON string.
+   * 
    * @param string source String.
    * @return result.
    */
@@ -236,37 +239,37 @@ public final class JsonUtils {
     char[] charArray = string.toCharArray();
     for (char c : charArray) {
       switch (c) {
-        case '\n':
-          sb.append("\\n");
-          break;
-        case '\r':
-          sb.append("\\r");
-          break;
-        case '\t':
-          sb.append("\\t");
-          break;
-        case '\b':
-          sb.append("\\b");
-          break;
-        case '\f':
-          sb.append("\\f");
-          break;
-        case '\\':
-          sb.append("\\\\");
-          break;
-        case '"':
-          sb.append("\\\"");
-          break;
-        default:
-          if (c < '\u0010')
-            sb.append("\\u000" + Integer.toHexString(c));
-          else if ((c < '\u0020' && c > '\u0009') || (c >= '\u0080' && c < '\u00a0'))
-            sb.append("\\u00" + Integer.toHexString(c));
-          else if (c >= '\u2000' && c < '\u2100')
-            sb.append("\\u" + Integer.toHexString(c));
-          else
-            sb.append(c);
-          break;
+      case '\n':
+        sb.append("\\n");
+        break;
+      case '\r':
+        sb.append("\\r");
+        break;
+      case '\t':
+        sb.append("\\t");
+        break;
+      case '\b':
+        sb.append("\\b");
+        break;
+      case '\f':
+        sb.append("\\f");
+        break;
+      case '\\':
+        sb.append("\\\\");
+        break;
+      case '"':
+        sb.append("\\\"");
+        break;
+      default:
+        if (c < '\u0010')
+          sb.append("\\u000" + Integer.toHexString(c));
+        else if ((c < '\u0020' && c > '\u0009') || (c >= '\u0080' && c < '\u00a0'))
+          sb.append("\\u00" + Integer.toHexString(c));
+        else if (c >= '\u2000' && c < '\u2100')
+          sb.append("\\u" + Integer.toHexString(c));
+        else
+          sb.append(c);
+        break;
       }
     }
     sb.append("\"");
@@ -275,6 +278,7 @@ public final class JsonUtils {
 
   /**
    * Check is given Object is known.
+   * 
    * @param o Object.
    * @return true if Object is known, false otherwise.
    */
@@ -286,6 +290,7 @@ public final class JsonUtils {
 
   /**
    * Check is given Class is known.
+   * 
    * @param clazz Class.
    * @return true if Class is known, false otherwise.
    */
@@ -297,6 +302,7 @@ public final class JsonUtils {
 
   /**
    * Get 'type' of Object. @see {@link KNOWN_TYPES} .
+   * 
    * @param o Object.
    * @return 'type'.
    */
@@ -316,6 +322,7 @@ public final class JsonUtils {
 
   /**
    * Get 'type' of Class. @see {@link KNOWN_TYPES} .
+   * 
    * @param clazz Class.
    * @return 'type'.
    */

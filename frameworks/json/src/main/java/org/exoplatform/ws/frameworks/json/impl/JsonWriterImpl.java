@@ -20,6 +20,7 @@ package org.exoplatform.ws.frameworks.json.impl;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.Stack;
 
@@ -36,19 +37,21 @@ public class JsonWriterImpl implements JsonWriter {
    * Stack for control position in document.
    */
   private final Stack<JsonToken> jsonTokens = new Stack<JsonToken>();
-  
+
   /**
    * Writer.
    */
-  private final Writer writer;
+  private final Writer           writer;
 
   /**
-   * Indicate is current value is the first, if not before value must be written comma.  
+   * Indicate is current value is the first, if not before value must be written
+   * comma.
    */
-  private boolean commaFirst = false;
+  private boolean                commaFirst = false;
 
   /**
    * Constructs JsonWriter.
+   * 
    * @param writer Writer.
    */
   public JsonWriterImpl(Writer writer) {
@@ -57,10 +60,12 @@ public class JsonWriterImpl implements JsonWriter {
 
   /**
    * Constructs JsonWriter.
+   * 
    * @param out OutputStream.
+   * @throws UnsupportedEncodingException 
    */
   public JsonWriterImpl(OutputStream out) {
-    this(new OutputStreamWriter(out));
+    this(new OutputStreamWriter(out, JsonUtils.DEFAULT_CHARSET));
   }
 
   /**
@@ -68,17 +73,17 @@ public class JsonWriterImpl implements JsonWriter {
    */
   public void writeStartObject() throws JsonException {
     if (!jsonTokens.isEmpty()) {
-      // Object can be stated after key with followed ':' or as array item.  
+      // Object can be stated after key with followed ':' or as array item.
       if (jsonTokens.peek() != JsonToken.key && jsonTokens.peek() != JsonToken.array)
         throw new JsonException("Syntax error. Unexpected element '{'.");
     }
     try {
-      if (commaFirst) // needed ',' before 
+      if (commaFirst) // needed ',' before
         writer.write(',');
       writer.write('{');
-     // if at the top of stack is 'key' then remove it.
+      // if at the top of stack is 'key' then remove it.
       if (!jsonTokens.isEmpty() && jsonTokens.peek() == JsonToken.key)
-        jsonTokens.pop(); 
+        jsonTokens.pop();
       jsonTokens.push(JsonToken.object); // remember new object opened
       commaFirst = false;
     } catch (IOException e) {
@@ -108,7 +113,7 @@ public class JsonWriterImpl implements JsonWriter {
         || (jsonTokens.peek() != JsonToken.key && jsonTokens.peek() != JsonToken.array))
       throw new JsonException("Sysntax error. Unexpected element '['..");
     try {
-      if (commaFirst) // needed ',' before 
+      if (commaFirst) // needed ',' before
         writer.write(',');
       writer.write('[');
       if (jsonTokens.peek() == JsonToken.key)
@@ -126,7 +131,7 @@ public class JsonWriterImpl implements JsonWriter {
    */
   public void writeEndArray() throws JsonException {
     try {
-      if (jsonTokens.pop() != JsonToken.array) // wrong JSON structure 
+      if (jsonTokens.pop() != JsonToken.array) // wrong JSON structure
         throw new JsonException("Sysntax error. Unexpected element ']'.");
       writer.write(']');
       commaFirst = true;
@@ -142,8 +147,7 @@ public class JsonWriterImpl implements JsonWriter {
     if (key == null)
       throw new JsonException("Key is null.");
     if (jsonTokens.isEmpty() || jsonTokens.peek() != JsonToken.object)
-      throw new JsonException("Sysntax error. Unexpected characters '"
-          + key + "'." + jsonTokens);
+      throw new JsonException("Sysntax error. Unexpected characters '" + key + "'." + jsonTokens);
     try {
       if (commaFirst)
         writer.write(',');
@@ -191,7 +195,7 @@ public class JsonWriterImpl implements JsonWriter {
   public void writeNull() throws JsonException {
     write("null");
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -216,16 +220,16 @@ public class JsonWriterImpl implements JsonWriter {
 
   /**
    * Write single String.
+   * 
    * @param value String.
    * @throws JsonException if any errors occurs.
    */
   private void write(String value) throws JsonException {
     try {
       if (jsonTokens.isEmpty()
-          || (jsonTokens.peek() != JsonToken.key
-              && jsonTokens.peek() != JsonToken.array))
+          || (jsonTokens.peek() != JsonToken.key && jsonTokens.peek() != JsonToken.array))
         throw new JsonException("Sysntax error. Unexpected characters '" + value + "'.");
-      if (commaFirst) 
+      if (commaFirst)
         writer.write(',');
       writer.write(value);
       commaFirst = true;
