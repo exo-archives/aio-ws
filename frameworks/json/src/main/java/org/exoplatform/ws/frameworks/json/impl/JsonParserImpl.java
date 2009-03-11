@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PushbackReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.Stack;
 
 import org.exoplatform.ws.frameworks.json.JsonHandler;
@@ -81,7 +82,7 @@ public class JsonParserImpl implements JsonParser {
    * {@inheritDoc}
    */
   public void parse(InputStream sream, JsonHandler handler) throws JsonException {
-    parse(new InputStreamReader(sream), handler);
+    parse(new InputStreamReader(sream, Charset.forName("UTF-8")), handler);
   }
   
   /**

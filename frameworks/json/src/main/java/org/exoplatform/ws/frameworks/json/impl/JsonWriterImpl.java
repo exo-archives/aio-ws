@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.util.Stack;
 
 import org.exoplatform.ws.frameworks.json.JsonWriter;
@@ -60,7 +61,7 @@ public class JsonWriterImpl implements JsonWriter {
    * @param out OutputStream.
    */
   public JsonWriterImpl(OutputStream out) {
-    this(new OutputStreamWriter(out));
+    this(new OutputStreamWriter(out, Charset.forName("UTF-8")));
   }
 
   /**

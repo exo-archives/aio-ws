@@ -19,9 +19,6 @@ package org.exoplatform.ws.frameworks.json.transformer;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 
 import org.exoplatform.services.rest.transformer.OutputEntityTransformer;
 import org.exoplatform.ws.frameworks.json.JsonWriter;
@@ -44,17 +41,13 @@ public class Bean2JsonOutputTransformer extends OutputEntityTransformer {
   public void writeTo(Object entity, OutputStream entityDataStream) throws IOException {
     try {
       JsonValue jv = new JsonGeneratorImpl().createJsonObject(entity);
-      Writer writer = new OutputStreamWriter(entityDataStream,"UTF-8");
-      JsonWriter jsonWriter = new JsonWriterImpl(writer);
+      JsonWriter jsonWriter = new JsonWriterImpl(entityDataStream);
       jv.writeTo(jsonWriter);
       jsonWriter.flush();
     } catch (JsonException e) {
       e.printStackTrace();
       throw new IOException("Error while converting POJO to JSON");
-    } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
     }
-
   }
 
 }
