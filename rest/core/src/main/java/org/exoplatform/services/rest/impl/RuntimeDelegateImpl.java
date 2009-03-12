@@ -207,7 +207,7 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
   /**
    * {@inheritDoc}
    */
-  public <T> void addContextResolver(Class<ContextResolver<T>> providerClass) {
+  public <T> void addContextResolver(Class<? extends ContextResolver<T>> providerClass) {
     ProviderDescriptor descriptor = new ProviderDescriptorImpl(providerClass);
     ProviderFactory pf = new PerRequestProviderFactory(descriptor);
     try {
@@ -230,7 +230,7 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
     }
   }
 
-  public <T> void addEntityProvider(Class<EntityProvider<T>> providerClass) {
+  public <T> void addEntityProvider(Class<? extends EntityProvider<T>> providerClass) {
     ProviderDescriptor descriptor = new ProviderDescriptorImpl(providerClass);
     ProviderFactory pf = new PerRequestProviderFactory(descriptor);
     try {
@@ -256,7 +256,7 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
   /**
    * {@inheritDoc}
    */
-  public <T extends Throwable> void addExceptionMapper(Class<ExceptionMapper<T>> providerClass) {
+  public <T extends Throwable> void addExceptionMapper(Class<? extends ExceptionMapper<T>> providerClass) {
     ProviderDescriptor descriptor = new ProviderDescriptorImpl(providerClass);
     ProviderFactory pf = new PerRequestProviderFactory(descriptor);
     try {
@@ -283,7 +283,7 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
   /**
    * {@inheritDoc}
    */
-  public <T> void addMessageBodyReader(Class<MessageBodyReader<T>> providerClass) {
+  public <T> void addMessageBodyReader(Class<? extends MessageBodyReader<T>> providerClass) {
     ProviderDescriptor descriptor = new ProviderDescriptorImpl(providerClass);
     ProviderFactory pf = new PerRequestProviderFactory(descriptor);
     try {
@@ -309,7 +309,7 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
   /**
    * {@inheritDoc}
    */
-  public <T> void addMessageBodyWriter(Class<MessageBodyWriter<T>> providerClass) {
+  public <T> void addMessageBodyWriter(Class<? extends MessageBodyWriter<T>> providerClass) {
     ProviderDescriptor descriptor = new ProviderDescriptorImpl(providerClass);
     ProviderFactory pf = new PerRequestProviderFactory(descriptor);
     try {

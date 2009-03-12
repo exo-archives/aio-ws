@@ -25,6 +25,7 @@ import javax.ws.rs.Path;
 import org.exoplatform.container.StandaloneContainer;
 import org.exoplatform.services.rest.impl.ConstructorInjectorImpl;
 import org.exoplatform.services.rest.impl.FieldInjectorImpl;
+import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 import org.exoplatform.services.rest.impl.resource.AbstractResourceDescriptorImpl;
 import org.exoplatform.services.rest.impl.resource.PathValue;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
@@ -38,10 +39,13 @@ import junit.framework.TestCase;
 public abstract class BaseTest extends TestCase {
 
   protected StandaloneContainer container;
+  
+  protected RuntimeDelegateImpl rd;
 
   public void setUp() throws Exception {
     StandaloneContainer.setConfigurationPath("src/test/java/conf/standalone/test-configuration.xml");
     container = StandaloneContainer.getInstance();
+    rd = RuntimeDelegateImpl.getInstance();
   }
 
   protected AbstractResourceDescriptor createResourceDescriptor(Class<?> clazz) {

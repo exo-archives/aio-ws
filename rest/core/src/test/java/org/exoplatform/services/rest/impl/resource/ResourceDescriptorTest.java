@@ -17,8 +17,6 @@
 
 package org.exoplatform.services.rest.impl.resource;
 
-import java.lang.reflect.Constructor;
-import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -35,8 +33,6 @@ import javax.ws.rs.core.MediaType;
 import org.exoplatform.services.rest.BaseTest;
 import org.exoplatform.services.rest.ConstructorInjector;
 import org.exoplatform.services.rest.FieldInjector;
-import org.exoplatform.services.rest.impl.ConstructorInjectorImpl;
-import org.exoplatform.services.rest.impl.FieldInjectorImpl;
 import org.exoplatform.services.rest.impl.header.MediaTypeHelper;
 import org.exoplatform.services.rest.method.MethodParameter;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;

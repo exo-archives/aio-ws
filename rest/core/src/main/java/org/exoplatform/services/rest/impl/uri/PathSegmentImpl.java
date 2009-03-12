@@ -67,10 +67,17 @@ public final class PathSegmentImpl implements PathSegment {
     if (p > 0)
       path = pathSegment.substring(0, p);
     else
-      return new PathSegmentImpl(pathSegment, m); // no matrix parameters
+      path = pathSegment;
+    if (decode)
+      path = UriComponent.decode(path, UriComponent.PATH_SEGMENT);
+    
+
+    if (p < 0) // no matrix parameters
+      return new PathSegmentImpl(path, m); 
 
     p++; // next character after ';'
-    while (p < pathSegment.length()) {
+    int length = pathSegment.length();
+    while (p < length) {
       n = pathSegment.indexOf(';', p); // find next ';'
       String pair; // should look like 'a=b', but value can absent
       if (n < 0) { // last pair in the string

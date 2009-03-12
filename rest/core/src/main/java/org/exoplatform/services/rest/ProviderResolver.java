@@ -44,7 +44,7 @@ public interface ProviderResolver extends Providers {
    * 
    * @param provider EntityProvider class
    */
-  <T> void addEntityProvider(Class<EntityProvider<T>> provider);
+  <T> void addEntityProvider(Class<? extends EntityProvider<T>> provider);
 
   /**
    * Add singleton EntityProvider.
@@ -60,7 +60,7 @@ public interface ProviderResolver extends Providers {
    * @param providerClass ExceptionMapper class
    * @see ExceptionMapper
    */
-  <T extends Throwable> void addExceptionMapper(Class<ExceptionMapper<T>> providerClass);
+  <T extends Throwable> void addExceptionMapper(Class<? extends ExceptionMapper<T>> providerClass);
 
   /**
    * Add singleton ExceptionMapper.
@@ -74,7 +74,7 @@ public interface ProviderResolver extends Providers {
    * 
    * @param providerClass ContextResolver class
    */
-  <T> void addContextResolver(Class<ContextResolver<T>> providerClass);
+  <T> void addContextResolver(Class<? extends ContextResolver<T>> providerClass);
 
   /**
    * Add singleton ContextResolver.
@@ -88,7 +88,7 @@ public interface ProviderResolver extends Providers {
    * 
    * @param providerClass MessageBodyReader class
    */
-  <T> void addMessageBodyReader(Class<MessageBodyReader<T>> providerClass);
+  <T> void addMessageBodyReader(Class<? extends MessageBodyReader<T>> providerClass);
 
   /**
    * Add singleton MessageBodyReader.
@@ -102,7 +102,7 @@ public interface ProviderResolver extends Providers {
    * 
    * @param providerClass MessageBodyWriter class
    */
-  <T> void addMessageBodyWriter(Class<MessageBodyWriter<T>> providerClass);
+  <T> void addMessageBodyWriter(Class<? extends MessageBodyWriter<T>> providerClass);
 
   /**
    * Add singleton MessageBodyWriter.

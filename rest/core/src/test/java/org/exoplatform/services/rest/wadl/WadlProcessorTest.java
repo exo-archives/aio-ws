@@ -225,6 +225,7 @@ public class WadlProcessorTest extends BaseTest {
     assertEquals("text/plain", res);
   }
 
+  @SuppressWarnings("unchecked")
   private static class DummyNamespaceContext implements NamespaceContext {
 
     private final String   nsPrefix;
