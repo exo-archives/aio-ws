@@ -25,12 +25,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.exoplatform.services.rest.BaseTest;
 import org.exoplatform.services.rest.RequestHandler;
 import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
-import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -43,23 +41,17 @@ public class JsonEntityProviderTest extends BaseTest {
   private RequestHandler      requestHandler;
 
   private MediaType           mediaType;
-  RuntimeDelegateImpl rd;
 
   public void setUp() throws Exception {
     super.setUp();
     requestHandler = (RequestHandler) container.getComponentInstanceOfType(RequestHandler.class);
     assertNotNull(requestHandler);
     mediaType = new MediaType("application", "json");
-    rd = (RuntimeDelegateImpl)RuntimeDelegate.getInstance();
   }
 
   @SuppressWarnings("unchecked")
   public void testRead() throws Exception {
-    RuntimeDelegateImpl rd = (RuntimeDelegateImpl)RuntimeDelegate.getInstance();
-    MessageBodyReader reader = rd/*requestHandler*/.getMessageBodyReader(Bean.class,
-                                                                   null,
-                                                                   null,
-                                                                   mediaType);
+    MessageBodyReader reader = rd.getMessageBodyReader(Bean.class, null, null, mediaType);
     assertNotNull(reader);
     assertTrue(reader.isReadable(Bean.class, Bean.class, null, mediaType));
     byte[] data = DATA.getBytes("UTF-8");
@@ -77,10 +69,7 @@ public class JsonEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testWrite() throws Exception {
-    MessageBodyWriter writer = /*requestHandler*/rd.getMessageBodyWriter(Bean.class,
-                                                                   null,
-                                                                   null,
-                                                                   mediaType);
+    MessageBodyWriter writer = rd.getMessageBodyWriter(Bean.class, null, null, mediaType);
     assertNotNull(writer);
     assertTrue(writer.isWriteable(Bean.class, Bean.class, null, mediaType));
     Bean bean = new Bean();

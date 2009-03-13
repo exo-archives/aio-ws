@@ -19,6 +19,8 @@ package org.exoplatform.services.rest;
 
 import java.lang.reflect.Field;
 
+import org.exoplatform.services.rest.resource.ResourceDescriptor;
+
 
 /**
  * Object field.
@@ -26,7 +28,7 @@ import java.lang.reflect.Field;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public interface FieldInjector extends Parameter {
+public interface FieldInjector extends Parameter, ResourceDescriptor {
 
   /**
    * @return field name

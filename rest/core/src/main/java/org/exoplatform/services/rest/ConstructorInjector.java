@@ -20,6 +20,8 @@ package org.exoplatform.services.rest;
 import java.lang.reflect.Constructor;
 import java.util.List;
 
+import org.exoplatform.services.rest.resource.ResourceDescriptor;
+
 
 /**
  * Abstraction of constructor descriptor.
@@ -27,7 +29,7 @@ import java.util.List;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public interface ConstructorInjector {
+public interface ConstructorInjector extends ResourceDescriptor {
 
   /**
    * @param context

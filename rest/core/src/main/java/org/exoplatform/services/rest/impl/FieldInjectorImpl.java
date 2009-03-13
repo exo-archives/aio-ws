@@ -38,6 +38,7 @@ import org.exoplatform.services.rest.FieldInjector;
 import org.exoplatform.services.rest.impl.method.ParameterHelper;
 import org.exoplatform.services.rest.impl.method.ParameterResolver;
 import org.exoplatform.services.rest.impl.method.ParameterResolverFactory;
+import org.exoplatform.services.rest.resource.ResourceDescriptorVisitor;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -212,6 +213,13 @@ public class FieldInjectorImpl implements FieldInjector {
 
   }
   
+  /**
+   * {@inheritDoc}
+   */
+  public void accept(ResourceDescriptorVisitor visitor) {
+    visitor.visitFieldInjector(this);
+  }
+
   /**
    * {@inheritDoc}
    */

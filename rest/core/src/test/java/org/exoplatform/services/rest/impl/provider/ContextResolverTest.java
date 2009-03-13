@@ -85,7 +85,6 @@ public class ContextResolverTest extends org.exoplatform.services.rest.AbstractR
     rd.addContextResolver(ContextResolver5.class); 
   }
   
-  
   public void testContextResolver() {
     assertEquals("text", rd.getContextResolver(String.class, new MediaType("text", "plain")).getContext(String.class));
     assertEquals("*", rd.getContextResolver(String.class, new MediaType("xxx", "xxx")).getContext(String.class));

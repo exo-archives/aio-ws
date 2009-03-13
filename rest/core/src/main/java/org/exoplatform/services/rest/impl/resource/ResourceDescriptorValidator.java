@@ -24,6 +24,8 @@ import java.util.List;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.exoplatform.services.rest.ConstructorInjector;
+import org.exoplatform.services.rest.FieldInjector;
 import org.exoplatform.services.rest.method.MethodParameter;
 import org.exoplatform.services.rest.resource.ResourceDescriptor;
 import org.exoplatform.services.rest.resource.ResourceDescriptorVisitor;
@@ -229,6 +231,20 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
     // TODO must be tolerant for not parameterized type and use string as
     // default ?
     return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void visitConstructorInjector(ConstructorInjector ci) {
+    // will be implemented later
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void visitFieldInjector(FieldInjector fi) {
+    // will be implemented later
   }
 
 }

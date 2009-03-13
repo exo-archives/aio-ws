@@ -29,7 +29,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.RuntimeDelegate;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
@@ -41,7 +40,6 @@ import org.exoplatform.services.rest.generated.Book;
 import org.exoplatform.services.rest.generated.MemberPrice;
 import org.exoplatform.services.rest.generated.Price;
 import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
-import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -49,27 +47,17 @@ import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
  */
 public class JAXBEntityProviderTest extends BaseTest {
 
-  private byte[]  data;
+  private byte[]    data;
 
-//  private RequestHandler requestHandler;
-
-  private MediaType      mediaType;
-
-private RuntimeDelegateImpl rd;
+  private MediaType mediaType;
 
   @Override
   public void setUp() throws Exception {
     super.setUp();
-//    requestHandler = (RequestHandler) container.getComponentInstanceOfType(RequestHandler.class);
-//    assertNotNull(requestHandler);
     mediaType = new MediaType("application", "xml");
-    data = ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-      + "<book send-by-post=\"true\">"
-      + "<title>Java and XML Data Binding</title>"
-      + "<author>Brett McLaughlin</author>" + "<price>34.95</price>"
-      + "<member-price currency=\"US\">26.56</member-price>"
-      + "</book>").getBytes("UTF-8");
-    rd = (RuntimeDelegateImpl)RuntimeDelegate.getInstance();
+    data = ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "<book send-by-post=\"true\">"
+        + "<title>Java and XML Data Binding</title>" + "<author>Brett McLaughlin</author>"
+        + "<price>34.95</price>" + "<member-price currency=\"US\">26.56</member-price>" + "</book>").getBytes("UTF-8");
   }
 
   public static JAXBElement<Book> m(JAXBElement<Book> je) {
@@ -82,10 +70,7 @@ private RuntimeDelegateImpl rd;
     assertNotNull(m);
     Class<?> type = m.getParameterTypes()[0];
     Type genericType = m.getGenericParameterTypes()[0];
-    MessageBodyReader reader = /*requestHandler*/rd.getMessageBodyReader(type,
-                                                                   genericType,
-                                                                   null,
-                                                                   mediaType);
+    MessageBodyReader reader = rd.getMessageBodyReader(type, genericType, null, mediaType);
     assertNotNull(reader);
     assertTrue(reader.isReadable(type, genericType, null, mediaType));
     InputStream in = new ByteArrayInputStream(data);
@@ -106,10 +91,10 @@ private RuntimeDelegateImpl rd;
     assertNotNull(m);
     Class<?> returnType = m.getReturnType();
     Type genericReturnType = m.getGenericReturnType();
-    MessageBodyWriter writer = /*requestHandler*/rd.getMessageBodyWriter(returnType,
-                                                                   genericReturnType,
-                                                                   null,
-                                                                   mediaType);
+    MessageBodyWriter writer = rd.getMessageBodyWriter(returnType,
+                                                       genericReturnType,
+                                                       null,
+                                                       mediaType);
     assertNotNull(writer);
     assertTrue(writer.isWriteable(returnType, genericReturnType, null, mediaType));
     JAXBContext ctx = JAXBContext.newInstance(Book.class);
@@ -127,7 +112,7 @@ private RuntimeDelegateImpl rd;
 
   @SuppressWarnings("unchecked")
   public void testReadJAXBObject() throws Exception {
-    MessageBodyReader prov = /*requestHandler*/rd.getMessageBodyReader(Book.class, null, null, mediaType);
+    MessageBodyReader prov = rd.getMessageBodyReader(Book.class, null, null, mediaType);
     assertNotNull(prov);
     assertTrue(prov.isReadable(Book.class, Book.class, null, mediaType));
     MultivaluedMap<String, String> h = new MultivaluedMapImpl();
@@ -143,10 +128,7 @@ private RuntimeDelegateImpl rd;
 
   @SuppressWarnings("unchecked")
   public void testWriteJAXBObject() throws Exception {
-    MessageBodyWriter writer = /*requestHandler*/rd.getMessageBodyWriter(Book.class,
-                                                                   null,
-                                                                   null,
-                                                                   mediaType);
+    MessageBodyWriter writer = rd.getMessageBodyWriter(Book.class, null, null, mediaType);
     assertNotNull(writer);
     assertTrue(writer.isWriteable(Book.class, Book.class, null, mediaType));
     Book book = new Book();

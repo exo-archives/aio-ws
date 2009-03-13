@@ -17,10 +17,14 @@
 
 package org.exoplatform.services.rest.resource;
 
+import org.exoplatform.services.rest.ConstructorInjector;
+import org.exoplatform.services.rest.FieldInjector;
+
 /**
  * Can be used for validation next resource descriptors
  * {@link AbstractResourceDescriptor}, {@link ResourceMethodDescriptor},
- * {@link SubResourceMethodDescriptor}, {@link SubResourceLocatorDescriptor} .
+ * {@link SubResourceMethodDescriptor}, {@link SubResourceLocatorDescriptor},
+ * {@link ConstructorInjector}, {@link FieldInjector} .
  * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
@@ -46,5 +50,15 @@ public interface ResourceDescriptorVisitor {
    * @param srld See {@link SubResourceLocatorDescriptor}
    */
   void visitSubResourceLocatorDescriptor(SubResourceLocatorDescriptor srld);
+
+  /**
+   * @param ci ConstructorInjector
+   */
+  void visitConstructorInjector(ConstructorInjector ci);
+
+  /**
+   * @param fi FieldInjector
+   */
+  void visitFieldInjector(FieldInjector fi);
 
 }

@@ -32,7 +32,9 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.Providers;
 
@@ -118,10 +120,39 @@ public class ProviderContextParameterInjectionTest extends AbstractResourceTest 
     }
 
   }
+  
+  @Provider
+  public static class ExceptionMapperChecker implements ExceptionMapper<RuntimeException> {
+
+    @Context
+    private UriInfo            uriInfo;
+
+    @Context
+    private Request            request;
+
+    @Context
+    private HttpHeaders        httpHeaders;
+
+    @Context
+    private Providers          providers;
+
+    @Context
+    private HttpServletRequest httpRequest;
+
+    public Response toResponse(RuntimeException exception) {
+      if (uriInfo != null && request != null && httpHeaders != null && providers != null
+          && httpRequest != null)
+        return Response.status(200).build();
+      else
+        return Response.status(500).build();
+    }
+    
+  }
 
   public void setUp() throws Exception {
     super.setUp();
     rd.addEntityProvider(ContextInjectionChecker.class);
+    rd.addExceptionMapper(ExceptionMapperChecker.class);
   }
 
   @Path("a")
@@ -134,12 +165,20 @@ public class ProviderContextParameterInjectionTest extends AbstractResourceTest 
       me.entity = "to be";
       return me;
     }
+
+    @GET
+    @Path("2")
+    public void m1() {
+      throw new RuntimeException();
+    }
   }
 
   public void test0() throws Exception {
     registry(new Resource1());
     ContainerResponse resp = service("GET", "/a/1", "", null, "to be or not to be".getBytes());
     assertEquals("to be", ((MockEntity) resp.getEntity()).entity);
+    resp = service("GET", "/a/2", "", null, null);
+    assertEquals(200, resp.getStatus());
     unregistry(Resource1.class);
   }
 

@@ -44,6 +44,7 @@ import org.exoplatform.services.rest.ConstructorParameter;
 import org.exoplatform.services.rest.impl.method.ParameterHelper;
 import org.exoplatform.services.rest.impl.method.ParameterResolver;
 import org.exoplatform.services.rest.impl.method.ParameterResolverFactory;
+import org.exoplatform.services.rest.resource.ResourceDescriptorVisitor;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -60,20 +61,13 @@ public class ConstructorInjectorImpl implements ConstructorInjector {
    * Compare two ConstructorDescriptor in number parameters order.
    */
   public static final Comparator<ConstructorInjector> CONSTRUCTOR_COMPARATOR = new Comparator<ConstructorInjector>() {
-                                                                               public int compare(ConstructorInjector o1,
-                                                                                                  ConstructorInjector o2) {
-                                                                                 int r = o2.getParameters()
-                                                                                           .size()
-                                                                                     - o1.getParameters()
-                                                                                         .size();
-                                                                                 if (r == 0)
-                                                                                   LOG.warn("Two constructors with the same number of parameter found "
-                                                                                       + o1
-                                                                                       + " and "
-                                                                                       + o2);
-                                                                                 return r;
-                                                                               }
-                                                                             };
+    public int compare(ConstructorInjector o1, ConstructorInjector o2) {
+      int r = o2.getParameters().size() - o1.getParameters().size();
+        if (r == 0)
+          LOG.warn("Two constructors with the same number of parameter found " + o1 + " and " + o2);
+        return r;
+    }
+  };
 
   /**
    * Constructor.
@@ -250,6 +244,13 @@ public class ConstructorInjectorImpl implements ConstructorInjector {
     } catch (Throwable thr) {
       throw new ApplicationException(thr);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void accept(ResourceDescriptorVisitor visitor) {
+    visitor.visitConstructorInjector(this);
   }
 
   /**

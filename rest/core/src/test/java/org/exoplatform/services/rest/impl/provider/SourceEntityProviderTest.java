@@ -25,7 +25,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.RuntimeDelegate;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -35,7 +34,6 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.exoplatform.services.rest.BaseTest;
 import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
-import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -46,29 +44,19 @@ import org.xml.sax.InputSource;
  */
 public class SourceEntityProviderTest extends BaseTest {
 
-  private byte[] data;
+  private byte[]    data;
 
-  private MediaType           mediaType;
-
-  private RuntimeDelegateImpl rd;
-
-//  private RequestHandler      requestHandler;
+  private MediaType mediaType;
 
   public void setUp() throws Exception {
     super.setUp();
-//    requestHandler = (RequestHandler) container.getComponentInstanceOfType(RequestHandler.class);
-//    assertNotNull(requestHandler);
     mediaType = new MediaType("application", "xml");
     data = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root><message>to be or not to be</message></root>".getBytes("UTF-8");
-    rd = (RuntimeDelegateImpl)RuntimeDelegate.getInstance();
   }
 
   @SuppressWarnings("unchecked")
   public void testReadStreamSourceEntityProvider() throws Exception {
-    MessageBodyReader reader = /*requestHandler*/rd.getMessageBodyReader(StreamSource.class,
-                                                                   null,
-                                                                   null,
-                                                                   mediaType);
+    MessageBodyReader reader = rd.getMessageBodyReader(StreamSource.class, null, null, mediaType);
     assertNotNull(reader);
     assertTrue(reader.isReadable(StreamSource.class, StreamSource.class, null, mediaType));
     MultivaluedMap<String, String> h = new MultivaluedMapImpl();
@@ -87,10 +75,7 @@ public class SourceEntityProviderTest extends BaseTest {
   @SuppressWarnings("unchecked")
   public void testWriteStreamSourceEntityProvider() throws Exception {
     StreamSource src = new StreamSource(new ByteArrayInputStream(data));
-    MessageBodyWriter writer = /*requestHandler*/rd.getMessageBodyWriter(StreamSource.class,
-                                                                   null,
-                                                                   null,
-                                                                   mediaType);
+    MessageBodyWriter writer = rd.getMessageBodyWriter(StreamSource.class, null, null, mediaType);
     assertNotNull(writer);
     assertTrue(writer.isWriteable(StreamSource.class, StreamSource.class, null, mediaType));
     ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -100,10 +85,7 @@ public class SourceEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testReadSAXSourceEntityProvider() throws Exception {
-    MessageBodyReader reader = /*requestHandler*/rd.getMessageBodyReader(SAXSource.class,
-                                                                   null,
-                                                                   null,
-                                                                   mediaType);
+    MessageBodyReader reader = rd.getMessageBodyReader(SAXSource.class, null, null, mediaType);
     assertNotNull(reader);
     assertTrue(reader.isReadable(SAXSource.class, SAXSource.class, null, mediaType));
     MultivaluedMap<String, String> h = new MultivaluedMapImpl();
@@ -122,10 +104,7 @@ public class SourceEntityProviderTest extends BaseTest {
   @SuppressWarnings("unchecked")
   public void testWriteSAXSourceEntityProvider() throws Exception {
     SAXSource src = new SAXSource(new InputSource(new ByteArrayInputStream(data)));
-    MessageBodyWriter writer = /*requestHandler*/rd.getMessageBodyWriter(SAXSource.class,
-                                                                   null,
-                                                                   null,
-                                                                   mediaType);
+    MessageBodyWriter writer = rd.getMessageBodyWriter(SAXSource.class, null, null, mediaType);
     assertNotNull(writer);
     assertTrue(writer.isWriteable(SAXSource.class, SAXSource.class, null, mediaType));
     ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -135,10 +114,7 @@ public class SourceEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testReadDOMSourceEntityProvider() throws Exception {
-    MessageBodyReader reader = /*requestHandler*/rd.getMessageBodyReader(DOMSource.class,
-                                                                   null,
-                                                                   null,
-                                                                   mediaType);
+    MessageBodyReader reader = rd.getMessageBodyReader(DOMSource.class, null, null, mediaType);
     assertNotNull(reader);
     assertTrue(reader.isReadable(DOMSource.class, DOMSource.class, null, mediaType));
     MultivaluedMap<String, String> h = new MultivaluedMapImpl();
@@ -160,10 +136,7 @@ public class SourceEntityProviderTest extends BaseTest {
     Document d = DocumentBuilderFactory.newInstance()
                                        .newDocumentBuilder()
                                        .parse(new ByteArrayInputStream(data));
-    MessageBodyWriter writer = /*requestHandler*/rd.getMessageBodyWriter(DOMSource.class,
-                                                                   null,
-                                                                   null,
-                                                                   mediaType);
+    MessageBodyWriter writer = rd.getMessageBodyWriter(DOMSource.class, null, null, mediaType);
     assertNotNull(writer);
     assertTrue(writer.isWriteable(DOMSource.class, DOMSource.class, null, mediaType));
     ByteArrayOutputStream out = new ByteArrayOutputStream();

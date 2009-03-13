@@ -33,6 +33,8 @@ import org.apache.commons.logging.Log;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.rest.ConstructorInjector;
+import org.exoplatform.services.rest.FieldInjector;
 import org.exoplatform.services.rest.impl.resource.AbstractResourceDescriptorImpl;
 import org.exoplatform.services.rest.impl.resource.PathValue;
 import org.exoplatform.services.rest.impl.resource.PerRequestResourceFactory;
@@ -97,7 +99,9 @@ public final class ResourceBinder {
    * @throws Exception if can't set instance of {@link RuntimeDelegate}
    */
   public ResourceBinder(ExoContainerContext containerContext) throws Exception {
-    // initialize RuntimeDelegate instance
+    // Initialize RuntimeDelegate instance
+    // This is first component in life cycle what needs.
+    // TODO better solution to initialize RuntimeDelegate
     RuntimeDelegateImpl rd = new RuntimeDelegateImpl();
     RuntimeDelegate.setInstance(rd);
 
@@ -126,8 +130,30 @@ public final class ResourceBinder {
       return false;
     }
 
-    validate(descriptor);
-   
+    for (ResourceFactory r : getRootResources()) {
+      if (r.getUriPattern().equals(descriptor.getUriPattern())) {
+        String msg = "Resource class " + descriptor.getResourceClass().getClass().getName()
+            + " can't be registered. Resource class " + r.getClass().getName()
+            + " with the same pattern " + r.getUriPattern() + " already registered.";
+        throw new RuntimeException(msg);
+      }
+    }
+
+    // validate AbstractResourceDescriptor
+    descriptor.accept(rdv);
+    // validate each ResourceMethodDescriptor
+    for (ResourceMethodDescriptor rmd : descriptor.getResourceMethodDescriptors()) {
+      rmd.accept(rdv);
+    }
+    // validate each SubResourceMethodDescriptor
+    for (SubResourceMethodDescriptor srmd : descriptor.getSubResourceMethodDescriptors()) {
+      srmd.accept(rdv);
+    }
+    // validate each SubResourceLocatorDescriptor
+    for (SubResourceLocatorDescriptor srld : descriptor.getSubResourceLocatorDescriptors()) {
+      srld.accept(rdv);
+    }
+
     ResourceFactory rc = new SingletonResourceFactory(descriptor, resource);
     getRootResources().add(rc);
     Collections.sort(getRootResources(), COMPARATOR);
@@ -152,6 +178,15 @@ public final class ResourceBinder {
       return false;
     }
 
+    for (ResourceFactory r : getRootResources()) {
+      if (r.getUriPattern().equals(descriptor.getUriPattern())) {
+        String msg = "Resource class " + descriptor.getResourceClass().getClass().getName()
+            + " can't be registered. Resource class " + r.getClass().getName()
+            + " with the same pattern " + r.getUriPattern() + " already registered.";
+        throw new RuntimeException(msg);
+      }
+    }
+
     // per-request resource then process constructors and fields
 
     // process constructors
@@ -159,12 +194,10 @@ public final class ResourceBinder {
       descriptor.getConstructorInjectors().add(new ConstructorInjectorImpl(resourceClass,
                                                                            constructor));
     }
-
     if (descriptor.getConstructorInjectors().size() == 0) {
       String msg = "Not found accepted constructors in resource class " + resourceClass.getName();
       throw new RuntimeException(msg);
     }
-
     // Sort constructors in number parameters order
     if (descriptor.getConstructorInjectors().size() > 1) {
       java.util.Collections.sort(descriptor.getConstructorInjectors(),
@@ -176,47 +209,34 @@ public final class ResourceBinder {
       descriptor.getFieldInjectors().add(new FieldInjectorImpl(resourceClass, jfield));
     }
 
-    validate(descriptor);
-
+    // validate AbstractResourceDescriptor
+    descriptor.accept(rdv);
+    // validate each ResourceMethodDescriptor
+    for (ResourceMethodDescriptor rmd : descriptor.getResourceMethodDescriptors()) {
+      rmd.accept(rdv);
+    }
+    // validate each SubResourceMethodDescriptor
+    for (SubResourceMethodDescriptor srmd : descriptor.getSubResourceMethodDescriptors()) {
+      srmd.accept(rdv);
+    }
+    // validate each SubResourceLocatorDescriptor
+    for (SubResourceLocatorDescriptor srld : descriptor.getSubResourceLocatorDescriptors()) {
+      srld.accept(rdv);
+    }
+    // validate constructors
+    for (ConstructorInjector ci : descriptor.getConstructorInjectors()) {
+      ci.accept(rdv);
+    }
+    // validate fields descriptor
+    for (FieldInjector fi : descriptor.getFieldInjectors()) {
+      fi.accept(rdv);
+    }
+    
     ResourceFactory rc = new PerRequestResourceFactory(descriptor);
     getRootResources().add(rc);
     Collections.sort(getRootResources(), COMPARATOR);
     LOG.info("Bind new resource " + rc.getUriPattern().getRegex() + " : " + resourceClass);
     return true;
-
-  }
-
-  /**
-   * Validate {@link AbstractResourceDescriptor}.
-   * 
-   * @param ard AbstractResourceDescriptor to be validated
-   * @see ResourceDescriptorValidator
-   */
-  private void validate(AbstractResourceDescriptor ard) {
-
-    // validate AbstractResourceDescriptor
-    ard.accept(rdv);
-
-    // validate each ResourceMethodDescriptor
-    for (ResourceMethodDescriptor rmd : ard.getResourceMethodDescriptors())
-      rmd.accept(rdv);
-
-    // validate each SubResourceMethodDescriptor
-    for (SubResourceMethodDescriptor srmd : ard.getSubResourceMethodDescriptors())
-      srmd.accept(rdv);
-
-    // validate each SubResourceLocatorDescriptor
-    for (SubResourceLocatorDescriptor srld : ard.getSubResourceLocatorDescriptors())
-      srld.accept(rdv);
-
-    for (ResourceFactory r : getRootResources()) {
-      if (r.getUriPattern().equals(ard.getUriPattern())) {
-        String msg = "Resource class " + ard.getResourceClass().getClass().getName()
-            + " can't be registered. Resource class " + r.getClass().getName()
-            + " with the same pattern " + r.getUriPattern() + " already registered.";
-        throw new RuntimeException(msg);
-      }
-    }
 
   }
 

@@ -112,6 +112,7 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
                             JAXBContextResolver jaxbContexts,
                             InitParams params) {
 
+    // NOTE!!! RuntimeDelegate should be already initialized by ResourceBinder
     rd = RuntimeDelegateImpl.getInstance();
 
     if (params != null) {
@@ -140,6 +141,7 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
   /**
    * {@inheritDoc}
    */
+  @SuppressWarnings("unchecked")
   public void handleRequest(GenericContainerRequest request, GenericContainerResponse response) throws Exception {
     try {
       URI uri = UriBuilder.fromUri(request.getRequestUri())
@@ -162,8 +164,53 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
       try {
         dispatcher.dispatch(request, response);
       } catch (Exception e) {
-        processError(e, response);
-        return;
+        if (e instanceof WebApplicationException) {
+
+          Response errorResponse = ((WebApplicationException) e).getResponse();
+          ExceptionMapper excmap = RuntimeDelegateImpl.getInstance()
+                                                      .getExceptionMapper(WebApplicationException.class);
+
+          // should be some of 4xx status
+          if (errorResponse.getStatus() < 500) {
+            if (errorResponse.getEntity() == null) {
+              if (excmap != null) {
+                errorResponse = excmap.toResponse(e);
+              }
+            }
+            response.setResponse(errorResponse);
+          } else {
+            if (LOG.isDebugEnabled())
+              e.printStackTrace();
+
+            if (errorResponse.getEntity() == null) {
+              if (excmap != null) {
+                errorResponse = excmap.toResponse(e);
+              } else {
+                // add stack trace as message body
+                errorResponse = Response.status(errorResponse.getStatus())
+                                        .entity(new ErrorStreaming(e))
+                                        .type(MediaType.TEXT_PLAIN)
+                                        .build();
+              }
+            }
+            response.setResponse(errorResponse);
+          }
+        } else if (e instanceof ApplicationException) {
+          Class cause = e.getCause().getClass();
+          ExceptionMapper excmap = RuntimeDelegateImpl.getInstance().getExceptionMapper(cause);
+          while (cause != null && excmap == null) {
+            excmap = RuntimeDelegateImpl.getInstance().getExceptionMapper(cause);
+            if (excmap == null)
+              cause = cause.getSuperclass();
+          }
+          if (excmap != null) {
+            response.setResponse(excmap.toResponse(e.getCause()));
+          } else {
+            throw new UnhandledException(e.getCause());
+          }
+        } else {
+          throw new UnhandledException(e);
+        }
       }
 
       for (Entry<UriPattern, List<ResponseFilter>> e : rd.getResponseFilters().entrySet()) {
@@ -174,6 +221,7 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
       }
 
       response.writeResponse();
+      
     } finally {
       // reset application context
       ApplicationContextImpl.setCurrent(null);
@@ -181,63 +229,6 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
   }
 
   //
-
-  /**
-   * Process errors, create message about occurs errors if needs, etc.
-   * 
-   * @param e See exception
-   * @param response See {@link GenericContainerResponse}
-   */
-  @SuppressWarnings("unchecked")
-  private static void processError(Exception e, GenericContainerResponse response) {
-    if (e instanceof WebApplicationException) {
-
-      Response errorResponse = ((WebApplicationException) e).getResponse();
-      ExceptionMapper excmap = RuntimeDelegateImpl.getInstance()
-                                                  .getExceptionMapper(WebApplicationException.class);
-
-      // should be some of 4xx status
-      if (errorResponse.getStatus() < 500) {
-        if (errorResponse.getEntity() == null) {
-          if (excmap != null) {
-            errorResponse = excmap.toResponse(e);
-          }
-        }
-        response.setResponse(errorResponse);
-      } else {
-        if (LOG.isDebugEnabled())
-          e.printStackTrace();
-
-        if (errorResponse.getEntity() == null) {
-          if (excmap != null) {
-            errorResponse = excmap.toResponse(e);
-          } else {
-            // add stack trace as message body
-            errorResponse = Response.status(errorResponse.getStatus())
-                                    .entity(new ErrorStreaming(e))
-                                    .type(MediaType.TEXT_PLAIN)
-                                    .build();
-          }
-        }
-        response.setResponse(errorResponse);
-      }
-    } else if (e instanceof ApplicationException) {
-      Class cause = e.getCause().getClass();
-      ExceptionMapper excmap = RuntimeDelegateImpl.getInstance().getExceptionMapper(cause);
-      while (cause != null && excmap == null) {
-        excmap = RuntimeDelegateImpl.getInstance().getExceptionMapper(cause);
-        if (excmap == null)
-          cause = cause.getSuperclass();
-      }
-      if (excmap != null) {
-        response.setResponse(excmap.toResponse(e.getCause()));
-      } else {
-        throw new UnhandledException(e.getCause());
-      }
-    } else {
-      throw new UnhandledException(e);
-    }
-  }
 
   /**
    * For writing error message.
