@@ -157,6 +157,6 @@ public interface ExtHttpHeaders extends HttpHeaders {
    * XUser-Agent header. See <a
    * href='http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html'>here</a>.
    */
-    public static final String USERAGENT              = "User-Agent";
+  public static final String USERAGENT              = "User-Agent";
 
 }
