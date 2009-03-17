@@ -154,9 +154,15 @@ public interface ExtHttpHeaders extends HttpHeaders {
   public static final String X_HTTP_METHOD_OVERRIDE = "X-HTTP-Method-Override";
 
   /**
-   * XUser-Agent header. See <a
-   * href='http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html'>here</a>.
+   * User-Agent header. See <a
+   * href='http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html'> HTTP Header Field Definitions sec. 14.43 Transfer-Encoding</a>.
    */
   public static final String USERAGENT              = "User-Agent";
+  
+  /**
+   * Transfer-Encoding header. See <a
+   * href='http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html'> HTTP Header Field Definitions sec. 14.41 Transfer-Encoding</a>.
+   */
+  public static final String TRANSFER_ENCODING = "Transfer-Encoding";
 
 }
