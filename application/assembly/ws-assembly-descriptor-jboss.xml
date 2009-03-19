@@ -1,5 +1,5 @@
 <assembly>
-  <id>${org.exoplatform.ws.version}</id>
+  <id>1.3.4-SNAPSHOT</id>
   <formats>
     <format>dir</format>
   </formats>

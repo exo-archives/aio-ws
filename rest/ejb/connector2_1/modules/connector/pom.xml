@@ -2,11 +2,11 @@
   <parent>
     <groupId>org.exoplatform.ws</groupId>
     <artifactId>config</artifactId>
-    <version>1.3.3-SNAPSHOT</version>
+    <version>1.3.4-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>exo.ws.rest.ejbconnector2_1.bean</artifactId>
-  <version>${org.exoplatform.ws.version}</version>
+  <version>1.3.4-SNAPSHOT</version>
   <name>Enterprise Bean ejb to rest connector ejb2.1</name>
   <description></description>
   
@@ -19,12 +19,12 @@
     <dependency>
       <groupId>org.exoplatform.ws</groupId>
       <artifactId>exo.ws.rest.core</artifactId>
-      <version>${org.exoplatform.ws.version}</version>
+      <version>1.3.4-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.ws</groupId>
       <artifactId>exo.ws.commons</artifactId>
-      <version>${org.exoplatform.ws.version}</version>
+      <version>1.3.4-SNAPSHOT</version>
     </dependency>
   </dependencies>
   
