@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <component>
+    <type>org.exoplatform.ws.security.oauth.impl.OAuthProviderServiceMD5Impl</type>
+    <init-params>
+      <properties-param>
+        <name>exo1</name>
+        <property name="secret" value="81d1b5d080d1" />
+        <property name="description" value="description" />
+        <property name="callbackURL" value="http://localhost:8080/ws-examples/callback" />
+      </properties-param>
+    </init-params>
+  </component>
+</configuration>

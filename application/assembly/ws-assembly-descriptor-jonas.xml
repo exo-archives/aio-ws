@@ -1,0 +1,58 @@
+<assembly>
+  <id>1.3.3</id>
+  <formats>
+    <format>dir</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+
+  <fileSets>
+    <fileSet>
+      <directory>target/classes</directory>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>
+  </fileSets>
+
+  <dependencySets>
+    <dependencySet>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <outputDirectory>/</outputDirectory>
+
+      <excludes>
+        <exclude>org.apache.geronimo.specs:geronimo-annotation_1.0_spec</exclude>
+        <exclude>org.apache.geronimo.specs:geronimo-stax-api_1.0_spec</exclude>
+        <exclude>org.apache.geronimo.specs:geronimo-servlet_2.5_spec</exclude>
+        <exclude>org.apache.geronimo.specs:geronimo-activation_1.1_spec</exclude>
+        <exclude>org.apache.geronimo.specs:geronimo-javamail_1.4_spec</exclude>
+        <exclude>org.apache.xmlbeans:xmlbeans</exclude>
+        <exclude>org.mortbay.jetty:servlet-api-2.5</exclude>
+        <exclude>xdoclet:xdoclet</exclude>
+        <exclude>xdoclet:xdoclet-xdoclet-module</exclude>
+        <exclude>xdoclet:xdoclet-hibernate-module</exclude>
+        <exclude>javax.faces:jsf-api</exclude>
+
+        <exclude>org.springframework:spring</exclude>
+        <exclude>javax.servlet:servlet-api</exclude>
+        <exclude>javax.ejb:ejb</exclude>
+        <exclude>org.apache.ws.commons:XmlSchema</exclude>
+        <exclude>org.apache.ant:ant</exclude>
+        <exclude>ant:ant</exclude>
+        <exclude>org.apache.ant:ant-launcher</exclude>
+        <exclude>ant:ant-launcher</exclude>
+        <exclude>org.objectweb.carol:carol</exclude>
+        <exclude>javax.mail:mail</exclude>
+        <exclude>org.apache.xbean:xbean</exclude>
+        <exclude>org.apache.xbean:xbean-spring</exclude>
+        <exclude>xmlbeans:xbean</exclude>
+        <exclude>xml-apis:xml-apis</exclude>
+        <exclude>xerces:xmlParserAPIs</exclude>
+        <exclude>xerces:xercesImpl</exclude>
+        <exclude>javax.portlet:portlet-api</exclude>
+      </excludes>
+
+    </dependencySet>
+  </dependencySets>
+
+  <componentDescriptors />
+
+</assembly>
