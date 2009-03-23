@@ -17,9 +17,9 @@
 
 package org.exoplatform.services.rest.impl.method;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.container.component.BaseComponentPlugin;
@@ -41,12 +41,12 @@ public class MethodInvokerFilterComponentPlugin extends BaseComponentPlugin {
   /**
    * Logger.
    */
-  private static final Log          LOG  = ExoLogger.getLogger(MethodInvokerFilterComponentPlugin.class.getName());
+  private static final Log                          LOG  = ExoLogger.getLogger(MethodInvokerFilterComponentPlugin.class.getName());
 
   /**
    * List of {@link MethodInvokerFilter}.
    */
-  private List<MethodInvokerFilter> mifs = new ArrayList<MethodInvokerFilter>();
+  private Set<Class<? extends MethodInvokerFilter>> mifs = new HashSet<Class<? extends MethodInvokerFilter>>();
 
   /**
    * @param params initialize parameters from configuration
@@ -59,20 +59,19 @@ public class MethodInvokerFilterComponentPlugin extends BaseComponentPlugin {
       while (i.hasNext()) {
         ValueParam v = i.next();
         try {
-          Class c = Class.forName(v.getValue());
-          MethodInvokerFilter mif = (MethodInvokerFilter) c.newInstance();
-          mifs.add(mif);
-        } catch (Exception e) {
-          LOG.error("Can't instantiate method invoker filter " + v.getValue(), e);
+          mifs.add((Class<? extends MethodInvokerFilter>) Class.forName(v.getValue()));
+        } catch (ClassNotFoundException e) {
+          LOG.error("Failed load class " + v.getValue(), e);
         }
       }
     }
   }
 
   /**
-   * @return get list of {@link MethodInvokerFilter} supplied from configuration
+   * @return get collection of classes MethodInvokerFilter supplied from
+   *         configuration
    */
-  public List<MethodInvokerFilter> getFilters() {
+  public Set<Class<? extends MethodInvokerFilter>> getFilters() {
     return mifs;
   }
 

@@ -22,9 +22,9 @@ import java.util.List;
 
 import org.exoplatform.services.rest.resource.ResourceDescriptor;
 
-
 /**
- * Abstraction of constructor descriptor.
+ * Abstraction of constructor descriptor. Used for create object instance when
+ * type is used in per-request lifecycle.
  * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
@@ -32,16 +32,20 @@ import org.exoplatform.services.rest.resource.ResourceDescriptor;
 public interface ConstructorInjector extends ResourceDescriptor {
 
   /**
-   * @param context
+   * @param context ApplicationContext
    * @return newly created instance of the constructor's
+   * @see ApplicationContext
    */
   Object createInstance(ApplicationContext context);
 
   /**
+   * Get source constructor.
+   * 
    * @return constructor
-   */ 
+   * @see Constructor
+   */
   Constructor<?> getConstructor();
-  
+
   /**
    * @return constructor's parameters
    */

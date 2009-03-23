@@ -69,7 +69,7 @@ public class SourceEntityProviderTest extends BaseTest {
                                                       new ByteArrayInputStream(data));
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     TransformerFactory.newInstance().newTransformer().transform(src, new StreamResult(out));
-    // write(out);
+    write(out);
   }
 
   @SuppressWarnings("unchecked")
@@ -80,7 +80,7 @@ public class SourceEntityProviderTest extends BaseTest {
     assertTrue(writer.isWriteable(StreamSource.class, StreamSource.class, null, mediaType));
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     writer.writeTo(src, StreamSource.class, StreamSource.class, null, mediaType, null, out);
-    // write(out);
+    write(out);
   }
 
   @SuppressWarnings("unchecked")
@@ -98,7 +98,7 @@ public class SourceEntityProviderTest extends BaseTest {
                                                 new ByteArrayInputStream(data));
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     TransformerFactory.newInstance().newTransformer().transform(src, new StreamResult(out));
-    // write(out);
+    write(out);
   }
 
   @SuppressWarnings("unchecked")
@@ -109,7 +109,7 @@ public class SourceEntityProviderTest extends BaseTest {
     assertTrue(writer.isWriteable(SAXSource.class, SAXSource.class, null, mediaType));
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     writer.writeTo(src, SAXSource.class, SAXSource.class, null, mediaType, null, out);
-    // write(out);
+    write(out);
   }
 
   @SuppressWarnings("unchecked")
@@ -141,10 +141,10 @@ public class SourceEntityProviderTest extends BaseTest {
     assertTrue(writer.isWriteable(DOMSource.class, DOMSource.class, null, mediaType));
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     writer.writeTo(new DOMSource(d), DOMSource.class, DOMSource.class, null, mediaType, null, out);
-    // write(out);
+     write(out);
   }
 
-  // private static void write(ByteArrayOutputStream out) throws Exception {
-  // System.out.println(out.toString("UTF-8"));
-  // }
+   private static void write(ByteArrayOutputStream out) throws Exception {
+    System.out.println(out.toString("UTF-8"));
+  }
 }

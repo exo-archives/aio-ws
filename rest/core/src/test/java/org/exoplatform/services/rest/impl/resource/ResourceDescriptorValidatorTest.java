@@ -17,6 +17,7 @@
 
 package org.exoplatform.services.rest.impl.resource;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 import javax.ws.rs.FormParam;
@@ -31,6 +32,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.exoplatform.services.rest.BaseTest;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
 import org.exoplatform.services.rest.resource.ResourceMethodDescriptor;
+import org.exoplatform.services.rest.resource.ResourceMethodMap;
 import org.exoplatform.services.rest.resource.SubResourceLocatorDescriptor;
 import org.exoplatform.services.rest.resource.SubResourceMethodDescriptor;
 
@@ -41,13 +43,7 @@ import org.exoplatform.services.rest.resource.SubResourceMethodDescriptor;
 public class ResourceDescriptorValidatorTest extends BaseTest {
 
   public void testAbstractResourceDescriptorValidator() {
-    AbstractResourceDescriptor resource = createResourceDescriptor(Resource1.class);
-    try {
-      resource.accept(new ResourceDescriptorValidator());
-      fail("Exception should be here");
-    } catch (RuntimeException e) {
-    }
-    resource = createResourceDescriptor(Resource2.class);
+    AbstractResourceDescriptor resource = new AbstractResourceDescriptorImpl(Resource2.class);
     try {
       resource.accept(new ResourceDescriptorValidator());
       fail("Exception should be here");
@@ -57,47 +53,52 @@ public class ResourceDescriptorValidatorTest extends BaseTest {
   
   
   public void testResourceMethodDescriptorValidator() {
-    AbstractResourceDescriptor resource = createResourceDescriptor(Resource3.class);
-    List<ResourceMethodDescriptor> l = resource.getResourceMethodDescriptors();
-    ResourceDescriptorValidator validator = new ResourceDescriptorValidator();
-    for (ResourceMethodDescriptor rmd : l) {
-      String mn = rmd.getMethod().getName();
-      if ("m1".equals(mn)) 
-        rmd.accept(validator);
-      else {
-        try {
+    AbstractResourceDescriptor resource = new AbstractResourceDescriptorImpl(Resource3.class);
+    for (List<ResourceMethodDescriptor> l : resource.getResourceMethods().values()) {
+      ResourceDescriptorValidator validator = new ResourceDescriptorValidator();
+      for (ResourceMethodDescriptor rmd : l) {
+        Method m = rmd.getMethod();
+        if (m == null) // maybe null for OPTIONS
+          continue;
+        String mn = rmd.getMethod().getName();
+        if ("m1".equals(mn))
           rmd.accept(validator);
-          fail("Exception should be here");
-        } catch (RuntimeException e) {
+        else {
+          try {
+            rmd.accept(validator);
+            fail("Exception should be here");
+          } catch (RuntimeException e) {
+          }
         }
       }
     }
   }
   
   public void testSubResourceMethodDescriptorValidator() {
-    AbstractResourceDescriptor resource = createResourceDescriptor(Resource4.class);
-    List<SubResourceMethodDescriptor> l = resource.getSubResourceMethodDescriptors();
-    
+    AbstractResourceDescriptor resource = new AbstractResourceDescriptorImpl(Resource4.class);
     ResourceDescriptorValidator validator = new ResourceDescriptorValidator();
-    for (SubResourceMethodDescriptor srmd : l) {
-      String mn = srmd.getMethod().getName();
-      if ("m1".equals(mn) || "m3".equals(mn)) 
-        srmd.accept(validator);
-      else {
-        try {
-          srmd.accept(validator);
-          fail("Exception should be here");
-        } catch (RuntimeException e) {
+    for (ResourceMethodMap<SubResourceMethodDescriptor> srmm : resource.getSubResourceMethods().values()) {
+      for (List<SubResourceMethodDescriptor> l : srmm.values()) {
+        for (SubResourceMethodDescriptor srmd : l) {
+          String mn = srmd.getMethod().getName();
+          if ("m1".equals(mn) || "m3".equals(mn)) 
+            srmd.accept(validator);
+          else {
+            try {
+              srmd.accept(validator);
+              fail("Exception should be here");
+            } catch (RuntimeException e) {
+            }
+          }
         }
       }
     }
   }
 
   public void testSubResourceLocatorDescriptorValidator() {
-    AbstractResourceDescriptor resource = createResourceDescriptor(Resource5.class);
-    List<SubResourceLocatorDescriptor> l = resource.getSubResourceLocatorDescriptors();
+    AbstractResourceDescriptor resource = new AbstractResourceDescriptorImpl(Resource5.class);
     ResourceDescriptorValidator validator = new ResourceDescriptorValidator();
-    for (SubResourceLocatorDescriptor rmd : l) {
+    for (SubResourceLocatorDescriptor rmd : resource.getSubResourceLocators().values()) {
       String mn = rmd.getMethod().getName();
       if ("m1".equals(mn)) 
         rmd.accept(validator);
@@ -113,21 +114,15 @@ public class ResourceDescriptorValidatorTest extends BaseTest {
   
   //
   
-  @Path("/a/b") // OK
-  private static class Resource1 {
-    public void m1() {
-    }
-  }
-
   @Path("") // wrong
-  private static class Resource2 {
+  public static class Resource2 {
     @GET
     public void m1() {
     }
   }
 
   @Path("/a/b")
-  private static class Resource3 {
+  public static class Resource3 {
     @GET
     public void m1(@FormParam("a") String t, MultivaluedMap<String, String> entity) {
       // OK
@@ -147,8 +142,9 @@ public class ResourceDescriptorValidatorTest extends BaseTest {
     }
   }
   
+  @SuppressWarnings("unchecked")
   @Path("/a/b")
-  private static class Resource4 {
+  public static class Resource4 {
     @GET
     @Path("c")
     public void m1() {
@@ -181,7 +177,7 @@ public class ResourceDescriptorValidatorTest extends BaseTest {
   }
 
   @Path("/a/b")
-  private static class Resource5 {
+  public static class Resource5 {
     @Path("c")
     public void m1() {
       // OK

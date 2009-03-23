@@ -17,8 +17,6 @@
 
 package org.exoplatform.services.rest.method;
 
-import javax.ws.rs.WebApplicationException;
-
 import org.exoplatform.services.rest.resource.GenericMethodResource;
 
 /**
@@ -35,8 +33,7 @@ public interface MethodInvokerFilter {
    * Check does supplied method can be invoked.
    * 
    * @param genericMethodResource See {@link GenericMethodResource}
-   * @throws WebApplicationException if method can't be invoked
    */
-  void accept(GenericMethodResource genericMethodResource) throws WebApplicationException;
+  void accept(GenericMethodResource genericMethodResource);
 
 }

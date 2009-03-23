@@ -15,39 +15,29 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest.impl.resource;
+package org.exoplatform.services.rest;
 
-import org.exoplatform.services.rest.ApplicationContext;
-import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.annotation.Retention;
+
+import org.exoplatform.services.rest.method.MethodInvokerFilter;
 
 /**
+ * Marks an implementation of an extension interface. Filters may contain
+ * {@link javax.ws.rs.Path} annotation for restriction filter scope. If
+ * &#64;Path is not specified then filter will be applied for all requests
+ * (RequestFilter), responses (ResponseFilter) or all resource methods
+ * (MethodInvokerFilter).
+ * 
+ * @see RequestFilter
+ * @see ResponseFilter
+ * @see MethodInvokerFilter
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class SingletonResourceFactory extends ResourceFactory {
-
-  /**
-   * Resource object.
-   */
-  protected final Object resource;
-
-  /**
-   * Constructor.
-   * 
-   * @param resourceDescriptor See {@link AbstractResourceDescriptor}
-   * @param resource resource instance
-   */
-  public SingletonResourceFactory(AbstractResourceDescriptor resourceDescriptor, Object resource) {
-    super(resourceDescriptor);
-    this.resource = resource;
-  }
-
-
-  /**
-   * {@inheritDoc}
-   */
-  public Object getResource(ApplicationContext context) {
-    return resource;
-  }
-
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Filter {
 }

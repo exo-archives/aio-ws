@@ -20,12 +20,12 @@ package org.exoplatform.services.rest.impl.resource;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.exoplatform.services.rest.impl.uri.UriPattern;
 import org.exoplatform.services.rest.method.MethodInvoker;
 import org.exoplatform.services.rest.method.MethodParameter;
 import org.exoplatform.services.rest.resource.ResourceDescriptorVisitor;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
 import org.exoplatform.services.rest.resource.SubResourceLocatorDescriptor;
+import org.exoplatform.services.rest.uri.UriPattern;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -142,4 +142,20 @@ public class SubResourceLocatorDescriptorImpl implements SubResourceLocatorDescr
     return getMethod().getReturnType();
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString() {
+    StringBuffer sb = new StringBuffer("[ SubResourceMethodDescriptorImpl: ");
+    sb.append("resource: " + getParentResource() + "; ")
+      .append("path: " + getPathValue() + "; ")
+      .append("return type: " + getResponseType() + "; ")
+      .append("invoker: " + getMethodInvoker() + "; ")
+      .append("parameters: [ ");
+    for (MethodParameter p : getMethodParameters())
+      sb.append(p.toString() + " ");
+    sb.append("] ]");
+    return sb.toString();
+  }
 }

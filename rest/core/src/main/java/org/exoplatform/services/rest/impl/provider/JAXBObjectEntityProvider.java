@@ -25,10 +25,12 @@ import java.lang.reflect.Type;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
+import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -54,25 +56,12 @@ public class JAXBObjectEntityProvider implements EntityProvider<Object> {
    * Logger.
    */
   private static final Log LOG = ExoLogger.getLogger(JAXBObjectEntityProvider.class.getName());
-  
-  /**
-   * See {@link JAXBContextResolver}.
-   */
-  private ContextResolver<JAXBContext> jaxbContextResolver;
 
   /**
-   * This method should be called before using method
-   * {@link #readFrom(Class, Type, Annotation[], MediaType, MultivaluedMap, InputStream)}
-   * or
-   * {@link #writeTo(Object, Class, Type, Annotation[], MediaType, MultivaluedMap, OutputStream)}.
-   * 
-   * @param jaxbContexts See {@link JAXBContextResolver}
+   * @see Providers
    */
-  public void setContexResolver(ContextResolver<JAXBContext> jaxbContexts) {
-    this.jaxbContextResolver = jaxbContexts;
-  }
-
-  // EntityProvider
+  @Context
+  private Providers        providers;
 
   /**
    * {@inheritDoc}
@@ -94,7 +83,8 @@ public class JAXBObjectEntityProvider implements EntityProvider<Object> {
                          MultivaluedMap<String, String> httpHeaders,
                          InputStream entityStream) throws IOException {
     try {
-      return jaxbContextResolver.getContext(type).createUnmarshaller().unmarshal(entityStream);
+      JAXBContext jaxbctx = getJAXBContext(type, mediaType);
+      return jaxbctx.createUnmarshaller().unmarshal(entityStream);
     } catch (UnmarshalException e) {
       // if can't read from stream (e.g. steam is empty)
       if (LOG.isDebugEnabled())
@@ -137,7 +127,8 @@ public class JAXBObjectEntityProvider implements EntityProvider<Object> {
                       MultivaluedMap<String, Object> httpHeaders,
                       OutputStream entityStream) throws IOException {
     try {
-      Marshaller m = jaxbContextResolver.getContext(type).createMarshaller();
+      JAXBContext jaxbctx = getJAXBContext(type, mediaType);
+      Marshaller m = jaxbctx.createMarshaller();
       // Must respect application specified character set.
       String charset = mediaType.getParameters().get("charset");
       if (charset != null)
@@ -147,6 +138,21 @@ public class JAXBObjectEntityProvider implements EntityProvider<Object> {
     } catch (JAXBException e) {
       throw new IOException("Can't write to output stream " + e);
     }
+  }
+
+  /**
+   * @param type type
+   * @param mediaType media type
+   * @return JAXBContext JAXBContext
+   * @throws JAXBException if JAXBContext creation failed
+   */
+  protected JAXBContext getJAXBContext(Class<?> type, MediaType mediaType) throws JAXBException {
+    ContextResolver<JAXBContextResolver> resolver = providers.getContextResolver(JAXBContextResolver.class,
+                                                                                 mediaType);
+    if (resolver == null)
+      throw new RuntimeException("Not found any JAXBContextResolver for media type " + mediaType);
+    JAXBContextResolver jaxbres = resolver.getContext(type);
+    return jaxbres.getJAXBContext(type);
   }
 
 }

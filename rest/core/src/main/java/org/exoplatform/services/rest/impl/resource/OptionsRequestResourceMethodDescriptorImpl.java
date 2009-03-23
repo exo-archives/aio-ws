@@ -33,6 +33,15 @@ import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
  */
 public final class OptionsRequestResourceMethodDescriptorImpl extends ResourceMethodDescriptorImpl {
 
+  /**
+   * @param method See {@link Method}
+   * @param httpMethod HTTP request method designator
+   * @param parameters list of method parameters. See {@link MethodParameter}
+   * @param parentResource parent resource for this method
+   * @param consumes list of media types which this method can consume
+   * @param produces list of media types which this method can produce
+   * @param invoker method invoker
+   */
   public OptionsRequestResourceMethodDescriptorImpl(Method method,
                                                     String httpMethod,
                                                     List<MethodParameter> parameters,
@@ -50,6 +59,5 @@ public final class OptionsRequestResourceMethodDescriptorImpl extends ResourceMe
   public Class<?> getResponseType() {
     return Response.class;
   }
-  
 
 }

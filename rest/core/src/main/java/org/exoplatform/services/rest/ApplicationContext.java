@@ -37,7 +37,7 @@ public interface ApplicationContext extends UriInfo {
   /**
    * Should be used to pass template values in context by using returned list in
    * matching to @see
-   * {@link org.exoplatform.services.rest.impl.uri.UriPattern#match(String, List)}
+   * {@link org.exoplatform.services.rest.uri.UriPattern#match(String, List)}
    * . List will be cleared during matching.
    * 
    * @return the list for template values

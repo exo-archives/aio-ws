@@ -15,7 +15,7 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest;
+package org.exoplatform.services.rest.impl;
 
 import java.util.List;
 import java.util.Locale;
@@ -24,6 +24,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Variant;
 
+import org.exoplatform.services.rest.BaseTest;
 import org.exoplatform.services.rest.impl.ContainerRequest;
 import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
 import org.exoplatform.services.rest.impl.VariantsHandler;

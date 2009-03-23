@@ -22,12 +22,12 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
-import org.exoplatform.services.rest.impl.uri.UriPattern;
 import org.exoplatform.services.rest.method.MethodInvoker;
 import org.exoplatform.services.rest.method.MethodParameter;
 import org.exoplatform.services.rest.resource.ResourceDescriptorVisitor;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
 import org.exoplatform.services.rest.resource.SubResourceMethodDescriptor;
+import org.exoplatform.services.rest.uri.UriPattern;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -43,7 +43,7 @@ public class SubResourceMethodDescriptorImpl implements SubResourceMethodDescrip
   /**
    * See {@link UriPattern}.
    */
-  private final UriPattern uriPattern;
+  private final UriPattern                 uriPattern;
 
   /**
    * This method will be invoked.
@@ -148,7 +148,7 @@ public class SubResourceMethodDescriptorImpl implements SubResourceMethodDescrip
   public PathValue getPathValue() {
     return path;
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -189,6 +189,26 @@ public class SubResourceMethodDescriptorImpl implements SubResourceMethodDescrip
    */
   public Class<?> getResponseType() {
     return getMethod().getReturnType();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString() {
+    StringBuffer sb = new StringBuffer("[ SubResourceMethodDescriptorImpl: ");
+    sb.append("resource: " + getParentResource() + "; ")
+      .append("path: " + getPathValue() + "; ")
+      .append("HTTP method: " + getHttpMethod() + "; ")
+      .append("produces media type: " + produces() + "; ")
+      .append("consumes media type: " + consumes() + "; ")
+      .append("return type: " + getResponseType() + "; ")
+      .append("invoker: " + getMethodInvoker() + "; ")
+      .append("parameters: [ ");
+    for (MethodParameter p : getMethodParameters())
+      sb.append(p.toString() + " ");
+    sb.append("] ]");
+    return sb.toString();
   }
 
 }

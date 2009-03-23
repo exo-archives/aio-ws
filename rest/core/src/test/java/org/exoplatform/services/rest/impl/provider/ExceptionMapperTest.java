@@ -78,6 +78,15 @@ public class ExceptionMapperTest extends AbstractResourceTest {
     rd.addExceptionMapper(ExceptionMapper4.class);
   }
   
+  public void tearDown() throws Exception {
+    super.tearDown();
+    //  be sure only default providers available
+    removeExceptionMapper(ExceptionMapper1.class);
+    removeExceptionMapper(ExceptionMapper2.class);
+    removeExceptionMapper(ExceptionMapper3.class);
+    removeExceptionMapper(ExceptionMapper4.class);
+  }
+  
   @Path("a")
   public static class Resource1 {
     

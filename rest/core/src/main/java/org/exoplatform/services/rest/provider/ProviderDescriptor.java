@@ -21,8 +21,8 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
-import org.exoplatform.services.rest.ConstructorInjector;
-import org.exoplatform.services.rest.FieldInjector;
+import org.exoplatform.services.rest.ObjectModel;
+import org.exoplatform.services.rest.resource.ResourceDescriptor;
 
 /**
  * Descriptor of Provider. Provider is annotated with &#64;Provider and
@@ -31,35 +31,20 @@ import org.exoplatform.services.rest.FieldInjector;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public interface ProviderDescriptor {
+public interface ProviderDescriptor extends ResourceDescriptor, ObjectModel {
 
   /**
-   * Get list of {@link MediaType} which current method consumes.
+   * Get list of {@link MediaType} which current provider consumes.
    * 
    * @return list of media types
    */
-  public List<MediaType> consumes();
+  List<MediaType> consumes();
 
   /**
-   * @return collections constructor
-   */
-  public List<ConstructorInjector> getConstructorInjectors();
-
-  /**
-   * @return collections of object fields
-   */
-  public List<FieldInjector> getFieldInjectors();
-
-  /**
-   * @return provider class
-   */
-  public Class<?> getProviderClass();
-
-  /**
-   * Get list of {@link MediaType} which current method produces.
+   * Get list of {@link MediaType} which current provider produces.
    * 
    * @return list of media types
    */
-  public List<MediaType> produces();
+  List<MediaType> produces();
 
 }

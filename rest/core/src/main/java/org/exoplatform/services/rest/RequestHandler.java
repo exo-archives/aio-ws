@@ -18,15 +18,31 @@
 package org.exoplatform.services.rest;
 
 /**
+ * Contract of this component is process all requests, initialization and
+ * control main components of JAX-RS implementation.
+ * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 public interface RequestHandler {
 
+  /**
+   * Temporary directory attribute name.
+   */
   public static final String WS_RS_TMP_DIR               = "ws.rs.tmpdir";
 
+  /**
+   * Max buffer size attribute name. Entities that has size greater then
+   * specified will be stored in temporary directory on file system during
+   * entity processing.
+   */
   public static final String WS_RS_BUFFER_SIZE           = "ws.rs.buffersize";
 
+  /**
+   * Should load prepared entity providers attribute.
+   * 
+   * @see org.exoplatform.services.rest.provider.EntityProvider
+   */
   public static final String WS_RS_USE_BUILTIN_PROVIDERS = "ws.rs.provider.builtin";
 
   /**

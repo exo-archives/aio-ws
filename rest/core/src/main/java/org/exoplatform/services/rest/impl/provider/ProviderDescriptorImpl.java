@@ -19,18 +19,21 @@ package org.exoplatform.services.rest.impl.provider;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.exoplatform.services.rest.ConponentLifecycleScope;
 import org.exoplatform.services.rest.ConstructorInjector;
 import org.exoplatform.services.rest.FieldInjector;
 import org.exoplatform.services.rest.impl.ConstructorInjectorImpl;
 import org.exoplatform.services.rest.impl.FieldInjectorImpl;
 import org.exoplatform.services.rest.impl.header.MediaTypeHelper;
 import org.exoplatform.services.rest.provider.ProviderDescriptor;
+import org.exoplatform.services.rest.resource.ResourceDescriptorVisitor;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -48,7 +51,7 @@ public class ProviderDescriptorImpl implements ProviderDescriptor {
    * 
    * @see {@link ConstructorInjector}
    */
-  private final List<ConstructorInjector> constructorDescriptors;
+  private final List<ConstructorInjector> constructors;
 
   /**
    * Resource class fields.
@@ -71,20 +74,53 @@ public class ProviderDescriptorImpl implements ProviderDescriptor {
    * @param providerClass provider class
    */
   public ProviderDescriptorImpl(Class<?> providerClass) {
+    this(providerClass, ConponentLifecycleScope.PER_REQUEST);
+  }
+
+  /**
+   * @param provider provider instance
+   */
+  public ProviderDescriptorImpl(Object provider) {
+    this(provider.getClass(), ConponentLifecycleScope.SINGLETON);
+  }
+
+  /**
+   * @param providerClass provider class
+   * @param scope provider scope
+   */
+  private ProviderDescriptorImpl(Class<?> providerClass, ConponentLifecycleScope scope) {
     this.providerClass = providerClass;
+
+    this.constructors = new ArrayList<ConstructorInjector>();
+    this.fields = new ArrayList<FieldInjector>();
+    if (scope == ConponentLifecycleScope.PER_REQUEST) {
+      for (Constructor<?> constructor : providerClass.getConstructors()) {
+        constructors.add(new ConstructorInjectorImpl(providerClass, constructor));
+      }
+      if (constructors.size() == 0) {
+        String msg = "Not found accepted constructors for provider class "
+            + providerClass.getName();
+        throw new RuntimeException(msg);
+      }
+      // Sort constructors in number parameters order
+      if (constructors.size() > 1) {
+        Collections.sort(constructors, ConstructorInjectorImpl.CONSTRUCTOR_COMPARATOR);
+      }
+      // process field
+      for (java.lang.reflect.Field jfield : providerClass.getDeclaredFields()) {
+        fields.add(new FieldInjectorImpl(providerClass, jfield));
+      }
+    }
+
     this.consumes = MediaTypeHelper.createConsumesList(providerClass.getAnnotation(Consumes.class));
     this.produces = MediaTypeHelper.createProducesList(providerClass.getAnnotation(Produces.class));
-    this.constructorDescriptors = new ArrayList<ConstructorInjector>();
-    this.fields = new ArrayList<FieldInjector>();
+  }
 
-    for (java.lang.reflect.Field jfield : providerClass.getDeclaredFields()) {
-      getFieldInjectors().add(new FieldInjectorImpl(providerClass, jfield));
-    }
-
-    for (Constructor<?> constructor : providerClass.getConstructors()) {
-      getConstructorInjectors().add(new ConstructorInjectorImpl(providerClass, constructor));
-    }
-
+  /**
+   * {@inheritDoc}
+   */
+  public void accept(ResourceDescriptorVisitor visitor) {
+    visitor.visitProviderDescriptor(this);
   }
 
   /**
@@ -98,7 +134,7 @@ public class ProviderDescriptorImpl implements ProviderDescriptor {
    * {@inheritDoc}
    */
   public List<ConstructorInjector> getConstructorInjectors() {
-    return constructorDescriptors;
+    return constructors;
   }
 
   /**
@@ -111,7 +147,7 @@ public class ProviderDescriptorImpl implements ProviderDescriptor {
   /**
    * {@inheritDoc}
    */
-  public Class<?> getProviderClass() {
+  public Class<?> getObjectClass() {
     return providerClass;
   }
 
@@ -120,6 +156,21 @@ public class ProviderDescriptorImpl implements ProviderDescriptor {
    */
   public List<MediaType> produces() {
     return produces;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public String toString() {
+    StringBuffer sb = new StringBuffer("[ ProviderDescriptorImpl: ");
+    sb.append("provider class: " + getObjectClass() + "; ")
+      .append("produces media type: " + produces() + "; ")
+      .append("consumes media type: " + consumes() + "; ")
+      .append(getConstructorInjectors() + "; ")
+      .append(getFieldInjectors())
+      .append(" ]");
+    return sb.toString();
+
   }
 
 }

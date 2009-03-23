@@ -26,6 +26,7 @@ import org.exoplatform.services.rest.impl.header.MediaTypeHelper;
 /**
  * Keeps sorted values.
  * 
+ * @param <T> actual value type
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
@@ -46,7 +47,7 @@ public class MediaTypeMap<T> extends java.util.TreeMap<MediaType, T> {
   /**
    * See {@link Comparator}.
    */
-  protected static final Comparator<MediaType> COMPARATOR = new Comparator<MediaType>() {
+  static final Comparator<MediaType> COMPARATOR = new Comparator<MediaType>() {
 
     /**
      * Compare two {@link MediaType}.
@@ -65,11 +66,11 @@ public class MediaTypeMap<T> extends java.util.TreeMap<MediaType, T> {
       // same 'weight' will be not added in map.
       if (r == 0)
         // TODO weak solution
-        r = toString0(o1).compareToIgnoreCase(toString0(o2));
+        r = _toString(o1).compareToIgnoreCase(_toString(o2));
       return r;
     }
     
-    private String toString0(MediaType mime) {
+    private String _toString(MediaType mime) {
       return mime.getType() + "/" + mime.getSubtype();
     }
     

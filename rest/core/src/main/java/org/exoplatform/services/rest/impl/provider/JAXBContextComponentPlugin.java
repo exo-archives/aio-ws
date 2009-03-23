@@ -17,11 +17,9 @@
 
 package org.exoplatform.services.rest.impl.provider;
 
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
-
-import javax.xml.bind.JAXBContext;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.container.component.BaseComponentPlugin;
@@ -30,23 +28,24 @@ import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.services.log.ExoLogger;
 
 /**
- * For injection JAXBContext from configuration at startup in {@link JAXBContextResolver}.
+ * For injection JAXBContext from configuration at startup in
+ * {@link JAXBContextResolver}.
+ * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 public class JAXBContextComponentPlugin extends BaseComponentPlugin {
-  
+
   /**
    * Logger.
    */
-  private static final Log LOG = ExoLogger.getLogger(JAXBContextComponentPlugin.class.getName());
-  
+  private static final Log    LOG = ExoLogger.getLogger(JAXBContextComponentPlugin.class.getName());
+
   /**
-   * See {@link JAXBContext}.
+   * Set of classes that will be bounded.
    */
-  private final Map<Class<?>, JAXBContext> jcs = new HashMap<Class<?>, JAXBContext>();
-  
-  
+  private final Set<Class<?>> jcs = new HashSet<Class<?>>();
+
   /**
    * @param params initialize parameters
    * @see InitParams
@@ -58,19 +57,18 @@ public class JAXBContextComponentPlugin extends BaseComponentPlugin {
       while (i.hasNext()) {
         ValueParam v = i.next();
         try {
-          Class c = Class.forName(v.getValue());
-          jcs.put(c, JAXBContext.newInstance(c));
-        } catch (Exception e) {
-          LOG.warn("Can't create JAXB context for class with name " + v.getValue(), e);
+          jcs.add(Class.forName(v.getValue()));
+        } catch (ClassNotFoundException e) {
+          LOG.warn("Failed load class " + v.getValue(), e);
         }
       }
     }
   }
-  
+
   /**
-   * @return collection of {@link JAXBContext}
+   * @return collection of classes to be bound
    */
-  public Map<Class<?>, JAXBContext> getJAXBContexts() {
+  public Set<Class<?>> getJAXBContexts() {
     return jcs;
   }
 

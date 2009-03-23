@@ -37,6 +37,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 import org.exoplatform.services.rest.method.TypeProducer;
+import org.exoplatform.services.rest.util.RawTypeUtil;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -44,18 +45,44 @@ import org.exoplatform.services.rest.method.TypeProducer;
  */
 public class ParameterHelper {
 
-  public static final List<String> PROVIDER_FIELDS_PARAMETER_ANNOTATIONS;
+  /**
+   * Collections of annotation that allowed to be used on fields on any type of
+   * Provider.
+   * 
+   * @see javax.ws.rs.ext.Provider
+   * @see javax.ws.rs.ext.Providers
+   */
+  public static final List<String> PROVIDER_FIELDS_ANNOTATIONS;
 
+  /**
+   * Collections of annotation than allowed to be used on constructor's
+   * parameters of any type of Provider.
+   * 
+   * @see javax.ws.rs.ext.Provider
+   * @see javax.ws.rs.ext.Providers
+   */
   public static final List<String> PROVIDER_CONSTRUCTOR_PARAMETER_ANNOTATIONS;
 
-  public static final List<String> RESOURCE_FIELDS_PARAMETER_ANNOTATIONS;
+  /**
+   * Collections of annotation that allowed to be used on fields of resource
+   * class.
+   */
+  public static final List<String> RESOURCE_FIELDS_ANNOTATIONS;
 
+  /**
+   * Collections of annotation than allowed to be used on constructor's
+   * parameters of resource class.
+   */
   public static final List<String> RESOURCE_CONSTRUCTOR_PARAMETER_ANNOTATIONS;
 
+  /**
+   * Collections of annotation than allowed to be used on method's parameters of
+   * resource class.
+   */
   public static final List<String> RESOURCE_METHOD_PARAMETER_ANNOTATIONS;
 
   static {
-    PROVIDER_FIELDS_PARAMETER_ANNOTATIONS = Collections.singletonList(Context.class.getName());
+    PROVIDER_FIELDS_ANNOTATIONS = Collections.singletonList(Context.class.getName());
     PROVIDER_CONSTRUCTOR_PARAMETER_ANNOTATIONS = Collections.singletonList(Context.class.getName());
     List<String> tmp1 = new ArrayList<String>(6);
     tmp1.add(CookieParam.class.getName());
@@ -64,7 +91,7 @@ public class ParameterHelper {
     tmp1.add(MatrixParam.class.getName());
     tmp1.add(PathParam.class.getName());
     tmp1.add(QueryParam.class.getName());
-    RESOURCE_FIELDS_PARAMETER_ANNOTATIONS = Collections.unmodifiableList(tmp1);
+    RESOURCE_FIELDS_ANNOTATIONS = Collections.unmodifiableList(tmp1);
     RESOURCE_CONSTRUCTOR_PARAMETER_ANNOTATIONS = Collections.unmodifiableList(tmp1);
 
     List<String> tmp2 = new ArrayList<String>(tmp1);
@@ -237,21 +264,17 @@ public class ParameterHelper {
    */
   static Class<?> getGenericType(Type type) {
     if (type instanceof ParameterizedType) {
-      ParameterizedType parameterizedType = (ParameterizedType) type;
 
-      Type[] genericTypes = ((ParameterizedType) parameterizedType).getActualTypeArguments();
+      Type[] genericTypes = RawTypeUtil.getActualTypes(type);
       if (genericTypes.length == 1) {
         try {
-
           // if can't be cast to java.lang.Class thrown Exception
           return (Class<?>) genericTypes[0];
-
         } catch (ClassCastException e) {
           throw new RuntimeException("Unsupported type");
         }
       }
     }
-
     // not parameterized type
     return null;
   }

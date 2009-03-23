@@ -26,6 +26,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriBuilderException;
 
+import org.exoplatform.services.rest.uri.UriPattern;
+
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $

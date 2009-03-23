@@ -23,7 +23,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 
 /**
  * All implementation of this interface should be able to write data in
- * container response, e. g. servlet container response.
+ * container response, e. g. servlet response.
  * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $

@@ -19,12 +19,15 @@ package org.exoplatform.services.rest.resource;
 
 import org.exoplatform.services.rest.ConstructorInjector;
 import org.exoplatform.services.rest.FieldInjector;
+import org.exoplatform.services.rest.FilterDescriptor;
+import org.exoplatform.services.rest.provider.ProviderDescriptor;
 
 /**
  * Can be used for validation next resource descriptors
  * {@link AbstractResourceDescriptor}, {@link ResourceMethodDescriptor},
  * {@link SubResourceMethodDescriptor}, {@link SubResourceLocatorDescriptor},
- * {@link ConstructorInjector}, {@link FieldInjector} .
+ * {@link ConstructorInjector}, {@link FieldInjector},
+ * {@link ProviderDescriptor}, {@link FilterDescriptor}.
  * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
@@ -60,5 +63,15 @@ public interface ResourceDescriptorVisitor {
    * @param fi FieldInjector
    */
   void visitFieldInjector(FieldInjector fi);
+
+  /**
+   * @param pd ProviderDescriptor
+   */
+  void visitProviderDescriptor(ProviderDescriptor pd);
+
+  /**
+   * @param fd FilterDescriptor
+   */
+  void visitFilterDescriptor(FilterDescriptor fd);
 
 }

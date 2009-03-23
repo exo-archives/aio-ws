@@ -19,6 +19,7 @@ package org.exoplatform.services.rest.wadl;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
@@ -29,8 +30,10 @@ import org.exoplatform.services.rest.impl.resource.AbstractResourceDescriptorImp
 import org.exoplatform.services.rest.method.MethodParameter;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
 import org.exoplatform.services.rest.resource.ResourceMethodDescriptor;
+import org.exoplatform.services.rest.resource.ResourceMethodMap;
 import org.exoplatform.services.rest.resource.SubResourceLocatorDescriptor;
 import org.exoplatform.services.rest.resource.SubResourceMethodDescriptor;
+import org.exoplatform.services.rest.resource.SubResourceMethodMap;
 import org.exoplatform.services.rest.wadl.research.Application;
 import org.exoplatform.services.rest.wadl.research.Param;
 import org.exoplatform.services.rest.wadl.research.ParamStyle;
@@ -100,12 +103,17 @@ public final class WadlProcessor {
     // Keeps common parameters for resource.
     Map<String, Param> wadlResourceParams = new HashMap<String, Param>();
 
-    for (ResourceMethodDescriptor rmd : resourceDescriptor.getResourceMethodDescriptors()) {
-      org.exoplatform.services.rest.wadl.research.Method wadlMethod = processMethod(rmd,
-                                                                                    wadlResourceParams);
-      wadlResource.getMethodOrResource().add(wadlMethod);
+    ResourceMethodMap<ResourceMethodDescriptor> resourceMethods = resourceDescriptor.getResourceMethods();
+    for (List<ResourceMethodDescriptor> l : resourceMethods.values()) {
+      for (ResourceMethodDescriptor rmd : l) {
+        org.exoplatform.services.rest.wadl.research.Method wadlMethod = processMethod(rmd,
+                                                                                      wadlResourceParams);
+        if (wadlMethod == null)
+          continue;
+        wadlResource.getMethodOrResource().add(wadlMethod);
+      }
     }
-
+    
     // Add parameters to a resource
     for (Param p : wadlResourceParams.values())
       wadlResource.getParam().add(p);
@@ -132,25 +140,37 @@ public final class WadlProcessor {
     // Mapping resource path to resource.
     Map<String, org.exoplatform.services.rest.wadl.research.Resource> wadlSubResources = new HashMap<String, org.exoplatform.services.rest.wadl.research.Resource>();
 
-    for (SubResourceMethodDescriptor srmd : resourceDescriptor.getSubResourceMethodDescriptors()) {
-      String path = srmd.getPathValue().getPath();
-      org.exoplatform.services.rest.wadl.research.Resource wadlSubResource = wadlSubResources.get(path);
-      // There is no any resource for 'path' yet.
-      if (wadlSubResource == null) {
-        wadlSubResource = wadlGenerator.createResource(path);
-        Map<String, Param> wadlResourceParams = new HashMap<String, Param>();
-        wadlSubResource.getMethodOrResource().add(processMethod(srmd, wadlResourceParams));
-        // Remember sub-resource and parameters.
-        wadlSubResources.put(path, wadlSubResource);
-        wadlCommonSubResourceParams.put(path, wadlResourceParams);
-      } else {
-        // Get parameters for sub-resource that was created by one of previous
-        // iteration.
-        Map<String, Param> wadlResourceParams = wadlCommonSubResourceParams.get(path);
-        // Add new method.
-        wadlSubResource.getMethodOrResource().add(processMethod(srmd, wadlResourceParams));
+    SubResourceMethodMap subresourceMethods = resourceDescriptor.getSubResourceMethods();
+    for (ResourceMethodMap<SubResourceMethodDescriptor> rmm : subresourceMethods.values()) {
+      for (List<SubResourceMethodDescriptor> l : rmm.values()) {
+        for (SubResourceMethodDescriptor srmd : l) {
+          String path = srmd.getPathValue().getPath();
+          org.exoplatform.services.rest.wadl.research.Resource wadlSubResource = wadlSubResources.get(path);
+          // There is no any resource for 'path' yet.
+          if (wadlSubResource == null) {
+            wadlSubResource = wadlGenerator.createResource(path);
+            Map<String, Param> wadlResourceParams = new HashMap<String, Param>();
+            org.exoplatform.services.rest.wadl.research.Method wadlMethod = processMethod(srmd, wadlResourceParams);
+            if (wadlMethod == null)
+              continue;
+            wadlSubResource.getMethodOrResource().add(wadlMethod);
+            // Remember sub-resource and parameters.
+            wadlSubResources.put(path, wadlSubResource);
+            wadlCommonSubResourceParams.put(path, wadlResourceParams);
+          } else {
+            // Get parameters for sub-resource that was created by one of previous
+            // iteration.
+            Map<String, Param> wadlResourceParams = wadlCommonSubResourceParams.get(path);
+            // Add new method.
+            org.exoplatform.services.rest.wadl.research.Method wadlMethod = processMethod(srmd, wadlResourceParams);
+            if (wadlMethod == null)
+              continue;
+            wadlSubResource.getMethodOrResource().add(wadlMethod);
+          }
+        }
+          
+        }
       }
-    }
     // Add sub-resources to the root resource.
     for (Map.Entry<String, org.exoplatform.services.rest.wadl.research.Resource> entry : wadlSubResources.entrySet()) {
       String path = entry.getKey();
@@ -172,7 +192,7 @@ public final class WadlProcessor {
    */
   private void processSubResourceLocators(org.exoplatform.services.rest.wadl.research.Resource wadlResource,
                                           AbstractResourceDescriptor resourceDescriptor) {
-    for (SubResourceLocatorDescriptor srld : resourceDescriptor.getSubResourceLocatorDescriptors()) {
+    for (SubResourceLocatorDescriptor srld : resourceDescriptor.getSubResourceLocators().values()) {
       AbstractResourceDescriptor subResourceDescriptor = new AbstractResourceDescriptorImpl(srld.getMethod()
                                                                                                 .getReturnType());
       org.exoplatform.services.rest.wadl.research.Resource wadlSubResource = processResource(subResourceDescriptor);
@@ -189,6 +209,10 @@ public final class WadlProcessor {
   private org.exoplatform.services.rest.wadl.research.Method processMethod(ResourceMethodDescriptor rmd,
                                                                            Map<String, Param> wadlResourceParams) {
     org.exoplatform.services.rest.wadl.research.Method wadlMethod = wadlGenerator.createMethod(rmd);
+    // See description of this in
+    // BaseWadlGeneratorImpl.createMethod(ResourceMethodDescriptor)
+    if (wadlMethod == null)
+      return null;
 
     org.exoplatform.services.rest.wadl.research.Request wadlRequest = processRequest(rmd,
                                                                                      wadlResourceParams);
@@ -242,7 +266,7 @@ public final class WadlProcessor {
    */
   private org.exoplatform.services.rest.wadl.research.Response processResponse(ResourceMethodDescriptor rmd) {
     org.exoplatform.services.rest.wadl.research.Response wadlResponse = null;
-    if (rmd.getMethod().getReturnType() != void.class) {
+    if (rmd.getResponseType() != void.class) {
       wadlResponse = wadlGenerator.createResponse();
       for (MediaType mediaType : rmd.produces()) {
         RepresentationType wadlRepresentation = wadlGenerator.createResponseRepresentation(mediaType);

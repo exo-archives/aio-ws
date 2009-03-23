@@ -26,13 +26,18 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.exoplatform.services.rest.ConstructorInjector;
 import org.exoplatform.services.rest.FieldInjector;
+import org.exoplatform.services.rest.FilterDescriptor;
+import org.exoplatform.services.rest.ObjectModel;
 import org.exoplatform.services.rest.method.MethodParameter;
+import org.exoplatform.services.rest.provider.ProviderDescriptor;
 import org.exoplatform.services.rest.resource.ResourceDescriptor;
 import org.exoplatform.services.rest.resource.ResourceDescriptorVisitor;
 import org.exoplatform.services.rest.resource.ResourceMethodDescriptor;
 import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
+import org.exoplatform.services.rest.resource.ResourceMethodMap;
 import org.exoplatform.services.rest.resource.SubResourceLocatorDescriptor;
 import org.exoplatform.services.rest.resource.SubResourceMethodDescriptor;
+import org.exoplatform.services.rest.util.RawTypeUtil;
 
 /**
  * Validate ResourceDescriptors. @see
@@ -66,6 +71,30 @@ import org.exoplatform.services.rest.resource.SubResourceMethodDescriptor;
 public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
 
   /**
+   * Visitor instance.
+   */
+  private static ResourceDescriptorVisitor instance = null;
+
+  /**
+   * Lock.
+   */
+  private static Object                    lock     = new Object();
+
+  /**
+   * @return singleton instance of ResourceDescriptorVisitor
+   */
+  public static ResourceDescriptorVisitor getInstance() {
+    if (instance == null) {
+      synchronized (lock) {
+        if (instance == null) {
+          instance = new ResourceDescriptorValidator();
+        }
+      }
+    }
+    return instance;
+  }
+
+  /**
    * Validate AbstractResourceDescriptor. AbstractResourceDescriptor is a class
    * which annotated with path annotation then it is root resource, or not
    * annotated with path then it is sub-resource. Can have also consumes and
@@ -73,18 +102,32 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
    * {@inheritDoc}
    */
   public void visitAbstractResourceDescriptor(AbstractResourceDescriptor ard) {
-    if (ard.getResourceMethodDescriptors().size() == 0
-        && ard.getSubResourceMethodDescriptors().size() == 0
-        && ard.getSubResourceLocatorDescriptors().size() == 0) {
-      String msg = "Not found any resource methods, sub-resource methods"
-          + " or sub-resource locators in " + ard.getResourceClass().getName();
-      throw new RuntimeException(msg);
-    }
-
-    if (ard.isRootResource() && ard.getPath().getPath().length() == 0) {
-      String msg = "Resource class " + ard.getResourceClass()
+    
+    if (ard.isRootResource() && ard.getPathValue().getPath().length() == 0) {
+      String msg = "Resource class " + ard.getObjectClass()
           + " is root resource but path value empty, see javax.ws.rs.Path#value()";
       throw new RuntimeException(msg);
+    }
+    
+    checkObjectModel(ard);
+    
+    // check all resource methods
+    for (List<ResourceMethodDescriptor> l : ard.getResourceMethods().values()) {
+      for (ResourceMethodDescriptor rmd : l)
+        rmd.accept(this);
+    }
+
+    // check all sub-resource methods
+    for (ResourceMethodMap<SubResourceMethodDescriptor> rmm : ard.getSubResourceMethods().values()) {
+      for (List<SubResourceMethodDescriptor> l : rmm.values()) {
+        for (SubResourceMethodDescriptor rmd : l)
+          rmd.accept(this);
+      }
+    }
+
+    // check all sub-resource locators
+    for (SubResourceLocatorDescriptor loc : ard.getSubResourceLocators().values()) {
+      loc.accept(this);
     }
 
   }
@@ -107,7 +150,7 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
   public void visitSubResourceLocatorDescriptor(SubResourceLocatorDescriptor srld) {
     if (srld.getPathValue().getPath().length() == 0) {
       String msg = "Path value is empty for method " + srld.getMethod().getName()
-          + " in resource class " + srld.getParentResource().getResourceClass()
+          + " in resource class " + srld.getParentResource().getObjectClass()
           + ", see javax.ws.rs.Path#value()";
       throw new RuntimeException(msg);
     }
@@ -122,7 +165,7 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
   public void visitSubResourceMethodDescriptor(SubResourceMethodDescriptor srmd) {
     if (srmd.getPathValue().getPath().length() == 0) {
       String msg = "Path value is null or empty for method " + srmd.getMethod().getName()
-          + " in resource class " + srmd.getParentResource().getResourceClass()
+          + " in resource class " + srmd.getParentResource().getObjectClass()
           + ", see javax.ws.rs.Path#value()";
       throw new RuntimeException(msg);
     }
@@ -151,7 +194,7 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
             checkFormParam(mp.getParameterClass(), mp.getGenericType());
         } else {
           String msg = "Wrong or absent annotation at parameter with index " + i + " at "
-              + rmd.getParentResource().getResourceClass() + "#" + rmd.getMethod().getName();
+              + rmd.getParentResource().getObjectClass() + "#" + rmd.getMethod().getName();
           throw new RuntimeException(msg);
         }
 
@@ -181,7 +224,7 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
       if (mp.getAnnotation() == null) {
         // not allowed to have not annotated parameters in resource locator
         String msg = "Wrong or absent annotation at parameter with index " + i + " at "
-            + srld.getParentResource().getResourceClass() + "#" + srld.getMethod().getName();
+            + srld.getParentResource().getObjectClass() + "#" + srld.getMethod().getName();
         throw new RuntimeException(msg);
       }
     }
@@ -212,39 +255,56 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
    */
   private static boolean checkGenericType(Type type) {
     if (type instanceof ParameterizedType) {
-      ParameterizedType parameterizedType = (ParameterizedType) type;
-
-      Type[] genericTypes = ((ParameterizedType) parameterizedType).getActualTypeArguments();
+      
+      Type[] genericTypes = RawTypeUtil.getActualTypes(type);
       if (genericTypes.length == 2) {
         try {
-
           return (String.class == (Class<?>) genericTypes[0])
               && (String.class == (Class<?>) genericTypes[1]);
-
         } catch (ClassCastException e) {
           return false;
         }
       }
     }
-
     // not parameterized type
     // TODO must be tolerant for not parameterized type and use string as
     // default ?
     return false;
   }
-
+  
   /**
    * {@inheritDoc}
    */
   public void visitConstructorInjector(ConstructorInjector ci) {
-    // will be implemented later
+    // currently nothing to do, should be already valid
   }
 
   /**
    * {@inheritDoc}
    */
   public void visitFieldInjector(FieldInjector fi) {
-    // will be implemented later
+    // currently nothing to do, should be already valid
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void visitFilterDescriptor(FilterDescriptor fd) {
+    checkObjectModel(fd);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void visitProviderDescriptor(ProviderDescriptor pd) {
+    checkObjectModel(pd);
+  }
+  
+  protected void checkObjectModel(ObjectModel model) {
+    for (ConstructorInjector c : model.getConstructorInjectors())
+      c.accept(this);
+    for (FieldInjector f : model.getFieldInjectors())
+      f.accept(this);
   }
 
 }

@@ -46,6 +46,9 @@ import org.exoplatform.services.rest.resource.ResourceDescriptorVisitor;
  */
 public class FieldInjectorImpl implements FieldInjector {
 
+  /**
+   * Logger.
+   */
   private static final Log   LOG = ExoLogger.getLogger(FieldInjectorImpl.class.getName());
 
   /**
@@ -80,10 +83,14 @@ public class FieldInjectorImpl implements FieldInjector {
   private final boolean      encoded;
 
   /**
-   * Field name, see {@link java.lang.reflect.Field#getName()}
+   * Field name, see {@link java.lang.reflect.Field#getName()}.
    */
   private final String       name;
 
+  /**
+   * @param resourceClass class that contains field <tt>jfield</tt>
+   * @param jfield java.lang.reflect.Field
+   */
   public FieldInjectorImpl(Class<?> resourceClass, java.lang.reflect.Field jfield) {
 
     this.name = jfield.getName();
@@ -99,9 +106,9 @@ public class FieldInjectorImpl implements FieldInjector {
     boolean provider = resourceClass.getAnnotation(Provider.class) != null;
     List<String> allowedAnnotation;
     if (provider)
-      allowedAnnotation = ParameterHelper.PROVIDER_CONSTRUCTOR_PARAMETER_ANNOTATIONS;
+      allowedAnnotation = ParameterHelper.PROVIDER_FIELDS_ANNOTATIONS;
     else
-      allowedAnnotation = ParameterHelper.RESOURCE_CONSTRUCTOR_PARAMETER_ANNOTATIONS;
+      allowedAnnotation = ParameterHelper.RESOURCE_FIELDS_ANNOTATIONS;
 
     for (Annotation a : annotations) {
       Class<?> ac = a.annotationType();
@@ -116,11 +123,11 @@ public class FieldInjectorImpl implements FieldInjector {
         }
 
         // @Encoded has not sense for Provider. Provider may use only @Context
-        // annotation for constructor parameters
+        // annotation for fields
       } else if (ac == Encoded.class && !provider) {
         encoded = true;
         // @Default has not sense for Provider. Provider may use only @Context
-        // annotation for constructor parameters
+        // annotation for fields
       } else if (ac == DefaultValue.class && !provider) {
         defaultValue = ((DefaultValue) a).value();
       } else {
@@ -225,7 +232,7 @@ public class FieldInjectorImpl implements FieldInjector {
    */
   @Override
   public String toString() {
-    StringBuffer sb = new StringBuffer("[ FieldInjector: ");
+    StringBuffer sb = new StringBuffer("[ FieldInjectorImpl: ");
     sb.append("annotation: " + getAnnotation())
       .append("; type: " + getParameterClass())
       .append("; generic-type : " + getGenericType())

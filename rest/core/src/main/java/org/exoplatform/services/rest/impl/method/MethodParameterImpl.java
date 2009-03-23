@@ -18,10 +18,7 @@
 package org.exoplatform.services.rest.impl.method;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-
-import javax.ws.rs.DefaultValue;
 
 /**
  * Describes the method's parameter.
@@ -44,12 +41,12 @@ public class MethodParameterImpl implements org.exoplatform.services.rest.method
   private final Annotation   annotation;
 
   /**
-   * Parameter type. See {@link Method#getGenericParameterTypes()} .
+   * Parameter type. See {@link java.lang.reflect.Method#getGenericParameterTypes()} .
    */
   private final Type         type;
 
   /**
-   * Parameter class. See {@link Method#getParameterTypes()}
+   * Parameter class. See {@link java.lang.reflect.Method#getParameterTypes()}
    */
   private final Class<?>     clazz;
 
@@ -72,7 +69,7 @@ public class MethodParameterImpl implements org.exoplatform.services.rest.method
    * @param clazz parameter class
    * @param type generic parameter type
    * @param defaultValue default value for parameter. See
-   *          {@link DefaultValue}.
+   *          {@link javax.ws.rs.DefaultValue}.
    * @param encoded true if parameter must not be decoded false otherwise
    */
   public MethodParameterImpl(Annotation annotation,

@@ -39,27 +39,9 @@ import org.exoplatform.services.rest.tools.DummyContainerResponseWriter;
  */
 public abstract class AbstractResourceTest extends BaseTest {
 
-  private ResourceBinder     binder;
-
-  private RequestHandlerImpl requestHandler;
-
-  public void setUp() throws Exception {
-    super.setUp();
-    binder = (ResourceBinder) container.getComponentInstanceOfType(ResourceBinder.class);
-    requestHandler = (RequestHandlerImpl) container.getComponentInstanceOfType(RequestHandlerImpl.class);
-    binder.clear();
-  }
-
-  public void registry(Object resource) throws Exception {
-    container.registerComponentInstance(resource);
-    binder.bind(resource);
-
-  }
-
-  public void registry(Class<?> resourceClass) throws Exception {
-    container.registerComponentImplementation(resourceClass.getName(), resourceClass);
-    binder.bind(resourceClass);
-  }
+//  public void setUp() throws Exception {
+//    super.setUp();
+//  }
 
   public ContainerResponse service(String method,
                                    String requestURI,
@@ -101,14 +83,14 @@ public abstract class AbstractResourceTest extends BaseTest {
 
   }
 
-  public void unregistry(Object resource) {
-    binder.unbind(resource.getClass());
+  public boolean unregistry(Object resource) {
     container.unregisterComponentByInstance(resource);
+    return binder.unbind(resource.getClass());
   }
 
-  public void unregistry(Class<?> resourceClass) {
-    binder.unbind(resourceClass);
+  public boolean unregistry(Class<?> resourceClass) {
     container.unregisterComponent(resourceClass.getName());
+    return binder.unbind(resourceClass);
   }
 
 }

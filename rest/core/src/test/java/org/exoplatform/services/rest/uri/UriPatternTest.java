@@ -15,13 +15,13 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest.impl.uri;
+package org.exoplatform.services.rest.uri;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.exoplatform.services.rest.impl.uri.UriPattern;
+import org.exoplatform.services.rest.uri.UriPattern;
 
 import junit.framework.TestCase;
 
@@ -127,12 +127,12 @@ public class UriPatternTest extends TestCase {
   
   private static void testMatch(String pattern, String uri, String[] values) {
     UriPattern p = new UriPattern(pattern);
-//    System.out.println("URI:        " + uri);
-//    System.out.println("REGEX:      " + p.getRegex());
+    System.out.println("URI:        " + uri);
+    System.out.println("REGEX:      " + p.getRegex());
     List<String> l = new ArrayList<String>();
     assertTrue(p.match(uri, l));
-//    System.out.println("PARAMETERS: " + p.getParameterNames());
-//    System.out.println("VARIABLES:  " + l);
+    System.out.println("PARAMETERS: " + p.getParameterNames());
+    System.out.println("VARIABLES:  " + l);
     assertEquals(values.length, l.size());
     int i = 0;
     for (String t : l)

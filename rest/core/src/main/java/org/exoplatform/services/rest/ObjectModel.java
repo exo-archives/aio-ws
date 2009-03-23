@@ -15,36 +15,37 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest.impl.provider;
+package org.exoplatform.services.rest;
 
-import org.exoplatform.services.rest.ApplicationContext;
-import org.exoplatform.services.rest.provider.ProviderDescriptor;
+import java.util.List;
 
 /**
+ * Abstract description of object.
+ * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class SingletonProviderFactory extends ProviderFactory {
+public interface ObjectModel {
 
   /**
-   * Provider object.
+   * @return collections constructor, MAY return empty collection or null if
+   *         object is singleton. There is no setter for this to add new
+   *         ConstructorInjector use
+   *         <code>ObjectModel.getConstructorInjectors().add(ConstructorInjector)</code>
    */
-  protected final Object provider;
+  List<ConstructorInjector> getConstructorInjectors();
 
   /**
-   * @param providerDescriptor See {@link ProviderDescriptor}
-   * @param provider provider instance
+   * @return collections of object fields, MAY return empty collection or null
+   *         if object is singleton. There is no setter for this to add new
+   *         ConstructorInjector use
+   *         <code>ObjectModel.getFieldInjectors().add(FieldInjector)</code>
    */
-  public SingletonProviderFactory(ProviderDescriptor providerDescriptor, Object provider) {
-    super(providerDescriptor);
-    this.provider = provider;
-  }
+  List<FieldInjector> getFieldInjectors();
 
   /**
-   * {@inheritDoc}
+   * @return {@link Class} of object
    */
-  public Object getProvider(ApplicationContext context) {
-    return provider;
-  }
+  Class<?> getObjectClass();
 
 }

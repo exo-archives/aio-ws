@@ -32,6 +32,9 @@ import java.nio.charset.Charset;
  */
 public final class IOHelper {
 
+  /**
+   * Default character set name.
+   */
   static final String      DEFAULT_CHARSET_NAME    = "UTF-8";
 
   /**

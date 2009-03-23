@@ -18,6 +18,10 @@
 package org.exoplatform.services.rest.impl;
 
 /**
+ * Should not be used by custom services. They have to use
+ * {@link javax.ws.rs.WebApplicationException} instead. ApplicationException is
+ * used as wrapper for exception that may occur during request processing.
+ * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
@@ -28,10 +32,17 @@ public class ApplicationException extends RuntimeException {
    */
   private static final long serialVersionUID = -712006975338590407L;
 
+  /**
+   * @param s message
+   * @param throwable cause
+   */
   public ApplicationException(String s, Throwable throwable) {
     super(s, throwable);
   }
 
+  /**
+   * @param throwable cause
+   */
   public ApplicationException(Throwable throwable) {
     super(throwable);
   }

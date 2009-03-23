@@ -17,9 +17,9 @@
 
 package org.exoplatform.services.rest.impl;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.container.component.BaseComponentPlugin;
@@ -42,12 +42,12 @@ public class RequestFilterComponentPlugin extends BaseComponentPlugin {
   /**
    * Logger.
    */
-  private static final Log    LOG = ExoLogger.getLogger(RequestFilterComponentPlugin.class.getName());
+  private static final Log                    LOG = ExoLogger.getLogger(RequestFilterComponentPlugin.class.getName());
 
   /**
    * See {@link RequestFilter}.
    */
-  private List<RequestFilter> fs  = new ArrayList<RequestFilter>();
+  private Set<Class<? extends RequestFilter>> fs  = new HashSet<Class<? extends RequestFilter>>();
 
   /**
    * @param params initialize parameters from configuration.
@@ -60,20 +60,18 @@ public class RequestFilterComponentPlugin extends BaseComponentPlugin {
       while (i.hasNext()) {
         ValueParam v = i.next();
         try {
-          Class c = Class.forName(v.getValue());
-          RequestFilter f = (RequestFilter) c.newInstance();
-          fs.add(f);
-        } catch (Exception e) {
-          LOG.error("Can't instantiate request filter " + v.getValue(), e);
+          fs.add((Class<? extends RequestFilter>) Class.forName(v.getValue()));
+        } catch (ClassNotFoundException e) {
+          LOG.error("Failed load class " + v.getValue(), e);
         }
       }
     }
   }
 
   /**
-   * @return Collection of {@link RequestFilter} supplied in configuration.
+   * @return Collection of classes RequestFilter supplied in configuration.
    */
-  public List<RequestFilter> getFilters() {
+  public Set<Class<? extends RequestFilter>> getFilters() {
     return fs;
   }
 

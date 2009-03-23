@@ -24,14 +24,11 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.exoplatform.services.rest.BaseTest;
-import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -56,17 +53,15 @@ public class StringEntityProviderTest extends BaseTest {
 
     MessageBodyReader reader = rd.getMessageBodyReader(String.class, null, null, mediaType);
     byte[] data = TEST_CYR.getBytes("windows-1251");
-    MultivaluedMap<String, String> h = new MultivaluedMapImpl();
-    h.putSingle(HttpHeaders.CONTENT_LENGTH, "" + data.length);
     InputStream in = new ByteArrayInputStream(data);
-    String res = (String) reader.readFrom(String.class, String.class, null, mediaType, h, in);
+    String res = (String) reader.readFrom(String.class, String.class, null, mediaType, null, in);
     assertTrue(TEST_CYR.equals(res));
 
     // not set character set then UTF-8 should be used
     mediaType = new MediaType("text", "plain");
     in = new ByteArrayInputStream(data);
-    res = (String) reader.readFrom(String.class, null, null, mediaType, h, in);
-    System.out.println(res);
+    res = (String) reader.readFrom(String.class, null, null, mediaType, null, in);
+    System.out.println(getClass().getName() + " : " + res);
     // string is wrong encoded
     assertFalse(TEST_CYR.equals(res));
   }
@@ -77,7 +72,7 @@ public class StringEntityProviderTest extends BaseTest {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     writer.writeTo(TEST_CYR, String.class, String.class, null, mediaType, null, out);
     String res = out.toString("windows-1251");
-    System.out.println(res);
+    System.out.println(getClass().getName() + " : " + res);
     assertTrue(TEST_CYR.equals(res));
 
     out.reset();

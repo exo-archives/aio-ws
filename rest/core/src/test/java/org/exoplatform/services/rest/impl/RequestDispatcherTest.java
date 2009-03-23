@@ -15,7 +15,7 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest;
+package org.exoplatform.services.rest.impl;
 
 import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
@@ -24,6 +24,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
+
+import org.exoplatform.services.rest.AbstractResourceTest;
+import org.exoplatform.services.rest.GenericContainerResponse;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>

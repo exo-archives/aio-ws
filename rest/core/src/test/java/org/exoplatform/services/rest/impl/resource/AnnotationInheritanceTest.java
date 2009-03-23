@@ -32,27 +32,52 @@ import org.exoplatform.services.rest.AbstractResourceTest;
  */
 public class AnnotationInheritanceTest extends AbstractResourceTest {
 
-  public interface ResourceInterface {
+  public static interface ResourceInterface {
     @GET
     @Produces(MediaType.TEXT_XML)
     String m0(String type);
   }
 
   @Path("/a")
-  public class Resource1 implements ResourceInterface {
+  public static class Resource1 implements ResourceInterface {
     public String m0(String type) {
       return "m0";
     }
   }
 
   @Path("/a")
-  public class Resource2 implements ResourceInterface {
+  public static class Resource2 implements ResourceInterface {
     @Produces(MediaType.APPLICATION_ATOM_XML)
     public String m0(String type) {
       return "m0";
     }
   }
   
+  // 
+  
+  public static interface ResourceInterface1 {
+    @GET
+    void m0();
+  }
+
+  public static interface ResourceInterface2 {
+    @GET
+    void m0();
+  }
+
+  @Path("a")
+  public static class Resource3 implements ResourceInterface1, ResourceInterface2 {
+    public void m0() {
+    }
+  }
+  
+  public void testFailedInheritance() {
+    try {
+      new AbstractResourceDescriptorImpl(Resource3.class);
+      fail("Should be failed here, equivocality annotation on method m0");
+    } catch (RuntimeException e) {
+    }
+  }
 
   public void testAnnotationsInheritance() throws Exception {
     Resource1 resource1 = new Resource1();

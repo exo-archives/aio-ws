@@ -17,9 +17,9 @@
 
 package org.exoplatform.services.rest.impl.provider;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.container.component.BaseComponentPlugin;
@@ -32,34 +32,32 @@ import org.exoplatform.services.rest.provider.EntityProvider;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
+@SuppressWarnings("unchecked")
 public class EntityProviderComponentPlugin extends BaseComponentPlugin {
-  
+
   /**
    * Logger.
    */
-  private static final Log LOG = ExoLogger.getLogger(EntityProviderComponentPlugin.class.getName());
-  
+  private static final Log                     LOG = ExoLogger.getLogger(EntityProviderComponentPlugin.class.getName());
+
   /**
    * See {@link EntityProvider}.
    */
-  private List<EntityProvider<?>> eps = new ArrayList<EntityProvider<?>>();
-  
+  private Set<Class<? extends EntityProvider>> eps = new HashSet<Class<? extends EntityProvider>>();
+
   /**
    * @param params initialize parameters
    * @see InitParams
    */
-  @SuppressWarnings("unchecked")
   public EntityProviderComponentPlugin(InitParams params) {
     if (params != null) {
       Iterator<ValueParam> i = params.getValueParamIterator();
       while (i.hasNext()) {
         ValueParam v = i.next();
         try {
-          Class c = Class.forName(v.getValue());
-          EntityProvider ep = (EntityProvider) c.newInstance();
-          eps.add(ep);
-        } catch (Exception e) {
-          LOG.error("Can't instantiate entity provider " + v.getValue(), e);
+          eps.add((Class<? extends EntityProvider>) Class.forName(v.getValue()));
+        } catch (ClassNotFoundException e) {
+          LOG.error("Failed load class " + v.getValue(), e);
         }
       }
     }
@@ -68,7 +66,7 @@ public class EntityProviderComponentPlugin extends BaseComponentPlugin {
   /**
    * @return the entityProviders supplied from configuration
    */
-  public List<EntityProvider<?>> getEntityProviders() {
+  public Set<Class<? extends EntityProvider>> getEntityProviders() {
     return eps;
   }
 

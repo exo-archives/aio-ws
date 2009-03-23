@@ -110,11 +110,7 @@ public class ResourceMethodTest extends AbstractResourceTest {
 
   public void testMultyEntity() throws Exception {
     Resource2 resource = new Resource2();
-    try {
-      registry(resource);
-      fail();
-    } catch (RuntimeException e){
-    }
+    assertFalse(registry(resource)); // must be ignored
     // [jsr-311 3.3.2.1] Resource methods MUST NOT have more than one parameter
     // that is not annotated with one of the above-listed annotations.
     assertEquals(404, service("POST", "/d", "", null, null).getStatus());

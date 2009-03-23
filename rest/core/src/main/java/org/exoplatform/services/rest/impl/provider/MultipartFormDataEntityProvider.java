@@ -49,9 +49,12 @@ import org.exoplatform.services.rest.provider.EntityProvider;
  * @version $Id: $
  */
 @Provider
-@Consumes( { "multipart/*" })
+@Consumes({ "multipart/*" })
 public class MultipartFormDataEntityProvider implements EntityProvider<Iterator<FileItem>> {
 
+  /**
+   * @see HttpServletRequest
+   */
   @Context
   private HttpServletRequest httpRequest;
 

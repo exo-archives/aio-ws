@@ -102,7 +102,7 @@ public class ApplicationContextImpl implements ApplicationContext {
   /**
    * Mutable runtime attributes.
    */
-  private Map<String, Object> attributes;
+  private Map<String, Object>        attributes;
 
   /**
    * Constructs new instance of ApplicationContext.
@@ -353,7 +353,7 @@ public class ApplicationContextImpl implements ApplicationContext {
                                  UriComponent.decode(encodedPathParameters.getFirst(key),
                                                      UriComponent.PATH));
       }
-      
+
       return pathParameters;
 
     }

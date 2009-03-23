@@ -66,7 +66,7 @@ public class BaseWadlGeneratorImpl implements WadlGenerator {
    */
   public org.exoplatform.services.rest.wadl.research.Resource createResource(AbstractResourceDescriptor rd) {
     if (rd.isRootResource())
-      return createResource(rd.getPath().getPath());
+      return createResource(rd.getPathValue().getPath());
     return createResource((String) null);
   }
 
@@ -84,9 +84,36 @@ public class BaseWadlGeneratorImpl implements WadlGenerator {
    * {@inheritDoc}
    */
   public org.exoplatform.services.rest.wadl.research.Method createMethod(ResourceMethodDescriptor rmd) {
+    String httpMethod = rmd.getHttpMethod();
+    // FIXME Ignore HEAD methods currently.
+    // Implementation of wadl2java for generation client code does not support
+    // HEAD method. See https://wadl.dev.java.net/ . 
+    // If WADL contains HEAD method description then client code get part of
+    // code as next:
+    // -------------------------------------------- 
+    //    public DataSource headAs()                                                                  
+    //    throws IOException, MalformedURLException                                               
+    // {                                                                                           
+    //    HashMap<String, Object> _queryParameterValues = new HashMap<String, Object>();          
+    //    HashMap<String, Object> _headerParameterValues = new HashMap<String, Object>();         
+    //    String _url = _uriBuilder.buildUri(_templateAndMatrixParameterValues, _queryParameterVal
+    //    DataSource _retVal = _dsDispatcher.doHEAD(_url, _headerParameterValues, "*/*");         
+    //    return _retVal;                                                                         
+    // }
+    // --------------------------------------------
+    // But class  org.jvnet.ws.wadl.util.DSDispatcher doesn't have method doHEAD at all.
+    //
+    if (httpMethod.equals("HEAD"))
+      return null;
+    
     org.exoplatform.services.rest.wadl.research.Method wadlMethod = new org.exoplatform.services.rest.wadl.research.Method();
-    wadlMethod.setName(rmd.getHttpMethod());
-    wadlMethod.setId(rmd.getMethod().getName());
+    wadlMethod.setName(httpMethod);
+    java.lang.reflect.Method m = rmd.getMethod();
+    // NOTE Method may be null in some cases. For example OPTIONS method
+    // processor use null method and fake invoker. See
+    // OptionsRequestResourceMethodDescriptorImpl.
+    if (m != null)
+      wadlMethod.setId(m.getName());
     return wadlMethod;
   }
 

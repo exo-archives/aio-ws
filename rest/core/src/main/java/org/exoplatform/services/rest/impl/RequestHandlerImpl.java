@@ -20,29 +20,30 @@ package org.exoplatform.services.rest.impl;
 import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.container.component.ComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.rest.ContainerObjectFactory;
+import org.exoplatform.services.rest.FilterDescriptor;
 import org.exoplatform.services.rest.GenericContainerRequest;
 import org.exoplatform.services.rest.GenericContainerResponse;
+import org.exoplatform.services.rest.ObjectFactory;
 import org.exoplatform.services.rest.RequestFilter;
 import org.exoplatform.services.rest.RequestHandler;
 import org.exoplatform.services.rest.ResponseFilter;
@@ -59,14 +60,16 @@ import org.exoplatform.services.rest.impl.provider.JAXBObjectEntityProvider;
 import org.exoplatform.services.rest.impl.provider.JsonEntityProvider;
 import org.exoplatform.services.rest.impl.provider.MultipartFormDataEntityProvider;
 import org.exoplatform.services.rest.impl.provider.MultivaluedMapEntityProvider;
+import org.exoplatform.services.rest.impl.provider.ProviderDescriptorImpl;
 import org.exoplatform.services.rest.impl.provider.ReaderEntityProvider;
 import org.exoplatform.services.rest.impl.provider.SAXSourceEntityProvider;
 import org.exoplatform.services.rest.impl.provider.StreamOutputEntityProvider;
 import org.exoplatform.services.rest.impl.provider.StreamSourceEntityProvider;
 import org.exoplatform.services.rest.impl.provider.StringEntityProvider;
-import org.exoplatform.services.rest.impl.uri.UriPattern;
 import org.exoplatform.services.rest.method.MethodInvokerFilter;
 import org.exoplatform.services.rest.provider.EntityProvider;
+import org.exoplatform.services.rest.provider.ProviderDescriptor;
+import org.exoplatform.services.rest.uri.UriPattern;
 import org.picocontainer.Startable;
 
 /**
@@ -86,12 +89,7 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
   private final RequestDispatcher   dispatcher;
 
   /**
-   * See {@link JAXBContextResolver}.
-   */
-  private final JAXBContextResolver jaxbContexts;
-
-  /**
-   * See {@link RuntimeDelegateImpl}, {@link RuntimeDelegate}.
+   * See {@link RuntimeDelegateImpl}, {@link javax.ws.rs.ext.RuntimeDelegate}.
    */
   private RuntimeDelegateImpl       rd;
 
@@ -104,13 +102,10 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
    * Constructs new instance of {@link RequestHandler}.
    * 
    * @param dispatcher See {@link RequestDispatcher}
-   * @param jaxbContexts See {@link JAXBContextResolver}
    * @param params init parameters
    */
   @SuppressWarnings("unchecked")
-  public RequestHandlerImpl(RequestDispatcher dispatcher,
-                            JAXBContextResolver jaxbContexts,
-                            InitParams params) {
+  public RequestHandlerImpl(RequestDispatcher dispatcher, InitParams params) {
 
     // NOTE!!! RuntimeDelegate should be already initialized by ResourceBinder
     rd = RuntimeDelegateImpl.getInstance();
@@ -132,7 +127,6 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
     }
 
     this.dispatcher = dispatcher;
-    this.jaxbContexts = jaxbContexts;
 
   }
 
@@ -144,23 +138,36 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
   @SuppressWarnings("unchecked")
   public void handleRequest(GenericContainerRequest request, GenericContainerResponse response) throws Exception {
     try {
-      URI uri = UriBuilder.fromUri(request.getRequestUri())
-                          .replaceQuery(null)
-                          .fragment(null)
-                          .build();
-      String path = uri.getRawPath().substring(request.getBaseUri().getRawPath().length());
-      List<String> t = new ArrayList<String>();
-
-      for (Entry<UriPattern, List<RequestFilter>> e : rd.getRequestFilters().entrySet()) {
-        if (e.getKey().match(path, t)) {
-          for (RequestFilter f : e.getValue())
-            f.doFilter(request);
-        }
-      }
 
       ApplicationContextImpl context = new ApplicationContextImpl(request, response);
       context.getAttributes().putAll(applicationProperties);
       ApplicationContextImpl.setCurrent(context);
+
+      String path = context.getPath();
+      List<String> capturingValues = new ArrayList<String>();
+
+      for (Entry<UriPattern, List<ObjectFactory<FilterDescriptor>>> e : rd.getRequestFilters()
+                                                                          .entrySet()) {
+        UriPattern uriPattern = e.getKey();
+        if (uriPattern != null) {
+          if (e.getKey().match(path, capturingValues)) {
+            int len = capturingValues.size();
+            if (capturingValues.get(len - 1) != null && !"/".equals(capturingValues.get(len - 1)))
+              continue; // not matched
+          } else {
+            continue; // not matched
+          }
+
+        }
+
+        // if matched or UriPattern is null
+        for (ObjectFactory<FilterDescriptor> factory : e.getValue()) {
+          RequestFilter f = (RequestFilter) factory.getInstance(context);
+          f.doFilter(request);
+        }
+
+      }
+
       try {
         dispatcher.dispatch(request, response);
       } catch (Exception e) {
@@ -213,15 +220,30 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
         }
       }
 
-      for (Entry<UriPattern, List<ResponseFilter>> e : rd.getResponseFilters().entrySet()) {
-        if (e.getKey().match(path, t)) {
-          for (ResponseFilter f : e.getValue())
-            f.doFilter(response);
+      for (Entry<UriPattern, List<ObjectFactory<FilterDescriptor>>> e : rd.getResponseFilters()
+                                                                          .entrySet()) {
+        UriPattern uriPattern = e.getKey();
+        if (uriPattern != null) {
+          if (e.getKey().match(path, capturingValues)) {
+            int len = capturingValues.size();
+            if (capturingValues.get(len - 1) != null && !"/".equals(capturingValues.get(len - 1)))
+              continue; // not matched
+          } else {
+            continue; // not matched
+          }
+
         }
+
+        // if matched or UriPattern is null
+        for (ObjectFactory<FilterDescriptor> factory : e.getValue()) {
+          ResponseFilter f = (ResponseFilter) factory.getInstance(context);
+          f.doFilter(response);
+        }
+
       }
 
       response.writeResponse();
-      
+
     } finally {
       // reset application context
       ApplicationContextImpl.setCurrent(null);
@@ -304,7 +326,7 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
 
     Integer bufferSize = (Integer) applicationProperties.get(WS_RS_BUFFER_SIZE);
     if (bufferSize == null) {
-      bufferSize = 204800;
+      bufferSize = 204800; // TODO move somewhere as const
       applicationProperties.put(WS_RS_BUFFER_SIZE, bufferSize);
     }
 
@@ -316,28 +338,28 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
 
     if (builtin) {
       // add prepared entity providers
-      rd.addProviderInstance(new ByteEntityProvider());
-      rd.addProviderInstance(new DataSourceEntityProvider());
-      rd.addProviderInstance(new DOMSourceEntityProvider());
-      rd.addProviderInstance(new FileEntityProvider());
-      rd.addProviderInstance(new MultivaluedMapEntityProvider());
-      rd.addProviderInstance(new InputStreamEntityProvider());
-      rd.addProviderInstance(new ReaderEntityProvider());
-      rd.addProviderInstance(new SAXSourceEntityProvider());
-      rd.addProviderInstance(new StreamSourceEntityProvider());
-      rd.addProviderInstance(new StringEntityProvider());
-      rd.addProviderInstance(new StreamOutputEntityProvider());
-      rd.addProviderInstance(new JsonEntityProvider());
-      
-      JAXBElementEntityProvider jep = new JAXBElementEntityProvider();
-      jep.setContexResolver(jaxbContexts);
-      rd.addProviderInstance(jep);
-      JAXBObjectEntityProvider jop = new JAXBObjectEntityProvider();
-      jop.setContexResolver(jaxbContexts);
-      rd.addProviderInstance(jop);
+      rd.addEntityProviderInstance(new ByteEntityProvider());
+      rd.addEntityProviderInstance(new DataSourceEntityProvider());
+      rd.addEntityProviderInstance(new DOMSourceEntityProvider());
+      rd.addEntityProviderInstance(new FileEntityProvider());
+      rd.addEntityProviderInstance(new MultivaluedMapEntityProvider());
+      rd.addEntityProviderInstance(new InputStreamEntityProvider());
+      rd.addEntityProviderInstance(new ReaderEntityProvider());
+      rd.addEntityProviderInstance(new SAXSourceEntityProvider());
+      rd.addEntityProviderInstance(new StreamSourceEntityProvider());
+      rd.addEntityProviderInstance(new StringEntityProvider());
+      rd.addEntityProviderInstance(new StreamOutputEntityProvider());
+      rd.addEntityProviderInstance(new JsonEntityProvider());
+
+      // per-request mode , Providers should be injected
+      rd.addProvider(JAXBElementEntityProvider.class);
+      rd.addProvider(JAXBObjectEntityProvider.class);
 
       // per-request mode , HttpServletRequest should be injected in provider
       rd.addProvider(MultipartFormDataEntityProvider.class);
+
+      // FIXME Remove this hard code by something more smart.
+      rd.addProvider(new ContainerObjectFactory<ProviderDescriptor>(new ProviderDescriptorImpl(JAXBContextResolver.class)));
     }
   }
 
@@ -346,23 +368,24 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
    * 
    * @param plugin See {@link ComponentPlugin}
    */
+  @SuppressWarnings("unchecked")
   public void addPlugin(ComponentPlugin plugin) {
     if (MethodInvokerFilterComponentPlugin.class.isAssignableFrom(plugin.getClass())) {
       // add method invoker filter
-      for (MethodInvokerFilter filter : ((MethodInvokerFilterComponentPlugin) plugin).getFilters())
+      for (Class<? extends MethodInvokerFilter> filter : ((MethodInvokerFilterComponentPlugin) plugin).getFilters())
         rd.addMethodInvokerFilter(filter);
     } else if (EntityProviderComponentPlugin.class.isAssignableFrom(plugin.getClass())) {
       // add external entity providers
-      List<EntityProvider<?>> eps = ((EntityProviderComponentPlugin) plugin).getEntityProviders();
-      for (EntityProvider<?> ep : eps)
-        rd.addProviderInstance(ep);
+      Set<Class<? extends EntityProvider>> eps = ((EntityProviderComponentPlugin) plugin).getEntityProviders();
+      for (Class<? extends EntityProvider> ep : eps)
+        rd.addProvider(ep);
     } else if (RequestFilterComponentPlugin.class.isAssignableFrom(plugin.getClass())) {
-      List<RequestFilter> filters = ((RequestFilterComponentPlugin) plugin).getFilters();
-      for (RequestFilter filter : filters)
+      Set<Class<? extends RequestFilter>> filters = ((RequestFilterComponentPlugin) plugin).getFilters();
+      for (Class<? extends RequestFilter> filter : filters)
         rd.addRequestFilter(filter);
     } else if (ResponseFilterComponentPlugin.class.isAssignableFrom(plugin.getClass())) {
-      List<ResponseFilter> filters = ((ResponseFilterComponentPlugin) plugin).getFilters();
-      for (ResponseFilter filter : filters)
+      Set<Class<? extends ResponseFilter>> filters = ((ResponseFilterComponentPlugin) plugin).getFilters();
+      for (Class<? extends ResponseFilter> filter : filters)
         rd.addResponseFilter(filter);
     }
   }

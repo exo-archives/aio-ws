@@ -19,11 +19,9 @@ package org.exoplatform.services.rest.impl;
 
 import java.util.HashMap;
 
-import javax.ws.rs.core.Context;
-
 /**
  * Keeps objects from environment (e. g. servlet container) which can be passed
- * in resource. Parameter must be annotated by {@link Context}.
+ * in resource. Parameter must be annotated by {@link javax.ws.rs.core.Context}.
  * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $

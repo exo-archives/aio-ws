@@ -15,22 +15,36 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest.util;
+package org.exoplatform.services.rest;
 
-import java.util.List;
-import java.util.Map;
+import org.exoplatform.services.rest.impl.resource.PathValue;
+import org.exoplatform.services.rest.method.MethodInvokerFilter;
+import org.exoplatform.services.rest.resource.ResourceDescriptor;
+import org.exoplatform.services.rest.uri.UriPattern;
 
 /**
+ * Description of filter.
+ * 
+ * @see Filter
+ * @see RequestFilter
+ * @see ResponseFilter
+ * @see MethodInvokerFilter
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public interface NotNullValueMultivaluedMap<K, V> extends Map<K, List<V>> {
+public interface FilterDescriptor extends ResourceDescriptor, ObjectModel {
 
   /**
-   * @param key key
-   * @return never null even any value not found in the map, return empty list
-   *         instead
+   * @return See {@link PathValue}
    */
-  List<V> getList(K key);
+  PathValue getPathValue();
+
+  /**
+   * UriPattern build in same manner as for resources. For detail see section
+   * 3.4 URI Templates in JAX-RS specification.
+   * 
+   * @return See {@link UriPattern}
+   */
+  UriPattern getUriPattern();
 
 }

@@ -18,10 +18,7 @@
 package org.exoplatform.services.rest.impl;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
-
-import javax.ws.rs.DefaultValue;
 
 import org.exoplatform.services.rest.ConstructorParameter;
 
@@ -44,7 +41,7 @@ public class ConstructorParameterImpl implements ConstructorParameter {
   private final Annotation   annotation;
 
   /**
-   * Parameter type. See {@link Constructor#getGenericParameterTypes()} .
+   * Parameter type. See {@link java.lang.reflect.Constructor#getGenericParameterTypes()} .
    */
   private final Type         type;
 
@@ -71,7 +68,7 @@ public class ConstructorParameterImpl implements ConstructorParameter {
    * @param additional see {@link #additional}
    * @param clazz parameter class
    * @param type generic parameter type
-   * @param defaultValue default value for parameter. See {@link DefaultValue}.
+   * @param defaultValue default value for parameter. See {@link javax.ws.rs.DefaultValue}.
    * @param encoded true if parameter must not be decoded false otherwise
    */
   public ConstructorParameterImpl(Annotation annotation,
@@ -135,7 +132,7 @@ public class ConstructorParameterImpl implements ConstructorParameter {
    */
   @Override
   public String toString() {
-    StringBuffer sb = new StringBuffer("[ ConstructorParameter: ");
+    StringBuffer sb = new StringBuffer("[ ConstructorParameterImpl : ");
     sb.append("annotation: " + getAnnotation())
       .append("; type: " + getParameterClass())
       .append("; generic-type : " + getGenericType())

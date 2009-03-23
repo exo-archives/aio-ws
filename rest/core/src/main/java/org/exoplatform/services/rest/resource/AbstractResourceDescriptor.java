@@ -17,12 +17,9 @@
 
 package org.exoplatform.services.rest.resource;
 
-import java.util.List;
-
-import org.exoplatform.services.rest.ConstructorInjector;
-import org.exoplatform.services.rest.FieldInjector;
+import org.exoplatform.services.rest.ObjectModel;
 import org.exoplatform.services.rest.impl.resource.PathValue;
-import org.exoplatform.services.rest.impl.uri.UriPattern;
+import org.exoplatform.services.rest.uri.UriPattern;
 
 /**
  * Describe Resource Class or Root Resource Class. Resource Class is any Java
@@ -31,12 +28,30 @@ import org.exoplatform.services.rest.impl.uri.UriPattern;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public interface AbstractResourceDescriptor extends ResourceDescriptor {
+public interface AbstractResourceDescriptor extends ResourceDescriptor, ObjectModel {
 
   /**
    * @return See {@link PathValue}
    */
-  PathValue getPath();
+  PathValue getPathValue();
+
+  /**
+   * @see ResourceMethodDescriptor
+   * @return resource methods
+   */
+  ResourceMethodMap<ResourceMethodDescriptor> getResourceMethods();
+
+  /**
+   * @see SubResourceLocatorDescriptor
+   * @return sub-resource locators
+   */
+  SubResourceLocatorMap getSubResourceLocators();
+
+  /**
+   * @see SubResourceMethodDescriptor
+   * @return sub-resource methods
+   */
+  SubResourceMethodMap getSubResourceMethods();
 
   /**
    * @return See {@link UriPattern}
@@ -48,37 +63,5 @@ public interface AbstractResourceDescriptor extends ResourceDescriptor {
    *         class which has own {@link javax.ws.rs.Path} annotation
    */
   boolean isRootResource();
-
-  /**
-   * @return {@link Class} of resource
-   */
-  Class<?> getResourceClass();
-
-  /**
-   * @return collection class's constructor empty collection should be returned
-   *         for singleton resources
-   */
-  List<ConstructorInjector> getConstructorInjectors();
-
-  /**
-   * @return collection class's fields, empty collection should be returned for
-   *         singleton resources
-   */
-  List<FieldInjector> getFieldInjectors();
-
-  /**
-   * @return collection of {@link SubResourceMethodDescriptor}
-   */
-  List<SubResourceMethodDescriptor> getSubResourceMethodDescriptors();
-
-  /**
-   * @return collection of {@link SubResourceLocatorDescriptor}
-   */
-  List<SubResourceLocatorDescriptor> getSubResourceLocatorDescriptors();
-
-  /**
-   * @return collection of {@link ResourceMethodDescriptor}
-   */
-  List<ResourceMethodDescriptor> getResourceMethodDescriptors();
 
 }

@@ -27,15 +27,27 @@ import org.exoplatform.services.rest.ContainerResponseWriter;
 import org.exoplatform.services.rest.GenericContainerResponse;
 
 /**
+ * Mock object that can be used for any tests.
+ * 
+ * @see ContainerResponseWriter
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 public class ByteArrayContainerResponseWriter implements ContainerResponseWriter {
 
+  /**
+   * Message body.
+   */
   private byte[]                         body;
 
+  /**
+   * HTTP headers.
+   */
   private MultivaluedMap<String, Object> headers;
 
+  /**
+   * {@inheritDoc}
+   */
   @SuppressWarnings("unchecked")
   public void writeBody(GenericContainerResponse response, MessageBodyWriter entityWriter) throws IOException {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -52,18 +64,30 @@ public class ByteArrayContainerResponseWriter implements ContainerResponseWriter
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public void writeHeaders(GenericContainerResponse response) throws IOException {
     headers = response.getHttpHeaders();
   }
 
+  /**
+   * @return message body
+   */
   public byte[] getBody() {
     return body;
   }
 
+  /**
+   * @return HTTP headers
+   */
   public MultivaluedMap<String, Object> getHeaders() {
     return headers;
   }
-  
+
+  /**
+   * Clear message body and HTTP headers map.
+   */
   public void reset() {
     body = null;
     headers = null;

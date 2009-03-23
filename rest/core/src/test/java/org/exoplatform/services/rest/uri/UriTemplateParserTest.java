@@ -15,12 +15,12 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest.impl.uri;
+package org.exoplatform.services.rest.uri;
 
 import java.util.List;
 
-import org.exoplatform.services.rest.impl.uri.UriPattern;
-import org.exoplatform.services.rest.impl.uri.UriTemplateParser;
+import org.exoplatform.services.rest.uri.UriPattern;
+import org.exoplatform.services.rest.uri.UriTemplateParser;
 
 import junit.framework.TestCase;
 

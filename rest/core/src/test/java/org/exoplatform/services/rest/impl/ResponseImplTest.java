@@ -15,7 +15,7 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest;
+package org.exoplatform.services.rest.impl;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -30,6 +30,7 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
+import org.exoplatform.services.rest.BaseTest;
 import org.exoplatform.services.rest.impl.header.HeaderHelper;
 
 /**

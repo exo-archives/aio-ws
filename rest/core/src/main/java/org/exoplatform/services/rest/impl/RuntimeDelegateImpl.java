@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.ws.rs.Path;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Cookie;
@@ -47,9 +46,13 @@ import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.rest.FilterDescriptor;
+import org.exoplatform.services.rest.ObjectFactory;
+import org.exoplatform.services.rest.PerRequestObjectFactory;
 import org.exoplatform.services.rest.ProviderResolver;
 import org.exoplatform.services.rest.RequestFilter;
 import org.exoplatform.services.rest.ResponseFilter;
+import org.exoplatform.services.rest.SingletonObjectFactory;
 import org.exoplatform.services.rest.impl.header.AcceptLanguage;
 import org.exoplatform.services.rest.impl.header.AcceptLanguageHeaderDelegate;
 import org.exoplatform.services.rest.impl.header.AcceptMediaType;
@@ -64,17 +67,16 @@ import org.exoplatform.services.rest.impl.header.MediaTypeHelper;
 import org.exoplatform.services.rest.impl.header.NewCookieHeaderDelegate;
 import org.exoplatform.services.rest.impl.header.StringHeaderDelegate;
 import org.exoplatform.services.rest.impl.header.URIHeaderDelegate;
-import org.exoplatform.services.rest.impl.provider.PerRequestProviderFactory;
 import org.exoplatform.services.rest.impl.provider.ProviderDescriptorImpl;
-import org.exoplatform.services.rest.impl.provider.ProviderFactory;
-import org.exoplatform.services.rest.impl.provider.SingletonProviderFactory;
+import org.exoplatform.services.rest.impl.resource.ResourceDescriptorValidator;
 import org.exoplatform.services.rest.impl.uri.UriBuilderImpl;
-import org.exoplatform.services.rest.impl.uri.UriPattern;
 import org.exoplatform.services.rest.method.MethodInvokerFilter;
 import org.exoplatform.services.rest.provider.EntityProvider;
 import org.exoplatform.services.rest.provider.ProviderDescriptor;
-import org.exoplatform.services.rest.util.EntityProviderMap;
-import org.exoplatform.services.rest.util.FilterMap;
+import org.exoplatform.services.rest.resource.ResourceDescriptorVisitor;
+import org.exoplatform.services.rest.util.MediaTypeMultivaluedMap;
+import org.exoplatform.services.rest.util.RawTypeUtil;
+import org.exoplatform.services.rest.util.UriPatternMap;
 import org.exoplatform.services.rest.util.MediaTypeMap;
 
 /**
@@ -94,6 +96,10 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
   @SuppressWarnings("unchecked")
   private static final Map<Class<?>, HeaderDelegate> HDS = new HashMap<Class<?>, HeaderDelegate>();
 
+  /**
+   * @return RuntimeDelegateImpl instance if it was already preset
+   * @see RuntimeDelegate#setInstance(RuntimeDelegate)
+   */
   public static RuntimeDelegateImpl getInstance() {
     return (RuntimeDelegateImpl) RuntimeDelegate.getInstance();
   }
@@ -114,41 +120,48 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
     HDS.put(Locale.class, new LocaleHeaderDelegate());
   }
 
-  /**
-   * Read message body providers. Also see {@link EntityProviderMap}.
-   */
-  private final EntityProviderMap                                writeProviders   = new EntityProviderMap();
+  //
 
   /**
-   * Read message body providers. Also see {@link EntityProviderMap}.
+   * Read message body providers. Also see {@link MediaTypeMultivaluedMap}.
    */
-  private final EntityProviderMap                                readProviders    = new EntityProviderMap();
+  private final MediaTypeMultivaluedMap<ObjectFactory<ProviderDescriptor>>         writeProviders   = new MediaTypeMultivaluedMap<ObjectFactory<ProviderDescriptor>>();
+
+  /**
+   * Read message body providers. Also see {@link MediaTypeMultivaluedMap}.
+   */
+  private final MediaTypeMultivaluedMap<ObjectFactory<ProviderDescriptor>>         readProviders    = new MediaTypeMultivaluedMap<ObjectFactory<ProviderDescriptor>>();
 
   /**
    * Exception mappers, see {@link ExceptionMapper}.
    */
-  private final Map<Class<? extends Throwable>, ProviderFactory> exceptionMappers = new HashMap<Class<? extends Throwable>, ProviderFactory>();
+  private final Map<Class<? extends Throwable>, ObjectFactory<ProviderDescriptor>> exceptionMappers = new HashMap<Class<? extends Throwable>, ObjectFactory<ProviderDescriptor>>();
 
   /**
    * Context resolvers.
    */
-  private final Map<Class<?>, MediaTypeMap<ProviderFactory>>     contextResolvers = new HashMap<Class<?>, MediaTypeMap<ProviderFactory>>();
+  private final Map<Class<?>, MediaTypeMap<ObjectFactory<ProviderDescriptor>>>     contextResolvers = new HashMap<Class<?>, MediaTypeMap<ObjectFactory<ProviderDescriptor>>>();
 
   /**
    * Request filters, see {@link RequestFilter}.
    */
-  private final FilterMap<RequestFilter>                         requestFilters   = new FilterMap<RequestFilter>();
+  private final UriPatternMap<ObjectFactory<FilterDescriptor>>                     requestFilters   = new UriPatternMap<ObjectFactory<FilterDescriptor>>();
 
   /**
    * Response filters, see {@link ResponseFilter}.
    */
-  private final FilterMap<ResponseFilter>                        responseFilters  = new FilterMap<ResponseFilter>();
+  private final UriPatternMap<ObjectFactory<FilterDescriptor>>                     responseFilters  = new UriPatternMap<ObjectFactory<FilterDescriptor>>();
 
   /**
    * Method invoking filters.
    */
-  private final List<MethodInvokerFilter>                        invokerFilters   = new ArrayList<MethodInvokerFilter>();
-  
+  private final UriPatternMap<ObjectFactory<FilterDescriptor>>                     invokerFilters   = new UriPatternMap<ObjectFactory<FilterDescriptor>>();
+
+  /**
+   * Validator.
+   */
+  private final ResourceDescriptorVisitor                                          rdv              = ResourceDescriptorValidator.getInstance();
+
   /**
    * Should be used only once for initialize.
    * 
@@ -159,7 +172,7 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
   }
 
   // RuntimeDelegate
-  
+
   /**
    * End Points is not supported. {@inheritDoc}
    */
@@ -203,66 +216,74 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
   }
 
   // ProviderResolver
-  
+
   /**
    * {@inheritDoc}
    */
-  public <T> void addContextResolver(Class<? extends ContextResolver<T>> providerClass) {
-    ProviderDescriptor descriptor = new ProviderDescriptorImpl(providerClass);
-    ProviderFactory pf = new PerRequestProviderFactory(descriptor);
+  public <T> void addContextResolver(Class<? extends ContextResolver<T>> ctxResolverClass) {
     try {
-      addProvider(pf);
+      ProviderDescriptor descriptor = new ProviderDescriptorImpl(ctxResolverClass);
+      descriptor.accept(rdv);
+      // Per-request provider
+      ObjectFactory<ProviderDescriptor> f = new PerRequestObjectFactory<ProviderDescriptor>(descriptor);
+      addContextResolver(f);
     } catch (Exception e) {
-      LOG.error("Unable add ContextResolver " + providerClass.getName(), e);
+      LOG.error("Failed add ContextResolver " + ctxResolverClass.getName(), e);
     }
   }
 
   /**
    * {@inheritDoc}
    */
-  public <T> void addContextResolverInstance(ContextResolver<T> provider) {
-    ProviderDescriptor descriptor = new ProviderDescriptorImpl(provider.getClass());
-    ProviderFactory pf = new SingletonProviderFactory(descriptor, provider);
+  public <T> void addContextResolverInstance(ContextResolver<T> ctxResolver) {
     try {
-      addProvider(pf);
+      ProviderDescriptor descriptor = new ProviderDescriptorImpl(ctxResolver);
+      descriptor.accept(rdv);
+      // Singleton provider
+      ObjectFactory<ProviderDescriptor> f = new SingletonObjectFactory<ProviderDescriptor>(descriptor,
+                                                                                           ctxResolver);
+      addContextResolver(f);
     } catch (Exception e) {
-      LOG.error("Unable add ContextResolver " + provider.getClass().getName(), e);
-    }
-  }
-
-  public <T> void addEntityProvider(Class<? extends EntityProvider<T>> providerClass) {
-    ProviderDescriptor descriptor = new ProviderDescriptorImpl(providerClass);
-    ProviderFactory pf = new PerRequestProviderFactory(descriptor);
-    try {
-      addProvider(pf);
-    } catch (Exception e) {
-      LOG.error("Unable add EntityProvider " + providerClass.getName(), e);
+      LOG.error("Failed add ContextResolver " + ctxResolver.getClass().getName(), e);
     }
   }
 
   /**
    * {@inheritDoc}
    */
-  public <T> void addEntityProviderInstance(EntityProvider<T> provider) {
-    ProviderDescriptor descriptor = new ProviderDescriptorImpl(provider.getClass());
-    ProviderFactory pf = new SingletonProviderFactory(descriptor, provider);
+  public <T> void addEntityProvider(Class<? extends EntityProvider<T>> entProviderClass) {
     try {
-      addProvider(pf);
+      addMessageBodyReader(entProviderClass);
+      addMessageBodyWriter(entProviderClass);
     } catch (Exception e) {
-      LOG.error("Unable add EntityProvider " + provider.getClass().getName(), e);
+      LOG.error("Failed add EntityProvider " + entProviderClass.getName());
     }
   }
 
   /**
    * {@inheritDoc}
    */
-  public <T extends Throwable> void addExceptionMapper(Class<? extends ExceptionMapper<T>> providerClass) {
-    ProviderDescriptor descriptor = new ProviderDescriptorImpl(providerClass);
-    ProviderFactory pf = new PerRequestProviderFactory(descriptor);
+  public <T> void addEntityProviderInstance(EntityProvider<T> entProvider) {
     try {
-      addProvider(pf);
+      addMessageBodyReaderInstance(entProvider);
+      addMessageBodyWriterInstance(entProvider);
     } catch (Exception e) {
-      LOG.error("Unable add ExceptionMapper " + providerClass.getName(), e);
+      LOG.error("Failed add EntityProvider " + entProvider.getClass().getName());
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public <T extends Throwable> void addExceptionMapper(Class<? extends ExceptionMapper<T>> excMapperClass) {
+    try {
+      ProviderDescriptor descriptor = new ProviderDescriptorImpl(excMapperClass);
+      descriptor.accept(rdv);
+      // Per-request provider
+      ObjectFactory<ProviderDescriptor> f = new PerRequestObjectFactory<ProviderDescriptor>(descriptor);
+      addExceptionMapper(f);
+    } catch (Exception e) {
+      LOG.error("Failed add ExceptionMapper " + excMapperClass.getClass().getName(), e);
     }
   }
 
@@ -270,175 +291,99 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
    * {@inheritDoc}
    */
   @SuppressWarnings("unchecked")
-  public void addExceptionMapperInstance(ExceptionMapper provider) {
-    ProviderDescriptor descriptor = new ProviderDescriptorImpl(provider.getClass());
-    ProviderFactory pf = new SingletonProviderFactory(descriptor, provider);
+  public void addExceptionMapperInstance(ExceptionMapper excMapper) {
     try {
-      addProvider(pf);
+      ProviderDescriptor descriptor = new ProviderDescriptorImpl(excMapper);
+      descriptor.accept(rdv);
+      // Singleton provider
+      ObjectFactory<ProviderDescriptor> f = new SingletonObjectFactory<ProviderDescriptor>(descriptor,
+                                                                                           excMapper);
+      addExceptionMapper(f);
     } catch (Exception e) {
-      LOG.error("Unable add ExceptionMapper " + provider.getClass().getName(), e);
+      LOG.error("Failed add ExceptionMapper " + excMapper.getClass().getName(), e);
     }
   }
 
   /**
    * {@inheritDoc}
    */
-  public <T> void addMessageBodyReader(Class<? extends MessageBodyReader<T>> providerClass) {
-    ProviderDescriptor descriptor = new ProviderDescriptorImpl(providerClass);
-    ProviderFactory pf = new PerRequestProviderFactory(descriptor);
+  public <T> void addMessageBodyReader(Class<? extends MessageBodyReader<T>> readerClass) {
     try {
-      addProvider(pf);
+      ProviderDescriptor descriptor = new ProviderDescriptorImpl(readerClass);
+      descriptor.accept(rdv);
+      // Per-request provider
+      ObjectFactory<ProviderDescriptor> f = new PerRequestObjectFactory<ProviderDescriptor>(descriptor);
+      // MessageBodyReader is smart component and can determine which type it
+      // supports, see method MessageBodyReader.isReadable. So here does not
+      // check is reader for the same Java and media type already exists.
+      // Let it be under developer's control.
+      for (MediaType mime : f.getObjectModel().consumes())
+        readProviders.getList(mime).add(f);
     } catch (Exception e) {
-      LOG.error("Unable add MessageBodyReader " + providerClass.getName(), e);
+      LOG.error("Failed add MessageBodyReader ", e);
     }
   }
 
   /**
    * {@inheritDoc}
    */
-  public <T> void addMessageBodyReaderInstance(MessageBodyReader<T> provider) {
-    ProviderDescriptor descriptor = new ProviderDescriptorImpl(provider.getClass());
-    ProviderFactory pf = new SingletonProviderFactory(descriptor, provider);
+  public <T> void addMessageBodyReaderInstance(MessageBodyReader<T> reader) {
     try {
-      addProvider(pf);
+      ProviderDescriptor descriptor = new ProviderDescriptorImpl(reader);
+      descriptor.accept(rdv);
+      // Singleton provider
+      ObjectFactory<ProviderDescriptor> f = new SingletonObjectFactory<ProviderDescriptor>(descriptor,
+                                                                                           reader);
+      // MessageBodyReader is smart component and can determine which type it
+      // supports, see method MessageBodyReader.isReadable. So here does not
+      // check is reader for the same Java and media type already exists.
+      // Let it be under developer's control.
+      for (MediaType mime : f.getObjectModel().consumes())
+        readProviders.getList(mime).add(f);
     } catch (Exception e) {
-      LOG.error("Unable add MessageBodyReader " + provider.getClass().getName(), e);
+      LOG.error("Failed add MessageBodyReader ", e);
     }
   }
 
   /**
    * {@inheritDoc}
    */
-  public <T> void addMessageBodyWriter(Class<? extends MessageBodyWriter<T>> providerClass) {
-    ProviderDescriptor descriptor = new ProviderDescriptorImpl(providerClass);
-    ProviderFactory pf = new PerRequestProviderFactory(descriptor);
+  public <T> void addMessageBodyWriter(Class<? extends MessageBodyWriter<T>> writerClass) {
     try {
-      addProvider(pf);
+      ProviderDescriptor descriptor = new ProviderDescriptorImpl(writerClass);
+      descriptor.accept(rdv);
+      // Per-request provider
+      ObjectFactory<ProviderDescriptor> f = new PerRequestObjectFactory<ProviderDescriptor>(descriptor);
+      // MessageBodyWriter is smart component and can determine which type it
+      // supports, see method MessageBodyWriter.isWritable. So here does not
+      // check is writer for the same Java and media type already exists.
+      // Let it be under developer's control.
+      for (MediaType mime : f.getObjectModel().produces())
+        writeProviders.getList(mime).add(f);
     } catch (Exception e) {
-      LOG.error("Unable add MessageBodyWriter " + providerClass.getName(), e);
+      LOG.error("Failed add MessageBodyWriter ", e);
     }
   }
 
   /**
    * {@inheritDoc}
    */
-  public <T> void addMessageBodywriterInstance(MessageBodyWriter<T> provider) {
-    ProviderDescriptor descriptor = new ProviderDescriptorImpl(provider.getClass());
-    ProviderFactory pf = new SingletonProviderFactory(descriptor, provider);
+  public <T> void addMessageBodyWriterInstance(MessageBodyWriter<T> writer) {
     try {
-      addProvider(pf);
+      ProviderDescriptor descriptor = new ProviderDescriptorImpl(writer);
+      descriptor.accept(rdv);
+      // Singleton provider
+      ObjectFactory<ProviderDescriptor> f = new SingletonObjectFactory<ProviderDescriptor>(descriptor,
+                                                                                           writer);
+      // MessageBodyWriter is smart component and can determine which type it
+      // supports, see method MessageBodyWriter.isWritable. So here does not
+      // check is writer for the same Java and media type already exists.
+      // Let it be under developer's control.
+      for (MediaType mime : f.getObjectModel().produces())
+        writeProviders.getList(mime).add(f);
     } catch (Exception e) {
-      LOG.error("Unable add MessageBodyWriter " + provider.getClass().getName(), e);
+      LOG.error("Failed add MessageBodyWriter ", e);
     }
-  }
-
-  /**
-   * @param filter see {@link MethodInvokerFilter}
-   */
-  public void addMethodInvokerFilter(MethodInvokerFilter filter) {
-    invokerFilters.add(filter);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void addProvider(Class<?> providerClass) {
-    ProviderDescriptor descriptor = new ProviderDescriptorImpl(providerClass);
-    ProviderFactory pf = new PerRequestProviderFactory(descriptor);
-    try {
-      addProvider(pf);
-    } catch (Exception e) {
-      LOG.error("Unable add Provider " + providerClass.getName(), e);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void addProviderInstance(Object provider) {
-    ProviderDescriptor descriptor = new ProviderDescriptorImpl(provider.getClass());
-    ProviderFactory pf = new SingletonProviderFactory(descriptor, provider);
-    try {
-      addProvider(pf);
-    } catch (Exception e) {
-      LOG.error("Unable add Provider " + provider.getClass().getName(), e);
-    }
-  }
-
-  /**
-   * Add {@link ProviderFactory}.
-   * 
-   * @param factory ProviderFactory
-   */
-  @SuppressWarnings("unchecked")
-  private void addProvider(ProviderFactory factory) {
-    if (MessageBodyReader.class.isAssignableFrom(factory.getProviderClass())) {
-      for (MediaType mime : factory.consumes())
-        readProviders.getList(mime).add(factory);
-    }
-    if (MessageBodyWriter.class.isAssignableFrom(factory.getProviderClass())) {
-      for (MediaType mime : factory.produces())
-        writeProviders.getList(mime).add(factory);
-    }
-    if (ExceptionMapper.class.isAssignableFrom(factory.getProviderClass())) {
-      for (Type t : factory.getProviderClass().getGenericInterfaces()) {
-        if (t instanceof ParameterizedType) {
-          ParameterizedType p = (ParameterizedType) t;
-          if (ExceptionMapper.class == p.getRawType()) {
-            Type[] ta = p.getActualTypeArguments();
-            try {
-              Class<? extends Throwable> exc = (Class<? extends Throwable>) ta[0];
-              exceptionMappers.put(exc, factory);
-            } catch (ClassCastException e) {
-              throw new RuntimeException("ExceptionMapper parameterized by incorrect type " + ta[0]);
-            }
-          }
-        }
-      }
-    }
-    if (ContextResolver.class.isAssignableFrom(factory.getProviderClass())) {
-      for (Type t : factory.getProviderClass().getGenericInterfaces()) {
-        if (t instanceof ParameterizedType) {
-          ParameterizedType p = (ParameterizedType) t;
-          if (ContextResolver.class == p.getRawType()) {
-            Type[] ta = p.getActualTypeArguments();
-            try {
-              Class<?> clazz = (Class<?>) ta[0];
-              MediaTypeMap<ProviderFactory> pm = contextResolvers.get(clazz);
-              if (pm == null) {
-                pm = new MediaTypeMap<ProviderFactory>();
-                contextResolvers.put(clazz, pm);
-              }
-              for (MediaType mime : factory.produces())
-                pm.put(mime, factory);
-            } catch (ClassCastException e) {
-              throw new RuntimeException("ContextResolver parameterized by incorrect type " + ta[0]);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * @param filter See {@link ResponseFilter}
-   */
-  public void addResponseFilter(ResponseFilter filter) {
-    final Path pathAnnotation = filter.getClass().getAnnotation(Path.class);
-    String path = pathAnnotation == null ? "/" : pathAnnotation.value();
-    UriPattern uriPattern = new UriPattern(path);
-    responseFilters.getList(uriPattern).add(filter);
-
-  }
-
-  /**
-   * @param filter See {@link RequestFilter}
-   */
-  public void addRequestFilter(RequestFilter filter) {
-    final Path pathAnnotation = filter.getClass().getAnnotation(Path.class);
-    String path = pathAnnotation == null ? "/" : pathAnnotation.value();
-    UriPattern uriPattern = new UriPattern(path);
-    requestFilters.getList(uriPattern).add(filter);
   }
 
   /**
@@ -449,10 +394,10 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
                                                        Type genericType,
                                                        Annotation[] annotations) {
     List<MediaType> l = new ArrayList<MediaType>();
-    for (Map.Entry<MediaType, List<ProviderFactory>> e : writeProviders.entrySet()) {
+    for (Map.Entry<MediaType, List<ObjectFactory<ProviderDescriptor>>> e : writeProviders.entrySet()) {
       MediaType mime = e.getKey();
-      for (ProviderFactory pf : e.getValue()) {
-        MessageBodyWriter writer = (MessageBodyWriter) pf.getProvider(ApplicationContextImpl.getCurrent());
+      for (ObjectFactory pf : e.getValue()) {
+        MessageBodyWriter writer = (MessageBodyWriter) pf.getInstance(ApplicationContextImpl.getCurrent());
         if (writer.isWriteable(type, genericType, annotations, MediaTypeHelper.DEFAULT_TYPE))
           l.add(mime);
       }
@@ -461,37 +406,26 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
     Collections.sort(l, MediaTypeHelper.MEDIA_TYPE_COMPARATOR);
     return l;
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public <T> ContextResolver<T> getContextResolver(Class<T> contextType, MediaType mediaType) {
-    MediaTypeMap<ProviderFactory> pm = contextResolvers.get(contextType);
+    MediaTypeMap<ObjectFactory<ProviderDescriptor>> pm = contextResolvers.get(contextType);
     ContextResolver<T> resolver = null;
     if (pm != null) {
       if (mediaType == null)
-        return getContextResolverInt(pm, contextType, MediaTypeHelper.DEFAULT_TYPE);
+        return _getContextResolver(pm, contextType, MediaTypeHelper.DEFAULT_TYPE);
 
-      resolver = getContextResolverInt(pm, contextType, mediaType);
+      resolver = _getContextResolver(pm, contextType, mediaType);
       if (resolver == null)
-        resolver = getContextResolverInt(pm, contextType, new MediaType(mediaType.getType(),
-                                                                     MediaType.MEDIA_TYPE_WILDCARD));
+        resolver = _getContextResolver(pm,
+                                       contextType,
+                                       new MediaType(mediaType.getType(), MediaType.MEDIA_TYPE_WILDCARD));
       if (resolver == null)
-        resolver = getContextResolverInt(pm, contextType, MediaTypeHelper.DEFAULT_TYPE);
+        resolver = _getContextResolver(pm, contextType, MediaTypeHelper.DEFAULT_TYPE);
     }
     return resolver;
-  }
-
-  @SuppressWarnings("unchecked")
-  private <T> ContextResolver<T> getContextResolverInt(MediaTypeMap<ProviderFactory> pm,
-                                                       Class<T> contextType,
-                                                       MediaType mediaType) {
-    for (Map.Entry<MediaType, ProviderFactory> e : pm.entrySet()) {
-      if (mediaType.isCompatible(e.getKey())) {
-        return (ContextResolver<T>) e.getValue().getProvider(ApplicationContextImpl.getCurrent());
-      }
-    }
-    return null;
   }
 
   /**
@@ -499,9 +433,9 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
    */
   @SuppressWarnings("unchecked")
   public <T extends Throwable> ExceptionMapper<T> getExceptionMapper(Class<T> type) {
-    ProviderFactory pf = exceptionMappers.get(type);
+    ObjectFactory pf = exceptionMappers.get(type);
     if (pf != null)
-      return (ExceptionMapper<T>) pf.getProvider(ApplicationContextImpl.getCurrent());
+      return (ExceptionMapper<T>) pf.getInstance(ApplicationContextImpl.getCurrent());
     return null;
   }
 
@@ -513,42 +447,18 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
                                                        Annotation[] annotations,
                                                        MediaType mediaType) {
     if (mediaType == null)
-      return getMessageBodyReaderInt(type, genericType, annotations, MediaTypeHelper.DEFAULT_TYPE);
+      return _getMessageBodyReader(type, genericType, annotations, MediaTypeHelper.DEFAULT_TYPE);
 
-    MessageBodyReader<T> reader = getMessageBodyReaderInt(type, genericType, annotations, mediaType);
+    MessageBodyReader<T> reader = _getMessageBodyReader(type, genericType, annotations, mediaType);
     if (reader == null)
-      reader = getMessageBodyReaderInt(type,
+      reader = _getMessageBodyReader(type,
                                      genericType,
                                      annotations,
-                                     new MediaType(mediaType.getType(),
-                                                   MediaType.MEDIA_TYPE_WILDCARD));
+                                     new MediaType(mediaType.getType(), MediaType.MEDIA_TYPE_WILDCARD));
     if (reader == null)
-      reader = getMessageBodyReaderInt(type, genericType, annotations, MediaTypeHelper.DEFAULT_TYPE);
+      reader = _getMessageBodyReader(type, genericType, annotations, MediaTypeHelper.DEFAULT_TYPE);
 
     return reader;
-  }
-
-  /**
-   * Looking for message body reader according to supplied entity class, entity
-   * generic type, annotations and content type.
-   * 
-   * @param type entity type
-   * @param genericType entity generic type
-   * @param annotations annotations
-   * @param mediaType entity content type
-   * @return message body reader or null if no one was found.
-   */
-  @SuppressWarnings("unchecked")
-  private <T> MessageBodyReader<T> getMessageBodyReaderInt(Class<T> type,
-                                                           Type genericType,
-                                                           Annotation[] annotations,
-                                                           MediaType mediaType) {
-    for (ProviderFactory pf : readProviders.getList(mediaType)) {
-      MessageBodyReader reader = (MessageBodyReader) pf.getProvider(ApplicationContextImpl.getCurrent());
-      if (reader.isReadable(type, genericType, annotations, mediaType))
-        return reader;
-    }
-    return null;
   }
 
   /**
@@ -559,24 +469,352 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
                                                        Annotation[] annotations,
                                                        MediaType mediaType) {
     if (mediaType == null)
-      return getMessageBodyWriterInt(type, genericType, annotations, MediaTypeHelper.DEFAULT_TYPE);
+      return _getMessageBodyWriter(type, genericType, annotations, MediaTypeHelper.DEFAULT_TYPE);
 
-    MessageBodyWriter<T> writer = getMessageBodyWriterInt(type, genericType, annotations, mediaType);
+    MessageBodyWriter<T> writer = _getMessageBodyWriter(type, genericType, annotations, mediaType);
     if (writer == null)
-      writer = getMessageBodyWriterInt(type,
+      writer = _getMessageBodyWriter(type,
                                      genericType,
                                      annotations,
-                                     new MediaType(mediaType.getType(),
-                                                   MediaType.MEDIA_TYPE_WILDCARD));
+                                     new MediaType(mediaType.getType(), MediaType.MEDIA_TYPE_WILDCARD));
     if (writer == null)
-      writer = getMessageBodyWriterInt(type, genericType, annotations, MediaTypeHelper.DEFAULT_TYPE);
+      writer = _getMessageBodyWriter(type, genericType, annotations, MediaTypeHelper.DEFAULT_TYPE);
     return writer;
+  }
+
+  /**
+   * @param providerClass should be one of known provider classes
+   */
+  void addProvider(Class<?> providerClass) {
+    try {
+      ProviderDescriptor descriptor = new ProviderDescriptorImpl(providerClass);
+      descriptor.accept(rdv);
+      ObjectFactory<ProviderDescriptor> f = new PerRequestObjectFactory<ProviderDescriptor>(descriptor);
+      addProvider(f);
+    } catch (Exception e) {
+      LOG.error("Failed add Provider " + providerClass.getName(), e);
+    }
+  }
+
+  /**
+   * @param provider should be one of known provider instances
+   */
+  void addProviderInstance(Object provider) {
+    try {
+      ProviderDescriptor descriptor = new ProviderDescriptorImpl(provider.getClass());
+      rdv.visitProviderDescriptor(descriptor);
+
+      ObjectFactory<ProviderDescriptor> f = new SingletonObjectFactory<ProviderDescriptor>(descriptor,
+                                                                                           provider);
+      addProvider(f);
+    } catch (Exception e) {
+      LOG.error("Failed add Provider " + provider.getClass().getName(), e);
+    }
+  }
+
+  //
+
+  /**
+   * Add {@link ProviderFactory}.
+   * 
+   * @see #addContextResolver(Class)
+   * @see #addContextResolverInstance(ContextResolver)
+   * @see #addEntityProvider(Class)
+   * @see #addEntityProviderInstance(EntityProvider)
+   * @see #addExceptionMapper(Class)
+   * @see #addExceptionMapperInstance(ExceptionMapper)
+   * @see #addMessageBodyReader(Class)
+   * @see #addMessageBodyReaderInstance(MessageBodyReader)
+   * @see #addMessageBodyWriter(Class)
+   * @see #addMessageBodyWriterInstance(MessageBodyWriter)
+   * @param factory ObjectFactory
+   */
+  void addProvider(ObjectFactory<ProviderDescriptor> factory) {
+    boolean isKnownProviderType = false;
+    try {
+      Class<?> clazz = factory.getObjectModel().getObjectClass();
+      if (MessageBodyReader.class.isAssignableFrom(clazz)) {
+        isKnownProviderType = true;
+        // MessageBodyReader is smart component and can determine which type it
+        // supports, see method MessageBodyReader.isReadable. So here does not
+        // check is reader for the same Java and media type already exists.
+        // Let it be under developer's control.
+        for (MediaType mime : factory.getObjectModel().consumes())
+          readProviders.getList(mime).add(factory);
+      }
+      if (MessageBodyWriter.class.isAssignableFrom(clazz)) {
+        isKnownProviderType = true;
+        // MessageBodyWriter is smart component and can determine which type it
+        // supports, see method MessageBodyWriter.isWritable. So here does not
+        // check is writer for the same Java and media type already exists.
+        // Let it be under developer's control.
+        for (MediaType mime : factory.getObjectModel().produces())
+          writeProviders.getList(mime).add(factory);
+      }
+      if (ExceptionMapper.class.isAssignableFrom(clazz)) {
+        isKnownProviderType = true;
+        addExceptionMapper(factory);
+      }
+      if (ContextResolver.class.isAssignableFrom(clazz)) {
+        isKnownProviderType = true;
+        addContextResolver(factory);
+      }
+    } catch (Exception e) {
+      LOG.error("Failed add Provider " + factory.getClass().getName());
+    }
+    if (!isKnownProviderType)
+      LOG.warn("Unsupported provider type: " + factory.getObjectModel().getObjectClass().getName());
+  }
+
+  //
+
+  /**
+   * @return all available ExceptionMappers
+   */
+  public Map<Class<? extends Throwable>, ObjectFactory<ProviderDescriptor>> getExceptionMappers() {
+    return exceptionMappers;
+  }
+
+  /**
+   * @return all available ContextResolvers
+   */
+  public Map<Class<?>, MediaTypeMap<ObjectFactory<ProviderDescriptor>>> getContextResolvers() {
+    return contextResolvers;
+  }
+
+  /**
+   * @return all available MessageBodyReaders
+   */
+  public MediaTypeMultivaluedMap<ObjectFactory<ProviderDescriptor>> getMessageBodyReaders() {
+    return readProviders;
+  }
+
+  /**
+   * @return all available MessageBodyWriters
+   */
+  public MediaTypeMultivaluedMap<ObjectFactory<ProviderDescriptor>> getMessageBodyWriters() {
+    return writeProviders;
+  }
+
+  // ----- Filters
+
+  /**
+   * @param filterClass see {@link MethodInvokerFilter}
+   */
+  public void addMethodInvokerFilter(Class<? extends MethodInvokerFilter> filterClass) {
+    try {
+      FilterDescriptor descriptor = new FilterDescriptorImpl(filterClass);
+      descriptor.accept(rdv);
+      ObjectFactory<FilterDescriptor> factory = new PerRequestObjectFactory<FilterDescriptor>(descriptor);
+      invokerFilters.getList(descriptor.getUriPattern()).add(factory);
+    } catch (Exception e) {
+      LOG.error("Failed add MethodInvokerFilter " + filterClass.getName(), e);
+    }
+  }
+
+  /**
+   * @param filter see {@link MethodInvokerFilter}
+   */
+  public void addMethodInvokerFilterInstance(MethodInvokerFilter filter) {
+    try {
+      FilterDescriptor descriptor = new FilterDescriptorImpl(filter);
+      descriptor.accept(rdv);
+      ObjectFactory<FilterDescriptor> factory = new SingletonObjectFactory<FilterDescriptor>(descriptor,
+                                                                                             filter);
+      invokerFilters.getList(descriptor.getUriPattern()).add(factory);
+    } catch (Exception e) {
+      LOG.error("Failed add RequestFilter " + filter.getClass().getName(), e);
+    }
+  }
+
+  /**
+   * @param filterClass See {@link RequestFilter}
+   */
+  public void addRequestFilter(Class<? extends RequestFilter> filterClass) {
+    try {
+      FilterDescriptor descriptor = new FilterDescriptorImpl(filterClass);
+      descriptor.accept(rdv);
+      ObjectFactory<FilterDescriptor> factory = new PerRequestObjectFactory<FilterDescriptor>(descriptor);
+      requestFilters.getList(descriptor.getUriPattern()).add(factory);
+    } catch (Exception e) {
+      LOG.error("Failed add MethodInvokerFilter " + filterClass.getName(), e);
+    }
+  }
+
+  /**
+   * @param filter See {@link RequestFilter}
+   */
+  public void addRequestFilterInstance(RequestFilter filter) {
+    try {
+      FilterDescriptor descriptor = new FilterDescriptorImpl(filter);
+      descriptor.accept(rdv);
+      ObjectFactory<FilterDescriptor> factory = new SingletonObjectFactory<FilterDescriptor>(descriptor,
+                                                                                             filter);
+      requestFilters.getList(descriptor.getUriPattern()).add(factory);
+    } catch (Exception e) {
+      LOG.error("Failed add RequestFilter " + filter.getClass().getName(), e);
+    }
+  }
+
+  /**
+   * @param filterClass See {@link ResponseFilter}
+   */
+  public void addResponseFilter(Class<? extends ResponseFilter> filterClass) {
+    try {
+      FilterDescriptor descriptor = new FilterDescriptorImpl(filterClass);
+      descriptor.accept(rdv);
+      ObjectFactory<FilterDescriptor> of = new PerRequestObjectFactory<FilterDescriptor>(descriptor);
+      responseFilters.getList(descriptor.getUriPattern()).add(of);
+    } catch (Exception e) {
+      LOG.error("Failed add ResponseFilter " + filterClass.getName(), e);
+    }
+  }
+
+  /**
+   * @param filter See {@link ResponseFilter}
+   */
+  public void addResponseFilterInstance(ResponseFilter filter) {
+    try {
+      FilterDescriptor descriptor = new FilterDescriptorImpl(filter);
+      descriptor.accept(rdv);
+      ObjectFactory<FilterDescriptor> of = new SingletonObjectFactory<FilterDescriptor>(descriptor,
+                                                                                        filter);
+      responseFilters.getList(descriptor.getUriPattern()).add(of);
+    } catch (Exception e) {
+      LOG.error("Failed add ResponseFilter " + filter.getClass().getName(), e);
+    }
+  }
+
+  /**
+   * @param filterClass one of know filter classes
+   * @see #addFilterFactory(FilterFactory)
+   */
+  @SuppressWarnings("unchecked")
+  void addFilter(Class<?> filterClass) {
+    boolean isKnownFilterType = false;
+    try {
+      if (RequestFilter.class.isAssignableFrom(filterClass)) {
+        isKnownFilterType = true;
+        addRequestFilter((Class<? extends RequestFilter>) filterClass);
+      }
+      if (ResponseFilter.class.isAssignableFrom(filterClass)) {
+        isKnownFilterType = true;
+        addResponseFilter((Class<? extends ResponseFilter>) filterClass);
+
+      }
+      if (MethodInvokerFilter.class.isAssignableFrom(filterClass)) {
+        isKnownFilterType = true;
+        addMethodInvokerFilter((Class<? extends MethodInvokerFilter>) filterClass);
+      }
+    } catch (Exception e) {
+      LOG.error("Unable add filter: " + filterClass.getName(), e);
+    }
+    if (!isKnownFilterType) {
+      LOG.warn("Unsupported filter type: " + filterClass.getName());
+    }
+  }
+
+  /**
+   * @param filter one of known filter instances
+   * @see #addFilterFactory(FilterFactory)
+   */
+  void addFilterInstance(Object filter) {
+    boolean isKnownFilterType = false;
+    try {
+      if (RequestFilter.class.isAssignableFrom(filter.getClass())) {
+        isKnownFilterType = true;
+        addRequestFilterInstance((RequestFilter) filter);
+      }
+      if (ResponseFilter.class.isAssignableFrom(filter.getClass())) {
+        isKnownFilterType = true;
+        addResponseFilterInstance((ResponseFilter) filter);
+
+      }
+      if (MethodInvokerFilter.class.isAssignableFrom(filter.getClass())) {
+        isKnownFilterType = true;
+        addMethodInvokerFilterInstance((MethodInvokerFilter) filter);
+      }
+    } catch (Exception e) {
+      LOG.error("Unable add filter: " + filter.getClass().getName(), e);
+    }
+    if (!isKnownFilterType) {
+      LOG.warn("Unsupported filter type: " + filter.getClass().getName());
+    }
+  }
+
+  /**
+   * @return method invocation filters
+   */
+  public UriPatternMap<ObjectFactory<FilterDescriptor>> getMethodInvokerFilters() {
+    return invokerFilters;
+  }
+
+  /**
+   * @return request filters
+   */
+  public UriPatternMap<ObjectFactory<FilterDescriptor>> getRequestFilters() {
+    return requestFilters;
+  }
+
+  /**
+   * @return response filters
+   */
+  public UriPatternMap<ObjectFactory<FilterDescriptor>> getResponseFilters() {
+    return responseFilters;
+  }
+
+  // ----------------------------------
+
+  /**
+   * @param <T> context resolver actual type argument
+   * @param pm MediaTypeMap that contains ProviderFactories that may produce
+   *          objects that are instance of T
+   * @param contextType context type
+   * @param mediaType media type that can be used to restrict context resolver
+   *          choose
+   * @return ContextResolver or null if nothing was found
+   */
+  @SuppressWarnings("unchecked")
+  private <T> ContextResolver<T> _getContextResolver(MediaTypeMap<ObjectFactory<ProviderDescriptor>> pm,
+                                                     Class<T> contextType,
+                                                     MediaType mediaType) {
+    for (Map.Entry<MediaType, ObjectFactory<ProviderDescriptor>> e : pm.entrySet()) {
+      if (mediaType.isCompatible(e.getKey())) {
+        return (ContextResolver<T>) e.getValue().getInstance(ApplicationContextImpl.getCurrent());
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Looking for message body reader according to supplied entity class, entity
+   * generic type, annotations and content type.
+   * 
+   * @param <T> message body reader actual type argument
+   * @param type entity type
+   * @param genericType entity generic type
+   * @param annotations annotations
+   * @param mediaType entity content type
+   * @return message body reader or null if no one was found.
+   */
+  @SuppressWarnings("unchecked")
+  private <T> MessageBodyReader<T> _getMessageBodyReader(Class<T> type,
+                                                         Type genericType,
+                                                         Annotation[] annotations,
+                                                         MediaType mediaType) {
+    for (ObjectFactory pf : readProviders.getList(mediaType)) {
+      MessageBodyReader reader = (MessageBodyReader) pf.getInstance(ApplicationContextImpl.getCurrent());
+      if (reader.isReadable(type, genericType, annotations, mediaType))
+        return reader;
+    }
+    return null;
   }
 
   /**
    * Looking for message body writer according to supplied entity class, entity
    * generic type, annotations and content type.
    * 
+   * @param <T> message body writer actual type argument
    * @param type entity type
    * @param genericType entity generic type
    * @param annotations annotations
@@ -584,37 +822,61 @@ public final class RuntimeDelegateImpl extends RuntimeDelegate implements Provid
    * @return message body writer or null if no one was found.
    */
   @SuppressWarnings("unchecked")
-  private <T> MessageBodyWriter<T> getMessageBodyWriterInt(Class<T> type,
-                                                           Type genericType,
-                                                           Annotation[] annotations,
-                                                           MediaType mediaType) {
-    for (ProviderFactory pf : writeProviders.getList(mediaType)) {
-      MessageBodyWriter writer = (MessageBodyWriter) pf.getProvider(ApplicationContextImpl.getCurrent());
+  private <T> MessageBodyWriter<T> _getMessageBodyWriter(Class<T> type,
+                                                         Type genericType,
+                                                         Annotation[] annotations,
+                                                         MediaType mediaType) {
+    for (ObjectFactory pf : writeProviders.getList(mediaType)) {
+      MessageBodyWriter writer = (MessageBodyWriter) pf.getInstance(ApplicationContextImpl.getCurrent());
       if (writer.isWriteable(type, genericType, annotations, mediaType))
         return writer;
     }
     return null;
   }
 
-  /**
-   * @return method invocation filters
-   */
-  public List<MethodInvokerFilter> getMethodInvokerFilters() {
-    return invokerFilters;
+  private void addContextResolver(ObjectFactory<ProviderDescriptor> factory) {
+    Class<?> clazz = factory.getObjectModel().getObjectClass();
+    for (Type type : clazz.getGenericInterfaces()) {
+      if (type instanceof ParameterizedType) {
+        if (ContextResolver.class == RawTypeUtil.getRawType(type)) {
+          Type[] atypes = RawTypeUtil.getActualTypes(type);
+          if (atypes.length > 1)
+            throw new RuntimeException("Unable strong determine actual type argument, more then one type found.");
+          Class<?> aclazz = (Class<?>) atypes[0];
+          MediaTypeMap<ObjectFactory<ProviderDescriptor>> pm = contextResolvers.get(aclazz);
+          if (pm == null) {
+            pm = new MediaTypeMap<ObjectFactory<ProviderDescriptor>>();
+            contextResolvers.put(aclazz, pm);
+          }
+          for (MediaType mime : factory.getObjectModel().produces()) {
+            if (pm.get(mime) != null) {
+              String msg = "Failed add ContextResolver " + clazz.getName()
+                  + ". ContextResolver for " + aclazz.getName() + " and media type " + mime
+                  + " already registered.";
+              throw new RuntimeException(msg);
+            } else {
+              pm.put(mime, factory);
+            }
+          }
+        }
+      }
+    }
   }
 
-  /**
-   * @return request filters
-   */
-  public FilterMap<RequestFilter> getRequestFilters() {
-    return requestFilters;
-  }
-
-  /**
-   * @return response filters
-   */
-  public FilterMap<ResponseFilter> getResponseFilters() {
-    return responseFilters;
+  @SuppressWarnings("unchecked")
+  private void addExceptionMapper(ObjectFactory<ProviderDescriptor> factory) {
+    Class<?> clazz = factory.getObjectModel().getObjectClass();
+    for (Type type : clazz.getGenericInterfaces()) {
+      if (type instanceof ParameterizedType) {
+        if (ExceptionMapper.class == RawTypeUtil.getRawType(type)) {
+          Type[] atypes = RawTypeUtil.getActualTypes(type);
+          if (atypes.length > 1)
+            throw new RuntimeException("Unable strong determine actual type argument, more then one type found.");
+          Class<? extends Throwable> exc = (Class<? extends Throwable>) atypes[0];
+          exceptionMappers.put(exc, factory);
+        }
+      }
+    }
   }
 
 }

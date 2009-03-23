@@ -18,7 +18,7 @@
 package org.exoplatform.services.rest.resource;
 
 import org.exoplatform.services.rest.impl.resource.PathValue;
-import org.exoplatform.services.rest.impl.uri.UriPattern;
+import org.exoplatform.services.rest.uri.UriPattern;
 
 /**
  * Describe sub-resource method. Sub-resource method is

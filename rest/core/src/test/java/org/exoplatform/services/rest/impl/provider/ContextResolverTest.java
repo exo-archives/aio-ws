@@ -85,6 +85,15 @@ public class ContextResolverTest extends org.exoplatform.services.rest.AbstractR
     rd.addContextResolver(ContextResolver5.class); 
   }
   
+  public void tearDown() throws Exception {
+    super.setUp();
+    removeContextResolver(ContextResolver1.class); 
+    removeContextResolver(ContextResolver2.class); 
+    removeContextResolver(ContextResolver3.class); 
+    removeContextResolver(ContextResolver4.class); 
+    removeContextResolver(ContextResolver5.class); 
+  }
+  
   public void testContextResolver() {
     assertEquals("text", rd.getContextResolver(String.class, new MediaType("text", "plain")).getContext(String.class));
     assertEquals("*", rd.getContextResolver(String.class, new MediaType("xxx", "xxx")).getContext(String.class));

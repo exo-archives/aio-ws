@@ -25,18 +25,24 @@ import org.exoplatform.services.rest.ContainerResponseWriter;
 import org.exoplatform.services.rest.GenericContainerResponse;
 
 /**
+ * Mock object than can be used for any test when we don't care about response
+ * entity at all.
+ * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 public class DummyContainerResponseWriter implements ContainerResponseWriter {
 
-  public DummyContainerResponseWriter() {
-  }
-
+  /**
+   * {@inheritDoc}
+   */
   @SuppressWarnings("unchecked")
   public void writeBody(GenericContainerResponse response, MessageBodyWriter entityWriter) throws IOException {
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public void writeHeaders(GenericContainerResponse response) throws IOException {
   }
 

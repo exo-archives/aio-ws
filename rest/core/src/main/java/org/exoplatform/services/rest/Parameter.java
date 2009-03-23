@@ -18,13 +18,10 @@
 package org.exoplatform.services.rest;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
-import javax.ws.rs.QueryParam;
-
 /**
- * Abstraction of method's or constructor's parameter.
+ * Abstraction of method's, constructor's parameter or object field.
  * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
@@ -39,7 +36,7 @@ public interface Parameter {
   /**
    * @return <i>main</i> annotation. It mind this annotation describe which
    *         value will be used for initialize parameter, e. g.
-   *         {@link PathParam}, {@link QueryParam}, etc.
+   *         {@link javax.ws.rs.PathParam}, {@link javax.ws.rs.QueryParam}, etc.
    */
   Annotation getAnnotation();
 
@@ -55,13 +52,13 @@ public interface Parameter {
 
   /**
    * @return generic parameter type
-   * @see Method#getGenericParameterTypes()
+   * @see java.lang.reflect.Method#getGenericParameterTypes()
    */
   Type getGenericType();
 
   /**
    * @return parameter class.
-   * @see Method#getParameterTypes()
+   * @see java.lang.reflect.Method#getParameterTypes()
    */
   Class<?> getParameterClass();
 

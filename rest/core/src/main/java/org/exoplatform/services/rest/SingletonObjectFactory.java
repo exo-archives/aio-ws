@@ -15,40 +15,49 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest.impl.provider;
-
-import java.util.List;
-
-import javax.ws.rs.core.MediaType;
-
-import org.exoplatform.services.rest.ApplicationContext;
-import org.exoplatform.services.rest.provider.ProviderDescriptor;
+package org.exoplatform.services.rest;
 
 /**
+ * Provide object instance of components that support singleton lifecycle.
+ * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
+ * @param <T>
  */
-public abstract class ProviderFactory {
-  
-  protected final ProviderDescriptor providerDescriptor;
-  
-  public ProviderFactory(ProviderDescriptor providerDescriptor) {
-    this.providerDescriptor = providerDescriptor;
-  }
-  
-  public abstract Object getProvider(ApplicationContext context);
-  
-  //
-  
-  public Class<?> getProviderClass() {
-    return providerDescriptor.getProviderClass();
-  }
-  
-  public List<MediaType> consumes() {
-    return providerDescriptor.consumes();
+public class SingletonObjectFactory<T extends ObjectModel> implements ObjectFactory<T> {
+
+  /**
+   * @see ObjectModel.
+   */
+  protected final T      model;
+
+  /**
+   * Component instance.
+   */
+  protected final Object object;
+
+  /**
+   * @param model ObjectMode
+   * @param object component instance
+   */
+  public SingletonObjectFactory(T model, Object object) {
+    this.model = model;
+    this.object = object;
   }
 
-  public List<MediaType> produces() {
-    return providerDescriptor.produces();
+  /**
+   * {@inheritDoc}
+   */
+  public Object getInstance(ApplicationContext context) {
+    // prepared object instance
+    return object;
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  public T getObjectModel() {
+    return model;
+  }
+
 }

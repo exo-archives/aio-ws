@@ -17,13 +17,11 @@
 
 package org.exoplatform.services.rest;
 
-import java.lang.reflect.Field;
-
 import org.exoplatform.services.rest.resource.ResourceDescriptor;
 
-
 /**
- * Object field.
+ * Object field. Useful for initialization object field if type is used in
+ * per-request mode.
  * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
@@ -36,8 +34,8 @@ public interface FieldInjector extends Parameter, ResourceDescriptor {
   String getName();
 
   /**
-   * Set Object {@link Field} using ApplicationContext for resolve actual field
-   * value.
+   * Set Object {@link java.lang.reflect.Field} using ApplicationContext for
+   * resolve actual field value.
    * 
    * @param resource root resource or provider
    * @param context ApplicationContext

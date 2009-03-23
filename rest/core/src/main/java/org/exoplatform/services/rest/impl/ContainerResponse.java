@@ -97,8 +97,10 @@ public class ContainerResponse implements GenericContainerResponse {
   @SuppressWarnings("unchecked")
   public void setResponse(Response response) {
     this.response = response;
-    if (response == null)
+    if (response == null) {
       reset();
+      return;
+    }
 
     status = response.getStatus();
     headers = response.getMetadata();

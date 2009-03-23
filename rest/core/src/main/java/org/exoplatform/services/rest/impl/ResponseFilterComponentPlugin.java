@@ -17,9 +17,9 @@
 
 package org.exoplatform.services.rest.impl;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.container.component.BaseComponentPlugin;
@@ -44,7 +44,7 @@ public class ResponseFilterComponentPlugin extends BaseComponentPlugin {
   /**
    * See {@link ResponseFilter}.
    */
-  private List<ResponseFilter> fs  = new ArrayList<ResponseFilter>();
+  private Set<Class<? extends ResponseFilter>> fs  = new HashSet<Class<? extends ResponseFilter>>();
 
   /**
    * @param params initialize parameters from configurations
@@ -57,20 +57,18 @@ public class ResponseFilterComponentPlugin extends BaseComponentPlugin {
       while (i.hasNext()) {
         ValueParam v = i.next();
         try {
-          Class c = Class.forName(v.getValue());
-          ResponseFilter f = (ResponseFilter) c.newInstance();
-          fs.add(f);
-        } catch (Exception e) {
-          LOG.error("Can't instantiate response filter " + v.getValue(), e);
+          fs.add((Class<? extends ResponseFilter>) Class.forName(v.getValue()));
+        } catch (ClassNotFoundException e) {
+          LOG.error("Failed load class " + v.getValue(), e);
         }
       }
     }
   }
 
   /**
-   * @return Collection of {@link ResponseFilter} supplied in configuration.
+   * @return Collection of classes ResponseFilter supplied in configuration.
    */
-  public List<ResponseFilter> getFilters() {
+  public Set<Class<? extends ResponseFilter>> getFilters() {
     return fs;
   }
 

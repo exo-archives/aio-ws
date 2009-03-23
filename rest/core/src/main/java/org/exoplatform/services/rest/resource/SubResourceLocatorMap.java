@@ -15,35 +15,24 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest.impl.provider;
+package org.exoplatform.services.rest.resource;
 
-import org.exoplatform.services.rest.ApplicationContext;
-import org.exoplatform.services.rest.ConstructorInjector;
-import org.exoplatform.services.rest.FieldInjector;
-import org.exoplatform.services.rest.provider.ProviderDescriptor;
+import java.util.TreeMap;
+
+import org.exoplatform.services.rest.resource.SubResourceLocatorDescriptor;
+import org.exoplatform.services.rest.uri.UriPattern;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class PerRequestProviderFactory extends ProviderFactory {
-
-  public PerRequestProviderFactory(ProviderDescriptor providerDescriptor) {
-    super(providerDescriptor);
-  }
-
+public class SubResourceLocatorMap extends TreeMap<UriPattern, SubResourceLocatorDescriptor> {
   /**
-   * {@inheritDoc}
+   * Serial version UID.
    */
-  public Object getProvider(ApplicationContext context) {
-    ConstructorInjector inj = providerDescriptor.getConstructorInjectors().get(0);
-    Object resource = inj.createInstance(context);
+  private static final long serialVersionUID = 89058515637607594L;
 
-    for (FieldInjector field : providerDescriptor.getFieldInjectors()) {
-      field.inject(resource, context);
-    }
-
-    return resource;
+  public SubResourceLocatorMap() {
+    super(UriPattern.URIPATTERN_COMPARATOR);
   }
-
 }

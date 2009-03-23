@@ -58,31 +58,40 @@ public class ConstructorInjectorImpl implements ConstructorInjector {
   private static final Log                            LOG                    = ExoLogger.getLogger(ConstructorInjectorImpl.class.getName());
 
   /**
+   * ConstructorDescriptor comparator.
+   */
+  public static final Comparator<ConstructorInjector> CONSTRUCTOR_COMPARATOR = new ConstructorComparator();
+
+  /**
    * Compare two ConstructorDescriptor in number parameters order.
    */
-  public static final Comparator<ConstructorInjector> CONSTRUCTOR_COMPARATOR = new Comparator<ConstructorInjector>() {
+  private static class ConstructorComparator implements Comparator<ConstructorInjector> {
+    
+    /**
+     * {@inheritDoc}
+     */
     public int compare(ConstructorInjector o1, ConstructorInjector o2) {
       int r = o2.getParameters().size() - o1.getParameters().size();
-        if (r == 0)
-          LOG.warn("Two constructors with the same number of parameter found " + o1 + " and " + o2);
-        return r;
+      if (r == 0)
+        LOG.warn("Two constructors with the same number of parameter found " + o1 + " and " + o2);
+      return r;
     }
-  };
+  }
 
   /**
    * Constructor.
    */
-  private final Constructor<?>                        constructor;
+  private final Constructor<?>             constructor;
 
   /**
    * Collection of constructor's parameters.
    */
-  private final List<ConstructorParameter>            parameters;
+  private final List<ConstructorParameter> parameters;
 
   /**
    * Resource class.
    */
-  private final Class<?>                              resourceClass;
+  private final Class<?>                   resourceClass;
 
   /**
    * @param resourceClass resource class
@@ -160,6 +169,13 @@ public class ConstructorInjectorImpl implements ConstructorInjector {
       parameters = java.util.Collections.unmodifiableList(params);
     }
 
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void accept(ResourceDescriptorVisitor visitor) {
+    visitor.visitConstructorInjector(this);
   }
 
   /**
@@ -249,16 +265,9 @@ public class ConstructorInjectorImpl implements ConstructorInjector {
   /**
    * {@inheritDoc}
    */
-  public void accept(ResourceDescriptorVisitor visitor) {
-    visitor.visitConstructorInjector(this);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
-    StringBuffer sb = new StringBuffer("[ ConstructorInjector: ");
+    StringBuffer sb = new StringBuffer("[ ConstructorInjectorImpl: ");
     sb.append("constructor: " + getConstructor().getName() + "; ");
     for (ConstructorParameter cp : getParameters())
       sb.append(cp.toString()).append(" ");
