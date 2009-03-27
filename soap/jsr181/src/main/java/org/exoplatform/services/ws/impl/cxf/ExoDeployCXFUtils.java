@@ -21,26 +21,19 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
-import java.util.Arrays;
 
-import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 
 import org.apache.commons.logging.Log;
-import org.apache.cxf.binding.soap.SoapFault;
-import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerImpl;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.JAXWSMethodInvoker;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.BeanInvoker;
 import org.apache.cxf.service.invoker.Factory;
@@ -173,6 +166,8 @@ public class ExoDeployCXFUtils {
   /**
    * Simple deploy service.
    * 
+   * Uses Endpoint class.
+   * 
    * @param address
    * @param object
    */
@@ -193,6 +188,23 @@ public class ExoDeployCXFUtils {
     if (endpoint.isPublished())
       LOG.info("The webservice '" + address + "' has been published SUCCESSFUL!");
     return endpoint;
+  }
+
+  /**
+   * Simple deploy service.
+   * 
+   * Uses JaxWsProxyFactoryBean class.
+   * 
+   * @param address
+   */
+  public static Object simpleDeployService2(String address, Class clazz) {
+    JaxWsProxyFactoryBean client = new JaxWsProxyFactoryBean();
+    client.setServiceClass(clazz);
+    client.setAddress(address);
+//    client.getInInterceptors().add(new LoggingInInterceptor());
+//    client.getOutInterceptors().add(new LoggingOutInterceptor());
+    Object obj = client.create();
+    return obj;
   }
 
 }
