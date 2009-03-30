@@ -26,6 +26,7 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.commons.logging.Log;
 import org.apache.cxf.bus.CXFBusFactory;
+import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerImpl;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
@@ -39,6 +40,8 @@ import org.apache.cxf.service.invoker.BeanInvoker;
 import org.apache.cxf.service.invoker.Factory;
 import org.apache.cxf.service.invoker.PerRequestFactory;
 import org.apache.cxf.service.invoker.PooledFactory;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.exoplatform.services.log.ExoLogger;
 
 /**
@@ -164,9 +167,7 @@ public class ExoDeployCXFUtils {
   }
 
   /**
-   * Simple deploy service.
-   * 
-   * Uses Endpoint class.
+   * Simple deploy service. Uses Endpoint class.
    * 
    * @param address
    * @param object
@@ -191,9 +192,7 @@ public class ExoDeployCXFUtils {
   }
 
   /**
-   * Simple deploy service.
-   * 
-   * Uses JaxWsProxyFactoryBean class.
+   * Simple deploy service. Uses JaxWsProxyFactoryBean class.
    * 
    * @param address
    */
@@ -205,6 +204,24 @@ public class ExoDeployCXFUtils {
 //    client.getOutInterceptors().add(new LoggingOutInterceptor());
     Object obj = client.create();
     return obj;
+  }
+
+  /**
+   * This method is allow to set connection timeout.
+   * Doesn't work in the tomcat application server.
+   * 
+   * @param client
+   */
+  private void setTimeOut(Client client) {
+    HTTPConduit http = (HTTPConduit) client.getConduit();
+    org.apache.cxf.endpoint.Endpoint endpoint = client.getEndpoint();
+    String address = endpoint.getEndpointInfo().getAddress();
+
+    HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+    httpClientPolicy.setConnectionTimeout(360000);
+    httpClientPolicy.setAllowChunking(false);
+    httpClientPolicy.setReceiveTimeout(320000);
+    http.setClient(httpClientPolicy);
   }
 
 }
