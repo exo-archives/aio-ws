@@ -133,7 +133,7 @@ public class ProviderDescriptorImpl implements ProviderDescriptor {
   /**
    * {@inheritDoc}
    */
-  public List<ConstructorDescriptor> getConstructorInjectors() {
+  public List<ConstructorDescriptor> getConstructorDescriptors() {
     return constructors;
   }
 
@@ -166,7 +166,7 @@ public class ProviderDescriptorImpl implements ProviderDescriptor {
     sb.append("provider class: " + getObjectClass() + "; ")
       .append("produces media type: " + produces() + "; ")
       .append("consumes media type: " + consumes() + "; ")
-      .append(getConstructorInjectors() + "; ")
+      .append(getConstructorDescriptors() + "; ")
       .append(getFieldInjectors())
       .append(" ]");
     return sb.toString();

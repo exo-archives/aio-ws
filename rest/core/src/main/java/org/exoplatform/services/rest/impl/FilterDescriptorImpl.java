@@ -127,7 +127,7 @@ public class FilterDescriptorImpl implements FilterDescriptor {
   /**
    * {@inheritDoc}
    */
-  public List<ConstructorDescriptor> getConstructorInjectors() {
+  public List<ConstructorDescriptor> getConstructorDescriptors() {
     return constructors;
   }
 
@@ -167,7 +167,7 @@ public class FilterDescriptorImpl implements FilterDescriptor {
     StringBuffer sb = new StringBuffer("[ FilterDescriptorImpl: ");
     sb.append("path: " + getPathValue() + "; ")
       .append("filter class: " + getObjectClass() + "; ")
-      .append(getConstructorInjectors() + "; ")
+      .append(getConstructorDescriptors() + "; ")
       .append(getFieldInjectors())
       .append(" ]");
     return sb.toString();

@@ -46,7 +46,7 @@ public class PerRequestObjectFactory<T extends ObjectModel> implements ObjectFac
    * {@inheritDoc}
    */
   public Object getInstance(ApplicationContext context) {
-    ConstructorDescriptor inj = model.getConstructorInjectors().get(0);
+    ConstructorDescriptor inj = model.getConstructorDescriptors().get(0);
     Object object = inj.createInstance(context);
 
     for (FieldInjector field : model.getFieldInjectors()) {

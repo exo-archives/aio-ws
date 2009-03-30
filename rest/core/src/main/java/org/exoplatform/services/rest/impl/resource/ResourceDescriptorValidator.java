@@ -294,7 +294,7 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
   }
   
   protected void checkObjectModel(ObjectModel model) {
-    for (ConstructorDescriptor c : model.getConstructorInjectors())
+    for (ConstructorDescriptor c : model.getConstructorDescriptors())
       c.accept(this);
     for (FieldInjector f : model.getFieldInjectors())
       f.accept(this);

@@ -31,9 +31,9 @@ public interface ObjectModel {
    * @return collections constructor, MAY return empty collection or null if
    *         object is singleton. There is no setter for this to add new
    *         ConstructorInjector use
-   *         <code>ObjectModel.getConstructorInjectors().add(ConstructorInjector)</code>
+   *         <code>ObjectModel.getConstructorDescriptors().add(ConstructorInjector)</code>
    */
-  List<ConstructorDescriptor> getConstructorInjectors();
+  List<ConstructorDescriptor> getConstructorDescriptors();
 
   /**
    * @return collections of object fields, MAY return empty collection or null

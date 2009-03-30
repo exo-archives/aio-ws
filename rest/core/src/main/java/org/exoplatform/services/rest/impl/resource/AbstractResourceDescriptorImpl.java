@@ -204,7 +204,7 @@ public class AbstractResourceDescriptorImpl implements AbstractResourceDescripto
   /**
    * {@inheritDoc}
    */
-  public List<ConstructorDescriptor> getConstructorInjectors() {
+  public List<ConstructorDescriptor> getConstructorDescriptors() {
     return constructors;
   }
 
@@ -669,7 +669,7 @@ public class AbstractResourceDescriptorImpl implements AbstractResourceDescripto
     sb.append("path: " + getPathValue())
       .append("; isRootResource: " + isRootResource())
       .append("; class: " + getObjectClass())
-      .append(getConstructorInjectors() + "; ")
+      .append(getConstructorDescriptors() + "; ")
       .append(getFieldInjectors())
       .append(" ]");
     return sb.toString();

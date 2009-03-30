@@ -426,8 +426,8 @@ public class ResourceDescriptorTest extends BaseTest {
 
   public void testConstructors() {
     AbstractResourceDescriptor resource = new AbstractResourceDescriptorImpl(SampleResource.class);
-    assertEquals(3, resource.getConstructorInjectors().size());
-    List<ConstructorDescriptor> c = resource.getConstructorInjectors();
+    assertEquals(3, resource.getConstructorDescriptors().size());
+    List<ConstructorDescriptor> c = resource.getConstructorDescriptors();
     assertEquals(2, c.get(0).getParameters().size());
     assertEquals(1, c.get(1).getParameters().size());
     assertEquals(0, c.get(2).getParameters().size());
