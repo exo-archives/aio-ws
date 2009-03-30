@@ -50,69 +50,10 @@ public class JAXBContextResolver implements ContextResolver<JAXBContextResolver>
   private static final Log LOG = ExoLogger.getLogger(JAXBContextResolver.class.getName());
 
   /**
-   * Classes map's key.
-   */
-  public static class ClassesKey {
-
-    /**
-     * Hash code for class array.
-     */
-    private int        hash = 0;
-
-    /**
-     * Classes.
-     */
-    private Class<?>[] classes;
-
-    /**
-     * @param classes classes 
-     */
-    public ClassesKey(Class<?>... classes) {
-      for (Class<?> cl : classes)
-        hash += cl.hashCode();
-      this.classes = classes;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-      return hash;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object obj) {
-      if (obj == null)
-        return false;
-      if (getClass() != obj.getClass())
-        return false;
-      ClassesKey other = (ClassesKey) obj;
-      if (classes.length != other.classes.length)
-        return false;
-      if (hash != other.hash)
-        return false;
-      l: for (Class<?> cl1 : classes) {
-        for (Class<?> cl2 : other.classes) {
-          if (cl2 == cl1)
-            continue l;
-        }
-        return false;
-      }
-
-      return true;
-
-    }
-
-  }
-
-  /**
    * JAXBContext cache.
    */
-  private final ConcurrentHashMap<ClassesKey, JAXBContext> jaxbContexts = new ConcurrentHashMap<ClassesKey, JAXBContext>();
+  @SuppressWarnings("unchecked")
+  private final ConcurrentHashMap<Class, JAXBContext> jaxbContexts = new ConcurrentHashMap<Class, JAXBContext>();
 
   /**
    * {@inheritDoc}
@@ -129,12 +70,11 @@ public class JAXBContextResolver implements ContextResolver<JAXBContextResolver>
    * @return JAXBContext
    * @throws JAXBException if JAXBContext creation failed
    */
-  public JAXBContext getJAXBContext(Class<?>... classes) throws JAXBException {
-    ClassesKey key = new ClassesKey(classes);
-    JAXBContext jaxbctx = jaxbContexts.get(key);
+  public JAXBContext getJAXBContext(Class<?> clazz) throws JAXBException {
+    JAXBContext jaxbctx = jaxbContexts.get(clazz);
     if (jaxbctx == null) {
-      jaxbctx = JAXBContext.newInstance(classes);
-      jaxbContexts.put(key, jaxbctx);
+      jaxbctx = JAXBContext.newInstance(clazz);
+      jaxbContexts.put(clazz, jaxbctx);
     }
     return jaxbctx;
   }
@@ -147,9 +87,9 @@ public class JAXBContextResolver implements ContextResolver<JAXBContextResolver>
    * @throws JAXBException if JAXBContext for supplied classes can't be created
    *           in any reasons
    */
-  public JAXBContext createJAXBContext(Class<?>... classes) throws JAXBException {
-    JAXBContext jaxbctx = JAXBContext.newInstance(classes);
-    addJAXBContext(jaxbctx, classes);
+  public JAXBContext createJAXBContext(Class<?> clazz) throws JAXBException {
+    JAXBContext jaxbctx = JAXBContext.newInstance(clazz);
+    addJAXBContext(jaxbctx, clazz);
     return jaxbctx;
   }
 
@@ -160,8 +100,8 @@ public class JAXBContextResolver implements ContextResolver<JAXBContextResolver>
    * @param jaxbctx JAXBContext
    * @param classes set of java classes to be bound
    */
-  public void addJAXBContext(JAXBContext jaxbctx, Class<?>... classes) {
-    jaxbContexts.put(new ClassesKey(classes), jaxbctx);
+  public void addJAXBContext(JAXBContext jaxbctx, Class<?> clazz) {
+    jaxbContexts.put(clazz, jaxbctx);
   }
 
   /**
