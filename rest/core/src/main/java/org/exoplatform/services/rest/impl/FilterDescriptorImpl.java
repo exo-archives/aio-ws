@@ -24,8 +24,8 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import org.exoplatform.services.rest.ConponentLifecycleScope;
-import org.exoplatform.services.rest.ConstructorInjector;
+import org.exoplatform.services.rest.ComponentLifecycleScope;
+import org.exoplatform.services.rest.ConstructorDescriptor;
 import org.exoplatform.services.rest.FieldInjector;
 import org.exoplatform.services.rest.FilterDescriptor;
 import org.exoplatform.services.rest.impl.resource.PathValue;
@@ -56,9 +56,9 @@ public class FilterDescriptorImpl implements FilterDescriptor {
   /**
    * Filter class constructors.
    * 
-   * @see ConstructorInjector
+   * @see ConstructorDescriptor
    */
-  private final List<ConstructorInjector> constructors;
+  private final List<ConstructorDescriptor> constructors;
 
   /**
    * Filter class fields.
@@ -69,22 +69,22 @@ public class FilterDescriptorImpl implements FilterDescriptor {
    * @param filterClass {@link Class} of filter
    */
   public FilterDescriptorImpl(Class<?> filterClass) {
-    this(filterClass, ConponentLifecycleScope.PER_REQUEST);
+    this(filterClass, ComponentLifecycleScope.PER_REQUEST);
   }
 
   /**
    * @param filter instance
    */
   public FilterDescriptorImpl(Object filter) {
-    this(filter.getClass(), ConponentLifecycleScope.SINGLETON);
+    this(filter.getClass(), ComponentLifecycleScope.SINGLETON);
   }
 
   /**
    * @param filterClass filter class
    * @param scope filter scope
-   * @see ConponentLifecycleScope
+   * @see ComponentLifecycleScope
    */
-  private FilterDescriptorImpl(Class<?> filterClass, ConponentLifecycleScope scope) {
+  private FilterDescriptorImpl(Class<?> filterClass, ComponentLifecycleScope scope) {
     final Path p = filterClass.getAnnotation(Path.class);
     if (p != null) {
       this.path = new PathValue(p.value());
@@ -96,11 +96,11 @@ public class FilterDescriptorImpl implements FilterDescriptor {
     
     this.filterClass = filterClass;
     
-    this.constructors = new ArrayList<ConstructorInjector>();
+    this.constructors = new ArrayList<ConstructorDescriptor>();
     this.fields = new ArrayList<FieldInjector>();
-    if (scope == ConponentLifecycleScope.PER_REQUEST) {
+    if (scope == ComponentLifecycleScope.PER_REQUEST) {
       for (Constructor<?> constructor : filterClass.getConstructors()) {
-        constructors.add(new ConstructorInjectorImpl(filterClass, constructor));
+        constructors.add(new ConstructorDescriptorImpl(filterClass, constructor));
       }
       if (constructors.size() == 0) {
         String msg = "Not found accepted constructors for filter class " + filterClass.getName();
@@ -108,7 +108,7 @@ public class FilterDescriptorImpl implements FilterDescriptor {
       }
       // Sort constructors in number parameters order
       if (constructors.size() > 1) {
-        Collections.sort(constructors, ConstructorInjectorImpl.CONSTRUCTOR_COMPARATOR);
+        Collections.sort(constructors, ConstructorDescriptorImpl.CONSTRUCTOR_COMPARATOR);
       }
       // process field
       for (java.lang.reflect.Field jfield : filterClass.getDeclaredFields()) {
@@ -127,7 +127,7 @@ public class FilterDescriptorImpl implements FilterDescriptor {
   /**
    * {@inheritDoc}
    */
-  public List<ConstructorInjector> getConstructorInjectors() {
+  public List<ConstructorDescriptor> getConstructorInjectors() {
     return constructors;
   }
 

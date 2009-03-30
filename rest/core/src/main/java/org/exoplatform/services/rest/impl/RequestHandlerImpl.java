@@ -20,13 +20,10 @@ package org.exoplatform.services.rest.impl;
 import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -39,7 +36,6 @@ import org.exoplatform.container.component.ComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.rest.ContainerObjectFactory;
 import org.exoplatform.services.rest.FilterDescriptor;
 import org.exoplatform.services.rest.GenericContainerRequest;
 import org.exoplatform.services.rest.GenericContainerResponse;
@@ -48,28 +44,9 @@ import org.exoplatform.services.rest.RequestFilter;
 import org.exoplatform.services.rest.RequestHandler;
 import org.exoplatform.services.rest.ResponseFilter;
 import org.exoplatform.services.rest.impl.method.MethodInvokerFilterComponentPlugin;
-import org.exoplatform.services.rest.impl.provider.ByteEntityProvider;
-import org.exoplatform.services.rest.impl.provider.DOMSourceEntityProvider;
-import org.exoplatform.services.rest.impl.provider.DataSourceEntityProvider;
 import org.exoplatform.services.rest.impl.provider.EntityProviderComponentPlugin;
-import org.exoplatform.services.rest.impl.provider.FileEntityProvider;
-import org.exoplatform.services.rest.impl.provider.InputStreamEntityProvider;
-import org.exoplatform.services.rest.impl.provider.JAXBContextResolver;
-import org.exoplatform.services.rest.impl.provider.JAXBElementEntityProvider;
-import org.exoplatform.services.rest.impl.provider.JAXBObjectEntityProvider;
-import org.exoplatform.services.rest.impl.provider.JsonEntityProvider;
-import org.exoplatform.services.rest.impl.provider.MultipartFormDataEntityProvider;
-import org.exoplatform.services.rest.impl.provider.MultivaluedMapEntityProvider;
-import org.exoplatform.services.rest.impl.provider.ProviderDescriptorImpl;
-import org.exoplatform.services.rest.impl.provider.ReaderEntityProvider;
-import org.exoplatform.services.rest.impl.provider.SAXSourceEntityProvider;
-import org.exoplatform.services.rest.impl.provider.StreamOutputEntityProvider;
-import org.exoplatform.services.rest.impl.provider.StreamSourceEntityProvider;
-import org.exoplatform.services.rest.impl.provider.StringEntityProvider;
 import org.exoplatform.services.rest.method.MethodInvokerFilter;
 import org.exoplatform.services.rest.provider.EntityProvider;
-import org.exoplatform.services.rest.provider.ProviderDescriptor;
-import org.exoplatform.services.rest.uri.UriPattern;
 import org.picocontainer.Startable;
 
 /**
@@ -88,10 +65,10 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
    */
   private final RequestDispatcher   dispatcher;
 
-  /**
-   * See {@link RuntimeDelegateImpl}, {@link javax.ws.rs.ext.RuntimeDelegate}.
-   */
-  private RuntimeDelegateImpl       rd;
+//  /**
+//   * See {@link ProviderBinder}.
+//   */
+//  private final ProviderBinder      providers;
 
   /**
    * Application properties.
@@ -106,10 +83,6 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
    */
   @SuppressWarnings("unchecked")
   public RequestHandlerImpl(RequestDispatcher dispatcher, InitParams params) {
-
-    // NOTE!!! RuntimeDelegate should be already initialized by ResourceBinder
-    rd = RuntimeDelegateImpl.getInstance();
-
     if (params != null) {
       for (Iterator<ValueParam> i = params.getValueParamIterator(); i.hasNext();) {
         ValueParam vp = i.next();
@@ -117,8 +90,6 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
         String value = vp.getValue();
         if (name.equals(WS_RS_BUFFER_SIZE))
           applicationProperties.put(name, Integer.parseInt(value));
-        else if (name.equals(WS_RS_USE_BUILTIN_PROVIDERS))
-          applicationProperties.put(name, Boolean.valueOf(value));
         else if (name.equals(WS_RS_TMP_DIR))
           applicationProperties.put(name, new File(value));
         else
@@ -138,44 +109,25 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
   @SuppressWarnings("unchecked")
   public void handleRequest(GenericContainerRequest request, GenericContainerResponse response) throws Exception {
     try {
-
-      ApplicationContextImpl context = new ApplicationContextImpl(request, response);
+      ApplicationContextImpl context = new ApplicationContextImpl(request, response, ProviderBinder.getInstance());
       context.getAttributes().putAll(applicationProperties);
       ApplicationContextImpl.setCurrent(context);
 
-      String path = context.getPath();
-      List<String> capturingValues = new ArrayList<String>();
-
-      for (Entry<UriPattern, List<ObjectFactory<FilterDescriptor>>> e : rd.getRequestFilters()
-                                                                          .entrySet()) {
-        UriPattern uriPattern = e.getKey();
-        if (uriPattern != null) {
-          if (e.getKey().match(path, capturingValues)) {
-            int len = capturingValues.size();
-            if (capturingValues.get(len - 1) != null && !"/".equals(capturingValues.get(len - 1)))
-              continue; // not matched
-          } else {
-            continue; // not matched
-          }
-
-        }
-
-        // if matched or UriPattern is null
-        for (ObjectFactory<FilterDescriptor> factory : e.getValue()) {
-          RequestFilter f = (RequestFilter) factory.getInstance(context);
-          f.doFilter(request);
-        }
-
+      for (ObjectFactory<FilterDescriptor> factory : ProviderBinder.getInstance().getRequestFilters(context.getPath())) {
+        RequestFilter f = (RequestFilter) factory.getInstance(context);
+        f.doFilter(request);
       }
 
       try {
+
         dispatcher.dispatch(request, response);
+
       } catch (Exception e) {
         if (e instanceof WebApplicationException) {
 
           Response errorResponse = ((WebApplicationException) e).getResponse();
-          ExceptionMapper excmap = RuntimeDelegateImpl.getInstance()
-                                                      .getExceptionMapper(WebApplicationException.class);
+          ExceptionMapper excmap = ProviderBinder.getInstance()
+                                                 .getExceptionMapper(WebApplicationException.class);
 
           // should be some of 4xx status
           if (errorResponse.getStatus() < 500) {
@@ -202,11 +154,11 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
             }
             response.setResponse(errorResponse);
           }
-        } else if (e instanceof ApplicationException) {
+        } else if (e instanceof InternalException) {
           Class cause = e.getCause().getClass();
-          ExceptionMapper excmap = RuntimeDelegateImpl.getInstance().getExceptionMapper(cause);
+          ExceptionMapper excmap = ProviderBinder.getInstance().getExceptionMapper(cause);
           while (cause != null && excmap == null) {
-            excmap = RuntimeDelegateImpl.getInstance().getExceptionMapper(cause);
+            excmap = ProviderBinder.getInstance().getExceptionMapper(cause);
             if (excmap == null)
               cause = cause.getSuperclass();
           }
@@ -220,26 +172,9 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
         }
       }
 
-      for (Entry<UriPattern, List<ObjectFactory<FilterDescriptor>>> e : rd.getResponseFilters()
-                                                                          .entrySet()) {
-        UriPattern uriPattern = e.getKey();
-        if (uriPattern != null) {
-          if (e.getKey().match(path, capturingValues)) {
-            int len = capturingValues.size();
-            if (capturingValues.get(len - 1) != null && !"/".equals(capturingValues.get(len - 1)))
-              continue; // not matched
-          } else {
-            continue; // not matched
-          }
-
-        }
-
-        // if matched or UriPattern is null
-        for (ObjectFactory<FilterDescriptor> factory : e.getValue()) {
-          ResponseFilter f = (ResponseFilter) factory.getInstance(context);
-          f.doFilter(response);
-        }
-
+      for (ObjectFactory<FilterDescriptor> factory : ProviderBinder.getInstance().getResponseFilters(context.getPath())) {
+        ResponseFilter f = (ResponseFilter) factory.getInstance(context);
+        f.doFilter(response);
       }
 
       response.writeResponse();
@@ -300,7 +235,7 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
   /**
    * Startup initialization.
    */
-  protected void init() {
+  public void init() {
     // Directory for temporary files
     final File tmpDir;
     if (applicationProperties.containsKey(WS_RS_TMP_DIR))
@@ -330,37 +265,6 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
       applicationProperties.put(WS_RS_BUFFER_SIZE, bufferSize);
     }
 
-    Boolean builtin = (Boolean) applicationProperties.get(WS_RS_USE_BUILTIN_PROVIDERS);
-    if (builtin == null) {
-      builtin = true;
-      applicationProperties.put(WS_RS_USE_BUILTIN_PROVIDERS, builtin);
-    }
-
-    if (builtin) {
-      // add prepared entity providers
-      rd.addEntityProviderInstance(new ByteEntityProvider());
-      rd.addEntityProviderInstance(new DataSourceEntityProvider());
-      rd.addEntityProviderInstance(new DOMSourceEntityProvider());
-      rd.addEntityProviderInstance(new FileEntityProvider());
-      rd.addEntityProviderInstance(new MultivaluedMapEntityProvider());
-      rd.addEntityProviderInstance(new InputStreamEntityProvider());
-      rd.addEntityProviderInstance(new ReaderEntityProvider());
-      rd.addEntityProviderInstance(new SAXSourceEntityProvider());
-      rd.addEntityProviderInstance(new StreamSourceEntityProvider());
-      rd.addEntityProviderInstance(new StringEntityProvider());
-      rd.addEntityProviderInstance(new StreamOutputEntityProvider());
-      rd.addEntityProviderInstance(new JsonEntityProvider());
-
-      // per-request mode , Providers should be injected
-      rd.addProvider(JAXBElementEntityProvider.class);
-      rd.addProvider(JAXBObjectEntityProvider.class);
-
-      // per-request mode , HttpServletRequest should be injected in provider
-      rd.addProvider(MultipartFormDataEntityProvider.class);
-
-      // FIXME Remove this hard code by something more smart.
-      rd.addProvider(new ContainerObjectFactory<ProviderDescriptor>(new ProviderDescriptorImpl(JAXBContextResolver.class)));
-    }
   }
 
   /**
@@ -370,23 +274,27 @@ public final class RequestHandlerImpl implements RequestHandler, Startable {
    */
   @SuppressWarnings("unchecked")
   public void addPlugin(ComponentPlugin plugin) {
+    // NOTE!!! ProviderBinder should be already initialized by ResourceBinder
+    ProviderBinder providers = ProviderBinder.getInstance();
     if (MethodInvokerFilterComponentPlugin.class.isAssignableFrom(plugin.getClass())) {
       // add method invoker filter
       for (Class<? extends MethodInvokerFilter> filter : ((MethodInvokerFilterComponentPlugin) plugin).getFilters())
-        rd.addMethodInvokerFilter(filter);
+        providers.addMethodInvokerFilter(filter);
     } else if (EntityProviderComponentPlugin.class.isAssignableFrom(plugin.getClass())) {
       // add external entity providers
       Set<Class<? extends EntityProvider>> eps = ((EntityProviderComponentPlugin) plugin).getEntityProviders();
-      for (Class<? extends EntityProvider> ep : eps)
-        rd.addProvider(ep);
+      for (Class<? extends EntityProvider> ep : eps) {
+        providers.addMessageBodyReader(ep);
+        providers.addMessageBodyWriter(ep);
+      }
     } else if (RequestFilterComponentPlugin.class.isAssignableFrom(plugin.getClass())) {
       Set<Class<? extends RequestFilter>> filters = ((RequestFilterComponentPlugin) plugin).getFilters();
       for (Class<? extends RequestFilter> filter : filters)
-        rd.addRequestFilter(filter);
+        providers.addRequestFilter(filter);
     } else if (ResponseFilterComponentPlugin.class.isAssignableFrom(plugin.getClass())) {
       Set<Class<? extends ResponseFilter>> filters = ((ResponseFilterComponentPlugin) plugin).getFilters();
       for (Class<? extends ResponseFilter> filter : filters)
-        rd.addResponseFilter(filter);
+        providers.addResponseFilter(filter);
     }
   }
 

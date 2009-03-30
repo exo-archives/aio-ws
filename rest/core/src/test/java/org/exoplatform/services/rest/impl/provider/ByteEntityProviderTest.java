@@ -35,13 +35,13 @@ public class ByteEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testRead() throws Exception {
-    MessageBodyReader reader = rd.getMessageBodyReader(byte[].class,
+    MessageBodyReader reader = providers.getMessageBodyReader(byte[].class,
                                                        null,
                                                        null,
                                                        MediaTypeHelper.DEFAULT_TYPE);
     assertNotNull(reader);
     // without media type
-    assertNotNull(rd.getMessageBodyReader(byte[].class, null, null, null));
+    assertNotNull(providers.getMessageBodyReader(byte[].class, null, null, null));
     assertTrue(reader.isReadable(byte[].class, null, null, null));
     byte[] data = new byte[16];
     for (int i = 0; i < data.length; i++)
@@ -58,13 +58,13 @@ public class ByteEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testWrite() throws Exception {
-    MessageBodyWriter writer = rd.getMessageBodyWriter(byte[].class,
+    MessageBodyWriter writer = providers.getMessageBodyWriter(byte[].class,
                                                        null,
                                                        null,
                                                        MediaTypeHelper.DEFAULT_TYPE);
     assertNotNull(writer);
     // without media type
-    assertNotNull(rd.getMessageBodyWriter(byte[].class, null, null, null));
+    assertNotNull(providers.getMessageBodyWriter(byte[].class, null, null, null));
     assertTrue(writer.isWriteable(byte[].class, null, null, null));
     byte[] data = new byte[16];
     for (int i = data.length - 1; i >= 0; i--)

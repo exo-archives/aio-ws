@@ -17,6 +17,7 @@
 
 package org.exoplatform.services.rest.impl;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -94,6 +95,7 @@ public class RequestDispatcherTest extends AbstractResourceTest {
     unregistry(r1);
   }
   
+//--------------------------------------
   @Path("/")
   public static class Resource2 {
     @POST
@@ -131,6 +133,7 @@ public class RequestDispatcherTest extends AbstractResourceTest {
     unregistry(r2);
   }
   
+//--------------------------------------
   @Path("/a/b/{c}/{d}")
   public static class Resource3 {
     
@@ -175,10 +178,55 @@ public class RequestDispatcherTest extends AbstractResourceTest {
     unregistry(Resource3.class);
   }
   
+//--------------------------------------
+  public static class TestContainerComponent {
+  }
+
+  @Path("{a}")
+  public static class Resource4 {
+    
+    @Context
+    private UriInfo uriInfo;
+    
+    @Context
+    private HttpServletRequest request;
+    
+    private TestContainerComponent tc;
+
+    public Resource4(@PathParam("a") String test) {
+      // this constructor must not be used. There is constructors with more
+      // parameter
+      fail("Must not be used.");
+    }
+
+    public Resource4(TestContainerComponent tc, @PathParam("a") String test) {
+      this.tc = tc;
+    }
+
+    @GET
+    @Path("{b}")
+    public void m0() {
+      assertNotNull(tc);
+      assertNotNull(uriInfo);
+      assertNotNull(request);
+    }
+    
+  }
+
+  public void testResourceConstructorsContainer() throws Exception {
+    container.registerComponentInstance(TestContainerComponent.class.getName(),
+                                        new TestContainerComponent());
+    registry(Resource4.class);
+    service("GET", "/aaa/bbb", "", null, null);
+    unregistry(Resource4.class);
+  }
+  
+  
+// --------------------------------------
   public static class Failure {
     // not member of exo-container
   }
-
+  
   @Path("/_a/b/{c}/{d}")
   public static class ResourceFail {
     
@@ -200,5 +248,6 @@ public class RequestDispatcherTest extends AbstractResourceTest {
     assertEquals(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), resp.getStatus());
     unregistry(ResourceFail.class);
   }
+//--------------------------------------
   
 }

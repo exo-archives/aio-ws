@@ -15,35 +15,22 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest.impl;
+package org.exoplatform.services.rest;
 
 /**
- * Should not be used by custom services. They have to use
- * {@link javax.ws.rs.WebApplicationException} instead. ApplicationException is
- * used as wrapper for exception that may occur during request processing.
- * 
- * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
- * @version $Id: $
+ * Object scope identifier.
  */
-public class ApplicationException extends RuntimeException {
-
+public enum ComponentLifecycleScope {
   /**
-   * Serial Version UID.
+   * New instance of object created foe each request.
    */
-  private static final long serialVersionUID = -712006975338590407L;
-
+  PER_REQUEST,
   /**
-   * @param s message
-   * @param throwable cause
+   * Singleton lifecycle.
    */
-  public ApplicationException(String s, Throwable throwable) {
-    super(s, throwable);
-  }
-
+  SINGLETON,
   /**
-   * @param throwable cause
+   * Inversion-of-control framework controls component's lifecycle.
    */
-  public ApplicationException(Throwable throwable) {
-    super(throwable);
-  }
+  CONTAINER
 }

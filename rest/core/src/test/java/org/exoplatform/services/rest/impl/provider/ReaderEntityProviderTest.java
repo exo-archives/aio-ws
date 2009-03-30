@@ -42,12 +42,12 @@ public class ReaderEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testRead() throws Exception {
-    MessageBodyReader reader = rd.getMessageBodyReader(Reader.class,
+    MessageBodyReader reader = providers.getMessageBodyReader(Reader.class,
                                                        null,
                                                        null,
                                                        MediaTypeHelper.DEFAULT_TYPE);
     assertNotNull(reader);
-    assertNotNull(rd.getMessageBodyReader(Reader.class, null, null, null));
+    assertNotNull(providers.getMessageBodyReader(Reader.class, null, null, null));
     assertTrue(reader.isReadable(Reader.class, null, null, null));
     byte[] data = TEST_CYR.getBytes("windows-1251");
     InputStream in = new ByteArrayInputStream(data);
@@ -73,12 +73,12 @@ public class ReaderEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testWrite() throws Exception {
-    MessageBodyWriter writer = rd.getMessageBodyWriter(Reader.class,
+    MessageBodyWriter writer = providers.getMessageBodyWriter(Reader.class,
                                                        null,
                                                        null,
                                                        MediaTypeHelper.DEFAULT_TYPE);
     assertNotNull(writer);
-    assertNotNull(rd.getMessageBodyWriter(Reader.class, null, null, null));
+    assertNotNull(providers.getMessageBodyWriter(Reader.class, null, null, null));
     assertTrue(writer.isWriteable(Reader.class, null, null, null));
     Reader source = new InputStreamReader(new ByteArrayInputStream(TEST_CYR.getBytes("windows-1251")),
                                           "windows-1251");

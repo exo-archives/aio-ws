@@ -23,7 +23,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
 import org.exoplatform.services.rest.impl.method.ParameterHelper;
+import org.exoplatform.services.rest.method.TypeProducer;
 
 import junit.framework.TestCase;
 
@@ -31,7 +35,7 @@ import junit.framework.TestCase;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class MethodParameterHelperTest extends TestCase {
+public class ParameterHelperTest extends TestCase {
   
   public void testString() throws Exception {
     Method method = getClass().getMethod("m1", List.class, Set.class, SortedSet.class);
@@ -104,7 +108,7 @@ public class MethodParameterHelperTest extends TestCase {
     assertEquals(null, ParameterHelper.getGenericType(types[1]));
     assertEquals(null, ParameterHelper.getGenericType(types[2]));
   }
-
+  
   ////////////////////////////////
   public void m1 (List<String> l, Set<String> s, SortedSet<String> ss) {
     // used for test
@@ -134,5 +138,5 @@ public class MethodParameterHelperTest extends TestCase {
   public void m9 (List l, Set s, SortedSet ss) {
     // used for test
   }
-
+  
 }

@@ -51,7 +51,7 @@ public class StringEntityProviderTest extends BaseTest {
   @SuppressWarnings("unchecked")
   public void testRead() throws IOException {
 
-    MessageBodyReader reader = rd.getMessageBodyReader(String.class, null, null, mediaType);
+    MessageBodyReader reader = providers.getMessageBodyReader(String.class, null, null, mediaType);
     byte[] data = TEST_CYR.getBytes("windows-1251");
     InputStream in = new ByteArrayInputStream(data);
     String res = (String) reader.readFrom(String.class, String.class, null, mediaType, null, in);
@@ -68,7 +68,7 @@ public class StringEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testWrite() throws IOException {
-    MessageBodyWriter writer = rd.getMessageBodyWriter(String.class, null, null, mediaType);
+    MessageBodyWriter writer = providers.getMessageBodyWriter(String.class, null, null, mediaType);
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     writer.writeTo(TEST_CYR, String.class, String.class, null, mediaType, null, out);
     String res = out.toString("windows-1251");

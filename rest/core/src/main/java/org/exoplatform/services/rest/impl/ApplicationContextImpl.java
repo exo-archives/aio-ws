@@ -34,7 +34,6 @@ import javax.ws.rs.core.UriInfo;
 import org.exoplatform.services.rest.ApplicationContext;
 import org.exoplatform.services.rest.GenericContainerRequest;
 import org.exoplatform.services.rest.GenericContainerResponse;
-import org.exoplatform.services.rest.RequestHandler;
 import org.exoplatform.services.rest.impl.uri.UriComponent;
 
 /**
@@ -85,6 +84,11 @@ public class ApplicationContextImpl implements ApplicationContext {
   private List<String>               matchedURIs        = new ArrayList<String>();
 
   /**
+   * Mutable runtime attributes.
+   */
+  private Map<String, Object>        attributes;
+
+  /**
    * See {@link GenericContainerRequest}.
    */
   protected GenericContainerRequest  request;
@@ -95,24 +99,23 @@ public class ApplicationContextImpl implements ApplicationContext {
   protected GenericContainerResponse response;
 
   /**
-   * See {@link RequestHandler}.
+   * Providers.
    */
-  protected RequestHandler           requestHandler;
-
-  /**
-   * Mutable runtime attributes.
-   */
-  private Map<String, Object>        attributes;
+  protected ProviderBinder          providers;
 
   /**
    * Constructs new instance of ApplicationContext.
    * 
    * @param request See {@link GenricContainerRequest}
    * @param response See {@link GenericContainerResponse}
+   * @param providers See {@link ProviderBinder}
    */
-  public ApplicationContextImpl(GenericContainerRequest request, GenericContainerResponse response) {
+  public ApplicationContextImpl(GenericContainerRequest request,
+                                GenericContainerResponse response,
+                                ProviderBinder providers) {
     this.request = request;
     this.response = response;
+    this.providers = providers;
   }
 
   /**
@@ -182,13 +185,6 @@ public class ApplicationContextImpl implements ApplicationContext {
    */
   public GenericContainerRequest getContainerRequest() {
     return request;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public RequestHandler getRequestHandler() {
-    return requestHandler;
   }
 
   /**
@@ -413,6 +409,13 @@ public class ApplicationContextImpl implements ApplicationContext {
    */
   public UriBuilder getRequestUriBuilder() {
     return UriBuilder.fromUri(getRequestUri());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public ProviderBinder getProviders() {
+    return providers;
   }
 
 }

@@ -104,12 +104,8 @@ public class ResponseFilterTest extends AbstractResourceTest {
     }
 
   }
-  
-  public void tearDown() throws Exception {
-    super.tearDown();
-    removeResponseFilter(ResponseFilter1.class);
-    removeResponseFilter(ResponseFilter2.class);
-  }
+
+  //------------------------------------
   
   public void testFilter() throws Exception {
     Resource1 r = new Resource1();
@@ -118,12 +114,12 @@ public class ResponseFilterTest extends AbstractResourceTest {
     assertEquals(204, resp.getStatus());
 
     // should not be any changes after add this
-    rd.addResponseFilterInstance(new ResponseFilter2());
+    providers.addResponseFilter(new ResponseFilter2());
     resp = service("POST", "/a", "", null, null);
     assertEquals(204, resp.getStatus());
 
     // add response filter and try again
-    rd.addResponseFilter(ResponseFilter1.class);
+    providers.addResponseFilter(ResponseFilter1.class);
 
     resp = service("POST", "/a", "", null, null);
     assertEquals(200, resp.getStatus());
@@ -142,7 +138,7 @@ public class ResponseFilterTest extends AbstractResourceTest {
     assertEquals("{\"name\":\"andrew\", \"password\":\"hello\"}", resp.getEntity());
     
     // add response filter and try again
-    rd.addResponseFilterInstance(new ResponseFilter2());
+    providers.addResponseFilter(new ResponseFilter2());
 
     resp = service("POST", "/a/b/c/d/e", "", null, null);
     assertEquals(200, resp.getStatus());

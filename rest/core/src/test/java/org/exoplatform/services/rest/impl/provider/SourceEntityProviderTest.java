@@ -56,7 +56,7 @@ public class SourceEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testReadStreamSourceEntityProvider() throws Exception {
-    MessageBodyReader reader = rd.getMessageBodyReader(StreamSource.class, null, null, mediaType);
+    MessageBodyReader reader = providers.getMessageBodyReader(StreamSource.class, null, null, mediaType);
     assertNotNull(reader);
     assertTrue(reader.isReadable(StreamSource.class, StreamSource.class, null, mediaType));
     MultivaluedMap<String, String> h = new MultivaluedMapImpl();
@@ -75,7 +75,7 @@ public class SourceEntityProviderTest extends BaseTest {
   @SuppressWarnings("unchecked")
   public void testWriteStreamSourceEntityProvider() throws Exception {
     StreamSource src = new StreamSource(new ByteArrayInputStream(data));
-    MessageBodyWriter writer = rd.getMessageBodyWriter(StreamSource.class, null, null, mediaType);
+    MessageBodyWriter writer = providers.getMessageBodyWriter(StreamSource.class, null, null, mediaType);
     assertNotNull(writer);
     assertTrue(writer.isWriteable(StreamSource.class, StreamSource.class, null, mediaType));
     ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -85,7 +85,7 @@ public class SourceEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testReadSAXSourceEntityProvider() throws Exception {
-    MessageBodyReader reader = rd.getMessageBodyReader(SAXSource.class, null, null, mediaType);
+    MessageBodyReader reader = providers.getMessageBodyReader(SAXSource.class, null, null, mediaType);
     assertNotNull(reader);
     assertTrue(reader.isReadable(SAXSource.class, SAXSource.class, null, mediaType));
     MultivaluedMap<String, String> h = new MultivaluedMapImpl();
@@ -104,7 +104,7 @@ public class SourceEntityProviderTest extends BaseTest {
   @SuppressWarnings("unchecked")
   public void testWriteSAXSourceEntityProvider() throws Exception {
     SAXSource src = new SAXSource(new InputSource(new ByteArrayInputStream(data)));
-    MessageBodyWriter writer = rd.getMessageBodyWriter(SAXSource.class, null, null, mediaType);
+    MessageBodyWriter writer = providers.getMessageBodyWriter(SAXSource.class, null, null, mediaType);
     assertNotNull(writer);
     assertTrue(writer.isWriteable(SAXSource.class, SAXSource.class, null, mediaType));
     ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -114,7 +114,7 @@ public class SourceEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testReadDOMSourceEntityProvider() throws Exception {
-    MessageBodyReader reader = rd.getMessageBodyReader(DOMSource.class, null, null, mediaType);
+    MessageBodyReader reader = providers.getMessageBodyReader(DOMSource.class, null, null, mediaType);
     assertNotNull(reader);
     assertTrue(reader.isReadable(DOMSource.class, DOMSource.class, null, mediaType));
     MultivaluedMap<String, String> h = new MultivaluedMapImpl();
@@ -136,7 +136,7 @@ public class SourceEntityProviderTest extends BaseTest {
     Document d = DocumentBuilderFactory.newInstance()
                                        .newDocumentBuilder()
                                        .parse(new ByteArrayInputStream(data));
-    MessageBodyWriter writer = rd.getMessageBodyWriter(DOMSource.class, null, null, mediaType);
+    MessageBodyWriter writer = providers.getMessageBodyWriter(DOMSource.class, null, null, mediaType);
     assertNotNull(writer);
     assertTrue(writer.isWriteable(DOMSource.class, DOMSource.class, null, mediaType));
     ByteArrayOutputStream out = new ByteArrayOutputStream();

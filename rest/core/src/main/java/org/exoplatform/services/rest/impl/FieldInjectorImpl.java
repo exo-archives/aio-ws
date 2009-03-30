@@ -207,7 +207,7 @@ public class FieldInjectorImpl implements FieldInjector {
         jfield.set(resource, pr.resolve(this, context));
       } catch (Throwable e) {
         
-        if (LOG.isDebugEnabled())
+//        if (LOG.isDebugEnabled())
           e.printStackTrace();
 
         Class<?> ac = annotation.annotationType();

@@ -38,8 +38,7 @@ public class InputHeadersMapTest extends TestCase {
   public void testCaseInsensitive() {
     InputHeadersMap um;
     try {
-//       um = InputHeadersMap.newInstance(null);
-       um = new InputHeadersMap(null);
+      um = new InputHeadersMap(null);
       fail("NullPointerException should be here");
     } catch (NullPointerException e) {
     }
@@ -51,19 +50,17 @@ public class InputHeadersMapTest extends TestCase {
     m.add("bar", "foo");
     m.add("bar", "hello");
 
-//    um = InputHeadersMap.newInstance(m);
     um = new InputHeadersMap(m);
     assertEquals("world", um.getFirst("hello"));
     assertEquals("foo", um.get("heLLo").get(1));
     assertEquals("foo", um.get("bar").get(1));
     assertEquals("hello", um.get("BAR").get(2));
-    
+
   }
-  
+
   public void testUnsupportedOperation() {
     MultivaluedMap<String, String> m = new MultivaluedMapImpl();
     m.add("hello", "world");
-//    InputHeadersMap um = InputHeadersMap.newInstance(m);
     InputHeadersMap um = new InputHeadersMap(m);
 
     try {
@@ -177,7 +174,7 @@ public class InputHeadersMapTest extends TestCase {
       fail("UnsupportedOperationException should be thrown");
     } catch (UnsupportedOperationException e) {
     }
-    
+
   }
 
 }

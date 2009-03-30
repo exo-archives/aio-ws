@@ -15,22 +15,35 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.services.rest;
+package org.exoplatform.services.rest.impl;
 
 /**
- * Object scope identifier.
+ * Should not be used by custom services. They have to use
+ * {@link javax.ws.rs.WebApplicationException} instead. This Exception is
+ * used as wrapper for exception that may occur during request processing.
+ * 
+ * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
+ * @version $Id: $
  */
-public enum ConponentLifecycleScope {
+public class InternalException extends RuntimeException {
+
   /**
-   * New instance of object created foe each request.
+   * Serial Version UID.
    */
-  PER_REQUEST,
+  private static final long serialVersionUID = -712006975338590407L;
+
   /**
-   * Singleton lifecycle.
+   * @param s message
+   * @param throwable cause
    */
-  SINGLETON,
+  public InternalException(String s, Throwable throwable) {
+    super(s, throwable);
+  }
+
   /**
-   * Inversion-of-control framework controls component's lifecycle.
+   * @param throwable cause
    */
-  CONTAINER
+  public InternalException(Throwable throwable) {
+    super(throwable);
+  }
 }

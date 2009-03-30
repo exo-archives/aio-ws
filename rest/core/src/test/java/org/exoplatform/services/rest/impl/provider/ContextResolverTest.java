@@ -75,31 +75,26 @@ public class ContextResolverTest extends org.exoplatform.services.rest.AbstractR
     }
     
   }
-
+  
   public void setUp() throws Exception {
     super.setUp();
-    rd.addContextResolver(ContextResolver1.class); 
-    rd.addContextResolver(ContextResolver2.class); 
-    rd.addContextResolver(ContextResolver3.class); 
-    rd.addContextResolver(ContextResolver4.class); 
-    rd.addContextResolver(ContextResolver5.class); 
+    providers.addContextResolver(ContextResolver1.class); 
+    providers.addContextResolver(ContextResolver2.class); 
+    providers.addContextResolver(ContextResolver3.class); 
+    providers.addContextResolver(ContextResolver4.class); 
+    providers.addContextResolver(ContextResolver5.class); 
   }
   
   public void tearDown() throws Exception {
     super.setUp();
-    removeContextResolver(ContextResolver1.class); 
-    removeContextResolver(ContextResolver2.class); 
-    removeContextResolver(ContextResolver3.class); 
-    removeContextResolver(ContextResolver4.class); 
-    removeContextResolver(ContextResolver5.class); 
   }
   
   public void testContextResolver() {
-    assertEquals("text", rd.getContextResolver(String.class, new MediaType("text", "plain")).getContext(String.class));
-    assertEquals("*", rd.getContextResolver(String.class, new MediaType("xxx", "xxx")).getContext(String.class));
-    assertEquals("xml", rd.getContextResolver(String.class, new MediaType("text", "xml")).getContext(String.class));
-    assertEquals("html", rd.getContextResolver(String.class, new MediaType("text", "html")).getContext(String.class));
-    assertEquals("anytext", rd.getContextResolver(String.class, new MediaType("text", "xxx")).getContext(String.class));
+    assertEquals("text", providers.getContextResolver(String.class, new MediaType("text", "plain")).getContext(String.class));
+    assertEquals("*", providers.getContextResolver(String.class, new MediaType("xxx", "xxx")).getContext(String.class));
+    assertEquals("xml", providers.getContextResolver(String.class, new MediaType("text", "xml")).getContext(String.class));
+    assertEquals("html", providers.getContextResolver(String.class, new MediaType("text", "html")).getContext(String.class));
+    assertEquals("anytext", providers.getContextResolver(String.class, new MediaType("text", "xxx")).getContext(String.class));
   }
   
 }

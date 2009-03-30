@@ -156,10 +156,9 @@ public class ContainerResponse implements GenericContainerResponse {
 
     // if content-type is still not preset try determine it
     if (contentType == null) {
-      List<MediaType> l = RuntimeDelegateImpl.getInstance()
-                                             .getAcceptableWriterMediaTypes(entity.getClass(),
-                                                                            entityType,
-                                                                            null);
+      List<MediaType> l = context.getProviders().getAcceptableWriterMediaTypes(entity.getClass(),
+                                                                               entityType,
+                                                                               null);
       contentType = context.getContainerRequest().getAcceptableMediaType(l);
       if (contentType == null || contentType.isWildcardType() || contentType.isWildcardSubtype())
         contentType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
@@ -167,11 +166,10 @@ public class ContainerResponse implements GenericContainerResponse {
       this.contentType = contentType;
       getHttpHeaders().putSingle(HttpHeaders.CONTENT_TYPE, contentType);
     }
-    MessageBodyWriter entityWriter = RuntimeDelegateImpl.getInstance()//context.getRequestHandler()
-                                            .getMessageBodyWriter(entity.getClass(),
-                                                                  entityType,
-                                                                  null,
-                                                                  contentType);
+    MessageBodyWriter entityWriter = context.getProviders().getMessageBodyWriter(entity.getClass(),
+                                                                                 entityType,
+                                                                                 null,
+                                                                                 contentType);
     if (entityWriter == null) {
       String message = "Not found writer for " + entity.getClass() + " and MIME type "
           + contentType;

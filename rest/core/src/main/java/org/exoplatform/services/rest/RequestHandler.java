@@ -39,13 +39,6 @@ public interface RequestHandler {
   public static final String WS_RS_BUFFER_SIZE           = "ws.rs.buffersize";
 
   /**
-   * Should load prepared entity providers attribute.
-   * 
-   * @see org.exoplatform.services.rest.provider.EntityProvider
-   */
-  public static final String WS_RS_USE_BUILTIN_PROVIDERS = "ws.rs.provider.builtin";
-
-  /**
    * Handle the HTTP request by dispatching request to appropriate resource. If
    * no one appropriate resource found then error response will be produced.
    * 

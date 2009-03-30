@@ -29,7 +29,7 @@ import javax.ws.rs.ext.Providers;
 
 import org.exoplatform.services.rest.ApplicationContext;
 import org.exoplatform.services.rest.impl.EnvironmentContext;
-import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
+import org.exoplatform.services.rest.impl.ProviderBinder;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -103,7 +103,7 @@ public class ContextParameterResolver extends ParameterResolver<Context> {
       case URI_INFO:
         return context.getUriInfo();
       case PROVIDERS:
-        return RuntimeDelegateImpl.getInstance();
+        return context.getProviders();
       }
     }
     // For servlet container environment context contains HttpServletRequest,

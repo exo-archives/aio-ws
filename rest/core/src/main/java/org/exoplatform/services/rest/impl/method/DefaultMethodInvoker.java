@@ -21,9 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.PathParam;
@@ -39,12 +36,10 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.rest.ApplicationContext;
 import org.exoplatform.services.rest.FilterDescriptor;
 import org.exoplatform.services.rest.ObjectFactory;
-import org.exoplatform.services.rest.impl.ApplicationException;
-import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
+import org.exoplatform.services.rest.impl.InternalException;
 import org.exoplatform.services.rest.method.MethodInvoker;
 import org.exoplatform.services.rest.method.MethodInvokerFilter;
 import org.exoplatform.services.rest.resource.GenericMethodResource;
-import org.exoplatform.services.rest.uri.UriPattern;
 
 /**
  * Invoker for Resource Method, Sub-Resource Method and SubResource Locator.
@@ -67,28 +62,10 @@ public final class DefaultMethodInvoker implements MethodInvoker {
                              GenericMethodResource methodResource,
                              ApplicationContext context) {
 
-    String path = context.getPath();
-    List<String> capturingValues = new ArrayList<String>();
-    for (Map.Entry<UriPattern, List<ObjectFactory<FilterDescriptor>>> e : RuntimeDelegateImpl.getInstance()
-                                                                                             .getMethodInvokerFilters()
-                                                                                             .entrySet()) {
-      UriPattern uripattern = e.getKey();
-      if (uripattern != null) {
-        if (e.getKey().match(path, capturingValues)) {
-          int len = capturingValues.size();
-          if (capturingValues.get(len - 1) != null && !"/".equals(capturingValues.get(len - 1)))
-            continue;
-        } else {
-          continue; // not matched
-        }
-
-      }
-
-      for (ObjectFactory<FilterDescriptor> factory : e.getValue()) {
-        MethodInvokerFilter f = (MethodInvokerFilter) factory.getInstance(context);
-        f.accept(methodResource);
-      }
-
+    for (ObjectFactory<FilterDescriptor> factory : context.getProviders()
+                                                          .getMethodInvokerFilters(context.getPath())) {
+      MethodInvokerFilter f = (MethodInvokerFilter) factory.getInstance(context);
+      f.accept(methodResource);
     }
 
     Object[] p = new Object[methodResource.getMethodParameters().size()];
@@ -122,11 +99,11 @@ public final class DefaultMethodInvoker implements MethodInvoker {
           MultivaluedMap<String, String> headers = context.getContainerRequest()
                                                           .getRequestHeaders();
 
-          MessageBodyReader entityReader = RuntimeDelegateImpl.getInstance()
-                                                              .getMessageBodyReader(mp.getParameterClass(),
-                                                                                    mp.getGenericType(),
-                                                                                    mp.getAnnotations(),
-                                                                                    contentType);
+          MessageBodyReader entityReader = context.getProviders()
+                                                  .getMessageBodyReader(mp.getParameterClass(),
+                                                                        mp.getGenericType(),
+                                                                        mp.getAnnotations(),
+                                                                        contentType);
           if (entityReader == null) {
             if (LOG.isDebugEnabled())
               LOG.warn("Unsupported media type. ");
@@ -148,7 +125,7 @@ public final class DefaultMethodInvoker implements MethodInvoker {
             if (LOG.isDebugEnabled())
               e.printStackTrace();
 
-            throw new ApplicationException(e);
+            throw new InternalException(e);
 
           }
         }
@@ -159,10 +136,10 @@ public final class DefaultMethodInvoker implements MethodInvoker {
       return methodResource.getMethod().invoke(resource, p);
     } catch (IllegalArgumentException argExc) {
       // should not be thrown
-      throw new ApplicationException(argExc);
+      throw new InternalException(argExc);
     } catch (IllegalAccessException accessExc) {
       // should not be thrown
-      throw new ApplicationException(accessExc);
+      throw new InternalException(accessExc);
     } catch (InvocationTargetException invExc) {
       if (LOG.isDebugEnabled())
         invExc.printStackTrace();
@@ -172,7 +149,7 @@ public final class DefaultMethodInvoker implements MethodInvoker {
       if (WebApplicationException.class == cause.getClass())
         throw (WebApplicationException) cause;
 
-      throw new ApplicationException(cause);
+      throw new InternalException(cause);
     }
   }
 

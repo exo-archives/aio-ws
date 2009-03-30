@@ -101,27 +101,27 @@ public class RequestFilterTest extends AbstractResourceTest {
     }
   }
   
-  public void tearDown() throws Exception {
-    super.tearDown();
-    removeRequestFilter(RequestFilter1.class);
-    removeRequestFilter(RequestFilter2.class);
-  }
-
-  public void testFilter() throws Exception {
+  public void testWithoutFilter1() throws Exception {
     registry(Resource1.class);
     ContainerResponse resp = service("GET", "/a", "", null, null);
     assertEquals(405, resp.getStatus());
     assertEquals(1, resp.getHttpHeaders().get("allow").size());
     assertTrue(resp.getHttpHeaders().get("allow").get(0).toString().contains("POST"));
+    unregistry(Resource1.class);
+  }
+  
+  public void testWithFilter2() throws Exception {
+    registry(Resource1.class);
 
     // add filter that can change method
-    rd.addRequestFilter(RequestFilter1.class);
+    providers.addRequestFilter(RequestFilter1.class);
 
-    // not should get status 204
-    resp = service("GET", "/a", "", null, null);
+    // should get status 204
+    ContainerResponse resp = service("GET", "/a", "", null, null);
     assertEquals(204, resp.getStatus());
 
     unregistry(Resource1.class);
+    
   }
 
   public void testFilter2() throws Exception {
@@ -132,7 +132,7 @@ public class RequestFilterTest extends AbstractResourceTest {
     assertTrue(resp.getHttpHeaders().get("allow").get(0).toString().contains("DELETE"));
 
     // add filter that can change method
-    rd.addRequestFilterInstance(new RequestFilter2());
+    providers.addRequestFilter(new RequestFilter2());
 
     // not should get status 204
     resp = service("GET", "/a/b/c/d/e", "", null, null);

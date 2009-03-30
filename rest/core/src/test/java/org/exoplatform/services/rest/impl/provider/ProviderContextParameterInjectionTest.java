@@ -181,18 +181,14 @@ public class ProviderContextParameterInjectionTest extends AbstractResourceTest 
 
   public void setUp() throws Exception {
     super.setUp();
-    rd.addEntityProvider(EntityProviderChecker.class);
-    rd.addExceptionMapper(ExceptionMapperChecker.class);
-    rd.addContextResolver(ContextResolverChecker.class);
+    providers.addMessageBodyReader(EntityProviderChecker.class);
+    providers.addMessageBodyWriter(EntityProviderChecker.class);
+    providers.addExceptionMapper(ExceptionMapperChecker.class);
+    providers.addContextResolver(ContextResolverChecker.class);
   }
   
   public void tearDown() throws Exception {
     super.tearDown();
-    //  be sure only default providers available
-    removeMessageBodyReader(EntityProviderChecker.class);
-    removeMessageBodyWriter(EntityProviderChecker.class);
-    removeExceptionMapper(ExceptionMapperChecker.class);
-    removeContextResolver(ContextResolverChecker.class);
   }
 
   @Path("a")

@@ -35,7 +35,7 @@ public class InputStreamEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testRead() throws Exception {
-    MessageBodyReader reader = rd.getMessageBodyReader(InputStream.class, null, null, null);
+    MessageBodyReader reader = providers.getMessageBodyReader(InputStream.class, null, null, null);
     assertNotNull(reader);
     assertTrue(reader.isReadable(InputStream.class, null, null, null));
     byte[] data = new byte[16];
@@ -55,7 +55,7 @@ public class InputStreamEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testWrite() throws Exception {
-    MessageBodyWriter writer = rd.getMessageBodyWriter(InputStream.class, null, null, null);
+    MessageBodyWriter writer = providers.getMessageBodyWriter(InputStream.class, null, null, null);
     assertNotNull(writer);
     assertTrue(writer.isWriteable(InputStream.class, null, null, null));
     byte[] data = new byte[16];

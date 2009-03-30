@@ -70,7 +70,7 @@ public class JAXBEntityProviderTest extends BaseTest {
     assertNotNull(m);
     Class<?> type = m.getParameterTypes()[0];
     Type genericType = m.getGenericParameterTypes()[0];
-    MessageBodyReader reader = rd.getMessageBodyReader(type, genericType, null, mediaType);
+    MessageBodyReader reader = providers.getMessageBodyReader(type, genericType, null, mediaType);
     assertNotNull(reader);
     assertTrue(reader.isReadable(type, genericType, null, mediaType));
     InputStream in = new ByteArrayInputStream(data);
@@ -91,7 +91,7 @@ public class JAXBEntityProviderTest extends BaseTest {
     assertNotNull(m);
     Class<?> returnType = m.getReturnType();
     Type genericReturnType = m.getGenericReturnType();
-    MessageBodyWriter writer = rd.getMessageBodyWriter(returnType,
+    MessageBodyWriter writer = providers.getMessageBodyWriter(returnType,
                                                        genericReturnType,
                                                        null,
                                                        mediaType);
@@ -112,7 +112,7 @@ public class JAXBEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testReadJAXBObject() throws Exception {
-    MessageBodyReader prov = rd.getMessageBodyReader(Book.class, null, null, mediaType);
+    MessageBodyReader prov = providers.getMessageBodyReader(Book.class, null, null, mediaType);
     assertNotNull(prov);
     assertTrue(prov.isReadable(Book.class, Book.class, null, mediaType));
     MultivaluedMap<String, String> h = new MultivaluedMapImpl();
@@ -128,7 +128,7 @@ public class JAXBEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testWriteJAXBObject() throws Exception {
-    MessageBodyWriter writer = rd.getMessageBodyWriter(Book.class, null, null, mediaType);
+    MessageBodyWriter writer = providers.getMessageBodyWriter(Book.class, null, null, mediaType);
     assertNotNull(writer);
     assertTrue(writer.isWriteable(Book.class, Book.class, null, mediaType));
     Book book = new Book();

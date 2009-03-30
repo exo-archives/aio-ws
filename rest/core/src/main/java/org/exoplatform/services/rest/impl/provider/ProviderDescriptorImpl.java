@@ -26,10 +26,10 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.exoplatform.services.rest.ConponentLifecycleScope;
-import org.exoplatform.services.rest.ConstructorInjector;
+import org.exoplatform.services.rest.ComponentLifecycleScope;
+import org.exoplatform.services.rest.ConstructorDescriptor;
 import org.exoplatform.services.rest.FieldInjector;
-import org.exoplatform.services.rest.impl.ConstructorInjectorImpl;
+import org.exoplatform.services.rest.impl.ConstructorDescriptorImpl;
 import org.exoplatform.services.rest.impl.FieldInjectorImpl;
 import org.exoplatform.services.rest.impl.header.MediaTypeHelper;
 import org.exoplatform.services.rest.provider.ProviderDescriptor;
@@ -49,9 +49,9 @@ public class ProviderDescriptorImpl implements ProviderDescriptor {
   /**
    * Resource class constructors.
    * 
-   * @see {@link ConstructorInjector}
+   * @see {@link ConstructorDescriptor}
    */
-  private final List<ConstructorInjector> constructors;
+  private final List<ConstructorDescriptor> constructors;
 
   /**
    * Resource class fields.
@@ -74,28 +74,28 @@ public class ProviderDescriptorImpl implements ProviderDescriptor {
    * @param providerClass provider class
    */
   public ProviderDescriptorImpl(Class<?> providerClass) {
-    this(providerClass, ConponentLifecycleScope.PER_REQUEST);
+    this(providerClass, ComponentLifecycleScope.PER_REQUEST);
   }
 
   /**
    * @param provider provider instance
    */
   public ProviderDescriptorImpl(Object provider) {
-    this(provider.getClass(), ConponentLifecycleScope.SINGLETON);
+    this(provider.getClass(), ComponentLifecycleScope.SINGLETON);
   }
 
   /**
    * @param providerClass provider class
    * @param scope provider scope
    */
-  private ProviderDescriptorImpl(Class<?> providerClass, ConponentLifecycleScope scope) {
+  private ProviderDescriptorImpl(Class<?> providerClass, ComponentLifecycleScope scope) {
     this.providerClass = providerClass;
 
-    this.constructors = new ArrayList<ConstructorInjector>();
+    this.constructors = new ArrayList<ConstructorDescriptor>();
     this.fields = new ArrayList<FieldInjector>();
-    if (scope == ConponentLifecycleScope.PER_REQUEST) {
+    if (scope == ComponentLifecycleScope.PER_REQUEST) {
       for (Constructor<?> constructor : providerClass.getConstructors()) {
-        constructors.add(new ConstructorInjectorImpl(providerClass, constructor));
+        constructors.add(new ConstructorDescriptorImpl(providerClass, constructor));
       }
       if (constructors.size() == 0) {
         String msg = "Not found accepted constructors for provider class "
@@ -104,7 +104,7 @@ public class ProviderDescriptorImpl implements ProviderDescriptor {
       }
       // Sort constructors in number parameters order
       if (constructors.size() > 1) {
-        Collections.sort(constructors, ConstructorInjectorImpl.CONSTRUCTOR_COMPARATOR);
+        Collections.sort(constructors, ConstructorDescriptorImpl.CONSTRUCTOR_COMPARATOR);
       }
       // process field
       for (java.lang.reflect.Field jfield : providerClass.getDeclaredFields()) {
@@ -133,7 +133,7 @@ public class ProviderDescriptorImpl implements ProviderDescriptor {
   /**
    * {@inheritDoc}
    */
-  public List<ConstructorInjector> getConstructorInjectors() {
+  public List<ConstructorDescriptor> getConstructorInjectors() {
     return constructors;
   }
 

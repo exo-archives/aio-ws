@@ -28,8 +28,6 @@ import org.exoplatform.services.rest.impl.ContainerResponse;
 import org.exoplatform.services.rest.impl.EnvironmentContext;
 import org.exoplatform.services.rest.impl.InputHeadersMap;
 import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
-import org.exoplatform.services.rest.impl.RequestHandlerImpl;
-import org.exoplatform.services.rest.impl.ResourceBinder;
 import org.exoplatform.services.rest.servlet.mock.MockHttpServletRequest;
 import org.exoplatform.services.rest.tools.DummyContainerResponseWriter;
 
@@ -81,16 +79,6 @@ public abstract class AbstractResourceTest extends BaseTest {
                                    byte[] data) throws Exception {
     return service(method, requestURI, baseURI, headers, data, new DummyContainerResponseWriter());
 
-  }
-
-  public boolean unregistry(Object resource) {
-    container.unregisterComponentByInstance(resource);
-    return binder.unbind(resource.getClass());
-  }
-
-  public boolean unregistry(Class<?> resourceClass) {
-    container.unregisterComponent(resourceClass.getName());
-    return binder.unbind(resourceClass);
   }
 
 }

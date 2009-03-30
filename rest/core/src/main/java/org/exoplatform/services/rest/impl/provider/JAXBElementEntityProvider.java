@@ -42,7 +42,6 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.commons.logging.Log;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.rest.provider.EntityProvider;
-import org.exoplatform.services.rest.util.RawTypeUtil;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -83,7 +82,8 @@ public class JAXBElementEntityProvider implements EntityProvider<JAXBElement<?>>
                                  MediaType mediaType,
                                  MultivaluedMap<String, String> httpHeaders,
                                  InputStream entityStream) throws IOException {
-    Class<?> c = (Class<?>) RawTypeUtil.getActualTypes(genericType)[0];
+    ParameterizedType pt = (ParameterizedType) genericType;
+    Class<?> c = (Class<?>) pt.getActualTypeArguments()[0];
     try {
       JAXBContext jaxbctx = getJAXBContext(c, mediaType);
       return jaxbctx.createUnmarshaller().unmarshal(new StreamSource(entityStream), c);

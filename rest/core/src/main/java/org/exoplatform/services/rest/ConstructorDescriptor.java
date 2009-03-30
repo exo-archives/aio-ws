@@ -29,7 +29,7 @@ import org.exoplatform.services.rest.resource.ResourceDescriptor;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public interface ConstructorInjector extends ResourceDescriptor {
+public interface ConstructorDescriptor extends ResourceDescriptor {
 
   /**
    * @param context ApplicationContext

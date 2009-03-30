@@ -40,7 +40,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.exoplatform.services.rest.BaseTest;
-import org.exoplatform.services.rest.ConstructorInjector;
+import org.exoplatform.services.rest.ConstructorDescriptor;
 import org.exoplatform.services.rest.FieldInjector;
 import org.exoplatform.services.rest.impl.header.MediaTypeHelper;
 import org.exoplatform.services.rest.method.MethodParameter;
@@ -126,8 +126,7 @@ public class ResourceDescriptorTest extends BaseTest {
     new AbstractResourceDescriptorImpl(Resource14.class);
   }
 
-  // ====================== all of this resource are not valid
-  // =========================
+  // ====================== all of this resource are not valid =========================
 
   @Path("a")
   public static class Resource1 {
@@ -428,7 +427,7 @@ public class ResourceDescriptorTest extends BaseTest {
   public void testConstructors() {
     AbstractResourceDescriptor resource = new AbstractResourceDescriptorImpl(SampleResource.class);
     assertEquals(3, resource.getConstructorInjectors().size());
-    List<ConstructorInjector> c = resource.getConstructorInjectors();
+    List<ConstructorDescriptor> c = resource.getConstructorInjectors();
     assertEquals(2, c.get(0).getParameters().size());
     assertEquals(1, c.get(1).getParameters().size());
     assertEquals(0, c.get(2).getParameters().size());

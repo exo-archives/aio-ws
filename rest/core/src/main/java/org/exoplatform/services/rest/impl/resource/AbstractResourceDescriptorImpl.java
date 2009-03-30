@@ -44,10 +44,10 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.rest.ConponentLifecycleScope;
-import org.exoplatform.services.rest.ConstructorInjector;
+import org.exoplatform.services.rest.ComponentLifecycleScope;
+import org.exoplatform.services.rest.ConstructorDescriptor;
 import org.exoplatform.services.rest.FieldInjector;
-import org.exoplatform.services.rest.impl.ConstructorInjectorImpl;
+import org.exoplatform.services.rest.impl.ConstructorDescriptorImpl;
 import org.exoplatform.services.rest.impl.FieldInjectorImpl;
 import org.exoplatform.services.rest.impl.header.MediaTypeHelper;
 import org.exoplatform.services.rest.impl.method.DefaultMethodInvoker;
@@ -115,9 +115,9 @@ public class AbstractResourceDescriptorImpl implements AbstractResourceDescripto
   /**
    * Resource class constructors.
    * 
-   * @see ConstructorInjector
+   * @see ConstructorDescriptor
    */
-  private final List<ConstructorInjector>                   constructors;
+  private final List<ConstructorDescriptor>                   constructors;
 
   /**
    * Resource class fields.
@@ -128,12 +128,12 @@ public class AbstractResourceDescriptorImpl implements AbstractResourceDescripto
    * Constructs new instance of AbstractResourceDescriptor without path
    * (sub-resource).
    * 
-   * @param resourceClazz resource class
+   * @param resourceClass resource class
    */
   public AbstractResourceDescriptorImpl(Class<?> resourceClass) {
     this(resourceClass.getAnnotation(Path.class),
          resourceClass,
-         ConponentLifecycleScope.PER_REQUEST);
+         ComponentLifecycleScope.PER_REQUEST);
   }
 
   /**
@@ -145,18 +145,18 @@ public class AbstractResourceDescriptorImpl implements AbstractResourceDescripto
   public AbstractResourceDescriptorImpl(Object resource) {
     this(resource.getClass().getAnnotation(Path.class),
          resource.getClass(),
-         ConponentLifecycleScope.SINGLETON);
+         ComponentLifecycleScope.SINGLETON);
   }
 
   /**
    * @param path the path value
    * @param resourceClass resource class
    * @param scope resource scope
-   * @see ConponentLifecycleScope
+   * @see ComponentLifecycleScope
    */
   private AbstractResourceDescriptorImpl(Path path,
                                          Class<?> resourceClass,
-                                         ConponentLifecycleScope scope) {
+                                         ComponentLifecycleScope scope) {
     if (path != null) {
       this.path = new PathValue(path.value());
       uriPattern = new UriPattern(path.value());
@@ -167,11 +167,11 @@ public class AbstractResourceDescriptorImpl implements AbstractResourceDescripto
 
     this.resourceClass = resourceClass;
 
-    this.constructors = new ArrayList<ConstructorInjector>();
+    this.constructors = new ArrayList<ConstructorDescriptor>();
     this.fields = new ArrayList<FieldInjector>();
-    if (scope == ConponentLifecycleScope.PER_REQUEST) {
+    if (scope == ComponentLifecycleScope.PER_REQUEST) {
       for (Constructor<?> constructor : resourceClass.getConstructors()) {
-        constructors.add(new ConstructorInjectorImpl(resourceClass, constructor));
+        constructors.add(new ConstructorDescriptorImpl(resourceClass, constructor));
       }
       if (constructors.size() == 0) {
         String msg = "Not found accepted constructors for resource class "
@@ -180,7 +180,7 @@ public class AbstractResourceDescriptorImpl implements AbstractResourceDescripto
       }
       // Sort constructors in number parameters order
       if (constructors.size() > 1) {
-        Collections.sort(constructors, ConstructorInjectorImpl.CONSTRUCTOR_COMPARATOR);
+        Collections.sort(constructors, ConstructorDescriptorImpl.CONSTRUCTOR_COMPARATOR);
       }
       // process field
       for (java.lang.reflect.Field jfield : resourceClass.getDeclaredFields()) {
@@ -204,7 +204,7 @@ public class AbstractResourceDescriptorImpl implements AbstractResourceDescripto
   /**
    * {@inheritDoc}
    */
-  public List<ConstructorInjector> getConstructorInjectors() {
+  public List<ConstructorDescriptor> getConstructorInjectors() {
     return constructors;
   }
 
@@ -458,8 +458,6 @@ public class AbstractResourceDescriptorImpl implements AbstractResourceDescripto
    * Call method annotated with a request method designation GET and discard any
    * returned entity.
    * </p>
-   * 
-   * @param resourceMethodMap ResourceMethodMap
    */
   protected void resolveHeadRequest() {
 
@@ -516,8 +514,6 @@ public class AbstractResourceDescriptorImpl implements AbstractResourceDescripto
    * present, 2. Generate an automatic response using the metadata provided by
    * the JAX-RS annotations on the matching class and its methods.
    * </p>
-   * 
-   * @param resourceMethodMap ResourceMethodMap
    */
   protected void resolveOptionsRequest() {
     List<ResourceMethodDescriptor> o = resourceMethods.getList("OPTIONS");
@@ -619,9 +615,9 @@ public class AbstractResourceDescriptorImpl implements AbstractResourceDescripto
    * ResourceMethodDescriptor with the same media types.
    * 
    * @param rmds {@link Set} of {@link ResourceMethodDescriptor}
-   * @param other ResourceMethodDescriptor which must be checked
-   * @return true if Set already contains resource with the same media types
-   *         false otherwise
+   * @param consumes resource method consumed media type
+   * @param produces resource method produced media type
+   * @return ResourceMethodDescriptor or null if nothing found
    */
   protected <T extends ResourceMethodDescriptor> ResourceMethodDescriptor findMethodResourceMediaType(List<T> rmds,
                                                                                                       List<MediaType> consumes,

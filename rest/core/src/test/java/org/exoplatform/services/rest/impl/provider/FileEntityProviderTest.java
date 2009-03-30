@@ -40,12 +40,12 @@ public class FileEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testRead() throws Exception {
-    MessageBodyReader reader = rd.getMessageBodyReader(File.class,
+    MessageBodyReader reader = providers.getMessageBodyReader(File.class,
                                                        null,
                                                        null,
                                                        MediaTypeHelper.DEFAULT_TYPE);
     assertNotNull(reader);
-    assertNotNull(rd.getMessageBodyReader(File.class, null, null, null));
+    assertNotNull(providers.getMessageBodyReader(File.class, null, null, null));
     assertTrue(reader.isReadable(File.class, null, null, null));
     String data = "to be or not to be";
     File result = (File) reader.readFrom(File.class,
@@ -69,12 +69,12 @@ public class FileEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testWrite() throws Exception {
-    MessageBodyWriter writer = rd.getMessageBodyWriter(File.class,
+    MessageBodyWriter writer = providers.getMessageBodyWriter(File.class,
                                                        null,
                                                        null,
                                                        MediaTypeHelper.DEFAULT_TYPE);
     assertNotNull(writer);
-    assertNotNull(rd.getMessageBodyWriter(File.class, null, null, null));
+    assertNotNull(providers.getMessageBodyWriter(File.class, null, null, null));
     assertTrue(writer.isWriteable(File.class, null, null, null));
     byte[] data = "to be or not to be".getBytes("UTF-8");
     File source  = File.createTempFile("fileentitytest", null);

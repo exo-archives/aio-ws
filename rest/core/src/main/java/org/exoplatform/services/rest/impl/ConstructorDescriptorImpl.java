@@ -39,7 +39,7 @@ import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.rest.ApplicationContext;
-import org.exoplatform.services.rest.ConstructorInjector;
+import org.exoplatform.services.rest.ConstructorDescriptor;
 import org.exoplatform.services.rest.ConstructorParameter;
 import org.exoplatform.services.rest.impl.method.ParameterHelper;
 import org.exoplatform.services.rest.impl.method.ParameterResolver;
@@ -50,27 +50,27 @@ import org.exoplatform.services.rest.resource.ResourceDescriptorVisitor;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class ConstructorInjectorImpl implements ConstructorInjector {
+public class ConstructorDescriptorImpl implements ConstructorDescriptor {
 
   /**
    * Logger.
    */
-  private static final Log                            LOG                    = ExoLogger.getLogger(ConstructorInjectorImpl.class.getName());
+  private static final Log                            LOG                    = ExoLogger.getLogger(ConstructorDescriptorImpl.class.getName());
 
   /**
    * ConstructorDescriptor comparator.
    */
-  public static final Comparator<ConstructorInjector> CONSTRUCTOR_COMPARATOR = new ConstructorComparator();
+  public static final Comparator<ConstructorDescriptor> CONSTRUCTOR_COMPARATOR = new ConstructorComparator();
 
   /**
    * Compare two ConstructorDescriptor in number parameters order.
    */
-  private static class ConstructorComparator implements Comparator<ConstructorInjector> {
+  private static class ConstructorComparator implements Comparator<ConstructorDescriptor> {
     
     /**
      * {@inheritDoc}
      */
-    public int compare(ConstructorInjector o1, ConstructorInjector o2) {
+    public int compare(ConstructorDescriptor o1, ConstructorDescriptor o2) {
       int r = o2.getParameters().size() - o1.getParameters().size();
       if (r == 0)
         LOG.warn("Two constructors with the same number of parameter found " + o1 + " and " + o2);
@@ -97,7 +97,7 @@ public class ConstructorInjectorImpl implements ConstructorInjector {
    * @param resourceClass resource class
    * @param constructor {@link Constructor}
    */
-  public ConstructorInjectorImpl(Class<?> resourceClass, Constructor<?> constructor) {
+  public ConstructorDescriptorImpl(Class<?> resourceClass, Constructor<?> constructor) {
     this.resourceClass = resourceClass;
     this.constructor = constructor;
 
@@ -239,13 +239,13 @@ public class ConstructorInjectorImpl implements ConstructorInjector {
       return constructor.newInstance(p);
     } catch (IllegalArgumentException argExc) {
       // should not be thrown, arguments already checked
-      throw new ApplicationException(argExc);
+      throw new InternalException(argExc);
     } catch (InstantiationException instExc) {
       // should not be thrown
-      throw new ApplicationException(instExc);
+      throw new InternalException(instExc);
     } catch (IllegalAccessException accessExc) {
       // should not be thrown
-      throw new ApplicationException(accessExc);
+      throw new InternalException(accessExc);
     } catch (InvocationTargetException invExc) {
       // constructor may produce exceptions
       if (LOG.isDebugEnabled())
@@ -256,9 +256,9 @@ public class ConstructorInjectorImpl implements ConstructorInjector {
       if (WebApplicationException.class == cause.getClass())
         throw (WebApplicationException) cause;
 
-      throw new ApplicationException(cause);
+      throw new InternalException(cause);
     } catch (Throwable thr) {
-      throw new ApplicationException(thr);
+      throw new InternalException(thr);
     }
   }
 

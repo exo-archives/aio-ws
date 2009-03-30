@@ -89,8 +89,31 @@ public final class RequestDispatcher {
     String requestPath = context.getPath(false);
     List<String> parameterValues = context.getParameterValues();
 
-    ObjectFactory<AbstractResourceDescriptor> resourceFactory = processResource(requestPath,
-                                                                                parameterValues);
+    ObjectFactory<AbstractResourceDescriptor> resourceFactory = null;
+    
+    List<ObjectFactory<AbstractResourceDescriptor>> resources = resourceBinder.getResources();
+    // be sure no new entries added
+    synchronized (resources) {
+      for (ObjectFactory<AbstractResourceDescriptor> rc : resources) {
+        if (rc.getObjectModel().getUriPattern().match(requestPath, parameterValues)) {
+          // all times will at least 1
+          int len = parameterValues.size();
+          // If capturing group contains last element and this element is
+          // neither null nor '/' then ResourceClass must contains at least one
+          // sub-resource method or sub-resource locator.
+          if (parameterValues.get(len - 1) != null && !parameterValues.get(len - 1).equals("/")) {
+            int subresnum = rc.getObjectModel().getSubResourceMethods().size()
+                + rc.getObjectModel().getSubResourceLocators().size();
+            if (subresnum == 0)
+              continue;
+          }
+          resourceFactory = rc;
+          break;
+        }
+      }
+
+    }
+    
     if (resourceFactory == null) {
       if (LOG.isDebugEnabled())
         LOG.debug("Root resource not found for " + requestPath);
@@ -382,38 +405,6 @@ public final class RequestDispatcher {
       response.setResponse(Response.ok(o, contentType).build());
     }
 
-  }
-
-  /**
-   * @param path full request path, see
-   *          {@link javax.ws.rs.core.UriInfo#getPath()}.
-   * @param capturingValues the list for keeping template values. See
-   *          {@link javax.ws.rs.core.UriInfo#getPathParameters()}
-   * @return {@link SingletonResourceFactory} or null
-   */
-  private ObjectFactory<AbstractResourceDescriptor> processResource(String path,
-                                                                    List<String> capturingValues) {
-    for (ObjectFactory<AbstractResourceDescriptor> rc : resourceBinder.getResourceFactories()) {
-      if (rc.getObjectModel().getUriPattern().match(path, capturingValues)) {
-
-        // all times will at least 1
-        int len = capturingValues.size();
-
-        // If capturing group contains last element and this element is
-        // neither null nor '/' then ResourceClass must contains at least one
-        // sub-resource method or sub-resource locator.
-        if (capturingValues.get(len - 1) != null && !capturingValues.get(len - 1).equals("/")) {
-          int subresnum = rc.getObjectModel().getSubResourceMethods().size()
-              + rc.getObjectModel().getSubResourceLocators().size();
-          if (subresnum == 0)
-            continue;
-        }
-
-        return rc;
-      }
-    }
-
-    return null;
   }
 
   /**

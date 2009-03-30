@@ -37,7 +37,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 import org.exoplatform.services.rest.method.TypeProducer;
-import org.exoplatform.services.rest.util.RawTypeUtil;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -113,7 +112,9 @@ public class ParameterHelper {
         || parameterClass == SortedSet.class) {
       // parameter is collection
 
-      Class<?> clazz = getGenericType(parameterType);
+      Class<?> clazz = null;
+      if (parameterType != null)
+        clazz = getGenericType(parameterType);
       Method methodValueOf = null;
       Constructor<?> constructor = null;
 
@@ -265,7 +266,8 @@ public class ParameterHelper {
   static Class<?> getGenericType(Type type) {
     if (type instanceof ParameterizedType) {
 
-      Type[] genericTypes = RawTypeUtil.getActualTypes(type);
+      ParameterizedType pt = (ParameterizedType) type;
+      Type[] genericTypes = pt.getActualTypeArguments();
       if (genericTypes.length == 1) {
         try {
           // if can't be cast to java.lang.Class thrown Exception

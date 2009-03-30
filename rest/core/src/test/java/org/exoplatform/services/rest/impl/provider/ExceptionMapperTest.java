@@ -72,19 +72,10 @@ public class ExceptionMapperTest extends AbstractResourceTest {
   
   public void setUp() throws Exception {
     super.setUp();
-    rd.addExceptionMapper(ExceptionMapper1.class);
-    rd.addExceptionMapper(ExceptionMapper2.class);
-    rd.addExceptionMapper(ExceptionMapper3.class);
-    rd.addExceptionMapper(ExceptionMapper4.class);
-  }
-  
-  public void tearDown() throws Exception {
-    super.tearDown();
-    //  be sure only default providers available
-    removeExceptionMapper(ExceptionMapper1.class);
-    removeExceptionMapper(ExceptionMapper2.class);
-    removeExceptionMapper(ExceptionMapper3.class);
-    removeExceptionMapper(ExceptionMapper4.class);
+    providers.addExceptionMapper(ExceptionMapper1.class);
+    providers.addExceptionMapper(ExceptionMapper2.class);
+    providers.addExceptionMapper(ExceptionMapper3.class);
+    providers.addExceptionMapper(ExceptionMapper4.class);
   }
   
   @Path("a")
@@ -125,7 +116,7 @@ public class ExceptionMapperTest extends AbstractResourceTest {
   }
   
   public void testExceptionMappers() throws Exception {
-    registry(new Resource1());
+    registry(Resource1.class);
     
     ContainerResponse resp = service("GET", "/a/1", "", null, null);
     assertEquals(200, resp.getStatus());

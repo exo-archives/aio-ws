@@ -33,7 +33,7 @@ public interface ObjectModel {
    *         ConstructorInjector use
    *         <code>ObjectModel.getConstructorInjectors().add(ConstructorInjector)</code>
    */
-  List<ConstructorInjector> getConstructorInjectors();
+  List<ConstructorDescriptor> getConstructorInjectors();
 
   /**
    * @return collections of object fields, MAY return empty collection or null

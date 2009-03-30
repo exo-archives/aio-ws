@@ -204,9 +204,9 @@ public final class ResponseImpl extends Response {
     private ResponseBuilderImpl(ResponseBuilderImpl other) {
       this.status = other.status;
       this.entity = other.entity;
-      this.headers = other.headers;
-      this.cookies = other.cookies;
-      this.headerValues = other.headerValues;
+      this.headers.putAll(other.headers);
+      this.cookies.putAll(other.cookies);
+      this.headerValues.addAll(other.headerValues);
     }
 
     /**

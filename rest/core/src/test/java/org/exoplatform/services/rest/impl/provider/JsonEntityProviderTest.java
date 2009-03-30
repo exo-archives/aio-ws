@@ -51,7 +51,7 @@ public class JsonEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testRead() throws Exception {
-    MessageBodyReader reader = rd.getMessageBodyReader(Bean.class, null, null, mediaType);
+    MessageBodyReader reader = providers.getMessageBodyReader(Bean.class, null, null, mediaType);
     assertNotNull(reader);
     assertTrue(reader.isReadable(Bean.class, Bean.class, null, mediaType));
     byte[] data = DATA.getBytes("UTF-8");
@@ -69,7 +69,7 @@ public class JsonEntityProviderTest extends BaseTest {
 
   @SuppressWarnings("unchecked")
   public void testWrite() throws Exception {
-    MessageBodyWriter writer = rd.getMessageBodyWriter(Bean.class, null, null, mediaType);
+    MessageBodyWriter writer = providers.getMessageBodyWriter(Bean.class, null, null, mediaType);
     assertNotNull(writer);
     assertTrue(writer.isWriteable(Bean.class, Bean.class, null, mediaType));
     Bean bean = new Bean();

@@ -17,7 +17,11 @@
 
 package org.exoplatform.services.rest.impl.method;
 
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
 import org.exoplatform.services.rest.impl.method.StringValueOfProducer;
+import org.exoplatform.services.rest.method.TypeProducer;
 
 import junit.framework.TestCase;
 
@@ -69,4 +73,31 @@ public class StringValueOfProducerTest extends TestCase {
     assertEquals(Boolean.valueOf("true"), stringValueOfProducer.createValue("true"));
   }
 
+  public void testCuctomTypeValueOf() throws Exception {
+    TypeProducer t = ParameterHelper.createTypeProducer(StringValueOf.class, null);
+    MultivaluedMap<String, String> values = new MultivaluedMapImpl();
+    values.putSingle("key1", "valueof test");
+    StringValueOf o1 = (StringValueOf) t.createValue("key1", values, null);
+    assertEquals("valueof test", o1.getValue());
+    values.clear();
+    o1 = (StringValueOf) t.createValue("key1", values, "default value");
+    assertEquals("default value", o1.getValue());
+  }
+
+  public static class StringValueOf {
+    private String value;
+
+    private StringValueOf(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    public static StringValueOf valueOf(String value) {
+      return new StringValueOf(value);
+    }
+  }
+  
 }

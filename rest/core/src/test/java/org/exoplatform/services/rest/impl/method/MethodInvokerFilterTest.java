@@ -116,18 +116,12 @@ public class MethodInvokerFilterTest extends AbstractResourceTest {
     }
   }
 
-  public void tearDown() throws Exception {
-    super.tearDown();
-    removeInvokerFilter(MethodInvokerFilter1.class);
-    removeInvokerFilter(MethodInvokerFilter2.class);
-  }
-
   public void testInvokerFilter() throws Exception {
     Resource1 r = new Resource1();
     registry(r);
     assertEquals(204, service("GET", "/a/b", "", null, null).getStatus());
     assertEquals(204, service("GET", "/a", "", null, null).getStatus());
-    rd.addMethodInvokerFilter(MethodInvokerFilter1.class);
+    providers.addMethodInvokerFilter(MethodInvokerFilter1.class);
     assertEquals(400, service("GET", "/a/b", "", null, null).getStatus());
     assertEquals(204, service("GET", "/a", "", null, null).getStatus());
     unregistry(r);
@@ -138,7 +132,7 @@ public class MethodInvokerFilterTest extends AbstractResourceTest {
     registry(r);
     assertEquals(204, service("GET", "/b/c", "", null, null).getStatus());
     assertEquals(204, service("GET", "/b/d", "", null, null).getStatus());
-    rd.addMethodInvokerFilterInstance(new MethodInvokerFilter2());
+    providers.addMethodInvokerFilter(new MethodInvokerFilter2());
     assertEquals(400, service("GET", "/b/c", "", null, null).getStatus());
     assertEquals(204, service("GET", "/b/d", "", null, null).getStatus());
     unregistry(r);

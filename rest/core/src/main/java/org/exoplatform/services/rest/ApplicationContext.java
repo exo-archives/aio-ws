@@ -24,6 +24,9 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.Providers;
+
+import org.exoplatform.services.rest.impl.ProviderBinder;
 
 /**
  * Provides access to ContainerRequest, ContainerResponse and request URI
@@ -103,11 +106,6 @@ public interface ApplicationContext extends UriInfo {
   GenericContainerRequest getContainerRequest();
 
   /**
-   * @return See {@link RequestHandler}
-   */
-  RequestHandler getRequestHandler();
-
-  /**
    * @return See {@link UriInfo}
    */
   UriInfo getUriInfo();
@@ -116,5 +114,11 @@ public interface ApplicationContext extends UriInfo {
    * @return See {@link GenericContainerResponse}
    */
   GenericContainerResponse getContainerResponse();
+  
+  /**
+   * @return {@link ProviderBinder}
+   * @see Providers
+   */
+  ProviderBinder getProviders();
 
 }

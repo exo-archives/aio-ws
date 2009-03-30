@@ -17,7 +17,6 @@
 
 package org.exoplatform.services.rest.impl;
 
-import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -27,9 +26,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
 import org.exoplatform.services.rest.BaseTest;
-import org.exoplatform.services.rest.ObjectFactory;
-import org.exoplatform.services.rest.impl.ResourceBinder;
-import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -37,37 +33,23 @@ import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
  */
 public class ResourceBinderTest extends BaseTest {
 
-  private ResourceBinder binder;
-  
   /**
    * {@inheritDoc}
    */
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    binder = (ResourceBinder) container.getComponentInstanceOfType(ResourceBinder.class);
-    binder.clear();
   }
   
   public void testBind() {
     binder.bind(Resource.class);
-    assertEquals(1, binder.getResourceFactories().size());
-    ObjectFactory<AbstractResourceDescriptor> rc = binder.getResourceFactories().iterator().next();
-    
-    // two resource methods because method annotated 'GET' and 'HEAD' added automatically.
-    assertEquals(3, rc.getObjectModel().getResourceMethods().size());
-    
-    assertEquals(1, rc.getObjectModel().getSubResourceMethods().size());
-    // two resource methods because method annotated 'GET' and 'HEAD' added automatically.
-    assertEquals(2, rc.getObjectModel().getSubResourceMethods().values().iterator().next().size());
-    
-    assertEquals(1, rc.getObjectModel().getSubResourceLocators().size());
+    assertEquals(1, binder.getSize());
   }
   
   public void testUnbind() {
     binder.bind(Resource.class);
     binder.unbind(Resource.class);
-    assertEquals(0, binder.getResourceFactories().size());
+    assertEquals(0, binder.getSize());
   }
   
   @Path("/a/b/{c}")
@@ -98,28 +80,29 @@ public class ResourceBinderTest extends BaseTest {
     public void m3() {
     }
   }
+
+  //-------------------------------------
   
   public void testSameResourceURI() {
-    List<ObjectFactory<AbstractResourceDescriptor>> l = binder.getResourceFactories();
     assertTrue(binder.bind(SameURIResource1.class));
-    assertEquals(1, l.size());
+    assertEquals(1, binder.getSize());
     assertFalse(binder.bind(SameURIResource2.class));
-    assertEquals(1, l.size());
+    assertEquals(1, binder.getSize());
     binder.clear();
     assertTrue(binder.bind(SameURIResource2.class));
-    assertEquals(1, l.size());
+    assertEquals(1, binder.getSize());
     assertFalse(binder.bind(SameURIResource1.class));
-    assertEquals(1, l.size());
+    assertEquals(1, binder.getSize());
     binder.clear();
     assertTrue(binder.bind(new SameURIResource1()));
-    assertEquals(1, l.size());
+    assertEquals(1, binder.getSize());
     assertFalse(binder.bind(new SameURIResource2()));
-    assertEquals(1, l.size());
+    assertEquals(1, binder.getSize());
     binder.clear();
     assertTrue(binder.bind(new SameURIResource2()));
-    assertEquals(1, l.size());
+    assertEquals(1, binder.getSize());
     assertFalse(binder.bind(new SameURIResource1()));
-    assertEquals(1, l.size());
+    assertEquals(1, binder.getSize());
   }
   
   @Path("/a/b/c/{d}/e")

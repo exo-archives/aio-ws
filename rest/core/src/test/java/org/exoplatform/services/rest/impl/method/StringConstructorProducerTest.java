@@ -17,7 +17,11 @@
 
 package org.exoplatform.services.rest.impl.method;
 
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
 import org.exoplatform.services.rest.impl.method.StringConstructorProducer;
+import org.exoplatform.services.rest.method.TypeProducer;
 
 import junit.framework.TestCase;
 
@@ -64,22 +68,26 @@ public class StringConstructorProducerTest extends TestCase {
     assertEquals(new Boolean("true"), StringConstructorProducer.createValue("true"));
   }
 
-  public void testMy() throws Exception {
-    StringConstructorProducer StringConstructorProducer = new StringConstructorProducer(My.class.getConstructor(String.class));
-    My my = (My) StringConstructorProducer.createValue("hello");
-    assertEquals(new My("hello").getString(), my.getString());
+  public void testCuctomTypeStringConstructor() throws Exception {
+    TypeProducer t = ParameterHelper.createTypeProducer(StringConstructor.class, null);
+    MultivaluedMap<String, String> values = new MultivaluedMapImpl();
+    values.putSingle("key1", "string constructor test");
+    StringConstructor o1 = (StringConstructor) t.createValue("key1", values, null);
+    assertEquals("string constructor test", o1.getValue());
+    values.clear();
+    o1 = (StringConstructor) t.createValue("key1", values, "default value");
+    assertEquals("default value", o1.getValue());
   }
 
-  private static class My {
+  public static class StringConstructor {
+    private String value;
 
-    private String s;
-
-    public My(String s) {
-      this.s = s;
+    public StringConstructor(String value) {
+      this.value = value;
     }
 
-    public String getString() {
-      return s;
+    public String getValue() {
+      return value;
     }
   }
 

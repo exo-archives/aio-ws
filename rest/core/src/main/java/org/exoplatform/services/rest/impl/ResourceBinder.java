@@ -25,6 +25,10 @@ import java.util.Iterator;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.RuntimeDelegate;
 
@@ -32,7 +36,6 @@ import org.apache.commons.logging.Log;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.rest.Filter;
 import org.exoplatform.services.rest.ObjectFactory;
 import org.exoplatform.services.rest.PerRequestObjectFactory;
 import org.exoplatform.services.rest.SingletonObjectFactory;
@@ -85,7 +88,7 @@ public final class ResourceBinder {
   };
 
   /**
-   * Collection of root resource descriptors.
+   * Root resource descriptors.
    */
   private final List<ObjectFactory<AbstractResourceDescriptor>> rootResources = new ArrayList<ObjectFactory<AbstractResourceDescriptor>>();
 
@@ -94,11 +97,14 @@ public final class ResourceBinder {
    */
   private final ResourceDescriptorVisitor                       rdv           = ResourceDescriptorValidator.getInstance();
 
+  private final ProviderBinder                                  providers;
+
+  private int                                                   size          = 0;
+
   /**
    * @see RuntimeDelegate
-   * @see RuntimeDelegateImpl
    */
-  private final RuntimeDelegateImpl                             rd;
+  private final RuntimeDelegate                                 rd;
 
   /**
    * @param containerContext eXo container context
@@ -111,6 +117,8 @@ public final class ResourceBinder {
     // TODO better solution to initialize RuntimeDelegate
     rd = new RuntimeDelegateImpl();
     RuntimeDelegate.setInstance(rd);
+    providers = ProviderBinder.getInstance();
+    
     ExoContainer container = containerContext.getContainer();
 
     // Lookup Applications
@@ -135,22 +143,44 @@ public final class ResourceBinder {
    * @param application Application
    * @see Application
    */
-  public synchronized void addApplication(Application application) {
+  @SuppressWarnings("unchecked")
+  public void addApplication(Application application) {
     for (Object obj : application.getSingletons()) {
-      if (obj.getClass().getAnnotation(Provider.class) != null)
-        rd.addProviderInstance(obj); // singleton provider
-      else if (obj.getClass().getAnnotation(Filter.class) != null)
-        rd.addFilterInstance(obj); // singleton filter
-      else
+      if (obj.getClass().getAnnotation(Provider.class) != null) {
+        // singleton provider
+        if (obj instanceof ContextResolver) {
+          providers.addContextResolver((ContextResolver) obj);
+        }
+        if (obj instanceof ExceptionMapper) {
+          providers.addExceptionMapper((ExceptionMapper) obj);
+        }
+        if (obj instanceof MessageBodyReader) {
+          providers.addMessageBodyReader((MessageBodyReader) obj);
+        }
+        if (obj instanceof MessageBodyWriter) {
+          providers.addMessageBodyWriter((MessageBodyWriter) obj);
+        }
+      } else {
         bind(obj); // singleton resource
+      }
     }
-    for (Class<?> clazz : application.getClasses()) {
+    for (Class clazz : application.getClasses()) {
       if (clazz.getAnnotation(Provider.class) != null)
-        rd.addProvider(clazz); // per-request provider
-      else if (clazz.getAnnotation(Filter.class) != null)
-        rd.addFilter(clazz); // per-request filter
-      else
+        // per-request provider
+        if (ContextResolver.class.isAssignableFrom(clazz)) {
+          providers.addContextResolver(clazz);
+        }
+      if (ExceptionMapper.class.isAssignableFrom(clazz)) {
+        providers.addExceptionMapper(clazz);
+      }
+      if (MessageBodyReader.class.isAssignableFrom(clazz)) {
+        providers.addMessageBodyReader(clazz);
+      }
+      if (MessageBodyWriter.class.isAssignableFrom(clazz)) {
+        providers.addMessageBodyWriter(clazz);
+      } else {
         bind(clazz); // per-request resource
+      }
     }
   }
 
@@ -163,7 +193,7 @@ public final class ResourceBinder {
    * @return true if resource was bound and false if resource was not bound
    *         cause it is not root resource
    */
-  public synchronized boolean bind(final Object resource) {
+  public boolean bind(final Object resource) {
     final Path path = resource.getClass().getAnnotation(Path.class);
 
     AbstractResourceDescriptor descriptor = null;
@@ -191,25 +221,28 @@ public final class ResourceBinder {
       return false;
     }
 
-    // check does exist other resource with the same URI pattern
-    for (ObjectFactory<AbstractResourceDescriptor> exist : getResourceFactories()) {
-      if (exist.getObjectModel().getUriPattern().equals(descriptor.getUriPattern())) {
-        String msg = "Resource class " + descriptor.getObjectClass().getName()
-            + " can't be registered. Resource class " + exist.getClass().getName()
-            + " with the same pattern " + exist.getObjectModel().getUriPattern()
-            + " already registered.";
-        LOG.warn(msg);
-        return false;
+    synchronized (rootResources) {
+      // check does exist other resource with the same URI pattern
+      for (ObjectFactory<AbstractResourceDescriptor> exist : rootResources) {
+        if (exist.getObjectModel().getUriPattern().equals(descriptor.getUriPattern())) {
+          String msg = "Resource class " + descriptor.getObjectClass().getName()
+              + " can't be registered. Resource class " + exist.getClass().getName()
+              + " with the same pattern " + exist.getObjectModel().getUriPattern().getTemplate()
+              + " already registered.";
+          LOG.warn(msg);
+          return false;
+        }
       }
-    }
 
-    // Singleton resource
-    ObjectFactory<AbstractResourceDescriptor> res = new SingletonObjectFactory<AbstractResourceDescriptor>(descriptor,
-                                                                                                           resource);
-    getResourceFactories().add(res);
-    Collections.sort(getResourceFactories(), RESOURCE_COMPARATOR);
-    LOG.info("Bind new resource " + res.getObjectModel().getUriPattern().getTemplate() + " : "
-        + descriptor.getObjectClass());
+      // Singleton resource
+      ObjectFactory<AbstractResourceDescriptor> res = new SingletonObjectFactory<AbstractResourceDescriptor>(descriptor,
+                                                                                                             resource);
+      rootResources.add(res);
+      Collections.sort(rootResources, RESOURCE_COMPARATOR);
+      LOG.info("Bind new resource " + res.getObjectModel().getUriPattern().getTemplate() + " : "
+          + descriptor.getObjectClass());
+    }
+    size++;
     return true;
   }
 
@@ -218,7 +251,7 @@ public final class ResourceBinder {
    * @return true if resource was bound and false if resource was not bound
    *         cause it is not root resource
    */
-  public synchronized boolean bind(final Class<?> resourceClass) {
+  public boolean bind(final Class<?> resourceClass) {
     final Path path = resourceClass.getAnnotation(Path.class);
 
     AbstractResourceDescriptor descriptor = null;
@@ -246,26 +279,28 @@ public final class ResourceBinder {
       return false;
     }
 
-    // check does exist other resource with the same URI pattern
-    for (ObjectFactory<AbstractResourceDescriptor> exist : getResourceFactories()) {
-      AbstractResourceDescriptor existDescriptor = exist.getObjectModel();
-      if (exist.getObjectModel().getUriPattern().equals(descriptor.getUriPattern())) {
+    synchronized (rootResources) {
+      // check does exist other resource with the same URI pattern
+      for (ObjectFactory<AbstractResourceDescriptor> exist : rootResources) {
+        AbstractResourceDescriptor existDescriptor = exist.getObjectModel();
+        if (exist.getObjectModel().getUriPattern().equals(descriptor.getUriPattern())) {
 
-        String msg = "Resource class " + descriptor.getObjectClass().getName()
-            + " can't be registered. Resource class " + existDescriptor.getObjectClass().getName()
-            + " with the same pattern " + exist.getObjectModel().getUriPattern().getTemplate()
-            + " already registered.";
-        LOG.warn(msg);
-        return false;
+          String msg = "Resource class " + descriptor.getObjectClass().getName()
+              + " can't be registered. Resource class "
+              + existDescriptor.getObjectClass().getName() + " with the same pattern "
+              + exist.getObjectModel().getUriPattern().getTemplate() + " already registered.";
+          LOG.warn(msg);
+          return false;
+        }
       }
+      // per-request resource
+      ObjectFactory<AbstractResourceDescriptor> res = new PerRequestObjectFactory<AbstractResourceDescriptor>(descriptor);
+      rootResources.add(res);
+      Collections.sort(rootResources, RESOURCE_COMPARATOR);
+      LOG.info("Bind new resource " + res.getObjectModel().getUriPattern().getRegex() + " : "
+          + resourceClass);
     }
-
-    // per-request resource
-    ObjectFactory<AbstractResourceDescriptor> res = new PerRequestObjectFactory<AbstractResourceDescriptor>(descriptor);
-    getResourceFactories().add(res);
-    Collections.sort(getResourceFactories(), RESOURCE_COMPARATOR);
-    LOG.info("Bind new resource " + res.getObjectModel().getUriPattern().getRegex() + " : "
-        + resourceClass);
+    size++;
     return true;
   }
 
@@ -276,44 +311,73 @@ public final class ResourceBinder {
    * @return true if resource was unbound false otherwise
    */
   @SuppressWarnings("unchecked")
-  public synchronized boolean unbind(Class clazz) {
-    Iterator<ObjectFactory<AbstractResourceDescriptor>> i = getResourceFactories().iterator();
-
-    while (i.hasNext()) {
-      ObjectFactory<AbstractResourceDescriptor> res = i.next();
-      Class c = res.getObjectModel().getObjectClass();
-      if (clazz.equals(c)) {
-        i.remove();
-        LOG.info("Remove ResourceContainer " + res.getObjectModel().getUriPattern().getRegex()
-            + " : " + c);
-        return true;
+  public boolean unbind(Class clazz) {
+    synchronized (rootResources) {
+      Iterator<ObjectFactory<AbstractResourceDescriptor>> i = rootResources.iterator();
+      while (i.hasNext()) {
+        ObjectFactory<AbstractResourceDescriptor> res = i.next();
+        Class c = res.getObjectModel().getObjectClass();
+        if (clazz.equals(c)) {
+          i.remove();
+          LOG.info("Remove ResourceContainer " + res.getObjectModel().getUriPattern().getTemplate()
+              + " : " + c);
+          size--;
+          return true;
+        }
       }
+      return false;
     }
-    return false;
+  }
+
+  public boolean unbind(String uriTemplate) {
+    synchronized (rootResources) {
+      Iterator<ObjectFactory<AbstractResourceDescriptor>> i = rootResources.iterator();
+      while (i.hasNext()) {
+        ObjectFactory<AbstractResourceDescriptor> res = i.next();
+        String t = res.getObjectModel().getUriPattern().getTemplate();
+        if (t.equals(uriTemplate)) {
+          i.remove();
+          LOG.info("Remove ResourceContainer " + res.getObjectModel().getUriPattern().getTemplate());
+          size--;
+          return true;
+        }
+      }
+      return false;
+    }
   }
 
   /**
    * Clear the list of ResourceContainer description.
    */
   public void clear() {
-    getResourceFactories().clear();
+    rootResources.clear();
+    size = 0;
   }
 
   /**
    * @return all registered root resources
    */
-  public List<ObjectFactory<AbstractResourceDescriptor>> getResourceFactories() {
+  public List<ObjectFactory<AbstractResourceDescriptor>> getResources() {
     return rootResources;
+  }
+
+  /**
+   * @return number of bound resources
+   */
+  public int getSize() {
+    return size;
   }
 
   /**
    * @return all registered root resources
    */
   @Deprecated
-  public synchronized List<AbstractResourceDescriptor> getRootResources() {
+  public List<AbstractResourceDescriptor> getRootResources() {
     List<AbstractResourceDescriptor> l = new ArrayList<AbstractResourceDescriptor>(rootResources.size());
-    for (ObjectFactory<AbstractResourceDescriptor> f : rootResources)
-      l.add(f.getObjectModel());
+    synchronized (rootResources) {
+      for (ObjectFactory<AbstractResourceDescriptor> f : rootResources)
+        l.add(f.getObjectModel());
+    }
     return l;
   }
 

@@ -20,11 +20,12 @@ package org.exoplatform.services.rest.impl.resource;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.exoplatform.services.rest.ConstructorInjector;
+import org.exoplatform.services.rest.ConstructorDescriptor;
 import org.exoplatform.services.rest.FieldInjector;
 import org.exoplatform.services.rest.FilterDescriptor;
 import org.exoplatform.services.rest.ObjectModel;
@@ -37,7 +38,6 @@ import org.exoplatform.services.rest.resource.AbstractResourceDescriptor;
 import org.exoplatform.services.rest.resource.ResourceMethodMap;
 import org.exoplatform.services.rest.resource.SubResourceLocatorDescriptor;
 import org.exoplatform.services.rest.resource.SubResourceMethodDescriptor;
-import org.exoplatform.services.rest.util.RawTypeUtil;
 
 /**
  * Validate ResourceDescriptors. @see
@@ -73,25 +73,18 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
   /**
    * Visitor instance.
    */
-  private static ResourceDescriptorVisitor instance = null;
-
-  /**
-   * Lock.
-   */
-  private static Object                    lock     = new Object();
+  private static AtomicReference<ResourceDescriptorValidator > instance = new AtomicReference<ResourceDescriptorValidator >();
 
   /**
    * @return singleton instance of ResourceDescriptorVisitor
    */
-  public static ResourceDescriptorVisitor getInstance() {
-    if (instance == null) {
-      synchronized (lock) {
-        if (instance == null) {
-          instance = new ResourceDescriptorValidator();
-        }
-      }
+  public static ResourceDescriptorValidator getInstance() {
+    ResourceDescriptorValidator t = instance.get();
+    if (t == null) {
+      instance.compareAndSet(null, new ResourceDescriptorValidator());
+      t = instance.get();
     }
-    return instance;
+    return t;
   }
 
   /**
@@ -255,8 +248,8 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
    */
   private static boolean checkGenericType(Type type) {
     if (type instanceof ParameterizedType) {
-      
-      Type[] genericTypes = RawTypeUtil.getActualTypes(type);
+      ParameterizedType pt = (ParameterizedType) type;
+      Type[] genericTypes = pt.getActualTypeArguments();
       if (genericTypes.length == 2) {
         try {
           return (String.class == (Class<?>) genericTypes[0])
@@ -275,7 +268,7 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
   /**
    * {@inheritDoc}
    */
-  public void visitConstructorInjector(ConstructorInjector ci) {
+  public void visitConstructorInjector(ConstructorDescriptor ci) {
     // currently nothing to do, should be already valid
   }
 
@@ -301,7 +294,7 @@ public class ResourceDescriptorValidator implements ResourceDescriptorVisitor {
   }
   
   protected void checkObjectModel(ObjectModel model) {
-    for (ConstructorInjector c : model.getConstructorInjectors())
+    for (ConstructorDescriptor c : model.getConstructorInjectors())
       c.accept(this);
     for (FieldInjector f : model.getFieldInjectors())
       f.accept(this);
