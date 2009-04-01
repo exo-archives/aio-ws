@@ -13,8 +13,8 @@
   <dependencies>
     <dependency>
       <groupId>net.oauth</groupId>
-      <artifactId>net.oauth.core</artifactId>
-      <version>20080229</version>
+      <artifactId>core</artifactId>
+      <version>20080328</version>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
