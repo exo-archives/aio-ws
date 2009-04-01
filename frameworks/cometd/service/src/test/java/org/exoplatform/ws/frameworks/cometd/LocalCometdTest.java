@@ -104,7 +104,7 @@ public class LocalCometdTest extends TestCase {
     super.setUp();
     Document document = DocumentBuilderFactory.newInstance()
                                               .newDocumentBuilder()
-                                              .parse("src/test/java/conf/test-configuration.xml");
+                                              .parse("src/test/java/conf/cometd-test-conf.xml");
     Node cont = document.getElementsByTagName("container").item(0);
     NamedNodeMap map = cont.getAttributes();
     startContainer = Boolean.parseBoolean(map.getNamedItem("containerStart").getTextContent());
