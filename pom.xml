@@ -10,13 +10,13 @@
   <groupId>org.exoplatform.ws</groupId>
   <artifactId>config</artifactId>
   <name>eXo WS Config</name>
-  <version>2.0.1</version>
+  <version>2.0.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <scm>
-    <connection>scm:svn:http://svn.exoplatform.org/svnroot/exoplatform/projects/ws/tags/2.0.1</connection>
-    <developerConnection>scm:svn:http://svn.exoplatform.org/svnroot/exoplatform/projects/ws/tags/2.0.1</developerConnection>
-    <url>http://fisheye.exoplatform.org/browse/projects-ws/tags/2.0.1</url>
+    <connection>scm:svn:http://svn.exoplatform.org/svnroot/exoplatform/projects/ws/trunk</connection>
+    <developerConnection>scm:svn:http://svn.exoplatform.org/svnroot/exoplatform/projects/ws/trunk</developerConnection>
+    <url>http://fisheye.exoplatform.org/browse/projects-ws/trunk</url>
   </scm>
  
   <modules>
