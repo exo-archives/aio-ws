@@ -105,7 +105,7 @@
               <sourceRoot>${basedir}/target/generated-source</sourceRoot>
               <wsdlOptions>
                 <wsdlOption>
-                  <wsdl>${basedir}/src/main/java/wsdl/TicketOrderServicePort.xml</wsdl>
+                  <wsdl>${basedir}/src/main/java/wsdl/TicketOrderService.wsdl</wsdl>
                   <extraargs>
                     <extraarg>-p</extraarg>
                     <extraarg>org.exoplatform.services.ws.soap.jsr181</extraarg>
