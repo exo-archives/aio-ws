@@ -146,6 +146,16 @@ public interface ExtHttpHeaders extends HttpHeaders {
    * Authoring</a> section 9 for more information.
    */
   public static final String OVERWRITE              = "Overwrite";
+  
+  /**
+   * JCR-specific header to add an opportunity to create nodes with a specific nodetype.
+   */
+  public static final String CONTENT_NODETYPE = "Content-nodetype";
+  
+  /**
+   * JCR-specific header to add an opportunity to set node mixins via WebDAV.
+   */
+  public static final String CONTENT_MIXINTYPES = "Content-mixins";
 
   /**
    * X-HTTP-Method-Override header. See <a
