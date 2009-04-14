@@ -95,7 +95,9 @@ public interface ExtHttpHeaders extends HttpHeaders {
 
   /**
    * JCR "Nodetype" header.
+   * Replaced with CONTENT_NODETYPE header.
    */
+  @Deprecated
   public static final String NODETYPE               = "NodeType";
 
   /**
@@ -113,8 +115,9 @@ public interface ExtHttpHeaders extends HttpHeaders {
   public static final String DESTINATION            = "Destination";
 
   /**
-   * JCR "MixType" header.
+   * JCR "MixType" header. Replaced with CONTENT_MIXINTYPES header.
    */
+  @Deprecated
   public static final String MIXTYPE                = "MixType";
 
   /**
@@ -146,16 +149,17 @@ public interface ExtHttpHeaders extends HttpHeaders {
    * Authoring</a> section 9 for more information.
    */
   public static final String OVERWRITE              = "Overwrite";
-  
-  /**
-   * JCR-specific header to add an opportunity to create nodes with a specific nodetype.
-   */
-  public static final String CONTENT_NODETYPE = "Content-nodetype";
-  
+
   /**
    * JCR-specific header to add an opportunity to set node mixins via WebDAV.
    */
-  public static final String CONTENT_MIXINTYPES = "Content-mixins";
+  public static final String CONTENT_MIXINTYPES     = "Content-MixinsTypes";
+
+  /**
+   * JCR-specific header to add an opportunity to create nodes of the specific
+   * types via WebDAV.
+   */
+  public static final String CONTENT_NODETYPE       = "Content-NodeTypes";
 
   /**
    * X-HTTP-Method-Override header. See <a
@@ -165,14 +169,16 @@ public interface ExtHttpHeaders extends HttpHeaders {
 
   /**
    * User-Agent header. See <a
-   * href='http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html'> HTTP Header Field Definitions sec. 14.43 Transfer-Encoding</a>.
+   * href='http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html'> HTTP Header
+   * Field Definitions sec. 14.43 Transfer-Encoding</a>.
    */
   public static final String USERAGENT              = "User-Agent";
-  
+
   /**
    * Transfer-Encoding header. See <a
-   * href='http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html'> HTTP Header Field Definitions sec. 14.41 Transfer-Encoding</a>.
+   * href='http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html'> HTTP Header
+   * Field Definitions sec. 14.41 Transfer-Encoding</a>.
    */
-  public static final String TRANSFER_ENCODING = "Transfer-Encoding";
+  public static final String TRANSFER_ENCODING      = "Transfer-Encoding";
 
 }
