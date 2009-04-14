@@ -36,5 +36,6 @@ $M2_REPO/org/jdom/jdom/1.0/jdom-1.0.jar:\
 $M2_REPO/commons-httpclient/commons-httpclient/3.1/commons-httpclient-3.1.jar:\
 $M2_REPO/commons-codec/commons-codec/1.2/commons-codec-1.2.jar:\
 $M2_REPO/com/sun/xml/stream/sjsxp/1.0/sjsxp-1.0.jar \
-org.exoplatform.services.ws.soap.jsr181.TicketOrderService_TicketOrderServicePort_Client ./src/main/java/wsdl/TicketOrderService.wsdl
+org.exoplatform.services.ws.soap.jsr181.TicketOrderService_TicketOrderServicePort_Client
+#./src/main/java/wsdl/TicketOrderService.wsdl
 
