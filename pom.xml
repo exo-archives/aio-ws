@@ -259,7 +259,7 @@
       </activation>
       <properties>
         <org.exoplatform.kernel.version>2.1.1</org.exoplatform.kernel.version>
-        <org.exoplatform.core.version>2.2.1-SNAPSHOT</org.exoplatform.core.version>
+        <org.exoplatform.core.version>2.2.1</org.exoplatform.core.version>
       </properties>
     </profile>
   </profiles>
