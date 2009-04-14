@@ -120,7 +120,7 @@
             <!-- copy todir="${basedir}/target/client/" verbose="true" overwrite="true">
               <fileset dir="${basedir}/client/" includes="*.*" />
             </copy -->
-            <jar destfile="${basedir}/target/exo.ws.soap.cxf.jsr181.samples.client-${org.exoplatform.ws.version}.jar">
+            <jar destfile="${basedir}/target/exo.ws.soap.cxf.jsr181.samples.client-${project.version}.jar">
               <fileset dir="${basedir}/target/generated" includes="**/*.class" />
             </jar>
           </tasks>

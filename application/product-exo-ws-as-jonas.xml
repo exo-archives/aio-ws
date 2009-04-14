@@ -81,7 +81,7 @@
             </copy>
             <!--copying jars-->
             <copy todir="${exo.projects.directory.working}/exo-jonas/lib/apps/" verbose="true" overwrite="true">
-              <fileset dir="${basedir}/target/lib-${org.exoplatform.ws.version}.dir">
+              <fileset dir="${basedir}/target/lib-${project.version}.dir">
                 <exclude name="**/*.war" />
               </fileset>
 	    </copy>
@@ -103,7 +103,7 @@
 	    
             <!--copying wars -->
             <copy todir="${exo.projects.directory.working}/exo-jonas/apps/autoload/exoplatform.ear/" verbose="true" flatten="true" overwrite="true">
-              <fileset dir="${basedir}/target/lib-${org.exoplatform.ws.version}.dir/" casesensitive="yes">
+              <fileset dir="${basedir}/target/lib-${project.version}.dir/" casesensitive="yes">
                 <include name="**/*.war" />
               </fileset>
             </copy>

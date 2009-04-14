@@ -60,40 +60,40 @@
         <configuration>
           <tasks>
             <!--delete>
-              <fileset dir="${basedir}/target/lib-${org.exoplatform.ws.version}.dir/"></fileset>
+              <fileset dir="${basedir}/target/lib-${project.version}.dir/"></fileset>
               </delete-->
             <delete dir="${exo.projects.directory.working}/exo-tomcat" includeEmptyDirs="true" quiet="yes" />
             <copy todir="${exo.projects.directory.working}/exo-tomcat" verbose="false" overwrite="true">
               <fileset dir="${exo.projects.directory.dependencies}/${exo.projects.app.tomcat.version}" />
             </copy>
             <copy todir="${exo.projects.directory.working}/exo-tomcat/lib/" verbose="true" overwrite="true">
-              <fileset dir="${basedir}/target/lib-${org.exoplatform.ws.version}.dir/" excludes="**/*.war" />
+              <fileset dir="${basedir}/target/lib-${project.version}.dir/" excludes="**/*.war" />
             </copy>
 	    
-            <move todir="${basedir}/target/lib-${org.exoplatform.ws.version}.dir/">
-              <fileset dir="${basedir}/target/lib-${org.exoplatform.ws.version}.dir/">
+            <move todir="${basedir}/target/lib-${project.version}.dir/">
+              <fileset dir="${basedir}/target/lib-${project.version}.dir/">
                 <include name="**/*.war" />
               </fileset>
               <mapper>
                 <chainedmapper>
                   <flattenmapper />
-                  <globmapper from="exo.ws.application.webapps-${org.exoplatform.ws.version}.war" to="ws-examples.war" casesensitive="no" />
+                  <globmapper from="exo.ws.application.webapps-${project.version}.war" to="ws-examples.war" casesensitive="no" />
                 </chainedmapper>
                 <chainedmapper>
                   <flattenmapper />
-                  <globmapper from="exo.ws.security.oauth.provider.webapp-${org.exoplatform.ws.version}.war" to="oauthprovider.war" casesensitive="no" />
+                  <globmapper from="exo.ws.security.oauth.provider.webapp-${project.version}.war" to="oauthprovider.war" casesensitive="no" />
                 </chainedmapper>
               </mapper>
             </move>
 	    
             <copy todir="${exo.projects.directory.working}/exo-tomcat/webapps/" verbose="true" overwrite="true">
-              <fileset dir="${basedir}/target/lib-${org.exoplatform.ws.version}.dir/" includes="**/*.war" />
+              <fileset dir="${basedir}/target/lib-${project.version}.dir/" includes="**/*.war" />
             </copy>
             <copy todir="${exo.projects.directory.working}/exo-tomcat/" verbose="true" overwrite="true">
               <fileset dir="${basedir}/assembly/tomcat" />
             </copy>
-            <move todir="${basedir}/target/lib-${org.exoplatform.ws.version}.dir/">
-              <fileset dir="${basedir}/target/lib-${org.exoplatform.ws.version}.dir/">
+            <move todir="${basedir}/target/lib-${project.version}.dir/">
+              <fileset dir="${basedir}/target/lib-${project.version}.dir/">
                 <include name="**/*.war" />
               </fileset>
               <mapper>
@@ -104,7 +104,7 @@
               </mapper>
             </move>
             <copy todir="${exo.projects.directory.working}/exo-tomcat/webapps/" verbose="true" flatten="true" overwrite="true">
-              <fileset dir="${basedir}/target/lib-${org.exoplatform.ws.version}.dir/" casesensitive="yes">
+              <fileset dir="${basedir}/target/lib-${project.version}.dir/" casesensitive="yes">
                 <include name="**/*.war" />
               </fileset>
             </copy>

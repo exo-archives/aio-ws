@@ -1,4 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <parent>
+    <groupId>org.exoplatform</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.1.1</version>
+  </parent>
+
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.exoplatform.ws</groupId>
   <artifactId>config</artifactId>
@@ -9,6 +16,7 @@
   <scm>
     <connection>scm:svn:http://svn.exoplatform.org/svnroot/exoplatform/projects/ws/trunk</connection>
     <developerConnection>scm:svn:http://svn.exoplatform.org/svnroot/exoplatform/projects/ws/trunk</developerConnection>
+    <url>http://fisheye.exoplatform.org/browse/projects-ws/trunk</url>
   </scm>
  
   <modules>
@@ -46,12 +54,8 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
 
-<!--  <sourceDirectory>src/main/java</sourceDirectory>-->
-<!--  <outputDirectory>target/classes</outputDirectory>-->
-<!--  <testSourceDirectory>src/test/java</testSourceDirectory>-->
-<!--  <testOutputDirectory>target/test-classes</testOutputDirectory>-->
+  <build>
     <resources>
       <resource>
         <directory>src/main/java</directory>
@@ -110,15 +114,6 @@
       </testResource>
     </testResources>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-          <optimize>${exo.compile.optimize}</optimize>
-        </configuration>
-      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -228,6 +223,7 @@
       </plugin>
     </plugins>
   </build>
+
   <reporting>
     <plugins>
       <plugin>
@@ -240,6 +236,7 @@
       </plugin>
     </plugins>
   </reporting>
+
   <profiles>
     <profile>
       <id>default</id>
@@ -250,10 +247,8 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <org.exoplatform.tool.version>trunk</org.exoplatform.tool.version>
-        <org.exoplatform.kernel.version>2.1.1-SNAPSHOT</org.exoplatform.kernel.version>
+        <org.exoplatform.kernel.version>2.1.1</org.exoplatform.kernel.version>
         <org.exoplatform.core.version>2.2.1-SNAPSHOT</org.exoplatform.core.version>
-        <org.exoplatform.ws.version>2.0.1-SNAPSHOT</org.exoplatform.ws.version>
       </properties>
     </profile>
   </profiles>

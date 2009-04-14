@@ -58,7 +58,7 @@
               <fileset dir="${exo.projects.directory.dependencies}/${exo.projects.app.jboss.version}" />
             </copy>
             <copy todir="${exo.projects.directory.working}/exo-jboss/server/default/deploy/exoplatform.sar/" verbose="true" overwrite="true">
-              <fileset dir="${basedir}/target/lib-${org.exoplatform.ws.version}.dir/" excludes="**/*.war" />
+              <fileset dir="${basedir}/target/lib-${project.version}.dir/" excludes="**/*.war" />
             </copy>
 
             <copy todir="${exo.projects.directory.working}/exo-jboss/server/default/deploy/" verbose="true" overwrite="true">
@@ -69,24 +69,24 @@
               <fileset dir="${basedir}/assembly/jboss/" includes="*.xml" />
             </copy>
 
-            <move todir="${basedir}/target/lib-${org.exoplatform.ws.version}.dir/">
-              <fileset dir="${basedir}/target/lib-${org.exoplatform.ws.version}.dir/">
+            <move todir="${basedir}/target/lib-${project.version}.dir/">
+              <fileset dir="${basedir}/target/lib-${project.version}.dir/">
                 <include name="**/*.war" />
               </fileset>
               <mapper>
                 <chainedmapper>
                   <flattenmapper />
-                  <globmapper from="exo.ws.application.webapps-${org.exoplatform.ws.version}.war" to="ws-examples.war" casesensitive="no" />
+                  <globmapper from="exo.ws.application.webapps-${project.version}.war" to="ws-examples.war" casesensitive="no" />
                 </chainedmapper>
                 <chainedmapper>
                   <flattenmapper />
-                  <globmapper from="exo.ws.security.oauth.provider.webapp-${org.exoplatform.ws.version}.war" to="oauthprovider.war" casesensitive="no" />
+                  <globmapper from="exo.ws.security.oauth.provider.webapp-${project.version}.war" to="oauthprovider.war" casesensitive="no" />
                 </chainedmapper>
               </mapper>
             </move>
 
             <copy todir="${exo.projects.directory.working}/exo-jboss/server/default/deploy/exoplatform.sar" verbose="true" flatten="true" overwrite="true">
-              <fileset dir="${basedir}/target/lib-${org.exoplatform.ws.version}.dir/" casesensitive="yes">
+              <fileset dir="${basedir}/target/lib-${project.version}.dir/" casesensitive="yes">
                 <include name="**/*.war" />
               </fileset>
             </copy>
