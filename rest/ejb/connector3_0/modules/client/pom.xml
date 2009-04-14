@@ -2,12 +2,12 @@
   <parent>
     <groupId>org.exoplatform.ws</groupId>
     <artifactId>config</artifactId>
-    <version>2.0.1-SNAPSHOT</version>
+    <version>2.0.1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.exoplatform.ws</groupId>
   <artifactId>exo.ws.rest.ejbconnector3_0.client</artifactId>
-  <version>2.0.1-SNAPSHOT</version>
+  <version>2.0.1</version>
   <name>eXo WS EJB-REST connector ejb3.0 Client</name>
   <description />
 
@@ -15,7 +15,7 @@
     <dependency>
       <groupId>org.exoplatform.ws</groupId>
       <artifactId>exo.ws.rest.ejbconnector3_0.bean</artifactId>
-      <version>2.0.1-SNAPSHOT</version>
+      <version>2.0.1</version>
     </dependency>
   </dependencies>
   <build>
