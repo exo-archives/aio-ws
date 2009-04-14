@@ -26,14 +26,12 @@
     <module>frameworks/cometd</module>
     <module>rest/core</module>
     <module>rest/ext</module>
-    <!--
     <module>rest/ejb/connector2_1/modules/connector</module>
     <module>rest/ejb/connector2_1/modules/client</module>
     <module>rest/ejb/connector2_1</module>
     <module>rest/ejb/connector3_0/modules/connector</module>
     <module>rest/ejb/connector3_0/modules/client</module>
     <module>rest/ejb/connector3_0</module>
-    -->
     <module>soap/jsr181</module>
     <module>security/oauth/consumer</module>
     <module>security/oauth/provider/service</module>
@@ -260,8 +258,8 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <org.exoplatform.kernel.version>2.1.1</org.exoplatform.kernel.version>
-        <org.exoplatform.core.version>2.2.1</org.exoplatform.core.version>
+        <org.exoplatform.kernel.version>2.1.2-SNAPSHOT</org.exoplatform.kernel.version>
+        <org.exoplatform.core.version>2.2.2-SNAPSHOT</org.exoplatform.core.version>
       </properties>
     </profile>
   </profiles>
