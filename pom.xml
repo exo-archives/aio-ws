@@ -13,6 +13,11 @@
   <version>2.0.1</version>
   <packaging>pom</packaging>
 
+  <properties>
+    <exo.product.name>exo-ws</exo.product.name>
+    <exo.product.specification>2.0</exo.product.specification>
+  </properties>
+
   <scm>
     <connection>scm:svn:http://svn.exoplatform.org/svnroot/exoplatform/projects/ws/tags/2.0.1</connection>
     <developerConnection>scm:svn:http://svn.exoplatform.org/svnroot/exoplatform/projects/ws/tags/2.0.1</developerConnection>
