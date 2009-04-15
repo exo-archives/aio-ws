@@ -5,7 +5,7 @@
     <version>2.0.2-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.exoplatform.jcr</groupId>
+  <groupId>org.exoplatform.ws</groupId>
   <artifactId>exo.ws.rest.ejbconnector3_0</artifactId>
   <name>eXo WS EJB-REST connector ejb3.0 EAR</name>
   <version>2.0.2-SNAPSHOT</version>
