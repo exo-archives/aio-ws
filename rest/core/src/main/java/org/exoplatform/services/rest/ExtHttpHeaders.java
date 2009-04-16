@@ -94,13 +94,6 @@ public interface ExtHttpHeaders extends HttpHeaders {
   public static final String MSAUTHORVIA            = "MS-Author-Via";
 
   /**
-   * JCR "Nodetype" header.
-   * Replaced with CONTENT_NODETYPE header.
-   */
-  @Deprecated
-  public static final String NODETYPE               = "NodeType";
-
-  /**
    * HTTP 1.1 "Range" header. See <a
    * href='http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html'> HTTP/1.1
    * section 14 "Header Field Definitions"</a> for more information.
@@ -113,12 +106,6 @@ public interface ExtHttpHeaders extends HttpHeaders {
    * Authoring</a> section 9 for more information.
    */
   public static final String DESTINATION            = "Destination";
-
-  /**
-   * JCR "MixType" header. Replaced with CONTENT_MIXINTYPES header.
-   */
-  @Deprecated
-  public static final String MIXTYPE                = "MixType";
 
   /**
    * WebDav "DAV" header. See <a href='http://www.ietf.org/rfc/rfc2518.txt'>
@@ -151,15 +138,21 @@ public interface ExtHttpHeaders extends HttpHeaders {
   public static final String OVERWRITE              = "Overwrite";
 
   /**
-   * JCR-specific header to add an opportunity to set node mixins via WebDAV.
+   * JCR-specific header to add an opportunity to create nodes of the specific
+   * types via WebDAV.
    */
-  public static final String CONTENT_MIXINTYPES     = "Content-MixinsTypes";
+  public static final String FILE_NODETYPE          = "File-NodeType";
 
   /**
    * JCR-specific header to add an opportunity to create nodes of the specific
    * types via WebDAV.
    */
-  public static final String CONTENT_NODETYPE       = "Content-NodeTypes";
+  public static final String CONTENT_NODETYPE       = "Content-NodeType";
+
+  /**
+   * JCR-specific header to add an opportunity to set node mixins via WebDAV.
+   */
+  public static final String CONTENT_MIXINTYPES     = "Content-MixinTypes";
 
   /**
    * X-HTTP-Method-Override header. See <a
