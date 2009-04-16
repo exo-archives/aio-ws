@@ -18,6 +18,11 @@
     <developerConnection>scm:svn:http://svn.exoplatform.org/svnroot/exoplatform/projects/ws/trunk</developerConnection>
     <url>http://fisheye.exoplatform.org/browse/projects-ws/trunk</url>
   </scm>
+  
+  <properties>
+    <exo.product.name>exo-ws</exo.product.name>
+    <exo.product.specification>2.0</exo.product.specification>
+  </properties>
  
   <modules>
     <module>commons</module>
