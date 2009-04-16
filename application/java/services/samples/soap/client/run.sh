@@ -6,19 +6,19 @@ fi
 echo $M2_REPO
 
 java -cp ./target/exo.ws.application.soap.cxf.samples.client-2.0.1.jar:\
-$M2_REPO/org/apache/cxf/cxf-api/2.1.4/cxf-api-2.1.4.jar:\
-$M2_REPO/org/apache/cxf/cxf-rt-transports-http/2.1.4/cxf-rt-transports-http-2.1.4.jar:\
-$M2_REPO/org/apache/cxf/cxf-tools-wsdlto-core/2.1.4/cxf-tools-wsdlto-core-2.1.4.jar:\
-$M2_REPO/org/apache/cxf/cxf-tools-java2ws/2.1.4/cxf-tools-java2ws-2.1.4.jar:\
-$M2_REPO/org/apache/cxf/cxf-rt-frontend-jaxws/2.1.4/cxf-rt-frontend-jaxws-2.1.4.jar:\
-$M2_REPO/org/apache/cxf/cxf-common-utilities/2.1.4/cxf-common-utilities-2.1.4.jar:\
-$M2_REPO/org/apache/cxf/cxf-rt-core/2.1.4/cxf-rt-core-2.1.4.jar:\
-$M2_REPO/org/apache/cxf/cxf-rt-bindings-soap/2.1.4/cxf-rt-bindings-soap-2.1.4.jar:\
-$M2_REPO/org/apache/cxf/cxf-tools-common/2.1.4/cxf-tools-common-2.1.4.jar:\
-$M2_REPO/org/apache/cxf/cxf-rt-databinding-jaxb/2.1.4/cxf-rt-databinding-jaxb-2.1.4.jar:\
-$M2_REPO/org/apache/cxf/cxf-rt-transports-http-jetty/2.1.4/cxf-rt-transports-http-jetty-2.1.4.jar:\
-$M2_REPO/org/apache/cxf/cxf-rt-frontend-simple/2.1.4/cxf-rt-frontend-simple-2.1.4.jar:\
-$M2_REPO/org/apache/cxf/cxf-rt-ws-addr/2.1.4/cxf-rt-ws-addr-2.1.4.jar:\
+$M2_REPO/org/apache/cxf/cxf-api/2.1.2/cxf-api-2.1.2.jar:\
+$M2_REPO/org/apache/cxf/cxf-rt-transports-http/2.1.2/cxf-rt-transports-http-2.1.2.jar:\
+$M2_REPO/org/apache/cxf/cxf-tools-wsdlto-core/2.1.2/cxf-tools-wsdlto-core-2.1.2.jar:\
+$M2_REPO/org/apache/cxf/cxf-tools-java2ws/2.1.2/cxf-tools-java2ws-2.1.2.jar:\
+$M2_REPO/org/apache/cxf/cxf-rt-frontend-jaxws/2.1.2/cxf-rt-frontend-jaxws-2.1.2.jar:\
+$M2_REPO/org/apache/cxf/cxf-common-utilities/2.1.2/cxf-common-utilities-2.1.2.jar:\
+$M2_REPO/org/apache/cxf/cxf-rt-core/2.1.2/cxf-rt-core-2.1.2.jar:\
+$M2_REPO/org/apache/cxf/cxf-rt-bindings-soap/2.1.2/cxf-rt-bindings-soap-2.1.2.jar:\
+$M2_REPO/org/apache/cxf/cxf-tools-common/2.1.2/cxf-tools-common-2.1.2.jar:\
+$M2_REPO/org/apache/cxf/cxf-rt-databinding-jaxb/2.1.2/cxf-rt-databinding-jaxb-2.1.2.jar:\
+$M2_REPO/org/apache/cxf/cxf-rt-transports-http-jetty/2.1.2/cxf-rt-transports-http-jetty-2.1.2.jar:\
+$M2_REPO/org/apache/cxf/cxf-rt-frontend-simple/2.1.2/cxf-rt-frontend-simple-2.1.2.jar:\
+$M2_REPO/org/apache/cxf/cxf-rt-ws-addr/2.1.2/cxf-rt-ws-addr-2.1.2.jar:\
 $M2_REPO/org/apache/geronimo/specs/geronimo-jaxws_2.1_spec/1.0/geronimo-jaxws_2.1_spec-1.0.jar:\
 $M2_REPO/org/apache/geronimo/specs/geronimo-ws-metadata_2.0_spec/1.1.2/geronimo-ws-metadata_2.0_spec-1.1.2.jar:\
 $M2_REPO/org/apache/tomcat/annotations-api/6.0.18/annotations-api-6.0.18.jar:\
