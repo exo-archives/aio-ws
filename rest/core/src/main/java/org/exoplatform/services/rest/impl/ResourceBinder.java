@@ -165,19 +165,20 @@ public final class ResourceBinder {
       }
     }
     for (Class clazz : application.getClasses()) {
-      if (clazz.getAnnotation(Provider.class) != null)
+      if (clazz.getAnnotation(Provider.class) != null) {
         // per-request provider
         if (ContextResolver.class.isAssignableFrom(clazz)) {
           providers.addContextResolver(clazz);
         }
-      if (ExceptionMapper.class.isAssignableFrom(clazz)) {
-        providers.addExceptionMapper(clazz);
-      }
-      if (MessageBodyReader.class.isAssignableFrom(clazz)) {
-        providers.addMessageBodyReader(clazz);
-      }
-      if (MessageBodyWriter.class.isAssignableFrom(clazz)) {
-        providers.addMessageBodyWriter(clazz);
+        if (ExceptionMapper.class.isAssignableFrom(clazz)) {
+          providers.addExceptionMapper(clazz);
+        }
+        if (MessageBodyReader.class.isAssignableFrom(clazz)) {
+          providers.addMessageBodyReader(clazz);
+        }
+        if (MessageBodyWriter.class.isAssignableFrom(clazz)) {
+          providers.addMessageBodyWriter(clazz);
+        }
       } else {
         bind(clazz); // per-request resource
       }
