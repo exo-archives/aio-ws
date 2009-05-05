@@ -24,78 +24,90 @@ package org.exoplatform.services.security.sso.config;
 public class Config {
 
   /**
-   * Authenticator key. With this key authenticator should be stored in HTTPSession. 
+   * Authenticator key. With this key authenticator should be stored in
+   * HTTPSession.
    */
-  public static final String SSOAUTHENTICATOR_KEY = "_sso.authenticator";
+  public static final String    SSOAUTHENTICATOR_KEY = "_sso.authenticator";
 
   /**
    * NTLMSSP signature : NTLMSSP.
    */
-  public static final byte[] NTLMSSP_SIGNATURE = new byte[] {0x4E, 0x54, 0x4C, 0x4D, 0x53, 0x53, 0x50, 0x00};
+  public static final byte[]    NTLMSSP_SIGNATURE    = new byte[] { 0x4E, 0x54, 0x4C, 0x4D, 0x53,
+      0x53, 0x50, 0x00                              };
 
   /**
    * Default character set for NTLM messages.
    */
-  public static final String DEFAULT_CHARSET = "UnicodeLittleUnmarked";
+  public static final String    DEFAULT_CHARSET      = "UnicodeLittleUnmarked";
 
   /**
    * Negotiate authentication.
    */
-  public static final String HTTP_NEGOTIATE = "Negotiate";
-  
-  /**
-   * NTLM authentication. 
-   */
-  public static final String HTTP_NTLM = "NTLM";
+  public static final String    HTTP_NEGOTIATE       = "Negotiate";
 
   /**
-   * Supported authentication type.
+   * NTLM authentication.
    */
-  private static final String[] SUPPORTED_MECHANISM = new String[] {HTTP_NEGOTIATE, HTTP_NTLM};
+  public static final String    HTTP_NTLM            = "NTLM";
+
+  /**
+   * userId attribute in the LDAP Supported authentication type.
+   */
+  private static final String[] SUPPORTED_MECHANISM  = new String[] { HTTP_NEGOTIATE, HTTP_NTLM };
 
   /**
    * Instance of Config.
    */
-  private static Config config;
+  private static Config         config;
 
   /**
    * Domain controller.
    */
-  private String domainCtrl;
-  
+  private String                domainCtrl;
+
   /**
    * Character encoding.
    */
-  private String charset;
-  
+  private String                charset;
+
   /**
    * LDAP server address. This address will be used for getting user's groups.
+   * 
    * @see {@link JndiAction}
    */
-  private String ldapServer;
-  
+  private String                ldapServer;
+
   /**
    * Name of JAAS context.
    */
-  private String jaasContext;
-  
-  /**
-   * Address for alternative authentication, should be used if client does
-   * not support 'Negotiate' or 'NTLMSSP'.
-   */
-  private String redirectOnError;
-  
-  /**
-   * Is cross domain authentication allowed.
-   * Usual actual only for NTLM, Kerberos authentication 
-   * is allowed only in one domain by default. 
-   */
-  private boolean crossDomain = false;
+  private String                jaasContext;
 
   /**
-   * Singleton instance. Constructor must not be used directly. 
-   * Only one instance of this class can be created.
-   * First time must be created and configured by SSOConfigurator.
+   * Address for alternative authentication, should be used if client does not
+   * support 'Negotiate' or 'NTLMSSP'.
+   */
+  private String                redirectOnError;
+
+  /**
+   * Is cross domain authentication allowed. Usual actual only for NTLM,
+   * Kerberos authentication is allowed only in one domain by default.
+   */
+  private boolean               crossDomain          = false;
+
+  /**
+   * Name of the userId attribute in the LDAP.
+   */
+  private String                userIdAttr           = "CN";
+
+  /**
+   * User URL in LDAP context.
+   */
+  private String                userURL              = "CN=Users";
+
+  /**
+   * Singleton instance. Constructor must not be used directly. Only one
+   * instance of this class can be created. First time must be created and
+   * configured by SSOConfigurator.
    */
   private Config() {
   }
@@ -123,6 +135,7 @@ public class Config {
 
   /**
    * Set Domain Controller name.
+   * 
    * @param domainCtrl the Domain Controller name.
    */
   void setDomain(String domainCtrl) {
@@ -166,7 +179,7 @@ public class Config {
 
   /**
    * @param url the URL for other type of authentication. Can be used if SSO
-   *            authentication failed.
+   *          authentication failed.
    */
   void setRedirectOnError(String url) {
     this.redirectOnError = url;
@@ -181,7 +194,7 @@ public class Config {
 
   /**
    * @param crossDomain set cross domain authentication to enable or disable. By
-   *            default it is disable. NOTE: This is actual for NTLM only.
+   *          default it is disable. NOTE: This is actual for NTLM only.
    */
   void setCrossDomain(boolean crossDomain) {
     this.crossDomain = crossDomain;
@@ -199,6 +212,34 @@ public class Config {
    */
   void setJaasContext(String jaasContext) {
     this.jaasContext = jaasContext;
+  }
+
+  /**
+   * @param userIdAttr user Id attribute in the LDAP
+   */
+  void setUserIdAttr(String userIdAttr) {
+    this.userIdAttr = userIdAttr;
+  }
+
+  /**
+   * @return user Id attribute in the LDAP
+   */
+  public String getUserIdAttr() {
+    return this.userIdAttr;
+  }
+
+  /**
+   * @param userURL user URL in LDAP context
+   */
+  void setUserURL(String userURL) {
+    this.userURL = userURL;
+  }
+
+  /**
+   * @return user URL in LDAP context
+   */
+  public String getUserURL() {
+    return this.userURL;
   }
 
 }

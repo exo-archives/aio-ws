@@ -64,6 +64,7 @@ public class JndiAction {
    * @return List of user's groups.
    * @throws LoginException if can't login to LDAP server. 
    */
+  @SuppressWarnings("unchecked")
   public static List<String> getGroups(String user) throws LoginException {
     Config config = Config.getInstance();
     /* Login context for JNDI action.
@@ -140,8 +141,8 @@ public class JndiAction {
         
         SearchControls searchCtrls = new SearchControls();
         searchCtrls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        String searchFilter = "(&(objectClass=user)(CN=" + user + "))";
-        String searchBase = "CN=Users," + JndiAction.domainName2LdapAddress(config.getDomain());
+        String searchFilter = "(&(objectClass=user)(" + config.getUserIdAttr() + "=" + user + "))";
+        String searchBase = config.getUserURL() + "," + JndiAction.domainName2LdapAddress(config.getDomain());
         String[] returnAttributes = {"memberOf"};
         searchCtrls.setReturningAttributes(returnAttributes);
 
@@ -175,7 +176,7 @@ public class JndiAction {
         }
         return list;
       } catch (Exception e) {
-        e.printStackTrace();
+        LOG.error("Unable to get user's groups", e);
         return null;
       }
     }

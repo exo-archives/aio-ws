@@ -90,7 +90,7 @@ public class JndiIdentityInitalizerFilter implements Filter {
           }
           identity = new Identity(userId, entries);
         } catch (LoginException e) {
-          LOG.error("Can't get groups for " + userId + " from AD!");
+          LOG.error("Can't get groups for " + userId + " from AD!", e);
           // create identity without memberships
           identity = new Identity(userId);
         }

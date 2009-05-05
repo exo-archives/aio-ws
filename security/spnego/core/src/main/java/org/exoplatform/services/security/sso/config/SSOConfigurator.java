@@ -44,6 +44,12 @@ public class SSOConfigurator implements Startable {
     String crossDomain = pparams.getProperty("cross-domain");
     if (crossDomain != null && "true".equalsIgnoreCase(crossDomain))
       config.setCrossDomain(true);
+    String userIdAttr = pparams.getProperty("user-id-attribute");
+    if (userIdAttr != null)
+      config.setUserIdAttr(userIdAttr);
+    String userURL = pparams.getProperty("user-url");
+    if (userURL != null)
+      config.setUserURL(userURL);
   }
 
   /**
