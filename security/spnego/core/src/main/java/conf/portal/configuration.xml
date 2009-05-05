@@ -24,6 +24,12 @@
         <!-- 
         <property name="redirect-on-error" value="http://google.com" />
         -->
+        <!-- 
+        <property name="user-url" value="CN=Users" />
+        -->
+        <!--
+        <property name="user-id-attribute" value="CN" />
+        -->
       </properties-param>
     </init-params>
   </component>
