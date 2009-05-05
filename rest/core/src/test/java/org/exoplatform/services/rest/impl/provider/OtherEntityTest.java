@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -250,21 +251,30 @@ public class OtherEntityTest extends AbstractResourceTest {
     assertEquals("text/plain", response.getContentType().toString());
     assertEquals("to be or not to be", new String(writer.getBody()));
 
+    Pattern pattern = Pattern.compile("(<\\?xml .*\\?>)");
+    String xml = pattern.matcher(XML_DATA).replaceFirst("");
+    
     h.putSingle("accept", "application/xml");
     response = service("GET", "/dom", "", h, null, writer);
     assertEquals(200, response.getStatus());
     assertEquals("application/xml", response.getContentType().toString());
-    assertEquals(XML_DATA, new String(writer.getBody()));
+    String result = new String(writer.getBody());
+    result = pattern.matcher(result).replaceFirst("");
+    assertEquals(xml, result);
 
     response = service("GET", "/sax", "", h, null, writer);
     assertEquals(200, response.getStatus());
     assertEquals("application/xml", response.getContentType().toString());
-    assertEquals(XML_DATA, new String(writer.getBody()));
+    result = new String(writer.getBody());
+    result = pattern.matcher(result).replaceFirst("");
+    assertEquals(xml, result);
 
     response = service("GET", "/ss", "", h, null, writer);
     assertEquals(200, response.getStatus());
     assertEquals("application/xml", response.getContentType().toString());
-    assertEquals(XML_DATA, new String(writer.getBody()));
+    result = new String(writer.getBody());
+    result = pattern.matcher(result).replaceFirst("");
+    assertEquals(xml, result);
 
     response = service("GET", "/so", "", h, null, writer);
     assertEquals(200, response.getStatus());
