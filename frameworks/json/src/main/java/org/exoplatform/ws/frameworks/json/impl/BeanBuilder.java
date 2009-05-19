@@ -62,7 +62,8 @@ public class BeanBuilder {
         Class<?>[] parameterTypes = method.getParameterTypes();
 
         if (parameterTypes.length != 1)
-          throw new JsonException("Each set method must have one parameters.");
+          throw new JsonException("Each set method must have one parameters, but method "
+              + clazz.getName() + "#" + method.getName() + " has " + parameterTypes.length);
 
         Class<?> methodParameterClazz = parameterTypes[0];
         String key = methodName.substring("set".length());
@@ -75,7 +76,8 @@ public class BeanBuilder {
           return null;
 
         if (!jsonValue.isObject())
-          throw new JsonException("Unsupported type of jsonValue.");
+          throw new JsonException("Unsupported type of jsonValue for parameter of method "
+              + clazz.getName() + "#" + method.getName());
 
         JsonValue childJsonValue = jsonValue.getElement(key);
 
@@ -107,12 +109,15 @@ public class BeanBuilder {
                     // Array, etc.
                     parameterizedTypeClass = (Class<?>) parameterizedType.getActualTypeArguments()[0];
                   } catch (ClassCastException e) {
-                    throw new JsonException("This type of Collection can't be restored from JSON source.\n"
+                    throw new JsonException("Unsupported parameter in method " + clazz.getName()
+                        + "#" + method.getName()
+                        + ". This type of Collection can't be restored from JSON source.\n"
                         + "Collection is parameterized by wrong Type: " + parameterizedType + ".");
                   }
                 } else {
-                  throw new JsonException("Collection is not parameterized! "
-                      + "Collection<Object> is not supported. \nCollection must be parameterized by"
+                  throw new JsonException("Unsupported parameter in method " + clazz.getName()
+                      + "#" + method.getName() + ". Collection is not parameterized. "
+                      + "Collection<?> is not supported. \nCollection must be parameterized by"
                       + " any types, or by JavaBean with 'get' and 'set' methods.");
                 }
               }
@@ -140,7 +145,8 @@ public class BeanBuilder {
               }
               if (constructor == null)
                 throw new JsonException("Can't find satisfied constructor for : "
-                    + methodParameterClazz);
+                    + methodParameterClazz + ", method : " + clazz.getName() + "#"
+                    + method.getName());
 
               ArrayList<Object> sourceCollection = new ArrayList<Object>(childJsonValue.size());
 
@@ -165,16 +171,20 @@ public class BeanBuilder {
                 if (genericParameterTypes[0] instanceof ParameterizedType) {
                   ParameterizedType parameterizedType = (ParameterizedType) genericParameterTypes[0];
                   if (!String.class.isAssignableFrom((Class<?>) parameterizedType.getActualTypeArguments()[0]))
-                    throw new JsonException("Key of Map must be String.");
+                    throw new JsonException("Unsupported parameter in method " + clazz.getName()
+                        + "#" + method.getName() + ". Key of Map must be String.");
                   try {
                     parameterizedTypeClass = (Class<?>) parameterizedType.getActualTypeArguments()[1];
                   } catch (Exception e) {
-                    throw new JsonException("This type of Map can't be restored from JSON source.\n"
+                    throw new JsonException("Unsupported parameter in method " + clazz.getName()
+                        + "#" + method.getName()
+                        + ". This type of Map can't be restored from JSON source.\n"
                         + "Map is parameterized by wrong Type: " + parameterizedType + ".");
                   }
                 } else {
-                  throw new JsonException("Map is not parameterized! "
-                      + "Map<Object, Object> is not supported. \nMap must be parameterized by"
+                  throw new JsonException("Unsupported parameter in method " + clazz.getName()
+                      + "#" + method.getName() + ". Map is not parameterized. "
+                      + "Map<Sting, ?> is not supported. \nMap must be parameterized by"
                       + "String and any types or JavaBean with 'get' and 'set' methods.");
                 }
               }
@@ -203,7 +213,8 @@ public class BeanBuilder {
 
               if (constructor == null)
                 throw new JsonException("Can't find satisfied constructor for : "
-                    + methodParameterClazz);
+                    + methodParameterClazz + ", method : " + clazz.getName() + "#"
+                    + method.getName());
 
               HashMap<String, Object> sourceMap = new HashMap<String, Object>(childJsonValue.size());
 
@@ -224,8 +235,8 @@ public class BeanBuilder {
               break;
             default:
               // it must never happen!
-              throw new JsonException("Can't restore parameter of method : " + method
-                  + " from JSON source.");
+              throw new JsonException("Can't restore parameter of method : " + clazz.getName()
+                  + "#" + method.getName() + " from JSON source.");
             }
 
           } else {
@@ -383,7 +394,7 @@ public class BeanBuilder {
       // Nothing to do for other type. Exception will be thrown.
       break;
     }
-    throw new JsonException("Unknown type");
+    throw new JsonException("Unknown type " + clazz.getName());
   }
 
 }
