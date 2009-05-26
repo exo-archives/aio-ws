@@ -15,7 +15,7 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.ws;
+package org.exoplatform.ws.frameworks.application.rest;
 
 import java.io.BufferedReader;
 import java.io.IOException;

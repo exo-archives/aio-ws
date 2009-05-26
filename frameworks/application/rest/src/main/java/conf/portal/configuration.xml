@@ -4,6 +4,6 @@
   xmlns="http://www.exoplaform.org/xml/ns/kernel_1_0.xsd">
 
   <component>
-    <type>org.exoplatform.ws.MirrorPost</type>
+    <type>org.exoplatform.ws.frameworks.application.rest.LoopbackContentService</type>
   </component>
 </configuration>
