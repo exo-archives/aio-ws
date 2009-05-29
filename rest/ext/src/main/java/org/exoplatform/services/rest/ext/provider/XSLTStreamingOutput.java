@@ -30,6 +30,7 @@ import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.xml.transform.NotSupportedIOTypeException;
 import org.exoplatform.services.xml.transform.impl.trax.TRAXTemplatesServiceImpl;
+import org.exoplatform.services.xml.transform.trax.TRAXTemplates;
 import org.exoplatform.services.xml.transform.trax.TRAXTemplatesService;
 import org.exoplatform.services.xml.transform.trax.TRAXTransformer;
 
@@ -74,9 +75,15 @@ public class XSLTStreamingOutput implements StreamingOutput {
     try {
       TRAXTransformer transformer = null;
       if (schemeName != null) {
-        transformer = templatesService.getTemplates(schemeName).newTransformer();
+        TRAXTemplates t = templatesService.getTemplates(schemeName);
+        if (t == null) {
+          String msg = "Template " + schemeName + " not found.";
+          throw new IllegalArgumentException(msg);
+        }
+        transformer = t.newTransformer();
       } else {
-        throw new TransformerConfigurationException();
+        String msg = "XSLT scheme name is null.";
+        throw new NullPointerException(msg);
       }
       transformer.initResult(new StreamResult(outStream));
       transformer.transform(source);
