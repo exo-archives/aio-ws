@@ -21,45 +21,41 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URLEncoder;
 import java.util.Iterator;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.fileupload.FileItem;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 
-
 /**
  * Simple REST service which returns the request body wraped in javascript.
  * Created by The eXo Platform SAS
  * 
- * @author <a href="work.visor.ck@gmail.com">Dmytro Katayev</a>
- *
- * ${date}  
+ * @author <a href="work.visor.ck@gmail.com">Dmytro Katayev</a> ${date}
  */
 
 @Path("/services/loopbackcontent")
 public class LoopbackContentService implements ResourceContainer {
-  
-  /**
-   * Callback field name.
-   */
-  private final String CALLBACK_FIELD_NAME = "callbackName";
 
   /**
-   * POST method that gets the request body and returns it wrapped in the JavaScript.
+   * POST method that gets the request body and returns it wrapped in the
+   * JavaScript.
+   * 
    * @param items file items form the request body.
-   * @return the request body content wrapped with JavaScript. 
+   * @return the request body content wrapped with JavaScript.
    */
   @POST
   @Consumes( { "multipart/*" })
-  public Response post(Iterator<FileItem> items) {
-    
-    String callbackName = null;
+  public Response post(@HeaderParam(HttpHeaders.CONTENT_ENCODING) String contentEncoding,
+                       Iterator<FileItem> items) {
 
     InputStream stream = null;
     while (items.hasNext()) {
@@ -71,8 +67,6 @@ public class LoopbackContentService implements ResourceContainer {
           ioe.printStackTrace();
           return Response.serverError().build();
         }
-      } else if (fitem.getFieldName().equals(CALLBACK_FIELD_NAME)){
-        callbackName = fitem.getString();
       }
     }
 
@@ -80,21 +74,22 @@ public class LoopbackContentService implements ResourceContainer {
     StringBuilder sb = new StringBuilder();
 
     String line = null;
+
     try {
       while ((line = reader.readLine()) != null) {
-        sb.append(line.replace("\\", "\\\\").replace("'", "\\'") + "\\n");
+        String str = URLEncoder.encode(line + "\n", "UTF-8");
+        sb.append(str);
       }
     } catch (IOException ioe) {
       ioe.printStackTrace();
       return Response.serverError().build();
     }
-    
+
     String bodyString = sb.toString();
 
-    String responceString = "<script type=\"text/javascript\">" + " window.top." + callbackName + "('"
-        + bodyString + "');" + "</script>";
+    String responceString = "<pre>" + bodyString + "</pre>";
 
     return Response.ok(responceString, MediaType.TEXT_HTML).build();
   }
-  
+
 }
