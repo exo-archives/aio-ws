@@ -25,10 +25,8 @@ import java.net.URLEncoder;
 import java.util.Iterator;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -54,8 +52,7 @@ public class LoopbackContentService implements ResourceContainer {
    */
   @POST
   @Consumes( { "multipart/*" })
-  public Response post(@HeaderParam(HttpHeaders.CONTENT_ENCODING) String contentEncoding,
-                       Iterator<FileItem> items) {
+  public Response post(Iterator<FileItem> items) {
 
     InputStream stream = null;
     while (items.hasNext()) {
