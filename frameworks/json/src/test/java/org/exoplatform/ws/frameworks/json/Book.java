@@ -19,7 +19,7 @@ package org.exoplatform.ws.frameworks.json;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
- * @version $Id: $
+ * @version $Id$
  */
 public class Book {
   
@@ -28,6 +28,8 @@ public class Book {
   private double price;
   private long isdn;
   private int pages;
+  private boolean availability;
+  private boolean delivery;
   
   public void setAuthor(String s) {
     author = s;
@@ -43,6 +45,12 @@ public class Book {
   }
   public void setPages(int i) {
     pages = i;
+  }
+  public void setAvailability(boolean availability) {
+    this.availability = availability;
+  }
+  public void setDelivery(boolean delivery) {
+    this.delivery = delivery;
   }
 
   public String getAuthor() {
@@ -60,6 +68,12 @@ public class Book {
   public int getPages() {
     return pages;
   }
+  public boolean isAvailability() {
+    return availability;
+  }
+  public boolean getDelivery() {
+    return delivery;
+  }
   
   @Override
   public String toString() {
@@ -69,7 +83,9 @@ public class Book {
     .append("Title: ").append(title).append(" ")
     .append("Pages: ").append(pages).append(" ")
     .append("Price: ").append(price).append(" ")
-    .append("ISDN: ").append(isdn).append("} ");
+    .append("ISDN: ").append(isdn)
+    .append("Availability: ").append(availability).append(" ")
+    .append("Delivery: ").append(delivery).append(" ").append("} ");
     return sb.toString();
   }
   
@@ -78,7 +94,9 @@ public class Book {
       && book.getTitle().equals(title)
       && book.getIsdn() == isdn
       && book.getPages() == pages
-      && book.getPrice() == price;
+      && book.getPrice() == price
+      && book.isAvailability() == availability
+      && book.getDelivery() == delivery;
   }
 }
 

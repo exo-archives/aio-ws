@@ -34,7 +34,7 @@ import junit.framework.TestCase;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
- * @version $Id: $
+ * @version $Id$
  */
 public class JsonGeneratorTest extends TestCase {
 
@@ -42,20 +42,24 @@ public class JsonGeneratorTest extends TestCase {
   protected void setUp() throws Exception {
     super.setUp();
   }
-  
+
   public void testSimpleObject() throws Exception {
     int _pages = 386;
     long _isdn = 93011099534534L;
     double _price = 19.37;
-    String _title = "JUnit in Action"; 
+    String _title = "JUnit in Action";
     String _author = "Vincent Masson";
+    boolean _delivery = true;
+    boolean _availability = true;
     Book book = new Book();
     book.setAuthor(_author);
     book.setTitle(_title);
     book.setPages(_pages);
     book.setPrice(_price);
     book.setIsdn(_isdn);
-    
+    book.setAvailability(_availability);
+    book.setDelivery(_delivery);
+
     JsonValue jsonValue = new JsonGeneratorImpl().createJsonObject(book);
     assertTrue(jsonValue.isObject());
     assertEquals(_author, jsonValue.getElement("author").getStringValue());
@@ -63,20 +67,26 @@ public class JsonGeneratorTest extends TestCase {
     assertEquals(_pages, jsonValue.getElement("pages").getIntValue());
     assertEquals(_price, jsonValue.getElement("price").getDoubleValue());
     assertEquals(_isdn, jsonValue.getElement("isdn").getLongValue());
+    assertEquals(_delivery, jsonValue.getElement("delivery").getBooleanValue());
+    assertEquals(_availability, jsonValue.getElement("availability").getBooleanValue());
   }
-  
+
   public void testSimpleObject2() throws Exception {
     int _pages = 386;
     int _isdn = 930110995;
     double _price = 19.37;
-    String _title = "JUnit in Action"; 
+    String _title = "JUnit in Action";
     String _author = "Vincent Masson";
+    boolean _delivery = false;
+    boolean _availability = true;
     Book book = new Book();
     book.setAuthor(_author);
     book.setTitle(_title);
     book.setPages(_pages);
     book.setPrice(_price);
     book.setIsdn(_isdn);
+    book.setAvailability(_availability);
+    book.setDelivery(_delivery);
 
     BookWrapper bookWrapper = new BookWrapper();
     bookWrapper.setBook(book);
@@ -87,6 +97,10 @@ public class JsonGeneratorTest extends TestCase {
     assertEquals(_pages, jsonValue.getElement("book").getElement("pages").getIntValue());
     assertEquals(_price, jsonValue.getElement("book").getElement("price").getDoubleValue());
     assertEquals(_isdn, jsonValue.getElement("book").getElement("isdn").getLongValue());
+    assertEquals(_delivery, jsonValue.getElement("book").getElement("delivery").getBooleanValue());
+    assertEquals(_availability, jsonValue.getElement("book")
+                                         .getElement("availability")
+                                         .getBooleanValue());
   }
 
   public void testSimpleObject3() throws Exception {
@@ -96,6 +110,8 @@ public class JsonGeneratorTest extends TestCase {
     book.setPages(386);
     book.setPrice(19.37);
     book.setIsdn(93011099534534L);
+    book.setAvailability(true);
+    book.setDelivery(true);
     List<Book> l = new ArrayList<Book>();
     l.add(book);
     book = new Book();
@@ -104,6 +120,8 @@ public class JsonGeneratorTest extends TestCase {
     book.setPages(511);
     book.setPrice(23.56);
     book.setIsdn(9781590598696L);
+    book.setAvailability(true);
+    book.setDelivery(true);
     l.add(book);
     book = new Book();
     book.setAuthor("Chuck Easttom");
@@ -111,6 +129,8 @@ public class JsonGeneratorTest extends TestCase {
     book.setPages(617);
     book.setPrice(25.99);
     book.setIsdn(9781598220339L);
+    book.setAvailability(true);
+    book.setDelivery(true);
     l.add(book);
     BookStorage bookStorage = new BookStorage();
     bookStorage.setBooks(l);
@@ -121,7 +141,7 @@ public class JsonGeneratorTest extends TestCase {
     assertEquals(l.get(1).getTitle(), iterator.next().getElement("title").getStringValue());
     assertEquals(l.get(2).getTitle(), iterator.next().getElement("title").getStringValue());
   }
-  
+
   public void test2() throws Exception {
     JavaMapBean mb = new JavaMapBean();
     Map<String, Book> m = new HashMap<String, Book>();
@@ -132,8 +152,8 @@ public class JsonGeneratorTest extends TestCase {
     book.setPrice(19.37);
     book.setIsdn(93011099534534L);
     m.put("test", book);
-    mb.setHashMap((HashMap<String, Book>)m);
-    
+    mb.setHashMap((HashMap<String, Book>) m);
+
     List<Book> l = new ArrayList<Book>();
     l.add(book);
     book = new Book();
@@ -155,26 +175,31 @@ public class JsonGeneratorTest extends TestCase {
     hu.put("2", l);
     hu.put("3", l);
     mb.setMapList(hu);
-    
+
     Map<String, String> str = new HashMap<String, String>();
     str.put("key1", "value1");
     str.put("key2", "value2");
     str.put("key3", "value3");
     mb.setStrings(str);
-    
+
     JsonValue jsonValue = new JsonGeneratorImpl().createJsonObject(mb);
-    
-    assertEquals(str.get("key2"), jsonValue.getElement("strings").getElement("key2")
-        .getStringValue());
-    
+
+    assertEquals(str.get("key2"), jsonValue.getElement("strings")
+                                           .getElement("key2")
+                                           .getStringValue());
+
     assertNotNull(jsonValue.getElement("hashMap"));
-    
+
     assertNotNull(jsonValue.getElement("mapList"));
-    assertEquals("JUnit in Action", jsonValue.getElement("mapList").getElement("3")
-        .getElements().next().getElement("title").getStringValue());
-//    System.out.println(jsonValue);
+    assertEquals("JUnit in Action", jsonValue.getElement("mapList")
+                                             .getElement("3")
+                                             .getElements()
+                                             .next()
+                                             .getElement("title")
+                                             .getStringValue());
+    // System.out.println(jsonValue);
   }
-  
+
   public void testBeanWithTransientField() throws Exception {
     BeanWithTransientField trBean = new BeanWithTransientField();
     JsonValue jsonValue = new JsonGeneratorImpl().createJsonObject(trBean);

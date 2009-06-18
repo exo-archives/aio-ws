@@ -42,7 +42,7 @@ import org.exoplatform.ws.frameworks.json.value.impl.StringValue;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
- * @version $Id: $
+ * @version $Id$
  */
 public class JsonGeneratorImpl implements JsonGenerator {
 
@@ -69,7 +69,8 @@ public class JsonGeneratorImpl implements JsonGenerator {
           && !"getClass".equals(name)) {
         key = name.substring(3);
       } else if (name.startsWith("is") && name.length() > 2
-          && method.getReturnType() == Boolean.class && method.getParameterTypes().length == 0) {
+          && (method.getReturnType() == Boolean.class || method.getReturnType() == boolean.class)
+          && method.getParameterTypes().length == 0) {
         key = name.substring(2);
       }
 

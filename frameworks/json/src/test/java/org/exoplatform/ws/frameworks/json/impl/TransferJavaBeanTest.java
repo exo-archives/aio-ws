@@ -30,7 +30,7 @@ import org.exoplatform.ws.frameworks.json.JsonHandler;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
- * @version $Id: $
+ * @version $Id$
  */
 public class TransferJavaBeanTest extends TestCase {
 

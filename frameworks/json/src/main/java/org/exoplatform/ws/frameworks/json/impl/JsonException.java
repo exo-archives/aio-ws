@@ -20,7 +20,7 @@ package org.exoplatform.ws.frameworks.json.impl;
 /**
  * Should be thrown if any error occurs during JSON <-> Java Object transformation.
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
- * @version $Id: $
+ * @version $Id$
  */
 public class JsonException extends Exception {
 
