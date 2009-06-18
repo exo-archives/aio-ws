@@ -51,45 +51,48 @@ public class JsonGeneratorImpl implements JsonGenerator {
    */
   public JsonValue createJsonObject(Object object) throws JsonException {
     Method[] methods = object.getClass().getMethods();
-    
+
     List<String> transientFields = getTransientFields(object.getClass());
 
     JsonValue jsonRootValue = new ObjectValue();
 
     for (Method method : methods) {
-      String methodName = method.getName();
+      String name = method.getName();
 
-      /* Method must be as follow:
-       * 1. Name start from "get" plus at least one character;
-       * 2. Must be without parameters.
-       * 3. Not "getClass" method. 
+      /*
+       * Method must be as follow: 1. Name starts from "get" plus at least one
+       * character or starts from "is" plus one more character and return
+       * boolean type; 2. Must be without parameters; 3. Not "getClass" method;
        */
-      if (methodName.startsWith("get") && methodName.length() > "get".length()
-          && method.getParameterTypes().length == 0 && !"getClass".equals(methodName)) {
+      String key = null;
+      if (name.startsWith("get") && name.length() > 3 && method.getParameterTypes().length == 0
+          && !"getClass".equals(name)) {
+        key = name.substring(3);
+      } else if (name.startsWith("is") && name.length() > 2
+          && method.getReturnType() == Boolean.class && method.getParameterTypes().length == 0) {
+        key = name.substring(2);
+      }
 
-        String key = methodName.substring("get".length());
-
-        // first letter of key to lower case.
+      if (key != null) {
+        // First letter of key to lower case.
         key = (key.length() > 1) ? Character.toLowerCase(key.charAt(0)) + key.substring(1)
-            : key.toLowerCase();
-        
+                                : key.toLowerCase();
         // Check is this field in list of transient field.
-        if (transientFields.contains(key))
-          continue;
+        if (!transientFields.contains(key)) {
+          try {
+            // Get result of invoke method get...
+            Object invokeResult = method.invoke(object, new Object[0]);
 
-        try {
-          // get result of invoke method get...
-          Object invokeResult = method.invoke(object, new Object[0]);
+            if (JsonUtils.getType(invokeResult) != null)
+              jsonRootValue.addElement(key, createJsonValue(invokeResult));
+            else
+              jsonRootValue.addElement(key, createJsonObject(invokeResult));
 
-          if (JsonUtils.getType(invokeResult) != null)
-            jsonRootValue.addElement(key, createJsonValue(invokeResult));
-         else
-            jsonRootValue.addElement(key, createJsonObject(invokeResult));
-          
-        } catch (InvocationTargetException e) {
-          throw new JsonException(e);
-        } catch (IllegalAccessException e) {
-          throw new JsonException(e);
+          } catch (InvocationTargetException e) {
+            throw new JsonException(e);
+          } catch (IllegalAccessException e) {
+            throw new JsonException(e);
+          }
         }
       }
     }
@@ -98,6 +101,7 @@ public class JsonGeneratorImpl implements JsonGenerator {
   
   /**
    * Create JsonValue corresponding to Java object.
+   * 
    * @param object source object.
    * @return JsonValue.
    * @throws JsonException if any errors occurs.
@@ -106,150 +110,138 @@ public class JsonGeneratorImpl implements JsonGenerator {
   protected JsonValue createJsonValue(Object object) throws JsonException {
     Types t = JsonUtils.getType(object);
     switch (t) {
-      case NULL:
-        return new NullValue();
-      case BOOLEAN:
-        return new BooleanValue((Boolean) object);
-      case BYTE:
-        return new LongValue((Byte) object);
-      case SHORT:
-        return new LongValue((Short) object);
-      case INT:
-        return new LongValue((Integer) object);
-      case LONG:
-        return new LongValue((Long) object);
-      case FLOAT:
-        return new DoubleValue((Float) object);
-      case DOUBLE:
-        return new DoubleValue((Double) object);
-      case CHAR:
-        return new StringValue(Character.toString((Character) object));
-      case STRING:
-        return new StringValue((String) object);
-      case ARRAY_BOOLEAN:
-      {
-        JsonValue jsonArray = new ArrayValue();
-        int length = Array.getLength(object);
-        for (int i = 0; i < length; i++)
-          jsonArray.addElement(new BooleanValue(Array.getBoolean(object, i)));
-        return jsonArray;
-      }
-      case ARRAY_BYTE:
-      {
-        JsonValue jsonArray = new ArrayValue();
-        int length = Array.getLength(object);
-        for (int i = 0; i < length; i++)
-          jsonArray.addElement(new LongValue(Array.getByte(object, i)));
-        return jsonArray;
-      }
-      case ARRAY_SHORT:
-      {
-        JsonValue jsonArray = new ArrayValue();
-        int length = Array.getLength(object);
-        for (int i = 0; i < length; i++)
-          jsonArray.addElement(new LongValue(Array.getShort(object, i)));
-        return jsonArray;
-      }
-      case ARRAY_INT:
-      {
-        JsonValue jsonArray = new ArrayValue();
-        int length = Array.getLength(object);
-        for (int i = 0; i < length; i++)
-          jsonArray.addElement(new LongValue(Array.getInt(object, i)));
-        return jsonArray;
-      }
-      case ARRAY_LONG:
-      {
-        JsonValue jsonArray = new ArrayValue();
-        int length = Array.getLength(object);
-        for (int i = 0; i < length; i++)
-          jsonArray.addElement(new LongValue(Array.getLong(object, i)));
-        return jsonArray;
-      }
-      case ARRAY_FLOAT:
-      {
-        JsonValue jsonArray = new ArrayValue();
-        int length = Array.getLength(object);
-        for (int i = 0; i < length; i++)
-          jsonArray.addElement(new DoubleValue(Array.getFloat(object, i)));
-        return jsonArray;
-      }
-      case ARRAY_DOUBLE:
-      {
-        JsonValue jsonArray = new ArrayValue();
-        int length = Array.getLength(object);
-        for (int i = 0; i < length; i++)
-          jsonArray.addElement(new DoubleValue(Array.getDouble(object, i)));
-        return jsonArray;
-      }
-      case ARRAY_CHAR:
-      {
-        JsonValue jsonArray = new ArrayValue();
-        int length = Array.getLength(object);
-        for (int i = 0; i < length; i++)
-          jsonArray.addElement(new StringValue(Character.toString(Array
-              .getChar(object, i))));
-        return jsonArray;
-      }
-      case ARRAY_STRING:
-      {
-        JsonValue jsonArray = new ArrayValue();
-        int length = Array.getLength(object);
-        for (int i = 0; i < length; i++)
-          jsonArray.addElement(new StringValue((String) Array.get(object, i)));
-        return jsonArray;
-      }
-      case ARRAY_OBJECT:
-      {
-        JsonValue jsonArray = new ArrayValue();
-        int length = Array.getLength(object);
-        for (int i = 0; i < length; i++) {
-          Object el = Array.get(object, i);
-          if (JsonUtils.getType(el) != null)
-            jsonArray.addElement(createJsonValue(el));
-          else
-            jsonArray.addElement(createJsonObject(el));
-        }
-
-        return jsonArray;
-      }
-      case COLLECTION:
-      {
-        JsonValue jsonArray = new ArrayValue();
-        List<Object> list = new ArrayList<Object>((Collection<?>) object);
-        for (Object o : list) {
-          if (JsonUtils.getType(o) != null)
-            jsonArray.addElement(createJsonValue(o));
-          else
-            jsonArray.addElement(createJsonObject(o));
-        }
-
-        return jsonArray;
-      }
-      case MAP:
-        JsonValue jsonObject = new ObjectValue();
-        Map<String, Object> map = new HashMap<String, Object>(
-            (Map<String, Object>) object);
-        Set<String> keys = map.keySet();
-        for (String k : keys) {
-          Object o = map.get(k);
-          if (JsonUtils.getType(o) != null)
-            jsonObject.addElement(k, createJsonValue(o));
-          else
-            jsonObject.addElement(k, createJsonObject(o));
-        }
-
-        return jsonObject;
-      default:
-        // Must not be here!
-        return null;
+    case NULL:
+      return new NullValue();
+    case BOOLEAN:
+      return new BooleanValue((Boolean) object);
+    case BYTE:
+      return new LongValue((Byte) object);
+    case SHORT:
+      return new LongValue((Short) object);
+    case INT:
+      return new LongValue((Integer) object);
+    case LONG:
+      return new LongValue((Long) object);
+    case FLOAT:
+      return new DoubleValue((Float) object);
+    case DOUBLE:
+      return new DoubleValue((Double) object);
+    case CHAR:
+      return new StringValue(Character.toString((Character) object));
+    case STRING:
+      return new StringValue((String) object);
+    case ARRAY_BOOLEAN: {
+      JsonValue jsonArray = new ArrayValue();
+      int length = Array.getLength(object);
+      for (int i = 0; i < length; i++)
+        jsonArray.addElement(new BooleanValue(Array.getBoolean(object, i)));
+      return jsonArray;
     }
-    
+    case ARRAY_BYTE: {
+      JsonValue jsonArray = new ArrayValue();
+      int length = Array.getLength(object);
+      for (int i = 0; i < length; i++)
+        jsonArray.addElement(new LongValue(Array.getByte(object, i)));
+      return jsonArray;
+    }
+    case ARRAY_SHORT: {
+      JsonValue jsonArray = new ArrayValue();
+      int length = Array.getLength(object);
+      for (int i = 0; i < length; i++)
+        jsonArray.addElement(new LongValue(Array.getShort(object, i)));
+      return jsonArray;
+    }
+    case ARRAY_INT: {
+      JsonValue jsonArray = new ArrayValue();
+      int length = Array.getLength(object);
+      for (int i = 0; i < length; i++)
+        jsonArray.addElement(new LongValue(Array.getInt(object, i)));
+      return jsonArray;
+    }
+    case ARRAY_LONG: {
+      JsonValue jsonArray = new ArrayValue();
+      int length = Array.getLength(object);
+      for (int i = 0; i < length; i++)
+        jsonArray.addElement(new LongValue(Array.getLong(object, i)));
+      return jsonArray;
+    }
+    case ARRAY_FLOAT: {
+      JsonValue jsonArray = new ArrayValue();
+      int length = Array.getLength(object);
+      for (int i = 0; i < length; i++)
+        jsonArray.addElement(new DoubleValue(Array.getFloat(object, i)));
+      return jsonArray;
+    }
+    case ARRAY_DOUBLE: {
+      JsonValue jsonArray = new ArrayValue();
+      int length = Array.getLength(object);
+      for (int i = 0; i < length; i++)
+        jsonArray.addElement(new DoubleValue(Array.getDouble(object, i)));
+      return jsonArray;
+    }
+    case ARRAY_CHAR: {
+      JsonValue jsonArray = new ArrayValue();
+      int length = Array.getLength(object);
+      for (int i = 0; i < length; i++)
+        jsonArray.addElement(new StringValue(Character.toString(Array.getChar(object, i))));
+      return jsonArray;
+    }
+    case ARRAY_STRING: {
+      JsonValue jsonArray = new ArrayValue();
+      int length = Array.getLength(object);
+      for (int i = 0; i < length; i++)
+        jsonArray.addElement(new StringValue((String) Array.get(object, i)));
+      return jsonArray;
+    }
+    case ARRAY_OBJECT: {
+      JsonValue jsonArray = new ArrayValue();
+      int length = Array.getLength(object);
+      for (int i = 0; i < length; i++) {
+        Object el = Array.get(object, i);
+        if (JsonUtils.getType(el) != null)
+          jsonArray.addElement(createJsonValue(el));
+        else
+          jsonArray.addElement(createJsonObject(el));
+      }
+
+      return jsonArray;
+    }
+    case COLLECTION: {
+      JsonValue jsonArray = new ArrayValue();
+      List<Object> list = new ArrayList<Object>((Collection<?>) object);
+      for (Object o : list) {
+        if (JsonUtils.getType(o) != null)
+          jsonArray.addElement(createJsonValue(o));
+        else
+          jsonArray.addElement(createJsonObject(o));
+      }
+
+      return jsonArray;
+    }
+    case MAP:
+      JsonValue jsonObject = new ObjectValue();
+      Map<String, Object> map = new HashMap<String, Object>((Map<String, Object>) object);
+      Set<String> keys = map.keySet();
+      for (String k : keys) {
+        Object o = map.get(k);
+        if (JsonUtils.getType(o) != null)
+          jsonObject.addElement(k, createJsonValue(o));
+        else
+          jsonObject.addElement(k, createJsonObject(o));
+      }
+
+      return jsonObject;
+    default:
+      // Must not be here!
+      return null;
+    }
+
   }
-  
+
   /**
-   * Check fields in class which marked as 'transient'. Transient fields will
-   * be not serialized in JSON representation. 
+   * Check fields in class which marked as 'transient'. Transient fields will be
+   * not serialized in JSON representation.
+   * 
    * @param clazz the class.
    * @return list of fields which must be skiped.
    */
@@ -263,5 +255,5 @@ public class JsonGeneratorImpl implements JsonGenerator {
     }
     return l;
   }
-  
+
 }
