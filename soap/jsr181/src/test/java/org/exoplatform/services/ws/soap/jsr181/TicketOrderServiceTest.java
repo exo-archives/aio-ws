@@ -109,7 +109,7 @@ public class TicketOrderServiceTest extends BaseTest {
         } catch (Exception e) {
           System.out.println(">>> TicketOrderServiceTest.testTicketSingletonService() checkConnection: There is no service at '"
               + SERVICE_ADDRESS_SINGLETON + "?wsdl'");
-          e.printStackTrace();
+//          e.printStackTrace();
           fail(e.getMessage());
         }
 
@@ -152,7 +152,7 @@ public class TicketOrderServiceTest extends BaseTest {
         } catch (Exception e) {
           System.out.println(">>> TicketOrderServiceTest.testTicketMultiinstanceService() checkConnection: There is no service at '"
               + SERVICE_ADDRESS_MULTIINSTANCE + "?wsdl'");
-          e.printStackTrace();
+//          e.printStackTrace();
           fail(e.getMessage());
         }
 
@@ -203,7 +203,7 @@ public class TicketOrderServiceTest extends BaseTest {
     } catch (Exception e) {
       System.out.println(">>> TicketOrderServiceTest.testTicketServiceService() checkConnection: There is no service at '"
           + SERVICE_ADDRESS_CUSTOM + "?wsdl'");
-      e.printStackTrace();
+//      e.printStackTrace();
       fail(e.getMessage());
     }
 
@@ -256,7 +256,7 @@ public class TicketOrderServiceTest extends BaseTest {
     } catch (Exception e) {
       System.out.println(">>> TicketOrderServiceTest.testTicketServiceService() checkConnection: There is no service at '"
           + SERVICE_ADDRESS_CUSTOM + "?wsdl'");
-      e.printStackTrace();
+//      e.printStackTrace();
       fail(e.getMessage());
     }
 
@@ -309,7 +309,7 @@ public class TicketOrderServiceTest extends BaseTest {
     } catch (Exception e) {
       System.out.println(">>> TicketOrderServiceTest.testTicketServiceService() checkConnection: There is no service at '"
           + SERVICE_ADDRESS_CUSTOM + "?wsdl'");
-      e.printStackTrace();
+//      e.printStackTrace();
       fail(e.getMessage());
     }
 
@@ -328,7 +328,7 @@ public class TicketOrderServiceTest extends BaseTest {
       fail("ticket.getUnregistered() - doesn't throw InvalidRegistration");
     } catch (InvalidRegistration e) {
       System.out.println(">>> TicketOrderServiceTest.testTicketServiceServiceWithExc() InvalidRegistration catched - OK! = ");
-      e.printStackTrace();
+//      e.printStackTrace();
     }
 
     endpoint.stop();

@@ -60,7 +60,7 @@ public class WebServiceLoaderTest extends BaseTest {
       webServiceLoader.init();
       bus.shutdown(true);
     } catch (Exception e) {
-      e.printStackTrace();
+//      e.printStackTrace();
       fail("There is an exception in the WebServiceLoaderTest.testWebServiceLoader():"
           + e.getMessage());
     }
