@@ -52,7 +52,7 @@ public class OrganizationIdentityInitalizerFilter implements Filter {
   /**
    * Logger.
    */
-  private static final Log LOG = ExoLogger.getLogger("ws.security.JndiIdentityInitalizerFilter");
+  private static final Log LOG = ExoLogger.getLogger("ws.security.OrganizationIdentityInitalizerFilter");
 
   /**
    * {@inheritDoc}
