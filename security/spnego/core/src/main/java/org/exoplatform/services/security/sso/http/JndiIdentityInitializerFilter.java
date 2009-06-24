@@ -46,7 +46,7 @@ import org.exoplatform.services.security.sso.jndi.JndiAction;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class JndiIdentityInitalizerFilter implements Filter {
+public class JndiIdentityInitializerFilter implements Filter {
 
   /**
    * Logger.
