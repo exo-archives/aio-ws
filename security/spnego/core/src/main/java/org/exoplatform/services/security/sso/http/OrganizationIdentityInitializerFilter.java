@@ -47,12 +47,12 @@ import org.exoplatform.services.security.MembershipEntry;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class OrganizationIdentityInitalizerFilter implements Filter {
+public class OrganizationIdentityInitializerFilter implements Filter {
 
   /**
    * Logger.
    */
-  private static final Log LOG = ExoLogger.getLogger("ws.security.OrganizationIdentityInitalizerFilter");
+  private static final Log LOG = ExoLogger.getLogger("ws.security.OrganizationIdentityInitializerFilter");
 
   /**
    * {@inheritDoc}
