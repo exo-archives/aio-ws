@@ -18,9 +18,6 @@
 package org.exoplatform.services.security.sso.http;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -34,11 +31,9 @@ import org.apache.commons.logging.Log;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.organization.Membership;
-import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.security.Authenticator;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.IdentityRegistry;
-import org.exoplatform.services.security.MembershipEntry;
 
 /**
  * NOTE must be configured after SSOAuthenticationFilter. Get groups for user
@@ -47,12 +42,12 @@ import org.exoplatform.services.security.MembershipEntry;
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class OrganizationIdentityInitializerFilter implements Filter {
+public class ExoIdentityInitializerFilter implements Filter {
 
   /**
    * Logger.
    */
-  private static final Log LOG = ExoLogger.getLogger("ws.security.OrganizationIdentityInitializerFilter");
+  private static final Log LOG = ExoLogger.getLogger("ws.security.ExoIdentityInitializerFilter");
 
   /**
    * {@inheritDoc}
@@ -66,36 +61,22 @@ public class OrganizationIdentityInitializerFilter implements Filter {
    */
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
                                                                                            ServletException {
-
     HttpServletRequest httpRequest = (HttpServletRequest) request;
-
     String userId = httpRequest.getRemoteUser();
 
-    IdentityRegistry identityRegistry = (IdentityRegistry) getContainer().getComponentInstanceOfType(IdentityRegistry.class);
-
     if (userId != null) {
-
+      IdentityRegistry identityRegistry = (IdentityRegistry) getContainer().getComponentInstanceOfType(IdentityRegistry.class);
       if (identityRegistry.getIdentity(userId) == null) {
+        Authenticator authenticator = (Authenticator) getContainer().getComponentInstanceOfType(Authenticator.class);
 
-        Identity identity = null;
+        if (authenticator == null)
+          throw new RuntimeException("No Authenticator component found, check your configuration");
         try {
-          Set<MembershipEntry> entries = new HashSet<MembershipEntry>();
-          OrganizationService orgService = (OrganizationService) getContainer().getComponentInstanceOfType(OrganizationService.class);
-          @SuppressWarnings("unchecked")
-          Collection<Membership> memberships = orgService.getMembershipHandler()
-                                                         .findMembershipsByUser(userId);
-          for (Membership membership : memberships) {
-            entries.add(new MembershipEntry(membership.getGroupId(), membership.getMembershipType()));
-          }
-          identity = new Identity(userId, entries);
+          Identity identity = authenticator.createIdentity(userId);
+          identityRegistry.register(identity);
         } catch (Exception e) {
-          LOG.error("Can't get groups for " + userId + " from AD!");
-          // create identity without memberships
-          identity = new Identity(userId);
+          LOG.error("Unable create identity for user " + userId, e);
         }
-
-        identityRegistry.register(identity);
-
       } else {
         if (LOG.isDebugEnabled()) {
           LOG.debug("Identity for " + userId + " already registered.");
@@ -104,9 +85,7 @@ public class OrganizationIdentityInitializerFilter implements Filter {
     } else {
       LOG.error("Username is null, can't create identity.");
     }
-
     chain.doFilter(request, response);
-
   }
 
   /**
