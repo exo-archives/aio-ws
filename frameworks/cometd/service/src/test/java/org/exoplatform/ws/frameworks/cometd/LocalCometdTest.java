@@ -29,7 +29,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.Log;
 import org.codehaus.cargo.container.InstalledLocalContainer;
 import org.exoplatform.common.http.client.CookieModule;
 import org.exoplatform.common.http.client.HTTPConnection;

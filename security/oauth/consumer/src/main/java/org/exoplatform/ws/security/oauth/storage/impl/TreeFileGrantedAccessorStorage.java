@@ -31,7 +31,7 @@ import java.util.LinkedHashMap;
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthProblemException;
 
-import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.ws.security.oauth.storage.GrantedAccessorStorage;
 import org.exoplatform.ws.security.oauth.storage.GrantedAccessorStorageProperties;

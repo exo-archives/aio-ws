@@ -24,7 +24,7 @@ import java.net.URL;
 
 import javax.xml.ws.Endpoint;
 
-import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.Log;
 import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;

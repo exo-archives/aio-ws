@@ -17,7 +17,7 @@ package org.mortbay.cometd.continuation;
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.RootContainer;

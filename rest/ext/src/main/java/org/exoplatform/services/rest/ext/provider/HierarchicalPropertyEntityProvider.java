@@ -39,7 +39,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.common.util.HierarchicalProperty;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.rest.provider.EntityProvider;

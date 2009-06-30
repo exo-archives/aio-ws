@@ -36,7 +36,7 @@ import java.io.IOException;
 import java.net.ProtocolException;
 import java.util.Hashtable;
 
-import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.log.ExoLogger;
 
 /**

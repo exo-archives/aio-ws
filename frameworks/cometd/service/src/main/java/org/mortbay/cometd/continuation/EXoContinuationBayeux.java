@@ -21,7 +21,7 @@ import dojox.cometd.SecurityPolicy;
 import dojox.cometd.Client;
 import dojox.cometd.Message;
 
-import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.log.ExoLogger;
 import org.mortbay.cometd.ClientImpl;
 

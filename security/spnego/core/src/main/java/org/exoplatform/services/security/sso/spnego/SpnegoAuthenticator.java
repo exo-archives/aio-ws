@@ -19,7 +19,7 @@ package org.exoplatform.services.security.sso.spnego;
 
 import java.security.Principal;
 
-import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.security.jaas.UserPrincipal;
 import org.exoplatform.services.security.sso.SSOAuthenticator;

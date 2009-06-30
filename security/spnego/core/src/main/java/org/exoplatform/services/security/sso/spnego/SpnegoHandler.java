@@ -21,7 +21,7 @@ import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSManager;
 import org.ietf.jgss.Oid;
 
-import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.security.sso.spnego.message.AbstractMessagePart;
 import org.exoplatform.services.security.sso.spnego.message.ApplicationConstructedObject;

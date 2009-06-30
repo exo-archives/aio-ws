@@ -16,7 +16,7 @@
  */
 package org.exoplatform.ws.frameworks.cometd.transport;
 
-import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.log.ExoLogger;
 
 /**
