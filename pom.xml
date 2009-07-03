@@ -31,12 +31,12 @@
     <module>frameworks/cometd</module>
     <module>rest/core</module>
     <module>rest/ext</module>
-    <module>rest/ejb/connector2_1/modules/connector</module>
-    <module>rest/ejb/connector2_1/modules/client</module>
-    <module>rest/ejb/connector2_1</module>
-    <module>rest/ejb/connector3_0/modules/connector</module>
-    <module>rest/ejb/connector3_0/modules/client</module>
-    <module>rest/ejb/connector3_0</module>
+    <module>rest/ejb/connector2_1/connector</module>
+    <module>rest/ejb/connector2_1/client</module>
+    <module>rest/ejb/connector2_1/ear</module>
+    <module>rest/ejb/connector3_0/connector</module>
+    <module>rest/ejb/connector3_0/client</module>
+    <module>rest/ejb/connector3_0/ear</module>
     <module>soap/jsr181</module>
     <module>security/oauth/consumer</module>
     <module>security/oauth/provider/service</module>
