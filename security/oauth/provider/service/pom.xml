@@ -2,12 +2,12 @@
   <parent>
     <groupId>org.exoplatform.ws</groupId>
     <artifactId>config</artifactId>
-    <version>2.0.2</version>
+    <version>2.0.3-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.exoplatform.ws</groupId>
   <artifactId>exo.ws.security.oauth.provider.service</artifactId>
-  <version>2.0.2</version>
+  <version>2.0.3-SNAPSHOT</version>
   <name>eXo WS OAuth provider</name>
   <description>OAuth Provider service</description>
   <dependencies>
