@@ -36,7 +36,7 @@
 @set CLASSPATH=%CLASSPATH%%M2_REPO%\commons-httpclient\commons-httpclient\3.1\commons-httpclient-3.1.jar;
 @set CLASSPATH=%CLASSPATH%%M2_REPO%\commons-codec\commons-codec\1.2\commons-codec-1.2.jar;
 @set CLASSPATH=%CLASSPATH%%M2_REPO%\com\sun\xml\stream\sjsxp\1.0\sjsxp-1.0.jar;
-@set CLASSPATH=%CLASSPATH%.\target\exo.ws.application.soap.cxf.samples.client-2.0.2-SNAPSHOT.jar
+@set CLASSPATH=%CLASSPATH%.\target\exo.ws.application.soap.cxf.samples.client-2.0.2.jar
 java org.exoplatform.services.ws.soap.jsr181.TicketOrderService_TicketOrderServicePort_Client
 
 rem .\src\main\java\wsdl\TicketOrderService.wsdl
