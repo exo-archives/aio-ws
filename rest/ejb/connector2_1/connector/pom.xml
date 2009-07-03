@@ -10,6 +10,7 @@
   <version>2.0.2-SNAPSHOT</version>
   <name>eXo WS EJB-REST connector ejb2.1 Bean</name>
   <description />
+  <packaging>ejb</packaging>
   
   <dependencies>
     <dependency>
