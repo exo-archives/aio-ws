@@ -25,12 +25,6 @@
     </dependency>
     <dependency>
       <groupId>org.exoplatform.ws</groupId>
-      <artifactId>exo.ws.commons</artifactId>
-      <version>2.0.2-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.ws</groupId>
       <artifactId>exo.ws.frameworks.json</artifactId>
       <version>2.0.2-SNAPSHOT</version>
       <scope>compile</scope>
@@ -68,7 +62,7 @@
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
+      <artifactId>slf4j-log4j12</artifactId>
       <version>1.5.6</version>
       <scope>test</scope>
     </dependency>

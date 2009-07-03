@@ -35,6 +35,7 @@
         <exclude>xerces:xmlParserAPIs</exclude>
         <exclude>xerces:xercesImpl</exclude>
         <exclude>javax.portlet:portlet-api</exclude>
+        <exclude>org.slf4j:slf4j-simple</exclude>
       </excludes>
 
     </dependencySet>
