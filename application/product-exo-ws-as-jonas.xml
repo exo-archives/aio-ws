@@ -87,10 +87,10 @@
 	    </copy>
 	    
             <copy todir="${exo.projects.directory.working}/exo-jonas/apps/" verbose="true" overwrite="true">
-              <fileset dir="${basedir}/../rest/ejb/connector2_1/target">
+              <fileset dir="${basedir}/../rest/ejb/connector2_1/ear/target">
 		<include name="**/rest-ejb-connector-2_1.ear" />
 	      </fileset>
-              <fileset dir="${basedir}/../rest/ejb/connector2_1">
+              <fileset dir="${basedir}/../rest/ejb/connector2_1/ear">
 		<include name="**/run.sh" />
 		<include name="**/run.bat" />
 	      </fileset>
