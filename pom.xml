@@ -7,7 +7,7 @@
   </parent>
 
   <groupId>org.exoplatform.ws</groupId>
-  <artifactId>config</artifactId>
+  <artifactId>ws-parent</artifactId>
   <name>eXo WebServices Config</name>
   <version>1.3.4-SNAPSHOT</version>
   <packaging>pom</packaging>
