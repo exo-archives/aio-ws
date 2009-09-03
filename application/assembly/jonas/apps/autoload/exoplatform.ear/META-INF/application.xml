@@ -4,13 +4,13 @@
   <display-name>exoplatform</display-name>
   <module>
     <web>
-      <web-uri>exo.ws.application.webapps-1.3.2.war</web-uri>
+      <web-uri>exo.ws.application.webapps-1.3.5-SNAPSHOT.war</web-uri>
       <context-root>ws-examples</context-root>
     </web>
   </module>
   <module>
     <web>
-      <web-uri>exo.ws.security.oauth.provider.webapp-1.3.2.war</web-uri>
+      <web-uri>exo.ws.security.oauth.provider.webapp-1.3.5-SNAPSHOT.war</web-uri>
       <context-root>oauthprovider</context-root>
     </web>
   </module>

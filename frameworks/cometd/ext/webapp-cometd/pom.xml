@@ -2,11 +2,11 @@
   <parent>
     <groupId>org.exoplatform.ws</groupId>
     <artifactId>ws-parent</artifactId>
-    <version>1.3.4-SNAPSHOT</version>
+    <version>1.3.5-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>exo.ws.frameworks.cometd.ext.webapp.cometd</artifactId>
-  <version>1.3.4-SNAPSHOT</version>
+  <version>1.3.5-SNAPSHOT</version>
   <name>Cometd External WebApp (use for test only)</name>
   <packaging>war</packaging>
   <description></description>
