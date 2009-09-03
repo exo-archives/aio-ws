@@ -2,24 +2,24 @@
   <parent>
     <groupId>org.exoplatform.ws</groupId>
     <artifactId>ws-parent</artifactId>
-    <version>1.3.4-SNAPSHOT</version>
+    <version>1.3.4</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.exoplatform.ws</groupId>
   <artifactId>exo.ws.frameworks.cometd.ext</artifactId>
-  <version>1.3.4-SNAPSHOT</version>
+  <version>1.3.4</version>
   <name>Cometd External (use for test only)</name>
   <description>for test only</description>
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.ws</groupId>
       <artifactId>exo.ws.rest.core</artifactId>
-      <version>1.3.4-SNAPSHOT</version>
+      <version>1.3.4</version>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.ws</groupId>
       <artifactId>exo.ws.commons</artifactId>
-      <version>1.3.4-SNAPSHOT</version>
+      <version>1.3.4</version>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
@@ -34,12 +34,12 @@
     <dependency>
       <groupId>org.exoplatform.ws</groupId>
       <artifactId>exo.ws.frameworks.cometd.service</artifactId>
-      <version>1.3.4-SNAPSHOT</version>
+      <version>1.3.4</version>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.ws</groupId>
       <artifactId>exo.ws.frameworks.json</artifactId>
-      <version>1.3.4-SNAPSHOT</version>
+      <version>1.3.4</version>
     </dependency>
   </dependencies>
 </project>
