@@ -6,10 +6,10 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>exo.ws.security.oauth.provider.webapp</artifactId>
-  <version>1.3.5-SNAPSHOT</version>
   <packaging>war</packaging>
-  <name>OAuth provider webapp</name>
+  <name>eXo WS OAuth provider webapp</name>
   <description>OAuth Provider web application</description>
+
   <dependencies>
     <dependency>
       <groupId>taglibs</groupId>

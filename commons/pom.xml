@@ -5,11 +5,9 @@
     <version>1.3.5-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.exoplatform.ws</groupId>
   <artifactId>exo.ws.commons</artifactId>
-  <version>1.3.5-SNAPSHOT</version>
-  <name>commons utils</name>
-  <description>commons utils</description>
+  <name>eXo WS Commons Utils</name>
+
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>

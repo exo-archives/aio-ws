@@ -6,8 +6,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>exo.ws.security.oauth.provider.service</artifactId>
-  <version>1.3.5-SNAPSHOT</version>
-  <name>OAuth provider</name>
+  <name>eXo WS OAuth provider</name>
   <description>OAuth Provider service</description>
   <dependencies>
     <dependency>

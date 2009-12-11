@@ -8,7 +8,7 @@
 
   <groupId>org.exoplatform.ws</groupId>
   <artifactId>ws-parent</artifactId>
-  <name>eXo WebServices Config</name>
+  <name>eXo WS Config</name>
   <version>1.3.5-SNAPSHOT</version>
   <packaging>pom</packaging>
   
@@ -116,17 +116,6 @@
       </testResource>
     </testResources>
 
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/*Test.java</include>
-          </includes>
-        </configuration>
-      </plugin>
-    </plugins>
   </build>
 
   </project>

@@ -6,11 +6,10 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>exo.ws.frameworks.cometd.ext.webapp.rest</artifactId>
-  <version>1.3.5-SNAPSHOT</version>
   <packaging>war</packaging>
-  <name>Cometd External REST WebApp (use for test only)</name>
-  <url>http://www.exoplatform.org</url>
+  <name>eXo WS Cometd External REST WebApp (use for test only)</name>
   <description>ext REST web application for test</description>
+
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.ws</groupId>
@@ -19,6 +18,7 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
+
   <build>
     <finalName>rest</finalName>
     <plugins>

@@ -5,11 +5,10 @@
     <version>1.3.5-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.exoplatform.ws</groupId>
   <artifactId>exo.ws.frameworks.cometd.ext.config</artifactId>
-  <name>Cometd Ext (for test)</name>
-  <version>1.3.5-SNAPSHOT</version>
+  <name>eXo WS Cometd Ext (for test)</name>
   <packaging>pom</packaging>
+
   <modules>
     <module>service</module>
     <module>webapp-rest</module>

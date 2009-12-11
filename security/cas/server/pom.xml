@@ -6,7 +6,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>exo.ws.security.cas.server</artifactId>
-  <name>cas authentication handler</name>
+  <name>eXo WS cas authentication handler</name>
 
   <dependencies>
     <dependency>

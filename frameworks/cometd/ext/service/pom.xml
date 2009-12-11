@@ -5,11 +5,9 @@
     <version>1.3.5-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.exoplatform.ws</groupId>
   <artifactId>exo.ws.frameworks.cometd.ext</artifactId>
-  <version>1.3.5-SNAPSHOT</version>
-  <name>Cometd External (use for test only)</name>
-  <description>for test only</description>
+  <name>eXo WS Cometd External (use for test only)</name>
+
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.ws</groupId>
