@@ -10,6 +10,11 @@
   <version>1.3.5-SNAPSHOT</version>
   <name>eXo WS SOAP CXF JSR181 impl</name>
   <description />
+
+  <properties>
+    <cxf.version>2.1.2</cxf.version>
+  </properties>
+
   <dependencies>
 
     <!-- EXO dependencies -->
@@ -83,10 +88,6 @@
     </dependency>
   </dependencies>
 
-  <properties>
-    <cxf.version>2.1.2</cxf.version>
-  </properties>
-
   <build>
 
     <plugins>
@@ -94,21 +95,10 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <skip>${exo.test.skip}</skip>
-          <useFile>${exo.test.use.file}</useFile>
-          <forkMode>once</forkMode><!-- once , pertest -->
-          <testFailureIgnore>${exo.test.failure.ignore}</testFailureIgnore>
-          <classesDirectory>${exo.test.classesdirectory}</classesDirectory>
           <includes>
             <!--            <include>**/WebServiceLoaderTest.java</include>            -->
             <include>**/TicketOrderServiceTest.java</include>
           </includes>
-          <systemProperties>
-            <property>
-              <name>emma.coverage.out.file</name>
-              <value>target/emma/coverage.ec</value>
-            </property>
-          </systemProperties>
         </configuration>
       </plugin>
     </plugins>
