@@ -15,8 +15,9 @@
   <properties>
      <exo.product.name>exo-ws</exo.product.name>
      <exo.product.specification>1.3.3</exo.product.specification>
-     <org.exoplatform.kernel.version>2.0.8</org.exoplatform.kernel.version>
-     <org.exoplatform.core.version>2.1.6</org.exoplatform.core.version>
+     
+     <org.exoplatform.kernel.version>2.0.9-SNAPSHOT</org.exoplatform.kernel.version>
+     <org.exoplatform.core.version>2.1.7-SNAPSHOT</org.exoplatform.core.version>
      
      <!-- surefire failing test do not break the build (to allow the release) -->
      <maven.test.failure.ignore>true</maven.test.failure.ignore>
