@@ -18,11 +18,6 @@
      
      <org.exoplatform.kernel.version>2.0.10-SNAPSHOT</org.exoplatform.kernel.version>
      <org.exoplatform.core.version>2.1.8-SNAPSHOT</org.exoplatform.core.version>
-     
-     <!-- A BIG CLEANUP MUST BE DONE IN TESTS -->
-     <maven.test.skip>true</maven.test.skip>
-     <!-- surefire failing test do not break the build (to allow the release) -->
-     <maven.test.failure.ignore>true</maven.test.failure.ignore>
   </properties>
   
   <scm>
