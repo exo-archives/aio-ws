@@ -19,6 +19,7 @@ package org.exoplatform.services.rest.servlet;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.SocketException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -87,12 +88,14 @@ public class RestServlet extends HttpServlet implements Connector {
       response.writeEntity(out);
       out.flush();
       out.close();
+    } catch (SocketException se) {
+      if (LOG.isDebugEnabled()) LOG.debug("Write socket error!", se);
     } catch (Exception e) {
-      LOG.error("Dispatch method error!");
-      e.printStackTrace();
-      httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-          "This request can't be serve by service.\n Check request parameters and try again.");
-    }
+      LOG.error("Dispatch method error!", e);
+      httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
+        "This request can't be serve by service.\n Check request parameters and try again.");
+      }
+
   }
 
   /**
