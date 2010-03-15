@@ -41,7 +41,9 @@ import org.exoplatform.services.rest.Response;
 
 /**
  * This servlet is front-end for the REST engine. Servlet get HTTP request then
- * produce REST request with helps by org.exoplatform.services.rest.servlet.RequestFactory. <br/>
+ * produce REST request with helps by
+ * org.exoplatform.services.rest.servlet.RequestFactory. <br/>
+ * 
  * @see org.exoplatform.services.rest.servlet.RequestFactory<br/>
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
@@ -56,57 +58,63 @@ public class RestServlet extends HttpServlet implements Connector {
   /**
    * Logger.
    */
-  private static final Log LOG = ExoLogger.getLogger("ws.rest.core.RestServlet");
+  private static final Log  LOG              = ExoLogger.getLogger("ws.rest.core.RestServlet");
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void service(HttpServletRequest httpRequest,
-      HttpServletResponse httpResponse) throws IOException, ServletException {
+  public void service(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException,
+                                                                                       ServletException {
     // Current container must be set by filter.
-    
+
     ExoContainer container = ExoContainerContext.getCurrentContainer();
-    if (LOG.isDebugEnabled()) { 
+    if (LOG.isDebugEnabled()) {
       LOG.debug("Current Container: " + container);
     }
-    
-    ResourceDispatcher dispatcher = (ResourceDispatcher) container
-        .getComponentInstanceOfType(ResourceDispatcher.class);
-    if (LOG.isDebugEnabled()) { 
+
+    ResourceDispatcher dispatcher = (ResourceDispatcher) container.getComponentInstanceOfType(ResourceDispatcher.class);
+    if (LOG.isDebugEnabled()) {
       LOG.debug("ResourceDispatcher: " + dispatcher);
     }
     if (dispatcher == null) {
       throw new ServletException("ResourceDispatcher is null.");
     }
     try {
-      Response response = dispatcher.dispatch(RequestFactory
-          .createRequest(httpRequest));
+      Response response = dispatcher.dispatch(RequestFactory.createRequest(httpRequest));
       httpResponse.setStatus(response.getStatus());
       tuneResponse(httpResponse, response.getResponseHeaders(), response.getCookies());
       OutputStream out = httpResponse.getOutputStream();
       response.writeEntity(out);
       out.flush();
       out.close();
-    } catch (SocketException se) {
-      if (LOG.isDebugEnabled()) LOG.debug("Write socket error!", se);
+    } catch (IOException se) {
+      if (se.getCause()
+            .getClass()
+            .getName()
+            .equals("org.apache.catalina.connector.ClientAbortException"))
+        LOG.debug("Write socket error!", se);
+      else
+        LOG.error("IO error!", se);
+
     } catch (Exception e) {
       LOG.error("Dispatch method error!", e);
-      httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
-        "This request can't be serve by service.\n Check request parameters and try again.");
-      }
+      httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                             "This request can't be serve by service.\n Check request parameters and try again.");
+    }
 
   }
 
   /**
    * Tune HTTP response.
+   * 
    * @param httpResponse HTTP response.
    * @param responseHeaders HTTP response headers.
    * @param cookies HTTP cookies.
    */
   private void tuneResponse(HttpServletResponse httpResponse,
-      MultivaluedMetadata responseHeaders,
-      List<org.exoplatform.services.rest.Cookie> cookies) {
+                            MultivaluedMetadata responseHeaders,
+                            List<org.exoplatform.services.rest.Cookie> cookies) {
     if (responseHeaders != null) {
       HashMap<String, String> headers = responseHeaders.getAll();
       Set<String> keys = headers.keySet();
