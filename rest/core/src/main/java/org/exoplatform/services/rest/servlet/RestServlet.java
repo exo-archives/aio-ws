@@ -19,11 +19,10 @@ package org.exoplatform.services.rest.servlet;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.SocketException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.HashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -88,14 +87,13 @@ public class RestServlet extends HttpServlet implements Connector {
       response.writeEntity(out);
       out.flush();
       out.close();
-    } catch (IOException se) {
-      if (se.getCause()
-            .getClass()
+    } catch (IOException ioe) {
+      if (ioe.getClass()
             .getName()
             .equals("org.apache.catalina.connector.ClientAbortException"))
-        LOG.debug("Write socket error!", se);
+        LOG.debug("Write socket error!", ioe);
       else
-        LOG.error("IO error!", se);
+        LOG.error("IO error!", ioe);
 
     } catch (Exception e) {
       LOG.error("Dispatch method error!", e);
