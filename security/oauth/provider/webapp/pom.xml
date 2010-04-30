@@ -28,18 +28,6 @@
   <packaging>war</packaging>
   <name>eXo WS OAuth provider webapp</name>
   <description>OAuth Provider web application</description>
-  <dependencies>
-    <dependency>
-      <groupId>taglibs</groupId>
-      <artifactId>standard</artifactId>
-      <version>1.1.2</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>jstl</artifactId>
-      <version>1.1.2</version>
-    </dependency>
-  </dependencies>
   <build>
     <plugins>
       <plugin>
