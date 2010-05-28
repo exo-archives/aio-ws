@@ -114,21 +114,11 @@
     <module>rest/ejb/connector3_0</module>
     <module>frameworks/json</module>
     <module>frameworks/servlet</module>
+    <module>frameworks/cometd</module>
     <module>soap/jsr181</module>
-    <module>frameworks/cometd/service</module>
-    <module>frameworks/cometd/webapp</module>
-    <module>security/oauth/consumer</module>
-    <module>security/oauth/provider/service</module>
-    <module>security/oauth/provider/webapp</module>
-    <module>security/cas/server</module>
-    <module>security/cas/client</module>
-    <module>security/spnego/core</module>
-    <module>security/spnego/tomcat</module>
-    <module>application/config</module>
-    <module>application/java/web/samples</module>
-    <module>application/java/services/samples/rest/ejb/simple-service</module>
-    <module>application/java/services/samples/rest/services</module>
-    <module>application/java/services/samples/soap/jsr181</module>
+    <module>security</module>
+    <module>application/config</module>  
+    <module>application/java</module>
     <module>packaging</module>
   </modules>
 </project>

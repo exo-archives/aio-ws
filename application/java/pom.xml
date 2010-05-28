@@ -17,14 +17,20 @@
     along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project>
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.exoplatform.ws</groupId>
     <artifactId>ws-parent</artifactId>
     <version>1.3.8-SNAPSHOT</version>
   </parent>
-  <artifactId>exo.ws.frameworks.cometd.ext.webapp.cometd</artifactId>
-  <packaging>war</packaging>
-  <name>eXo WS Cometd External WebApp (use for test only)</name>
+  <artifactId>exo.ws.application.java.config</artifactId>
+  <packaging>pom</packaging>
+  <name>eXo WS Java Applications Reactor</name>
+  <modules>
+    <module>services/organization</module>    
+    <module>web/samples</module>    
+    <module>services/samples</module>    
+  </modules>
 </project>
+
