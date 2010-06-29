@@ -62,23 +62,23 @@ public class TicketOrderServiceTest extends BaseTest {
   /**
    * Address for Singleton.
    */
-  private final static String SERVICE_ADDRESS_SINGLETON     = "http://localhost:8080/"
+  private final static String SERVICE_ADDRESS_SINGLETON     = "http://localhost:8899/"
                                                                 + SERVICE_NAME_SINGLETON;
 
   /**
    * Address for Multiinstance.
    */
-  private final static String SERVICE_ADDRESS_MULTIINSTANCE = "http://localhost:8080/"
+  private final static String SERVICE_ADDRESS_MULTIINSTANCE = "http://localhost:8899/"
                                                                 + SERVICE_NAME_MULTIINSTANCE;
 
   /**
    * Address for Custom.
    */
-  private final static String SERVICE_ADDRESS_CUSTOM        = "http://localhost:8080/"
+  private final static String SERVICE_ADDRESS_CUSTOM        = "http://localhost:8899/"
                                                                 + SERVICE_NAME_CUSTOM;
 
 //private final static String address = "local://TicketOrderService";
-//private final static String address = "http://localhost:8080/ws-examples/soap/TicketOrderService";
+//private final static String address = "http://localhost:8899/ws-examples/soap/TicketOrderService";
 
   @Override
   public void setUp() throws Exception {
