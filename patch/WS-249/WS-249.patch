@@ -1,0 +1,259 @@
+Index: commons/src/test/java/org/exoplatform/common/util/MediaTypeHelperTest.java
+===================================================================
+--- commons/src/test/java/org/exoplatform/common/util/MediaTypeHelperTest.java	(revision 0)
++++ commons/src/test/java/org/exoplatform/common/util/MediaTypeHelperTest.java	(revision 48893)
+@@ -0,0 +1,57 @@
++/*
++ * Copyright (C) 2003-2010 eXo Platform SAS.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Affero General Public License
++ * as published by the Free Software Foundation; either version 3
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see<http://www.gnu.org/licenses/>.
++ */
++package org.exoplatform.common.util;
++
++import java.util.ArrayList;
++import java.util.Collections;
++import java.util.List;
++
++import junit.framework.TestCase;
++
++/**
++ * Created by The eXo Platform SAS
++ * Author : eXoPlatform
++ *          exo@exoplatform.com
++ * Jun 25, 2010  
++ */
++public class MediaTypeHelperTest extends TestCase {
++  
++  public void testMediaTypeComparator() throws Exception {
++    
++    List<MediaType> mediaTypes = new ArrayList<MediaType>();
++    
++    MediaType wildcard = new MediaType(MediaType.MEDIA_TYPE_WILDCARD, MediaType.MEDIA_TYPE_WILDCARD);
++    mediaTypes.add(wildcard);    
++    MediaType text = new MediaType("text", MediaType.MEDIA_TYPE_WILDCARD);
++    mediaTypes.add(text);
++    MediaType text_xml = new MediaType("text", "xml");
++    mediaTypes.add(text_xml);
++    
++    Collections.shuffle(mediaTypes);
++    Collections.sort(mediaTypes, MediaTypeHelper.MEDIA_TYPE_COMPARATOR);
++    
++    // Must be:
++    // 0: "text/xml"
++    // 1: "text/*"
++    // 2: */*"
++    assertEquals(mediaTypes.get(0), text_xml);
++    assertEquals(mediaTypes.get(1), text);
++    assertEquals(mediaTypes.get(2), wildcard);
++    
++  }
++
++}
+
+Property changes on: commons/src/test/java/org/exoplatform/common/util/MediaTypeHelperTest.java
+___________________________________________________________________
+Added: svn:mime-type
+   + text/plain
+
+Index: commons/src/main/java/org/exoplatform/common/util/MediaType.java
+===================================================================
+--- commons/src/main/java/org/exoplatform/common/util/MediaType.java	(revision 0)
++++ commons/src/main/java/org/exoplatform/common/util/MediaType.java	(revision 48893)
+@@ -0,0 +1,101 @@
++/*
++ * Copyright (C) 2003-2010 eXo Platform SAS.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Affero General Public License
++ * as published by the Free Software Foundation; either version 3
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see<http://www.gnu.org/licenses/>.
++ */
++package org.exoplatform.common.util;
++
++/**
++ * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com Jun
++ * 25, 2010
++ */
++public class MediaType {
++
++  /**
++   * Main type f.e. 'text' in 'text/xml'. 
++   */
++  private String             type;
++
++  /**
++   * Main type f.e. 'xml' in 'text/xml'. 
++   */
++  private String             subtype;
++
++  /**
++   * Wildcard type. 
++   */
++  public static final String MEDIA_TYPE_WILDCARD = "*";
++  
++  public static final String WILDCARD = "*/*";
++
++  public String getType() {
++    return type;
++  }
++
++  public void setType(String type) {
++    this.type = type;
++  }
++
++  public String getSubtype() {
++    return subtype;
++  }
++
++  public void setSubtype(String subtype) {
++    this.subtype = subtype;
++  }
++  
++  /**
++   * Creates an instance of specified mediatype.
++   * @param mediaType mediatype, f.e.: text/plain
++   */
++  public MediaType(String mediaType) {
++    this.type = mediaType.split("/")[0];
++    this.subtype = mediaType.split("/")[1];
++  }
++
++  /**
++   * Creates an instance of mediatype with specified type and subtype.
++   * @param type main type f.e. 'text' in 'text/xml'. 
++   * @param subtype subtype f.e. 'xmk' in 'text/xml'.
++   */
++  public MediaType(String type, String subtype) {
++    this.type = type == null ? MEDIA_TYPE_WILDCARD : type;
++    this.subtype = subtype == null ? MEDIA_TYPE_WILDCARD : subtype;
++  }
++  
++  /**
++   * Check if this media type is compatible with another media type. E.g.
++   * image/* is compatible with image/jpeg, image/png, etc. Media type
++   * parameters are ignored. The function is commutative.
++   * @return true if the types are compatible, false otherwise.
++   * @param other the media type to compare with
++   */
++  public boolean isCompatible(MediaType other) {
++    if (other == null){
++        return false;}
++    if (type.equals(MEDIA_TYPE_WILDCARD) || other.type.equals(MEDIA_TYPE_WILDCARD)){
++        return true;}
++    else if (type.equalsIgnoreCase(other.type) && (subtype.equals(MEDIA_TYPE_WILDCARD) || other.subtype.equals(MEDIA_TYPE_WILDCARD))){
++        return true;}
++    else{
++        return this.type.equalsIgnoreCase(other.type)
++            && this.subtype.equalsIgnoreCase(other.subtype);}
++}
++  
++  @Override
++  public String toString() {
++    return type + "/" + subtype;
++  }
++
++}
+
+Property changes on: commons/src/main/java/org/exoplatform/common/util/MediaType.java
+___________________________________________________________________
+Added: svn:mime-type
+   + text/plain
+
+Index: commons/src/main/java/org/exoplatform/common/util/MediaTypeHelper.java
+===================================================================
+--- commons/src/main/java/org/exoplatform/common/util/MediaTypeHelper.java	(revision 0)
++++ commons/src/main/java/org/exoplatform/common/util/MediaTypeHelper.java	(revision 48893)
+@@ -0,0 +1,68 @@
++/*
++ * Copyright (C) 2003-2010 eXo Platform SAS.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Affero General Public License
++ * as published by the Free Software Foundation; either version 3
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see<http://www.gnu.org/licenses/>.
++ */
++package org.exoplatform.common.util;
++
++import java.util.Comparator;
++
++/**
++ * Created by The eXo Platform SAS
++ * Author : eXoPlatform
++ *          exo@exoplatform.com
++ * Jun 25, 2010  
++ */
++public class MediaTypeHelper {
++  
++  /**
++   * Compare two mimetypes. The main rule for sorting media types is :
++   * <p>
++   * <li>type / subtype</li>
++   * <li>type / *</li>
++   * <li>* / *</li>
++   * <p>
++   */
++  public static final Comparator<MediaType> MEDIA_TYPE_COMPARATOR = new Comparator<MediaType>()
++  {
++
++    public int compare(MediaType o1, MediaType o2)
++      {
++        if (o1.getType().equals(MediaType.MEDIA_TYPE_WILDCARD) && !o2.getType().equals(MediaType.MEDIA_TYPE_WILDCARD))
++        {
++          return 1;
++        }
++
++        if (!o1.getType().equals(MediaType.MEDIA_TYPE_WILDCARD) && o2.getType().equals(MediaType.MEDIA_TYPE_WILDCARD))
++        {
++          return -1;
++        }
++
++        if (o1.getSubtype().equals(MediaType.MEDIA_TYPE_WILDCARD)
++           && !o2.getSubtype().equals(MediaType.MEDIA_TYPE_WILDCARD))
++        {
++          return 1;
++        }
++
++        if (!o1.getSubtype().equals(MediaType.MEDIA_TYPE_WILDCARD)
++           && o2.getSubtype().equals(MediaType.MEDIA_TYPE_WILDCARD))
++        {
++          return -1;
++        }
++        return 0;
++     }
++
++  };
++
++}
+
+Property changes on: commons/src/main/java/org/exoplatform/common/util/MediaTypeHelper.java
+___________________________________________________________________
+Added: svn:mime-type
+   + text/plain
+
