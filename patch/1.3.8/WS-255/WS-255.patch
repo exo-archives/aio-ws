@@ -1,0 +1,32 @@
+Index: security/spnego/core/src/main/java/org/exoplatform/services/security/sso/http/SSOAuthenticationFilter.java
+===================================================================
+--- security/spnego/core/src/main/java/org/exoplatform/services/security/sso/http/SSOAuthenticationFilter.java	(revision 52190)
++++ security/spnego/core/src/main/java/org/exoplatform/services/security/sso/http/SSOAuthenticationFilter.java	(working copy)
+@@ -55,11 +55,6 @@
+   private static final Log LOG = ExoLogger.getLogger("ws.security.SSOAuthenticationFilter");
+ 
+   /**
+-   * URL for alternative authentication. If user can't authenticate by this filter.
+-   */
+-  private static String redirectOnError;
+-
+-  /**
+    * {@inheritDoc}
+    */
+   public void destroy() {
+@@ -89,7 +84,6 @@
+    * {@inheritDoc}
+    */
+   public void init(FilterConfig filterConfig) throws ServletException {
+-    redirectOnError = Config.getInstance().getRedirectOnError();
+   }
+ 
+   /**
+@@ -228,6 +222,7 @@
+    * @throws IOException if i/o error occurs.
+    */
+   private static void doFailed(HttpServletResponse httpResponse, Exception e) throws IOException {
++    String redirectOnError = Config.getInstance().getRedirectOnError();
+     if (redirectOnError == null) {
+       // If alternative authentication is not supported show errors.
+       e.printStackTrace();
