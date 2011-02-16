@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.exoplatform.ws</groupId>
     <artifactId>ws-parent</artifactId>
-    <version>1.3.10</version>
+    <version>1.3.11-SNAPSHOT</version>
   </parent>
   <artifactId>exo.rest.organization</artifactId>
   <name>eXo WS Application Organization</name>
@@ -30,7 +30,7 @@
     <dependency>
       <groupId>org.exoplatform.ws</groupId>
       <artifactId>exo.ws.rest.core</artifactId>
-      <version>1.3.10</version>
+      <version>1.3.11-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
@@ -60,7 +60,7 @@
     <dependency>
       <groupId>org.exoplatform.ws</groupId>
       <artifactId>exo.ws.frameworks.json</artifactId>
-      <version>1.3.10</version>
+      <version>1.3.11-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>javax.xml.bind</groupId>
