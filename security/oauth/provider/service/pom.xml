@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.exoplatform.ws</groupId>
     <artifactId>ws-parent</artifactId>
-    <version>1.3.10-SNAPSHOT</version>
+    <version>1.3.10</version>
   </parent>
   <artifactId>exo.ws.security.oauth.provider.service</artifactId>
   <name>eXo WS OAuth provider</name>

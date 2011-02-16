@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.exoplatform.ws</groupId>
     <artifactId>exo.ws.packaging</artifactId>
-    <version>1.3.10-SNAPSHOT</version>
+    <version>1.3.10</version>
   </parent>
   <artifactId>ws.packaging.module</artifactId>
   <packaging>pom</packaging>
