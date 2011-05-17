@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.exoplatform.ws</groupId>
     <artifactId>ws-parent</artifactId>
-    <version>1.3.11-SNAPSHOT</version>
+    <version>1.3.11</version>
   </parent>
   <artifactId>exo.ws.frameworks.cometd.ext.config</artifactId>
   <packaging>pom</packaging>
