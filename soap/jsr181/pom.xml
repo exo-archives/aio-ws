@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.exoplatform.ws</groupId>
     <artifactId>ws-parent</artifactId>
-    <version>1.3.13-SNAPSHOT</version>
+    <version>1.3.13</version>
   </parent>
   <artifactId>exo.ws.soap.cxf.jsr181</artifactId>
   <name>eXo WS SOAP CXF JSR181 impl</name>
