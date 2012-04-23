@@ -30,8 +30,8 @@
   <packaging>pom</packaging>
   <name>eXo WS Parent</name>
   <scm>
-    <connection>scm:git:ssh://github.com/exodev/aio-ws.git</connection>
-    <developerConnection>scm:git:ssh://github.com/exodev/aio-ws.git<developerConnection>
+    <connection>scm:git:git://github.com/exoplatform/aio-ws.git</connection>
+    <developerConnection>scm:git:git@github.com/exoplatform/aio-ws.git<developerConnection>
     <url>http://fisheye.exoplatform.org/browse/projects/ws</url>
   </scm>
   <ciManagement>
